@@ -1,0 +1,767 @@
+
+
+FreeLanceNow
+
+Especificação de Casos de Uso
+
+Versão 1.2
+
+Histórico de Revisão
+
+Data
+Versão
+Descrição
+Autor
+07/04/2026
+1.0
+Versão inicial do documento
+Equipe Freelance
+25/04/2026
+1.1
+Atualização dos casos de uso UC4 e UC5
+Equipe Freelancer
+11/05/2026
+1.2
+Criação do caso de uso UC6 e atualização do diagrama de casos de uso do sistema
+Equipe Freelancer
+
+FreeLanceNow
+Especificação de Caso de Uso: UC01 - Cadastro e Autenticação de Usuários
+Versão 1.0
+
+1. Descrição
+Este caso de uso descreve o processo de cadastro e autenticação de usuários na plataforma FreeLanceNow. Permite que novos usuários se registrem como cliente ou freelancer, preencham suas informações básicas de perfil e realizem login seguro para acessar as funcionalidades da plataforma.
+
+2. Pré-condições
+O usuário deve ter acesso à internet.
+O usuário deve acessar a página inicial da plataforma FreeLanceNow (web ou mobile).
+Para login: o usuário já deve estar cadastrado na plataforma.
+
+3. Fluxo de Eventos
+3.1 Fluxo Básico - Cadastro
+O usuário acessa a plataforma FreeLanceNow e clica em "Cadastrar".
+O sistema exibe o formulário de cadastro com os campos: nome completo, e-mail, senha, tipo de conta (cliente ou freelancer) e telefone.
+O usuário preenche todos os campos obrigatórios e seleciona o tipo de conta.
+O usuário clica em "Criar Conta".
+O sistema valida os dados informados (ver RN01 e RN02).
+O sistema cria a conta e exibe mensagem de sucesso.
+O sistema redireciona o usuário para a tela de perfil para completar as informações.
+
+3.2 Subfluxos
+(S01) - Login de Usuário Existente
+O usuário acessa a plataforma e clica em "Entrar".
+O sistema exibe a tela de login com campos de e-mail e senha.
+O usuário informa seu e-mail e senha cadastrados.
+O usuário clica em "Entrar".
+O sistema valida as credenciais.
+O sistema autentica o usuário e redireciona para a página principal (dashboard).
+
+(S02) - Completar Perfil após Cadastro
+O sistema exibe formulário de complemento de perfil.
+Para freelancer: o usuário informa categorias de serviço, descrição profissional e foto.
+Para cliente: o usuário informa localização e tipo de serviços que costuma contratar.
+O usuário salva as informações. O sistema confirma e ativa a conta.
+
+3.3 Fluxos Alternativos
+(A01) - Recuperação de Senha
+Pré-condições:
+O usuário não lembra sua senha e está na tela de login.
+Passos:
+O usuário clica em "Esqueci minha senha".
+O sistema solicita o e-mail cadastrado.
+O sistema envia um link de redefinição para o e-mail informado.
+O usuário acessa o link, informa nova senha e confirma.
+O sistema atualiza a senha e redireciona para o login.
+
+3.4 Exceções
+(E01) - E-mail já cadastrado
+Pré-condições:
+No passo 5 do Fluxo Básico, o e-mail informado já existe na base de dados.
+Passos:
+O sistema exibe a mensagem: "Este e-mail já está cadastrado. Deseja fazer login?".
+O usuário escolhe entre fazer login ou redefinir senha.
+
+(E02) - Credenciais inválidas no login
+Pré-condições:
+No passo 5 do Subfluxo S01, e-mail ou senha não conferem com os registros.
+Passos:
+O sistema exibe: "E-mail ou senha incorretos. Verifique e tente novamente.".
+O usuário pode tentar novamente ou usar a recuperação de senha.
+
+4. Pós-condições
+O usuário está cadastrado e autenticado na plataforma.
+Um perfil (cliente ou freelancer) foi criado com as informações básicas.
+O usuário tem acesso às funcionalidades da plataforma de acordo com seu tipo de conta.
+
+5. Requisitos Especiais
+(RE01) - Segurança de Dados
+A senha do usuário deve ser armazenada com hash criptográfico (ex.: bcrypt). A autenticação deve suportar 2FA opcional, conforme os Requisitos Não-Funcionais do projeto.
+
+(RE02) - Conformidade com LGPD
+O cadastro deve incluir aceite explícito dos Termos de Uso e Política de Privacidade. O sistema deve informar a finalidade do uso dos dados coletados.
+
+6. Regras de Negócio Específicas
+(RN01) - Unicidade de E-mail
+Cada e-mail deve estar associado a apenas uma conta na plataforma.
+
+(RN02) - Requisitos de Senha
+A senha deve ter no mínimo 8 caracteres, contendo letras e números.
+
+(RN03) - Tipo de Conta
+O usuário deve selecionar obrigatoriamente o tipo de conta (cliente ou freelancer) no momento do cadastro. Após criação, a troca de tipo exige validação adicional.
+
+7. Detalhamento das Interfaces com Usuários
+(I01) - Tela de Cadastro
+Campos
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Nome Completo
+Nome do usuário
+Texto
+Texto
+Obrigatório, até 100 caracteres
+2.
+E-mail
+Endereço de e-mail
+Formato válido
+Texto
+Obrigatório, único no sistema
+3.
+Senha
+Senha de acesso
+Min. 8 chars
+Senha
+Obrigatório, hash armazenado
+4.
+Tipo de Conta
+Cliente ou Freelancer
+Cliente / Freelancer
+Seleção
+Obrigatório
+5.
+Telefone
+Contato do usuário
+DDD + número
+Texto
+Obrigatório, formato BR
+
+Comandos
+Criar Conta: valida os dados e cria a conta do usuário.
+Cancelar: retorna para a tela inicial sem salvar.
+Já tenho conta: redireciona para a tela de login.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+Banco de dados PostgreSQL para armazenamento de contas. Serviço de envio de e-mail para confirmação de cadastro e recuperação de senha.
+
+8.2 Interfaces de Hardware
+Acesso via navegadores web desktop e dispositivos móveis iOS/Android.
+
+9. Observações
+O login social (Google, Facebook) pode ser implementado como melhoria futura (prioridade Útil). A autenticação de dois fatores (2FA) é opcional nesta versão.
+
+FreeLanceNow
+Especificação de Caso de Uso: UC02 - Cadastro de Serviços pelo Freelancer
+Versão 1.0
+
+1. Descrição
+Este caso de uso descreve como um freelancer cadastra, edita e gerencia os serviços oferecem na plataforma FreeLanceNow. O freelancer pode criar anúncios de serviços com descrição, categoria, preço e disponibilidade, tornando-os visíveis para os clientes na busca.
+
+2. Pré-condições
+O freelancer deve estar autenticado na plataforma (UC01).
+O usuário deve ter conta do tipo "Freelancer".
+
+3. Fluxo de Eventos
+3.1 Fluxo Básico - Cadastrar Novo Serviço
+O freelancer acessa o painel e clica em "Meus Serviços" &gt; "Adicionar Serviço".
+O sistema exibe o formulário de cadastro de serviço.
+O freelancer preenche: título do serviço, categoria, descrição detalhada, valor estimado e prazo de entrega.
+O freelancer clica em "Publicar Serviço".
+O sistema valida os dados (ver RN01, RN02).
+O sistema publica o serviço e o torna visível nas buscas da plataforma.
+O sistema exibe mensagem de confirmação e redireciona para a lista de serviços do freelancer.
+
+3.2 Subfluxos
+(S01) - Editar Serviço Existente
+O freelancer acessa "Meus Serviços" e seleciona um serviço cadastrado.
+O sistema exibe os dados atuais do serviço em modo de edição.
+O freelancer altera os campos desejados.
+O freelancer clica em "Salvar Alterações". O sistema atualiza o serviço.
+
+(S02) - Desativar/Reativar Serviço
+O freelancer acessa "Meus Serviços" e seleciona a opção "Desativar" em um serviço ativo.
+O sistema solicita confirmação. O freelancer confirma.
+O sistema oculta o serviço das buscas sem excluí-lo. O freelancer pode reativá-lo a qualquer momento.
+
+3.3 Fluxos Alternativos
+(A01) - Adicionar Fotos ao Serviço
+Pré-condições:
+O freelancer está preenchendo o formulário de cadastro ou edição de serviço.
+Passos:
+O freelancer clica em "Adicionar Fotos".
+O sistema exibe o seletor de imagens. O freelancer seleciona até 5 fotos.
+O sistema valida o formato (JPG, PNG) e tamanho (máx. 5MB cada) e as exibe como prévia.
+O freelancer confirma. As fotos são associadas ao serviço.
+
+3.4 Exceções
+(E01) - Campos Obrigatórios Não Preenchidos
+Pré-condições:
+No passo 5 do Fluxo Básico, algum campo obrigatório não foi preenchido.
+Passos:
+O sistema destaca os campos obrigatórios não preenchidos em vermelho.
+O sistema exibe a mensagem: "Preencha todos os campos obrigatórios para publicar.".
+O fluxo retorna ao passo 3 do Fluxo Básico.
+
+4. Pós-condições
+O serviço está cadastrado e visível nas buscas da plataforma para clientes.
+O serviço aparece listado no painel "Meus Serviços" do freelancer.
+
+5. Requisitos Especiais
+(RE01) - Moderação de Conteúdo
+Os serviços publicados devem respeitar os Termos de Uso da plataforma. Conteúdos inapropriados podem ser removidos pelo administrador (UC05).
+
+6. Regras de Negócio Específicas
+(RN01) - Limite de Serviços por Freelancer
+Um freelancer pode cadastrar até 20 serviços ativos simultaneamente nesta versão da plataforma.
+
+(RN02) - Obrigatoriedade de Categoria
+Todo serviço deve ser associado a pelo menos uma categoria previamente cadastrada pelo administrador (ex.: Elétrica, Limpeza, Pintura, TI).
+
+7. Detalhamento das Interfaces com Usuários
+(I01) - Formulário de Cadastro de Serviço
+Campos
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Título
+Nome do serviço oferecido
+Texto
+Texto
+Obrigatório, até 80 caracteres
+2.
+Categoria
+Área do serviço
+Lista pré-definida
+Seleção
+Obrigatório
+3.
+Descrição
+Detalhamento do serviço
+Texto livre
+Texto
+Obrigatório, até 500 caracteres
+4.
+Valor Estimado
+Faixa de preço do serviço
+Maior que zero
+Moeda (R$)
+Obrigatório
+5.
+Prazo de Entrega
+Tempo estimado para conclusão
+Inteiro positivo
+Inteiro (dias)
+Obrigatório
+
+Comandos
+Publicar Serviço: valida e publica o serviço na plataforma.
+Salvar Rascunho: salva o serviço sem publicá-lo.
+Cancelar: descarta as alterações e retorna ao painel.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+Banco de dados PostgreSQL para persistência dos serviços. Serviço de armazenamento de imagens para fotos dos serviços.
+
+8.2 Interfaces de Hardware
+Dispositivos com câmera para upload de fotos (opcional). Acesso via web e dispositivos móveis.
+
+9. Observações
+A funcionalidade de destaque pago de serviços (boost) pode ser implementada como melhoria futura, sujeita a análise de monetização da plataforma.
+
+FreeLanceNow
+Especificação de Caso de Uso: UC03 - Busca e Contratação de Serviços
+Versão 1.0
+
+1. Descrição
+Este caso de uso descreve o processo pelo qual um cliente busca profissionais na plataforma FreeLanceNow, visualiza perfis e serviços, e realiza a solicitação de contratação de um freelancer. O freelancer recebe a solicitação e confirma ou recusa o serviço.
+
+2. Pré-condições
+O cliente deve estar autenticado na plataforma (UC01).
+Deve existir ao menos um serviço publicado por um freelancer na categoria desejada.
+
+3. Fluxo de Eventos
+3.1 Fluxo Básico
+O cliente acessa a plataforma e utiliza a barra de busca ou navega pelas categorias de serviço.
+O sistema exibe os resultados filtrados por categoria, localização e avaliação.
+O cliente seleciona um serviço de interesse.
+O sistema exibe a página de detalhes do serviço com informações do freelancer, descrição, valor e avaliações.
+O cliente clica em "Solicitar Serviço".
+O sistema exibe um formulário de solicitação com campos de data desejada, descrição da demanda e endereço (se aplicável).
+O cliente preenche os dados e confirma a solicitação.
+O sistema notifica o freelancer sobre a nova solicitação.
+O freelancer acessa a plataforma, visualiza a solicitação e confirma ou recusa.
+O sistema notifica o cliente sobre a resposta do freelancer.
+
+3.2 Subfluxos
+(S01) - Aplicar Filtros na Busca
+O cliente acessa os filtros disponíveis: categoria, faixa de preço, avaliação mínima e localização.
+O sistema atualiza os resultados em tempo real conforme os filtros são aplicados.
+O cliente seleciona o serviço de interesse. O fluxo retorna ao passo 3 do Fluxo Básico.
+
+(S02) - Visualizar Perfil Completo do Freelancer
+Na página do serviço, o cliente clica no nome do freelancer.
+O sistema exibe o perfil completo com foto, bio, habilidades, histórico de serviços e todas as avaliações recebidas.
+O cliente retorna à página do serviço ou inicia a solicitação diretamente pelo perfil.
+
+3.3 Fluxos Alternativos
+(A01) - Nenhum Resultado Encontrado na Busca
+Pré-condições:
+O sistema não encontra serviços que correspondam aos termos ou filtros informados pelo cliente.
+Passos:
+O sistema exibe a mensagem: "Nenhum serviço encontrado para sua busca.".
+O sistema sugere categorias relacionadas ou a opção de ampliar os filtros.
+
+3.4 Exceções
+(E01) - Freelancer Recusa a Solicitação
+Pré-condições:
+No passo 9 do Fluxo Básico, o freelancer recusa a solicitação recebida.
+Passos:
+O freelancer informa o motivo da recusa (opcional) e confirma a recusa.
+O sistema notifica o cliente e sugere outros profissionais disponíveis na mesma categoria.
+
+4. Pós-condições
+A solicitação de serviço foi registrada e confirmada entre cliente e freelancer.
+Ambos os usuários recebem notificação com os detalhes do serviço acordado.
+O serviço aparece como "Em Andamento" no painel de ambos os usuários.
+
+5. Requisitos Especiais
+(RE01) - Desempenho de Busca
+A busca deve retornar resultados em menos de 3 segundos, conforme os Requisitos Não-Funcionais do produto.
+
+(RE02) - Notificações
+As notificações de solicitação e resposta devem ser entregues em tempo real via push notification (mobile) ou e-mail.
+
+6. Regras de Negócio Específicas
+(RN01) - Solicitação Única Ativa
+Um cliente não pode enviar mais de uma solicitação simultânea para o mesmo freelancer no mesmo serviço enquanto houver uma solicitação pendente.
+
+(RN02) - Prazo de Resposta do Freelancer
+O freelancer tem até 48 horas para aceitar ou recusar uma solicitação. Após esse prazo, a solicitação é automaticamente cancelada e o cliente é notificado.
+
+7. Detalhamento das Interfaces com Usuários
+(I01) - Formulário de Solicitação de Serviço
+Campos
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Data Desejada
+Data para realização do serviço
+Data futura
+Data
+Obrigatório, DD/MM/AAAA
+2.
+Descrição da Demanda
+Detalhes do que precisa ser feito
+Texto livre
+Texto
+Obrigatório, até 300 caracteres
+3.
+Endereço
+Local onde o serviço será prestado
+Texto
+Texto
+Opcional (para serviços presenciais)
+
+Comandos
+Confirmar Solicitação: envia a solicitação para o freelancer.
+Cancelar: descarta a solicitação e retorna à página do serviço.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+Banco de dados PostgreSQL para registro das solicitações. Serviço de notificação push e e-mail para comunicação entre cliente e freelancer.
+
+8.2 Interfaces de Hardware
+Dispositivos móveis para recebimento de notificações push. Navegadores web para acesso via desktop.
+
+9. Observações
+O sistema de pagamento integrado (escrow) é considerado uma funcionalidade futura de alta prioridade. Nesta versão, o pagamento é negociado diretamente entre as partes fora da plataforma.
+
+FreeLanceNow
+Especificação de Caso de Uso: UC04 - Avaliação de Serviços
+Versão 1.0
+
+1. Descrição
+Este caso de uso descreve o processo de avaliação de um serviço realizado na plataforma FreeLanceNow. Após a conclusão de um serviço, o cliente pode atribuir uma nota em estrelas e deixar um comentário sobre a experiência, contribuindo para a reputação do freelancer na plataforma.
+
+2. Pré-condições
+O cliente deve estar autenticado na plataforma (UC01).
+Deve existir uma contratação com status "Concluído" associada ao cliente.
+O cliente não deve ter avaliado previamente o mesmo serviço/contratação.
+
+3. Fluxo de Eventos
+
+3.1 Fluxo Básico
+O sistema notifica o cliente que o serviço foi marcado como concluído e solicita avaliação.
+O cliente acessa o painel e clica em "Avaliar Serviço" na contratação concluída.
+O sistema exibe o formulário de avaliação com campos de nota (1 a 5 estrelas) e comentário.
+O cliente seleciona a nota e escreve o comentário (opcional).
+O cliente clica em "Enviar Avaliação".
+O sistema registra a avaliação e atualiza a média de avaliações do freelancer.
+O sistema exibe mensagem de confirmação e publica a avaliação no perfil do freelancer.
+
+3.2 Subfluxos
+(S01) - Freelancer Responde à Avaliação
+O freelancer recebe notificação de nova avaliação.
+O freelancer acessa o perfil e clica em "Responder" na avaliação.
+O freelancer escreve sua resposta (máx. 200 caracteres) e confirma.
+O sistema publica a resposta abaixo da avaliação original.
+
+3.3 Fluxos Alternativos
+(A01) - Cliente Não Avalia no Prazo
+Pré-condições:
+O cliente não realiza a avaliação em até 7 dias após a conclusão do serviço.
+Passos:
+O sistema encerra o período de avaliação automaticamente.
+O serviço permanece como "Concluído" sem avaliação registrada.
+
+3.4 Exceções
+(E01) - Conteúdo Inapropriado na Avaliação
+Pré-condições:
+O comentário da avaliação contém linguagem ofensiva ou viola os Termos de Uso.
+Passos:
+O sistema bloqueia a publicação e exibe mensagem de alerta.
+O cliente pode revisar e reescrever o comentário.
+O freelancer pode reportar avaliações publicadas ao administrador.
+
+4. Pós-condições
+A avaliação foi registrada e está visível no perfil público do freelancer.
+A média de avaliações do freelancer foi atualizada automaticamente.
+
+5. Requisitos Especiais
+(RE01) - Autenticidade das Avaliações
+Somente clientes que efetivamente realizaram uma contratação concluída com o freelancer podem avaliar. Avaliações não podem ser editadas após publicação.
+
+6. Regras de Negócio Específicas
+(RN01) - Avaliação Única por Contratação
+Cada contratação concluída permite apenas uma avaliação por parte do cliente.
+
+(RN02) - Prazo para Avaliação
+O cliente tem até 7 dias corridos após a conclusão do serviço para registrar sua avaliação.
+
+(RN03) - Cálculo da Média
+A nota média do freelancer é calculada como a média aritmética de todas as avaliações recebidas e exibida com até uma casa decimal.
+
+7. Detalhamento das Interfaces com Usuários
+(I01) - Formulário de Avaliação
+Campos
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Nota
+Avaliação de 1 a 5 estrelas
+1 a 5
+Inteiro
+Obrigatório
+2.
+Comentário
+Relato da experiência com o serviço
+Texto livre
+Texto
+Opcional, até 500 caracteres
+
+Comandos
+Enviar Avaliação: publica a avaliação no perfil do freelancer.
+Cancelar: fecha o formulário sem registrar avaliação.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+Banco de dados PostgreSQL para armazenamento e cálculo das avaliações.
+
+8.2 Interfaces de Hardware
+Acesso via dispositivos móveis e navegadores web.
+
+9. Observações
+O sistema de denúncia de avaliações inadequadas requer implementação do painel administrativo (UC05). Avaliações reportadas ficam em análise até decisão do administrador.
+
+FreeLanceNow
+Especificação de Caso de Uso: UC05 - Painel Administrativo
+Versão 1.0
+
+1. Descrição
+Este caso de uso descreve as funcionalidades disponíveis para o administrador do sistema FreeLanceNow. O administrador pode gerenciar usuários, moderar serviços e avaliações, gerenciar categorias e monitorar as operações gerais da plataforma para garantir qualidade e conformidade com os Termos de Uso.
+
+2. Pré-condições
+O usuário deve estar autenticado com conta do tipo "Administrador".
+O acesso ao painel administrativo é restrito e não está disponível para clientes ou freelancers.
+
+3. Fluxo de Eventos
+3.1 Fluxo Básico - Gerenciar Usuários
+O administrador acessa o painel e seleciona "Gerenciamento de Usuários".
+O sistema exibe a lista de usuários com filtros por tipo (cliente/freelancer), status e data de cadastro.
+O administrador seleciona um usuário para visualizar seu perfil completo.
+O administrador pode realizar ações: Ativar, Suspender ou Excluir conta.
+O sistema solicita confirmação da ação. O administrador confirma.
+O sistema aplica a ação e notifica o usuário afetado por e-mail.
+
+3.2 Subfluxos
+(S01) - Gerenciar Categorias de Serviço
+O administrador acessa "Categorias" no painel.
+O sistema exibe a lista de categorias ativas.
+O administrador pode adicionar nova categoria, editar nome ou desativar uma categoria existente.
+O sistema atualiza o cadastro. Serviços vinculados a categorias desativadas permanecem, mas a categoria não aparece para novos cadastros.
+
+(S02) - Moderar Conteúdo Reportado
+O administrador acessa "Moderação" e visualiza a fila de conteúdos reportados (avaliações, serviços).
+Para cada item, o administrador pode: Manter (ignorar o reporte) ou Remover o conteúdo.
+O sistema aplica a decisão e notifica os envolvidos.
+
+3.3 Fluxos Alternativos
+(A01) - Visualizar Relatórios e Métricas
+Pré-condições:
+O administrador deseja visualizar indicadores de uso da plataforma.
+Passos:
+O administrador acessa "Relatórios" no painel.
+O sistema exibe métricas: total de usuários, serviços cadastrados, contratações realizadas e avaliações por período.
+O administrador pode exportar os dados em formato CSV.
+
+3.4 Exceções
+(E01) - Tentativa de Exclusão de Conta com Contratação Ativa
+Pré-condições:
+O administrador tenta excluir uma conta que possui contratação com status "Em Andamento".
+Passos:
+O sistema exibe um aviso indicando as contratações ativas associadas ao usuário.
+O sistema sugere Suspender a conta em vez de excluí-la.
+O administrador decide suspender ou cancelar a operação.
+
+4. Pós-condições
+As ações administrativas foram aplicadas e registradas no log de auditoria do sistema.
+Os usuários afetados foram notificados conforme a ação tomada.
+
+5. Requisitos Especiais
+(RE01) - Auditoria de Ações
+Todas as ações realizadas pelo administrador devem ser registradas em log com data, hora e descrição da ação, para fins de rastreabilidade e conformidade.
+
+6. Regras de Negócio Específicas
+(RN01) - Perfil Exclusivo de Administrador
+O perfil de administrador não pode ser criado por cadastro comum. Deve ser atribuído diretamente no banco de dados ou por outro administrador existente.
+
+(RN02) - Suspensão vs. Exclusão
+Contas com histórico de contratações concluídas devem ser apenas suspensas, preservando o histórico da plataforma. A exclusão definitiva é permitida apenas para contas sem qualquer atividade registrada.
+
+7. Detalhamento das Interfaces com Usuários
+(I01) - Painel de Gerenciamento de Usuários
+Campos de Busca/Filtro
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Busca por Nome/E-mail
+Localizar usuário específico
+Texto
+Texto
+Opcional
+2.
+Tipo de Conta
+Filtrar por cliente ou freelancer
+Cliente / Freelancer / Todos
+Seleção
+Opcional
+3.
+Status
+Filtrar por situação da conta
+Ativo / Suspenso / Todos
+Seleção
+Opcional
+
+Comandos
+Suspender Conta: impede o login do usuário sem remover os dados.
+Reativar Conta: restaura o acesso de um usuário suspenso.
+Excluir Conta: remove definitivamente o usuário (condicionado à RN02).
+Exportar CSV: gera arquivo com os dados listados.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+Banco de dados PostgreSQL com log de auditoria. Serviço de e-mail para notificações automáticas aos usuários afetados por ações administrativas.
+
+8.2 Interfaces de Hardware
+O painel administrativo é acessível apenas via navegador web desktop, sem versão mobile prevista nesta versão.
+
+9. Observações
+O painel administrativo poderá ser expandido com funcionalidades de análise de fraudes e integração com ferramentas de BI em versões futuras do sistema.
+
+FreeLanceNow
+Especificação de Caso de Uso: UC06 - Conclusão de Serviço
+Versão 1.0
+1. Descrição
+Este caso de uso descreve o processo pelo qual o freelancer sinaliza a conclusão de um serviço em andamento na plataforma FreeLanceNow, e o cliente confirma ou contesta essa conclusão. A conclusão bem-sucedida atualiza o status da contratação para "Concluído", registra a data de finalização e dispara automaticamente o fluxo de avaliação (UC04).
+Este UC resolve a lacuna identificada entre UC03 (Busca e Contratação) e UC04 (Avaliação de Serviços): antes deste caso de uso, nenhum fluxo definia quem marca o serviço como concluído, como e quando.
+
+2. Pré-condições
+• O freelancer deve estar autenticado na plataforma (UC01).
+• Deve existir uma contratação com status "EM_ANDAMENTO" associada ao freelancer.
+• A contratação deve ter sido previamente aceita pelo freelancer (status ACEITO → EM_ANDAMENTO).
+
+3. Fluxo de Eventos
+3.1 Fluxo Básico – Freelancer Conclui o Serviço
+1. O freelancer acessa o painel e navega até "Minhas Contratações".
+2. O sistema exibe a lista de contratações com status "EM_ANDAMENTO".
+3. O freelancer seleciona a contratação desejada e clica em "Marcar como Concluído".
+4. O sistema exibe um formulário de conclusão com campo de observações finais e opção de upload de comprovante (ambos opcionais).
+5. O freelancer preenche as informações opcionais e confirma clicando em "Confirmar Conclusão".
+6. O sistema atualiza o status da contratação para "AGUARDANDO_CONFIRMACAO" e registra a data/hora da solicitação de conclusão.
+7. O sistema notifica o cliente via e-mail e push notification informando que o freelancer sinalizou a conclusão do serviço.
+8. O cliente acessa a plataforma, visualiza a contratação e clica em "Confirmar Recebimento".
+9. O sistema atualiza o status da contratação para "CONCLUIDO", registra a data_conclusao e notifica ambas as partes.
+10. O sistema dispara automaticamente o fluxo de avaliação (UC04), enviando notificação ao cliente para avaliar o serviço.
+
+3.2 Subfluxos
+(S01) – Iniciar Serviço após Aceite
+Pré-condição: a contratação está com status ACEITO após o freelancer aceitar a solicitação (UC03).
+1. O freelancer acessa a contratação aceita e clica em "Iniciar Serviço".
+2. O sistema atualiza o status para "EM_ANDAMENTO" e notifica o cliente que o serviço foi iniciado.
+3. O fluxo retorna ao passo 1 do Fluxo Básico quando o freelancer estiver pronto para concluir.
+
+(S02) – Visualizar Histórico da Contratação
+1. Em qualquer momento, cliente ou freelancer podem acessar o histórico da contratação.
+2. O sistema exibe o registro de todas as mudanças de status com data/hora: PENDENTE → ACEITO → EM_ANDAMENTO → CONCLUIDO.
+
+3.3 Fluxos Alternativos
+(A01) – Cliente Confirma sem Interação (Confirmação Automática)
+Pré-condições: O cliente não confirma nem contesta a conclusão em até 5 dias corridos após a notificação.
+1. O sistema confirma automaticamente a conclusão da contratação.
+2. O status é atualizado para "CONCLUIDO" com data_conclusao igual ao momento da confirmação automática.
+3. O sistema notifica o cliente e o freelancer sobre a conclusão automática.
+4. O fluxo de avaliação (UC04) é disparado normalmente.
+
+3.4 Exceções
+(E01) – Cliente Contesta a Conclusão
+Pré-condições: No passo 8 do Fluxo Básico, o cliente acredita que o serviço não foi concluído satisfatoriamente.
+1. O cliente clica em "Contestar Conclusão".
+2. O sistema exibe formulário de contestação com campo de motivo (obrigatório) e upload de evidência (opcional).
+3. O cliente preenche o motivo e confirma a contestação.
+4. O sistema atualiza o status da contratação para "EM_DISPUTA" e notifica o freelancer.
+5. O freelancer visualiza a contestação e pode responder com justificativa (máx. 300 caracteres).
+6. O administrador é notificado automaticamente para mediação (UC05 – Painel Administrativo).
+7. O administrador analisa as evidências e decide: manter "CONCLUIDO" ou reverter para "EM_ANDAMENTO".
+8. O sistema aplica a decisão, notifica ambas as partes e, se concluído, dispara o fluxo de avaliação (UC04).
+
+(E02) – Prazo de Entrega Ultrapassado
+Pré-condições: A contratação está com status EM_ANDAMENTO e a data_desejada foi ultrapassada sem sinalização de conclusão pelo freelancer.
+1. O sistema envia notificação de alerta ao freelancer informando que o prazo combinado foi ultrapassado.
+2. O cliente é notificado que o prazo foi ultrapassado e pode aguardar ou iniciar uma contestação.
+3. O fluxo permanece aberto até que o freelancer sinalize a conclusão ou o cliente cancele a contratação (via UC03 – Cancelamento).
+
+4. Pós-condições
+• A contratação tem status "CONCLUIDO" e data_conclusao registrada.
+• Ambos os usuários foram notificados sobre a conclusão.
+• O fluxo de avaliação (UC04) foi disparado automaticamente.
+• O serviço não aparece mais como "EM_ANDAMENTO" no painel de nenhuma das partes.
+
+5. Requisitos Especiais
+(RE01) – Rastreabilidade de Status: Toda mudança de status da contratação deve ser registrada com data/hora e ator responsável (freelancer, cliente ou sistema), para fins de auditoria e resolução de disputas.
+
+(RE02) – Notificações em Tempo Real: As notificações de sinalização de conclusão, confirmação e disputa devem ser entregues em até 10 segundos via push notification (mobile) ou e-mail, conforme definido em UC03-RE02.
+
+(RE03) – Integridade Transacional: A atualização do status da contratação e o registro da data_conclusao devem ocorrer em uma única transação ACID, garantindo que não exista estado inconsistente em caso de falha.
+
+6. Regras de Negócio Específicas
+(RN01) – Quem pode marcar como concluído: Somente o freelancer responsável pela contratação pode sinalizar a conclusão. O cliente não pode alterar o status unilateralmente para CONCLUIDO — ele apenas confirma ou contesta.
+
+(RN02) – Prazo de Confirmação pelo Cliente: O cliente tem até 5 dias corridos após a notificação de conclusão para confirmar ou contestar. Após esse prazo, o sistema confirma automaticamente (Fluxo Alternativo A01).
+
+(RN03) – Status EM_DISPUTA: Uma contratação em disputa não pode receber avaliação até que a disputa seja resolvida pelo administrador. O prazo de avaliação (UC04-RN02) é suspenso durante o período de disputa.
+
+(RN04) – Imutabilidade da Conclusão: Uma contratação com status CONCLUIDO não pode ter seu status revertido, exceto por decisão do administrador em caso de disputa (E01, passo 7).
+
+(RN05) – Sequência Obrigatória de Status: A sequência de status deve ser respeitada: PENDENTE → ACEITO → EM_ANDAMENTO → AGUARDANDO_CONFIRMACAO → CONCLUIDO. Nenhum status pode ser pulado, exceto os caminhos de cancelamento e recusa.
+
+7. Detalhamento das Interfaces com Usuários
+(I01) – Formulário de Conclusão de Serviço (visão do Freelancer)
+Campos:
+
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Observações Finais
+Comentário opcional do freelancer ao concluir
+
+Texto livre
+Texto
+Opcional
+2.
+Comprovante / Foto
+Foto ou arquivo comprobatório do serviço concluído
+JPG, PNG, PDF
+Arquivo
+Opcional
+
+Comandos:
+• Confirmar Conclusão: atualiza o status para AGUARDANDO_CONFIRMACAO e notifica o cliente.
+• Cancelar: fecha o formulário sem alterar o status da contratação.
+
+(I02) – Formulário de Contestação de Conclusão (visão do Cliente)
+Campos:
+
+No.
+Nome
+Descrição
+Valores Válidos
+Tipo
+Restrições
+1.
+Motivo da Contestação
+Descrição do problema relatado pelo cliente
+
+Texto livre
+Texto
+Obrigatório
+2.
+Evidência
+Foto ou arquivo de evidência do problema
+JPG, PNG, PDF
+Arquivo
+Opcional
+
+Comandos:
+• Confirmar Recebimento: atualiza o status para CONCLUIDO e dispara avaliação (UC04).
+• Contestar Conclusão: abre o formulário de disputa e atualiza o status para EM_DISPUTA.
+
+8. Demais Interfaces
+8.1 Interfaces de Software
+• Banco de dados PostgreSQL para atualização de status e registro de data_conclusao na tabela CONTRATACAO.
+• Serviço de notificação push e e-mail para alertas de conclusão, confirmação e disputa.
+• Integração com UC04 (Avaliação de Serviços) disparada automaticamente ao confirmar conclusão.
+• Integração com UC05 (Painel Administrativo) para resolução de disputas.
+
+8.2 Interfaces de Hardware
+• Dispositivos móveis para recebimento de notificações push.
+• Navegadores web desktop e mobile para acesso ao fluxo de conclusão.
+
+9. Observações
+A funcionalidade de pagamento integrado (escrow), prevista como melhoria futura em UC03, alterará este fluxo: a liberação do pagamento ao freelancer deverá ocorrer no momento da confirmação da conclusão pelo cliente (passo 8 do Fluxo Básico ou confirmação automática A01). Este UC foi projetado para acomodar essa extensão sem necessidade de reestruturação.
+O status EM_DISPUTA e o mecanismo de mediação pelo administrador podem evoluir para um sistema de arbitragem com SLA definido em versões futuras da plataforma.
+

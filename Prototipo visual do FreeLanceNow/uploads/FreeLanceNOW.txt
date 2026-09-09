@@ -1,0 +1,25 @@
+
+
+FreeLanceNOW
+Plataforma digital (web e mobile) que conecta clientes a profissionais freelancers de serviços gerais
+Turma: GPE17M80586
+Grupo: 2
+
+Membros do grupo:
+Arthur Almirante Simões
+Arthur de Oliveira de Souza
+Caio Rafael Alves de Souza
+Fábio Luiz Cardoso Laranjeira Rocha
+Felipe Alves Muniz
+
+Bussines Model Canvas:
+O quadro a seguir apresenta o modelo de negócio do FreeLanceNow organizado nos nove blocos do Business Model Canvas. A plataforma opera como um marketplace de dois lados: de um lado, clientes e empresas que precisam de serviços gerais; de outro, os profissionais autônomos que os oferecem. O valor cresce à medida que os dois lados crescem juntos, e a confiança é o ativo central do modelo — sustentada por dois mecanismos: a custódia dos valores até o encerramento do serviço e a avaliação mútua restrita a quem concluiu a ordem de serviço.
+
+Elevator pitch:
+Encontrar rapidamente um eletricista, diarista, pintor ou outro profissional confiável ainda é um processo difícil e inseguro, enquanto muitos trabalhadores autônomos enfrentam falta de visibilidade e oportunidades. O FreeLanceNow é um marketplace digital de serviços gerais que conecta clientes, empresas e freelancers em uma plataforma simples e acessível, permitindo buscar profissionais por categoria, localização, preço e reputação, solicitar serviços e acompanhar a contratação em um único ambiente.
+Com avaliações vinculadas a serviços efetivamente concluídos, perfis profissionais detalhados e pagamentos protegidos por custódia, o FreeLanceNow oferece mais agilidade e confiança para quem contrata e mais oportunidades para quem trabalha. Seu modelo de negócio é baseado em uma taxa sobre cada contratação realizada com sucesso, podendo ser ampliado com planos premium e anúncios patrocinados, tornando a plataforma escalável e sustentável.
+Carômetro:
+ Arthur Almirante             Fábio Luiz
+ Caio Rafael
+ Arthur de Oliveira
+ Felipe Alves

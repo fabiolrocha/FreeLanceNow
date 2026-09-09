@@ -1,0 +1,269 @@
+
+Documento de Arquitetura de Software
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+[Sigla] – [Nome do Projeto]
+Gestor do Projeto
+Gerente de Projeto
+Alexandre Silva dos Santos
+Equipe FreeLanceNow
+alexandre.santos@p.ucb.br
+fabio.rocha@a.ucb.br
+
+Objetivo deste Documento
+
+Este documento tem como objetivo descrever as principais decisões de projeto tomadas pela equipe de desenvolvimento e os critérios considerados durante a tomada destas decisões. Suas informações incluem a parte de hardware e software do sistema FreeLanceNow.
+
+Histórico de Revisão
+Data
+Demanda
+Autor
+Descrição
+Versão
+20/04/2026
+FLN-000001
+Equipe FreeLancer
+Versão inicial do Documento de Arquitetura de Software do FreeLanceNow
+1.0
+05/05/2026
+FLN-000002
+Equipe FreeLancer
+Foi adicionado os campos de prototipação, com adesão das telas, fluxos de usuários e descrição de funcionalidades 
+1.1
+
+Sumário
+		 TOC \o "1-3" \h \z \u 1.	INTRODUÇÃO	 PAGEREF _Toc229470964 \h 3
+		1.1	Finalidade	 PAGEREF _Toc229470965 \h 3
+		1.2	Escopo	 PAGEREF _Toc229470966 \h 3
+		1.3	Definições, Acrônimos e Abreviações	 PAGEREF _Toc229470967 \h 3
+		1.4	Referências	 PAGEREF _Toc229470968 \h 4
+		2.	REPRESENTAÇÃO ARQUITETURAL	 PAGEREF _Toc229470969 \h 4
+		3.	REQUISITOS E RESTRIÇÕES ARQUITETURAIS	 PAGEREF _Toc229470970 \h 5
+		4.	VISÃO DE CASOS DE USO	 PAGEREF _Toc229470971 \h 5
+		4.1	Casos de Uso significantes para a arquitetura	 PAGEREF _Toc229470972 \h 6
+		5.	VISÃO LÓGICA	 PAGEREF _Toc229470973 \h 6
+		5.1	Visão Geral – pacotes e camadas	 PAGEREF _Toc229470974 \h 7
+		6.	VISÃO DE IMPLEMENTAÇÃO	 PAGEREF _Toc229470975 \h 8
+		6.1	Caso de Uso UC03 – Busca e Contratação de Serviços	 PAGEREF _Toc229470976 \h 8
+		6.1.1	Diagrama de Classes	 PAGEREF _Toc229470977 \h 8
+		6.1.2	Diagrama de Sequência	 PAGEREF _Toc229470978 \h 9
+		6.2	Caso de Uso UC2 - Cadastro de serviços pelo freelancer	 PAGEREF _Toc229470979 \h 10
+		6.2.1	Diagrama de classes	 PAGEREF _Toc229470980 \h 10
+		6.2.2	Diagrama de Sequência	 PAGEREF _Toc229470981 \h 11
+		6.3	Caso de Uso UC1 – Cadastro e autenticação do Usuário	 PAGEREF _Toc229470982 \h 12
+		6.3.1	Diagrama de classes	 PAGEREF _Toc229470983 \h 12
+		6.3.2	Diagrama de Sequência	 PAGEREF _Toc229470984 \h 13
+		7.	VISÃO DE IMPLANTAÇÃO	 PAGEREF _Toc229470985 \h 13
+		8.	DIMENSIONAMENTO E PERFORMANCE	 PAGEREF _Toc229470986 \h 14
+		8.1	Volume	 PAGEREF _Toc229470987 \h 14
+		8.2	Performance	 PAGEREF _Toc229470988 \h 14
+		9.	QUALIDADE	 PAGEREF _Toc229470989 \h 14
+		10.	PROTÓTIPO	 PAGEREF _Toc229470990 \h 15
+		10.1	Principais telas do sistema	 PAGEREF _Toc229470991 \h 15
+		10.2	Fluxo de usuário	 PAGEREF _Toc229470992 \h 16
+
+INTRODUÇÃO
+Finalidade
+Este documento fornece uma visão arquitetural abrangente do sistema FreeLanceNow, usando diversas visões de arquitetura para representar diferentes aspectos do sistema. O objetivo deste documento é capturar e comunicar as decisões arquiteturais significativas que foram tomadas em relação ao sistema.
+O documento irá adotar uma estrutura baseada na visão “4+1” de modelo de arquitetura [KRU41]. 
+
+Figura 1 – Arquitetura 4+1
+
+Escopo
+Este Documento de Arquitetura de Software se aplica ao FreeLanceNow, uma plataforma digital (web e mobile) voltada para conectar pessoas que precisam de serviços gerais com profissionais freelancers que oferecem esses serviços. A plataforma será desenvolvida pela Equipe FreeLance no âmbito do projeto acadêmico da disciplina de Engenharia de Software.
+O sistema contempla cadastro e autenticação de usuários, cadastro de serviços por freelancers, busca e contratação de serviços por clientes, avaliação dos serviços realizados e um painel administrativo para gerenciamento da plataforma.
+Definições, Acrônimos e Abreviações
+QoS – Quality of Service, ou qualidade de serviço. Termo utilizado para descrever um conjunto de qualidades que descrevem os requisitos não-funcionais de um sistema, como performance, disponibilidade e escalabilidade [QOS].
+LGPD – Lei Geral de Proteção de Dados Pessoais (Lei nº 13.709/2018), que regulamenta o tratamento de dados pessoais no Brasil.
+UML – Unified Modeling Language, linguagem gráfica de notação padrão para modelagem de sistemas orientados a objetos.
+REST – Representational State Transfer, estilo arquitetural para sistemas distribuídos baseado em recursos acessíveis por HTTP.
+JWT – JSON Web Token, padrão aberto (RFC 7519) para autenticação e troca segura de informações entre partes.
+ORM – Object-Relational Mapping, técnica que mapeia estruturas de um banco de dados relacional para objetos no código da aplicação.
+2FA – Two-Factor Authentication, autenticação de dois fatores utilizada como camada adicional de segurança no login.
+MDS – Metodologia de Desenvolvimento de Software, conjunto de práticas e artefatos adotados pela equipe.
+JDBC – Java Database Connectivity, API padrão da plataforma Java para acesso a bancos de dados relacionais.
+Referências
+
+[KRU41]: The “4+1” view model of software architecture, Philippe Kruchten, November 1995, http://www3.software.ibm.com/ibmdl/pub/software/rational/web/whitepapers/2003/Pbk4p1.pdf
+[QOS]: https://docs.oracle.com/cd/E19636-01/819-2326/6n4kfe7dj/index.html
+[VIS]: FreeLanceNow – Documento de Visão, Versão 1.0, Equipe FreeLanceNow, Março/2026.
+[UC]: FreeLanceNow – Especificação de Casos de Uso, Versão 1.0, Equipe FreeLanceNow, 07/04/2026.
+[LGPD]: Lei nº 13.709, de 14 de agosto de 2018 – Lei Geral de Proteção de Dados Pessoais (LGPD).
+
+REPRESENTAÇÃO ARQUITETURAL
+
+Este documento irá detalhar as visões baseado no modelo “4+1” [KRU41], utilizando como referência os modelos definidos na MDS. As visões utilizadas no documento serão:
+Visão
+Público
+Área
+Modelo da MDS
+Lógica
+Analistas
+Realização dos Casos de Uso
+Diagrama de Classes
+Processo
+Integradores
+Performance, Escalabilidade, Concorrência
+Requisitos Não-Funcionais
+Implementação
+Programadores
+Componentes de Software
+Diagrama de Pacotes / Componentes
+Implantação
+Gerência de Configuração
+Nodos físicos
+Diagrama de Implantação
+Caso de Uso
+Todos
+Requisitos funcionais
+Especificação de Casos de Uso
+Dados
+Especialistas em dados
+Administradores de dados
+Persistência de dados
+Modelo Entidade-Relacionamento
+Tabela 1 – Visões, Público, Área e Artefatos da MDS
+
+REQUISITOS E RESTRIÇÕES ARQUITETURAIS
+Esta seção descrever os requisitos de software e restrições que tem um impacto significante na arquitetura. 
+
+Requisito
+Solução
+Linguagem
+Back-end em Java (Spring Boot / Spring MVC) para implementação da API REST e das regras de negócio. Front-end web em HTML5, JavaScript (ES6+) e Tailwind CSS, com layout responsivo para acesso via desktop e dispositivos móveis no mesmo código-base.
+Plataforma
+Servidor de aplicação Java (JRE 17+) com Spring Boot utilizando Tomcat embarcado, executado em ambiente Linux, com possibilidade de containerização via Docker. Servidor web Nginx atuando como reverse proxy para a API e servindo os arquivos estáticos do front-end.
+Segurança
+Autenticação via JWT (JSON Web Token) com opção de 2FA. Senhas armazenadas com hash bcrypt. Comunicação exclusivamente via HTTPS (TLS 1.2+). Controle de acesso baseado em perfis (Cliente, Freelancer e Administrador). Conformidade com a LGPD para tratamento de dados pessoais.
+Persistência
+Banco de dados relacional PostgreSQL 15 para armazenamento de usuários, serviços, contratações e avaliações. Armazenamento de imagens em serviço de object storage (S3-compatible). Acesso aos dados via ORM para abstração das consultas.
+Internacionalização (i18n)
+Interface disponibilizada inicialmente em Português do Brasil (pt-BR). Estrutura preparada com chaves de tradução para adição futura de outros idiomas sem necessidade de refatoração.
+Tabela 2 – Exemplo de requisitos e restrições
+
+VISÃO DE CASOS DE USO
+Esta seção lista as especificações centrais e significantes para a arquitetura do sistema.
+      Lista de casos de uso do sistema:
+UC01 – Cadastro e Autenticação de Usuários
+UC02 – Cadastro de Serviços pelo Freelancer
+UC03 – Busca e Contratação de Serviços
+UC04 – Avaliação de Serviços
+UC05 – Painel Administrativo
+UC06 – Conclusão de Serviço
+Casos de Uso significantes para a arquitetura
+
+Figura 2 – Diagrama de Casos de Uso do FreeLanceNow
+VISÃO LÓGICA
+	Descrever uma visão lógica da arquitetura. Descrever as classes mais importantes, sua organização em pacotes de serviços e subsistemas, e a organização desses subsistemas em camadas. Também descreve as realizações dos casos de uso mais importantes, por exemplo, aspectos dinâmicos da arquitetura. Diagramas de classes e sequência devem ser incluídos para ilustrar os relacionamentos entre as classes significativas na arquitetura, subsistemas, pacotes e camadas.
+Visão Geral – pacotes e camadas
+
+Figura 3 – Diagrama de Camadas da Aplicação FreeLanceNow
+
+Figura 4 – Diagrama de Pacotes da Aplicação FreeLanceNow
+
+VISÃO DE IMPLEMENTAÇÃO
+Caso de Uso UC03 – Busca e Contratação de Serviços
+Diagrama de Classes
+O diagrama a seguir apresenta as classes envolvidas na realização do UC03, destacando os atributos, operações e os relacionamentos entre Cliente, Freelancer, Serviço, Contratação, Avaliação e Categoria:
+
+Figura 5 – Diagrama de Classes do UC03
+
+Diagrama de Sequência
+
+Figura 6 – Diagrama de Sequência do UC03
+Caso de Uso UC2 - Cadastro de serviços pelo freelancer
+Diagrama de classes
+
+Figura 7 – Diagrama de Classes do UC02
+Diagrama de Sequência 
+
+Figura 8 – Diagrama de Sequência do UC02
+Caso de Uso UC1 – Cadastro e autenticação do Usuário
+Diagrama de classes
+
+Figura 9 – Diagrama de Classes do UC01
+
+Diagrama de Sequência
+
+Figura 10 – Diagrama de Sequência do UC01
+
+VISÃO DE IMPLANTAÇÃO
+O sistema será implantado na seguinte topologia:
+•	Dispositivo do Usuário: computador com navegador web moderno (Chrome, Firefox, Edge ou Safari) ou smartphone iOS/Android acessando a aplicação através do navegador móvel, com layout responsivo adaptado ao tamanho da tela.
+•	Servidor de Aplicação: instância Linux executando a API FreeLanceNow (Java com Spring Boot, Tomcat embarcado) e servindo os arquivos estáticos do front-end web (JavaScript + Tailwind CSS), com Nginx como reverse proxy.
+•	Servidor de Banco de Dados: instância dedicada com PostgreSQL 15, acessível via JDBC apenas pela rede interna do servidor de aplicação (porta 5432).
+•	Serviços Externos: provedor SMTP para envio de e-mails transacionais, serviço de notificação para alertas em tempo real ao usuário e serviço de object storage para armazenamento das imagens dos serviços. 
+
+Figura 11 – Diagrama de Implantação do FreeLanceNow
+DIMENSIONAMENTO E PERFORMANCE
+
+Volume
+Enumerar os itens relativos ao volume de acesso aos recursos da aplicação:
+
+Número estimado de usuários cadastrados: 5.000
+Número estimado de acessos diários: 1.500
+Número estimado de acessos simultâneos em pico (horário comercial): 200
+Tempo médio de sessão de um usuário: 15 minutos
+Número estimado de serviços ativos cadastrados: 2.000
+Número estimado de contratações realizadas por mês: 800
+
+Performance
+
+Enumerar os itens referentes à resposta esperada do sistema:
+
+Tempo máximo para carregamento de uma página (P95): 3 segundos.
+Tempo máximo para execução de uma busca de serviços (P95): 3 segundos.
+Tempo máximo para execução de uma contratação (solicitação → persistência): 5 segundos.
+Tempo máximo para envio de notificação de nova solicitação ao freelancer: 10 segundos.
+Disponibilidade alvo do sistema: 99,0% em horário comercial.
+
+QUALIDADE
+
+Enumerar os itens de qualidade de software [QOS] significativos para a aplicação:
+
+Item
+Descrição
+Solução
+Escalabilidade
+Capacidade do sistema de suportar crescimento da base de usuários sem refatoração completa da arquitetura.
+Arquitetura em camadas com separação entre front-end e back-end (API REST). Possibilidade de escalar horizontalmente a API atrás de um balanceador de carga e de adicionar réplicas de leitura no PostgreSQL.
+Confiabilidade, Disponibilidade
+Garantia de que os dados de contratos e avaliações não sejam perdidos e de que o sistema esteja disponível para os usuários.
+Backup automático diário do banco de dados PostgreSQL, transações ACID para as operações críticas (contratação, avaliação) e monitoramento de saúde da aplicação.
+Portabilidade
+Aplicativo responsivo e funcional em iOS, Android e principais navegadores web
+Front-end web com layout responsivo utilizando Tailwind CSS (breakpoints para desktop, tablet e mobile). Um único código-base em JavaScript atende todos os dispositivos, eliminando a necessidade de aplicativos nativos nesta versão.
+Segurança
+Proteção dos dados pessoais dos usuários e das credenciais de acesso, em conformidade com a LGPD.
+Autenticação JWT com expiração, 2FA opcional, criptografia de senhas com bcrypt, HTTPS obrigatório em todas as chamadas e aceite explícito de Termos de Uso e Política de Privacidade no cadastro.
+Usabilidade
+Facilidade de uso para perfis técnicos e não técnicos (Requisito Não-Funcional do Documento de Visão).
+Fluxos simplificados de cadastro, busca e contratação com no máximo 3 cliques até a ação principal. Feedback visual imediato para todas as ações do usuário.
+
+PROTÓTIPO
+  Principais telas do sistema
+Telas
+Função
+Busca de Serviços
+Permitir que empresas ou clientes explorem "pacotes de serviços" específicos previamente cadastrados pelos freelancers na plataforma.
+Perfil do Freelancer
+Atuar como o currículo detalhado e portfólio digital do profissional. É a página de conversão onde a empresa toma a decisão de enviar um convite de contratação.
+Perfil da Empresa
+Servir como uma página institucional pública para a empresa contratante. Seu objetivo é transmitir segurança e transparência para o freelancer que avalia uma proposta.
+Dashboard da Empresa
+Ser o centro de controle e painel gerencial do contratante logado no sistema.
+Meus Projetos
+Gerenciar o funil de contratação da empresa, organizando as demandas abertas, em andamento e já concluídas.
+Publicar Novo Projeto
+Interface estruturada de formulário para que a empresa crie e detalhe uma nova oportunidade de trabalho, tornando-a visível para os freelancers da plataforma.
+Busca de Profissional
+Mecanismo de "Hunting" (pesquisa ativa). Diferente da "Busca de Serviços" (onde se procura um produto fechado), aqui a empresa busca o perfil ideal de talento por meio de habilidades e características.
+Tela de Login
+Autenticar o usuário de forma segura e redirecioná-lo automaticamente para o painel correto (Dashboard da Empresa ou do Freelancer) com base no seu tipo de conta.
+Tela de Cadastro - Perfil Freelancer
+Coletar as informações vitais para criar a conta do profissional e prepará-lo para a exibição no catálogo da plataforma.
+Tela de Cadastro - Perfil Empresa/Cliente
+Registrar a empresa contratante de forma rápida para que ela possa publicar um projeto ou iniciar uma busca o mais rápido possível.
+Fluxo de usuário
+Visitante acessa a plataforma -> Escolhe "Cadastrar" ou "Entrar" -> Preenche credenciais -> Sistema redireciona com base no Tipo de Conta. 
+Fluxo do Cliente: Acessa Home -> Realiza Busca/Filtro -> Visualiza Lista -> Clica em um Serviço -> Analisa Perfil -> Clica em "Solicitar Serviço" -> Preenche Dados -> Envia Solicitação. Após conclusão -> Recebe Notificação -> Avalia o Serviço. 
+Fluxo do Freelancer: Acessa Dashboard -> Clica em "Adicionar Serviço" -> Preenche Formulário e Fotos -> Publica. Recebe notificação de solicitação -> Aceita ou Recusa (em até 48h). 

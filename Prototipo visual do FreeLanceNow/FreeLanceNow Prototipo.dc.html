@@ -82,9 +82,9 @@ a:hover{color:oklch(0.44 0.15 152)}
 
   <section style="border-top:1px solid #e4e7ec;padding:clamp(44px,4.5vw,64px) clamp(20px,3.4vw,56px);max-width:1440px;margin:0 auto">
     <h2 style="margin:0 0 8px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.025em">Como funciona</h2>
-    <p style="margin:0 0 40px;font:400 16px/1.6 'Public Sans',sans-serif;color:#667085">Do primeiro clique à avaliação final, em cinco etapas.</p>
-    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:clamp(14px,1.6vw,20px)">
-      <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="5">
+    <p style="margin:0 0 40px;font:400 16px/1.6 'Public Sans',sans-serif;color:#667085">Do primeiro clique à avaliação final, em seis etapas.</p>
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:clamp(14px,1.6vw,20px)">
+      <sc-for list="{{ etapas }}" as="e" hint-placeholder-count="6">
         <div style="border-top:2px solid oklch(0.55 0.17 152);padding-top:16px">
           <div style="font:700 12px/1 'JetBrains Mono',monospace;color:oklch(0.55 0.17 152);margin-bottom:10px">0{{ e.n }}</div>
           <div style="font:600 16px/1.3 'Public Sans',sans-serif;margin-bottom:6px">{{ e.titulo }}</div>
@@ -121,7 +121,7 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div>
       <div style="font:400 13px/1 'JetBrains Mono',monospace;color:oklch(0.72 0.14 152);margin-bottom:20px">SEGURANÇA E CONFIANÇA</div>
       <h2 style="margin:0 0 16px;font:700 40px/1.15 'Public Sans',sans-serif;letter-spacing:-0.03em;max-width:22ch">O serviço certo, com quem você pode confiar.</h2>
-      <p style="margin:0;font:400 16px/1.6 'Public Sans',sans-serif;color:#98a2b3;max-width:44ch">Senhas com hash bcrypt, autenticação por token e 2FA opcional. Seus dados tratados conforme a LGPD.</p>
+      <p style="margin:0;font:400 16px/1.6 'Public Sans',sans-serif;color:#98a2b3;max-width:44ch">Pagamento em custódia: o valor sai da sua conta, fica retido pela plataforma e só é repassado ao profissional quando você confirma a conclusão. Senhas com hash bcrypt, autenticação por token e 2FA opcional, dados tratados conforme a LGPD.</p>
     </div>
     <div style="height:180px;border-radius:14px;border:1px dashed #344054;background:repeating-linear-gradient(135deg,rgba(255,255,255,.03) 0 10px,transparent 10px 20px);display:flex;align-items:flex-end;padding:16px">
       <span style="font:500 11px/1 'JetBrains Mono',monospace;color:#667085">foto — cliente e profissional</span>
@@ -295,7 +295,9 @@ a:hover{color:oklch(0.44 0.15 152)}
           <span onClick="{{ goFeed }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Início</span>
           <span onClick="{{ goBusca }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Serviços</span>
           <span onClick="{{ goBuscaProf }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Profissionais</span>
+          <span onClick="{{ goPropostas }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Demandas</span>
           <span onClick="{{ goContratacoes }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Contratações</span>
+          <span onClick="{{ goCarteira }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Pagamentos</span>
         </span>
         </sc-if>
         <sc-if value="{{ isFreelaRole }}" hint-placeholder-val="{{ false }}">
@@ -305,6 +307,7 @@ a:hover{color:oklch(0.44 0.15 152)}
           <span onClick="{{ goMeusServicos }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Serviços</span>
           <span onClick="{{ goSolicitacoes }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Solicitações</span>
           <span onClick="{{ goContratacoes }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Contratações</span>
+          <span onClick="{{ goCarteira }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Carteira</span>
         </span>
         </sc-if>
         <span onClick="{{ goMensagens }}" style="padding:8px 10px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer;white-space:nowrap" style-hover="background:#f2f4f7;color:#101828">Mensagens</span>
@@ -344,6 +347,17 @@ a:hover{color:oklch(0.44 0.15 152)}
         </div>
       </div>
       <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:16px">
+        <div style="font:700 12px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">MINHAS DEMANDAS</div>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ demandas }}" as="dm" hint-placeholder-count="3">
+            <div onClick="{{ goPropostas }}" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;margin:0 -10px;border-radius:7px;cursor:pointer" style-hover="background:#f9fafb">
+              <span style="min-width:0;font:500 13px/1.3 'Public Sans',sans-serif;color:#344054;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ dm.titulo }}</span>
+              <span style="flex:none;font:400 12px/1 'JetBrains Mono',monospace;color:{{ dm.corProp }}">{{ dm.qtd }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:16px">
         <div style="font:700 12px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">CATEGORIAS</div>
         <div style="display:flex;flex-direction:column;gap:2px">
           <sc-for list="{{ categorias }}" as="c" hint-placeholder-count="4">
@@ -372,7 +386,7 @@ a:hover{color:oklch(0.44 0.15 152)}
       <sc-for list="{{ feedItens }}" as="p" hint-placeholder-count="3">
         <article style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
           <div style="padding:16px 18px 12px;display:flex;gap:12px;align-items:flex-start">
-            <div style="width:44px;height:44px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+            <div style="width:44px;height:44px;flex:none;border-radius:50%;background:{{ p.avBg }};border:1px solid {{ p.avBd }};display:flex;align-items:center;justify-content:center;font:700 15px/1 'Public Sans',sans-serif;color:{{ p.avFg }}">{{ p.ini }}</div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:8px">
                 <span onClick="{{ goPerfilFreela }}" style="font:700 14px/1.3 'Public Sans',sans-serif;cursor:pointer">{{ p.autor }}</span>
@@ -403,6 +417,13 @@ a:hover{color:oklch(0.44 0.15 152)}
     </main>
 
     <aside style="position:sticky;top:84px;display:flex;flex-direction:column;gap:16px">
+      <div style="background:#fff;border:1px solid #b2ddff;border-radius:12px;padding:16px">
+        <div style="font:700 12px/1 'JetBrains Mono',monospace;color:#175cd3;margin-bottom:14px">PAGAMENTO PENDENTE</div>
+        <div style="font:600 14px/1.35 'Public Sans',sans-serif">Caça-vazamento sem quebra</div>
+        <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:3px">Rafael Andrade · #102 · {{ vlrServico }}</div>
+        <div style="margin-top:12px;padding:9px 11px;border-radius:8px;background:#eff8ff;border:1px solid #b2ddff;font:600 12px/1.4 'Public Sans',sans-serif;color:#175cd3">Aceito. O serviço inicia após o pagamento em custódia.</div>
+        <button onClick="{{ goPagamento }}" style="width:100%;margin-top:10px;padding:10px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Pagar agora</button>
+      </div>
       <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:16px">
         <div style="font:700 12px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">EM ANDAMENTO</div>
         <div style="font:600 14px/1.35 'Public Sans',sans-serif">Instalação de chuveiro elétrico</div>
@@ -416,7 +437,7 @@ a:hover{color:oklch(0.44 0.15 152)}
         <div style="display:flex;flex-direction:column;gap:14px">
           <sc-for list="{{ freelancers }}" as="f" hint-placeholder-count="4">
             <div style="display:flex;gap:10px;align-items:center">
-              <div style="width:36px;height:36px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+              <div style="width:36px;height:36px;flex:none;border-radius:50%;background:{{ f.avBg }};border:1px solid {{ f.avBd }};display:flex;align-items:center;justify-content:center;font:700 13px/1 'Public Sans',sans-serif;color:{{ f.avFg }}">{{ f.ini }}</div>
               <div style="flex:1;min-width:0">
                 <div style="font:600 13px/1.3 'Public Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ f.nome }}</div>
                 <div style="font:400 11px/1.3 'Public Sans',sans-serif;color:#98a2b3">{{ f.cat }} · {{ f.nota }}★</div>
@@ -484,7 +505,7 @@ a:hover{color:oklch(0.44 0.15 152)}
       <sc-for list="{{ feedDemandas }}" as="d" hint-placeholder-count="4">
         <article style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
           <div style="padding:16px 18px 12px;display:flex;gap:12px;align-items:flex-start">
-            <div style="width:44px;height:44px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+            <div style="width:44px;height:44px;flex:none;border-radius:50%;background:{{ d.avBg }};border:1px solid {{ d.avBd }};display:flex;align-items:center;justify-content:center;font:700 15px/1 'Public Sans',sans-serif;color:{{ d.avFg }}">{{ d.ini }}</div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:8px">
                 <span onClick="{{ goPerfilCliente }}" style="font:700 14px/1.3 'Public Sans',sans-serif;cursor:pointer">{{ d.autor }}</span>
@@ -510,7 +531,7 @@ a:hover{color:oklch(0.44 0.15 152)}
             <span style="font:500 13px/1 'Public Sans',sans-serif;color:#667085">{{ d.propostas }} propostas enviadas</span>
             <span onClick="{{ goMensagens }}" style="font:500 13px/1 'Public Sans',sans-serif;color:#667085;cursor:pointer" style-hover="color:#101828">Comentar ({{ d.coment }})</span>
             <span style="font:500 13px/1 'Public Sans',sans-serif;color:#667085;cursor:pointer" style-hover="color:#101828">Salvar</span>
-            <button onClick="{{ goSolicitacoes }}" style="margin-left:auto;padding:8px 15px;border-radius:8px;border:1px solid oklch(0.55 0.17 152);background:#fff;color:oklch(0.44 0.15 152);font:600 13px/1 'Public Sans',sans-serif;cursor:pointer" style-hover="background:oklch(0.55 0.17 152);color:#fff">Enviar proposta</button>
+            <button onClick="{{ goEnviarProposta }}" style="margin-left:auto;padding:8px 15px;border-radius:8px;border:1px solid oklch(0.55 0.17 152);background:#fff;color:oklch(0.44 0.15 152);font:600 13px/1 'Public Sans',sans-serif;cursor:pointer" style-hover="background:oklch(0.55 0.17 152);color:#fff">Enviar proposta</button>
           </div>
         </article>
       </sc-for>
@@ -526,8 +547,8 @@ a:hover{color:oklch(0.44 0.15 152)}
       </div>
       <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:16px">
         <div style="font:700 12px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">SERVIÇO A CONCLUIR</div>
-        <div style="font:600 14px/1.35 'Public Sans',sans-serif">Troca de quadro de distribuição</div>
-        <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:3px">Construtora Meridiano · #107 · R$ 640</div>
+        <div style="font:600 14px/1.35 'Public Sans',sans-serif">Instalação de ventilador de teto</div>
+        <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:3px">Ana Lopes · #107 · R$ 280</div>
         <button onClick="{{ goConcluir }}" style="width:100%;margin-top:12px;padding:10px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Marcar como concluído</button>
       </div>
       <div style="background:#101828;border-radius:12px;padding:16px;color:#fff">
@@ -606,17 +627,37 @@ a:hover{color:oklch(0.44 0.15 152)}
           <label style="display:flex;align-items:center;gap:9px;font:400 13px/1.3 'Public Sans',sans-serif;color:#344054;cursor:pointer"><input type="checkbox" checked="{{ c.marcada }}" onChange="{{ c.toggle }}" style="accent-color:oklch(0.55 0.17 152)">{{ c.nome }}<span style="margin-left:auto;font:400 11px/1 'JetBrains Mono',monospace;color:#98a2b3">{{ c.ativos }}</span></label>
         </sc-for>
       </div>
-      <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:10px">FAIXA DE PREÇO</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <input placeholder="R$ mín" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:400 13px/1.2 'Public Sans',sans-serif">
-        <input placeholder="R$ máx" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:400 13px/1.2 'Public Sans',sans-serif">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:12px">
+        <span style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3">FAIXA DE PREÇO</span>
+        <span style="font:600 12px/1 'Public Sans',sans-serif;color:#344054">{{ faixaLabel }}</span>
       </div>
-      <input type="range" min="0" max="100" value="60" style="width:100%;accent-color:oklch(0.55 0.17 152);margin-bottom:22px">
+      <div style="position:relative;height:20px;margin-bottom:12px">
+        <span style="position:absolute;left:0;right:0;top:9px;height:4px;border-radius:2px;background:#eaecf0"></span>
+        <span style="position:absolute;top:9px;height:4px;border-radius:2px;background:oklch(0.55 0.17 152);left:{{ faixaLeft }};width:{{ faixaWidth }}"></span>
+        <span style="position:absolute;top:4px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid oklch(0.55 0.17 152);margin-left:-7px;left:{{ faixaLeft }}"></span>
+        <span style="position:absolute;top:4px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid oklch(0.55 0.17 152);margin-left:-7px;left:{{ faixaRight }}"></span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+        <label style="flex:1;min-width:0;display:block">
+          <span style="display:block;font:400 10px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:4px">MÍNIMO</span>
+          <input type="number" min="0" step="20" value="{{ precoMin }}" onChange="{{ setPrecoMin }}" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:500 13px/1.2 'Public Sans',sans-serif">
+        </label>
+        <span style="flex:none;margin-top:14px;font:400 13px/1 'Public Sans',sans-serif;color:#98a2b3">—</span>
+        <label style="flex:1;min-width:0;display:block">
+          <span style="display:block;font:400 10px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:4px">MÁXIMO</span>
+          <input type="number" min="0" step="20" value="{{ precoMax }}" onChange="{{ setPrecoMax }}" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:500 13px/1.2 'Public Sans',sans-serif">
+        </label>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px">
+        <sc-for list="{{ faixasRapidas }}" as="fx" hint-placeholder-count="3">
+          <span onClick="{{ fx.aplicar }}" style="padding:6px 11px;border-radius:999px;border:1px solid {{ fx.bd }};background:{{ fx.bg }};font:600 12px/1 'Public Sans',sans-serif;color:{{ fx.fg }};cursor:pointer">{{ fx.label }}</span>
+        </sc-for>
+      </div>
       <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:10px">AVALIAÇÃO MÍNIMA</div>
       <div style="display:flex;gap:6px;margin-bottom:22px">
-        <span style="flex:1;text-align:center;padding:8px 0;border:1px solid oklch(0.55 0.17 152);border-radius:7px;background:oklch(0.97 0.025 152);font:600 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152);cursor:pointer">4,5★</span>
-        <span style="flex:1;text-align:center;padding:8px 0;border:1px solid #d0d5dd;border-radius:7px;font:600 12px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer">4★</span>
-        <span style="flex:1;text-align:center;padding:8px 0;border:1px solid #d0d5dd;border-radius:7px;font:600 12px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer">3★</span>
+        <sc-for list="{{ notasMin }}" as="nm" hint-placeholder-count="3">
+          <span onClick="{{ nm.aplicar }}" style="flex:1;text-align:center;padding:8px 0;border:1px solid {{ nm.bd }};border-radius:7px;background:{{ nm.bg }};font:600 12px/1 'Public Sans',sans-serif;color:{{ nm.fg }};cursor:pointer">{{ nm.label }}</span>
+        </sc-for>
       </div>
       <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:10px">LOCALIZAÇÃO</div>
       <input placeholder="Brasília, DF" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:400 13px/1.2 'Public Sans',sans-serif">
@@ -662,7 +703,7 @@ a:hover{color:oklch(0.44 0.15 152)}
             <div style="padding:16px">
               <div style="font:700 16px/1.35 'Public Sans',sans-serif;margin-bottom:8px;text-wrap:pretty">{{ r.titulo }}</div>
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
-                <div style="width:24px;height:24px;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+                <div style="width:24px;height:24px;flex:none;border-radius:50%;background:{{ r.avBg }};border:1px solid {{ r.avBd }};display:flex;align-items:center;justify-content:center;font:700 9px/1 'Public Sans',sans-serif;color:{{ r.avFg }}">{{ r.ini }}</div>
                 <span style="font:500 13px/1 'Public Sans',sans-serif;color:#475467">{{ r.freela }}</span>
                 <span style="font:600 12px/1 'Public Sans',sans-serif;color:oklch(0.5 0.15 152)">{{ r.nota }}★</span>
                 <span style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">({{ r.aval }})</span>
@@ -701,7 +742,7 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div style="display:flex;flex-direction:column;gap:14px">
       <sc-for list="{{ freelancers }}" as="f" hint-placeholder-count="4">
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px;display:flex;gap:18px;align-items:flex-start">
-          <div style="width:64px;height:64px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 7px,#f7f8fa 7px 14px)"></div>
+          <div style="width:64px;height:64px;flex:none;border-radius:50%;background:{{ f.avBg }};border:1px solid {{ f.avBd }};display:flex;align-items:center;justify-content:center;font:700 22px/1 'Public Sans',sans-serif;color:{{ f.avFg }}">{{ f.ini }}</div>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
               <span style="font:700 17px/1.2 'Public Sans',sans-serif">{{ f.nome }}</span>
@@ -767,7 +808,7 @@ a:hover{color:oklch(0.44 0.15 152)}
           <div style="display:flex;flex-direction:column;gap:16px">
             <div style="padding:16px;border:1px solid #eaecf0;border-radius:10px;background:#fcfcfd">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                <div style="width:32px;height:32px;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:oklch(0.95 0.035 302);border:1px solid oklch(0.89 0.055 302);display:flex;align-items:center;justify-content:center;font:700 11px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 302)">AL</div>
                 <span style="font:600 14px/1 'Public Sans',sans-serif">Ana Lopes</span>
                 <span style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.5 0.15 152)">★★★★★</span>
                 <span style="margin-left:auto;font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">02/09/2026 · contratação verificada</span>
@@ -780,7 +821,7 @@ a:hover{color:oklch(0.44 0.15 152)}
             </div>
             <div style="padding:16px;border:1px solid #eaecf0;border-radius:10px;background:#fcfcfd">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                <div style="width:32px;height:32px;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:oklch(0.95 0.035 248);border:1px solid oklch(0.89 0.055 248);display:flex;align-items:center;justify-content:center;font:700 11px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 248)">CM</div>
                 <span style="font:600 14px/1 'Public Sans',sans-serif">Construtora Meridiano</span>
                 <span style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.5 0.15 152)">★★★★<span style="color:#d0d5dd">★</span></span>
                 <span style="margin-left:auto;font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">18/08/2026 · contratação verificada</span>
@@ -803,10 +844,11 @@ a:hover{color:oklch(0.44 0.15 152)}
           <button onClick="{{ goSolicitar }}" style="width:100%;padding:14px;border-radius:9px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Solicitar serviço</button>
           <button onClick="{{ goMensagens }}" style="width:100%;margin-top:8px;padding:12px;border-radius:9px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Tirar uma dúvida</button>
           <p style="margin:14px 0 0;font:400 12px/1.5 'Public Sans',sans-serif;color:#98a2b3">O profissional tem até 48 h para aceitar ou recusar. Depois disso a solicitação é cancelada automaticamente.</p>
+          <div onClick="{{ denunciarServico }}" style="margin-top:12px;padding-top:12px;border-top:1px solid #f2f4f7;text-align:center;font:600 12px/1 'Public Sans',sans-serif;color:#98a2b3;cursor:pointer" style-hover="color:#b42318">Denunciar este anúncio</div>
         </div>
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
           <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
-            <div style="width:48px;height:48px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+            <div style="width:48px;height:48px;flex:none;border-radius:50%;background:{{ freelaAv.avBg }};border:1px solid {{ freelaAv.avBd }};display:flex;align-items:center;justify-content:center;font:700 17px/1 'Public Sans',sans-serif;color:{{ freelaAv.avFg }}">{{ freelaAv.ini }}</div>
             <div>
               <div style="font:700 15px/1.2 'Public Sans',sans-serif">{{ freelaSel.nome }}</div>
               <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:3px">{{ freelaSel.titulo }}</div>
@@ -831,7 +873,7 @@ a:hover{color:oklch(0.44 0.15 152)}
         <span style="font:500 11px/1 'JetBrains Mono',monospace;color:#667085;background:#fff;padding:5px 9px;border-radius:5px;border:1px solid #e4e7ec">capa do perfil</span>
       </div>
       <div style="padding:0 28px 24px;display:flex;gap:22px;align-items:flex-end;margin-top:-44px">
-        <div style="width:112px;height:112px;flex:none;border-radius:50%;border:4px solid #fff;background:repeating-linear-gradient(135deg,#eef0f3 0 8px,#f7f8fa 8px 16px)"></div>
+        <div style="width:112px;height:112px;flex:none;border-radius:50%;border:4px solid #fff;background:{{ freelaAv.avBg }};display:flex;align-items:center;justify-content:center;font:700 38px/1 'Public Sans',sans-serif;color:{{ freelaAv.avFg }}">{{ freelaAv.ini }}</div>
         <div style="flex:1;padding-bottom:6px">
           <div style="display:flex;align-items:center;gap:10px">
             <h1 style="margin:0;font:700 28px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">{{ freelaSel.nome }}</h1>
@@ -840,9 +882,21 @@ a:hover{color:oklch(0.44 0.15 152)}
           <div style="font:500 15px/1.4 'Public Sans',sans-serif;color:#475467;margin-top:6px">{{ freelaSel.titulo }}</div>
           <div style="font:400 13px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:4px">{{ freelaSel.local }} · {{ freelaSel.nota }}★ ({{ freelaSel.aval }} avaliações) · {{ freelaSel.entregas }} serviços entregues</div>
         </div>
-        <div style="flex:none;display:flex;gap:8px;padding-bottom:6px">
-          <button onClick="{{ goMensagens }}" style="padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Mensagem</button>
-          <button onClick="{{ goSolicitar }}" style="padding:11px 18px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Solicitar serviço</button>
+        <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-bottom:6px">
+          <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ goMensagens }}" style="padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Mensagem</button>
+            <button onClick="{{ goSolicitar }}" style="padding:11px 18px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Solicitar serviço</button>
+          </div>
+          <span onClick="{{ denunciarPerfil }}" style="font:600 12px/1 'Public Sans',sans-serif;color:#98a2b3;cursor:pointer" style-hover="color:#b42318">Denunciar perfil</span>
+          </sc-if>
+          <sc-if value="{{ isFreelaRole }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ goMeusServicos }}" style="padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Meus serviços</button>
+            <button onClick="{{ goEditarPerfil }}" style="padding:11px 18px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Editar perfil</button>
+          </div>
+          <span style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">Esta é a visão pública do seu perfil</span>
+          </sc-if>
         </div>
       </div>
     </div>
@@ -943,11 +997,300 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:48px;text-align:center">
       <div style="width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:oklch(0.96 0.03 152);border:1px solid oklch(0.88 0.06 152);display:flex;align-items:center;justify-content:center;font:700 22px/1 'Public Sans',sans-serif;color:oklch(0.44 0.15 152)">✓</div>
       <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Solicitação enviada</h1>
-      <p style="margin:0 auto 28px;max-width:50ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">{{ freelaSel.nome }} foi notificado por e-mail e push. Você recebe um aviso assim que houver resposta — o prazo é de 48 horas.</p>
+      <p style="margin:0 auto 28px;max-width:50ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">{{ freelaSel.nome }} foi notificado por e-mail e push. Você recebe um aviso assim que houver resposta — o prazo é de 48 horas. Se ele aceitar, você paga o valor em custódia aqui no app e o serviço entra em execução.</p>
       <div style="display:flex;gap:10px;justify-content:center">
         <button onClick="{{ goContratacoes }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver minhas contratações</button>
         <button onClick="{{ goBusca }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Continuar buscando</button>
       </div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPagamento }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1060px;margin:0 auto;padding:32px 24px 64px">
+    <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">PAGAMENTO · CONTRATAÇÃO #102</div>
+    <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Pagar para iniciar o serviço</h1>
+    <p style="margin:0 0 24px;max-width:70ch;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085;text-wrap:pretty">Rafael Andrade aceitou sua solicitação. O pagamento é feito aqui, dentro do app: o valor fica retido em custódia pela plataforma e só é repassado ao profissional depois que você confirmar a conclusão.</p>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start">
+      <main style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">MÉTODO DE PAGAMENTO</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ metodos }}" as="m" hint-placeholder-count="3">
+              <div onClick="{{ m.escolher }}" style="display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid {{ m.bd }};border-radius:10px;background:{{ m.bg }};cursor:pointer">
+                <span style="width:18px;height:18px;flex:none;border-radius:50%;border:1.5px solid {{ m.bd }};display:flex;align-items:center;justify-content:center"><span style="width:9px;height:9px;border-radius:50%;background:{{ m.dot }}"></span></span>
+                <span style="flex:1;min-width:0">
+                  <span style="display:block;font:600 14px/1.2 'Public Sans',sans-serif;color:#101828">{{ m.nome }}</span>
+                  <span style="display:block;font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">{{ m.desc }}</span>
+                </span>
+                <span style="flex:none;font:600 12px/1 'JetBrains Mono',monospace;color:#98a2b3">{{ m.prazo }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-if value="{{ isPix }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-top:18px;padding-top:18px;border-top:1px solid #f2f4f7;display:flex;gap:20px;align-items:center">
+            <div style="width:150px;height:150px;flex:none;border-radius:10px;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 8px,#f7f8fa 8px 16px);display:flex;align-items:center;justify-content:center;text-align:center;padding:10px"><span style="font:500 11px/1.4 'JetBrains Mono',monospace;color:#667085;background:#fff;padding:5px 8px;border-radius:5px;border:1px solid #e4e7ec">QR Code Pix</span></div>
+            <div style="flex:1;min-width:0">
+              <div style="font:600 14px/1.4 'Public Sans',sans-serif;color:#101828;margin-bottom:8px">Escaneie o QR ou copie o código</div>
+              <div style="padding:11px 13px;border-radius:8px;background:#f9fafb;border:1px solid #e4e7ec;font:400 12px/1.5 'JetBrains Mono',monospace;color:#475467;word-break:break-all;margin-bottom:10px">00020126360014BR.GOV.BCB.PIX0114freelancenow52040000530398654042200</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button style="padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Copiar código</button>
+                <span style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3">Baixa automática em segundos</span>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isCartao }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;padding-top:18px;border-top:1px solid #f2f4f7;display:grid;gap:14px">
+            <div>
+              <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Número do cartão</label>
+              <input placeholder="0000 0000 0000 0000" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+              <div>
+                <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Validade</label>
+                <input placeholder="MM/AA" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+              </div>
+              <div>
+                <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">CVV</label>
+                <input placeholder="000" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+              </div>
+              <div>
+                <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Parcelas</label>
+                <select style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:500 14px/1.4 'Public Sans',sans-serif;background:#fff"><option>1x sem juros</option><option>2x sem juros</option><option>3x sem juros</option></select>
+              </div>
+            </div>
+            <div>
+              <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Nome impresso no cartão</label>
+              <input placeholder="Como aparece no cartão" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+            </div>
+          </div>
+          </sc-if>
+
+          <sc-if value="{{ isBoleto }}" hint-placeholder-val="{{ false }}">
+          <div style="margin-top:18px;padding-top:18px;border-top:1px solid #f2f4f7">
+            <div style="padding:14px 16px;border-radius:10px;background:#fffaeb;border:1px solid #fedf89;font:400 13px/1.6 'Public Sans',sans-serif;color:#b54708">O serviço só entra em execução depois que o boleto for compensado — o que leva de 1 a 3 dias úteis. Para agendamentos urgentes, prefira Pix.</div>
+            <button style="margin-top:14px;padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Gerar boleto</button>
+          </div>
+          </sc-if>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:16px">COMO FUNCIONA A CUSTÓDIA</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+            <div>
+              <div style="width:26px;height:26px;border-radius:8px;background:oklch(0.96 0.03 152);border:1px solid oklch(0.9 0.05 152);display:flex;align-items:center;justify-content:center;font:700 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152);margin-bottom:10px">1</div>
+              <div style="font:600 13px/1.35 'Public Sans',sans-serif;margin-bottom:5px">Você paga agora</div>
+              <p style="margin:0;font:400 12px/1.55 'Public Sans',sans-serif;color:#667085">O valor sai da sua conta e entra na custódia da plataforma. O profissional é avisado e inicia o serviço.</p>
+            </div>
+            <div>
+              <div style="width:26px;height:26px;border-radius:8px;background:oklch(0.96 0.03 152);border:1px solid oklch(0.9 0.05 152);display:flex;align-items:center;justify-content:center;font:700 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152);margin-bottom:10px">2</div>
+              <div style="font:600 13px/1.35 'Public Sans',sans-serif;margin-bottom:5px">O dinheiro fica retido</div>
+              <p style="margin:0;font:400 12px/1.55 'Public Sans',sans-serif;color:#667085">Nem você nem o profissional movimentam o valor durante a execução. Em caso de disputa, ele permanece retido até a mediação.</p>
+            </div>
+            <div>
+              <div style="width:26px;height:26px;border-radius:8px;background:oklch(0.96 0.03 152);border:1px solid oklch(0.9 0.05 152);display:flex;align-items:center;justify-content:center;font:700 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152);margin-bottom:10px">3</div>
+              <div style="font:600 13px/1.35 'Public Sans',sans-serif;margin-bottom:5px">Repasse na conclusão</div>
+              <p style="margin:0;font:400 12px/1.55 'Public Sans',sans-serif;color:#667085">Quando você confirma o recebimento, a plataforma retém a taxa e repassa o restante automaticamente ao profissional.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside style="position:sticky;top:84px;background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
+        <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">RESUMO DA CONTRATAÇÃO</div>
+        <div style="font:600 15px/1.35 'Public Sans',sans-serif;margin-bottom:4px">Caça-vazamento sem quebra</div>
+        <div style="font:400 13px/1.5 'Public Sans',sans-serif;color:#667085;margin-bottom:18px">Rafael Andrade · Encanamento<br>data desejada 12/09/2026<br>QNL 12, Taguatinga Norte — DF</div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid #f2f4f7;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Valor do serviço</span><span style="font-weight:600;color:#101828">{{ vlrServico }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid #f2f4f7;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Taxa para o cliente</span><span style="font-weight:600;color:oklch(0.44 0.15 152)">isento</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:14px 0 18px;border-top:1px solid #e4e7ec;margin-top:4px"><span style="font:700 14px/1 'Public Sans',sans-serif">Total a pagar</span><span style="font:800 22px/1 'Public Sans',sans-serif;letter-spacing:-0.02em">{{ vlrServico }}</span></div>
+        <button onClick="{{ pagar }}" style="width:100%;padding:14px;border-radius:9px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Pagar {{ vlrServico }}</button>
+        <div onClick="{{ goContratacoes }}" style="margin-top:12px;text-align:center;font:600 13px/1 'Public Sans',sans-serif;color:#667085;cursor:pointer">Cancelar</div>
+        <div style="margin-top:16px;padding:12px 14px;border-radius:9px;background:#f9fafb;border:1px solid #eaecf0;font:400 12px/1.55 'Public Sans',sans-serif;color:#475467">Do valor repassado na conclusão, a plataforma retém {{ taxaPct }} de taxa de intermediação. O profissional recebe {{ vlrLiquido }} líquidos.</div>
+        <div style="margin-top:10px;font:400 11px/1.5 'JetBrains Mono',monospace;color:#98a2b3">Transação via HTTPS · dados de pagamento não são armazenados pela plataforma</div>
+      </aside>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isPagamentoOk }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:720px;margin:0 auto;padding:32px 24px 64px">
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:44px 40px;text-align:center">
+      <div style="width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:oklch(0.96 0.03 152);border:1px solid oklch(0.88 0.06 152);display:flex;align-items:center;justify-content:center;font:700 22px/1 'Public Sans',sans-serif;color:oklch(0.44 0.15 152)">✓</div>
+      <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Pagamento em custódia</h1>
+      <p style="margin:0 auto 26px;max-width:52ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">{{ vlrServico }} foram retidos pela plataforma. Rafael Andrade já foi notificado e pode iniciar o serviço — o valor só é repassado quando você confirmar a conclusão.</p>
+      <div style="text-align:left;border:1px solid #e4e7ec;border-radius:10px;overflow:hidden;margin-bottom:24px">
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;background:#f9fafb;border-bottom:1px solid #e4e7ec;font:700 11px/1 'JetBrains Mono',monospace;color:#667085"><span>COMPROVANTE</span><span>{{ trxId }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #f2f4f7;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Contratação</span><span style="color:#101828;font-weight:600">#102 · Caça-vazamento sem quebra</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #f2f4f7;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Método</span><span style="color:#101828;font-weight:600">{{ metodoNome }}</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid #f2f4f7;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Data e hora</span><span style="color:#101828;font-weight:600">09/09/2026 08:41</span></div>
+        <div style="display:flex;justify-content:space-between;gap:10px;padding:12px 16px;font:400 13px/1.4 'Public Sans',sans-serif;color:#475467"><span>Status</span><span style="padding:4px 10px;border-radius:999px;background:#eff8ff;border:1px solid #b2ddff;font:700 11px/1.4 'Public Sans',sans-serif;color:#175cd3">EM CUSTÓDIA</span></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onClick="{{ goContratacoes }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver minhas contratações</button>
+        <button onClick="{{ goTransacao }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver comprovante</button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isTransacao }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:860px;margin:0 auto;padding:32px 24px 64px">
+    <div style="font:400 13px/1 'Public Sans',sans-serif;color:#98a2b3;margin-bottom:18px"><span onClick="{{ goCarteira }}" style="cursor:pointer;color:#667085">Pagamentos</span> / <span style="color:#98a2b3">{{ trxId }}</span></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px">
+      <div>
+        <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">DETALHE DA TRANSAÇÃO</div>
+        <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">{{ vlrServico }} em custódia</h1>
+        <p style="margin:0;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">{{ trxId }} · contratação #102 · Caça-vazamento sem quebra</p>
+      </div>
+      <span style="flex:none;padding:6px 13px;border-radius:999px;background:#eff8ff;border:1px solid #b2ddff;font:700 11px/1.5 'JetBrains Mono',monospace;color:#175cd3">EM CUSTÓDIA</span>
+    </div>
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;align-items:start">
+      <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">COMPOSIÇÃO DO VALOR</div>
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f2f4f7;font:400 14px/1.4 'Public Sans',sans-serif;color:#475467"><span>Valor pago pelo cliente</span><span style="font-weight:600;color:#101828">{{ vlrServico }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f2f4f7;font:400 14px/1.4 'Public Sans',sans-serif;color:#475467"><span>Taxa de intermediação FreeLanceNow ({{ taxaPct }})</span><span style="font-weight:600;color:#b42318">− {{ vlrTaxa }}</span></div>
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:14px 0 0;font:600 15px/1.4 'Public Sans',sans-serif;color:#101828"><span>Repasse ao profissional na conclusão</span><span style="font-weight:800">{{ vlrLiquido }}</span></div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:16px">HISTÓRICO DA TRANSAÇÃO</div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            <div style="display:flex;gap:14px">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.55 0.17 152)"></span><span style="width:2px;flex:1;background:oklch(0.55 0.17 152)"></span></div>
+              <div style="padding-bottom:20px"><div style="font:600 14px/1.3 'Public Sans',sans-serif">Pagamento autorizado</div><div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">{{ metodoNome }} · 09/09/2026 08:41 · autor: cliente</div></div>
+            </div>
+            <div style="display:flex;gap:14px">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:oklch(0.55 0.17 152)"></span><span style="width:2px;flex:1;background:#e4e7ec"></span></div>
+              <div style="padding-bottom:20px"><div style="font:600 14px/1.3 'Public Sans',sans-serif">Valor retido em custódia</div><div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">09/09/2026 08:41 · autor: sistema · contratação passou para EM ANDAMENTO</div></div>
+            </div>
+            <div style="display:flex;gap:14px">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#d0d5dd"></span><span style="width:2px;flex:1;background:#e4e7ec"></span></div>
+              <div style="padding-bottom:20px"><div style="font:600 14px/1.3 'Public Sans',sans-serif;color:#98a2b3">Repasse ao profissional</div><div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:4px">pendente · disparado quando o cliente confirmar a conclusão</div></div>
+            </div>
+            <div style="display:flex;gap:14px">
+              <div style="flex:none;display:flex;flex-direction:column;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#d0d5dd"></span></div>
+              <div><div style="font:600 14px/1.3 'Public Sans',sans-serif;color:#98a2b3">Saque para a conta do profissional</div><div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:4px">pendente · solicitado pelo profissional na carteira</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <aside style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">PARTES</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:34px;height:34px;flex:none;border-radius:50%;background:oklch(0.95 0.035 302);border:1px solid oklch(0.89 0.055 302);display:flex;align-items:center;justify-content:center;font:700 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 302)">AL</div>
+              <div><div style="font:600 13px/1.2 'Public Sans',sans-serif">Ana Lopes</div><div style="font:400 11px/1.3 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">Cliente · pagou</div></div>
+            </div>
+            <div style="display:flex;gap:10px;align-items:center">
+              <div style="width:34px;height:34px;flex:none;border-radius:50%;background:oklch(0.95 0.035 32);border:1px solid oklch(0.89 0.055 32);display:flex;align-items:center;justify-content:center;font:700 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 32)">RA</div>
+              <div><div style="font:600 13px/1.2 'Public Sans',sans-serif">Rafael Andrade</div><div style="font:400 11px/1.3 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">Profissional · recebe na conclusão</div></div>
+            </div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:9px">
+          <button style="padding:11px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Baixar recibo em PDF</button>
+          <button onClick="{{ goContratacoes }}" style="padding:11px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Ver contratação</button>
+          <button onClick="{{ goContestar }}" style="padding:11px;border-radius:8px;border:1px solid #fda29b;background:#fff;color:#b42318;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Abrir disputa sobre o valor</button>
+        </div>
+        <div style="background:#f9fafb;border:1px solid #eaecf0;border-radius:12px;padding:16px;font:400 12px/1.6 'Public Sans',sans-serif;color:#475467">Toda movimentação da transação é gravada em log com data, hora e responsável — cliente, profissional ou sistema.</div>
+      </aside>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isCarteira }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1100px;margin:0 auto;padding:24px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:20px">
+      <div>
+        <h1 style="margin:0 0 4px;font:700 26px/1.2 'Public Sans',sans-serif;letter-spacing:-0.025em">{{ tituloCarteira }}</h1>
+        <p style="margin:0;max-width:80ch;font:400 14px/1.4 'Public Sans',sans-serif;color:#667085">{{ subCarteira }}</p>
+      </div>
+      <sc-if value="{{ isFreelaRole }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ goSaque }}" style="flex:none;padding:12px 20px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Solicitar saque</button>
+      </sc-if>
+      <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ goPagamento }}" style="flex:none;padding:12px 20px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Pagar pendente · #102</button>
+      </sc-if>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px">
+      <sc-for list="{{ cardsCarteira }}" as="k" hint-placeholder-count="3">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">{{ k.rotulo }}</div>
+          <div style="font:800 26px/1.1 'Public Sans',sans-serif;letter-spacing:-0.03em">{{ k.valor }}</div>
+          <div style="font:400 12px/1.45 'Public Sans',sans-serif;color:#667085;margin-top:8px">{{ k.nota }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
+      <div style="padding:16px 20px;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span style="font:700 15px/1 'Public Sans',sans-serif">Extrato</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select style="padding:9px 12px;border:1px solid #d0d5dd;border-radius:8px;font:500 13px/1.2 'Public Sans',sans-serif;background:#fff"><option>Últimos 30 dias</option><option>Últimos 90 dias</option><option>Este ano</option></select>
+          <button style="padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer;white-space:nowrap">Exportar CSV</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.5fr) minmax(0,86px) minmax(0,80px) minmax(0,90px) minmax(0,120px);gap:12px;padding:13px 20px;background:#f9fafb;border-bottom:1px solid #e4e7ec;font:700 11px/1 'JetBrains Mono',monospace;color:#667085">
+        <span>DATA</span><span>CONTRATAÇÃO</span><span>{{ colBruto }}</span><span>TAXA</span><span>{{ colLiquido }}</span><span>SITUAÇÃO</span>
+      </div>
+      <sc-for list="{{ extrato }}" as="t" hint-placeholder-count="5">
+        <div style="display:grid;grid-template-columns:minmax(0,0.85fr) minmax(0,1.5fr) minmax(0,86px) minmax(0,80px) minmax(0,90px) minmax(0,120px);gap:12px;padding:15px 20px;border-bottom:1px solid #f2f4f7;align-items:center">
+          <span style="font:400 12px/1.4 'JetBrains Mono',monospace;color:#98a2b3">{{ t.data }}</span>
+          <div style="min-width:0">
+            <div style="font:600 14px/1.35 'Public Sans',sans-serif">{{ t.servico }}</div>
+            <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">#{{ t.ct }} · {{ t.parte }} · {{ t.metodo }}</div>
+          </div>
+          <span style="font:700 14px/1.2 'Public Sans',sans-serif">{{ t.bruto }}</span>
+          <span style="font:400 13px/1.2 'Public Sans',sans-serif;color:#b42318">{{ t.taxa }}</span>
+          <span style="font:700 14px/1.2 'Public Sans',sans-serif;color:oklch(0.42 0.14 152)">{{ t.liquido }}</span>
+          <span style="display:inline-block;padding:5px 11px;border-radius:999px;font:700 11px/1.4 'Public Sans',sans-serif;background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.bd }};justify-self:start">{{ t.label }}</span>
+        </div>
+      </sc-for>
+      <div style="padding:16px 20px;font:400 12px/1.6 'Public Sans',sans-serif;color:#667085">{{ notaExtrato }}</div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isSaque }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:680px;margin:0 auto;padding:32px 24px 64px">
+    <sc-if value="{{ !saqueEnviado }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">CARTEIRA · SAQUE</div>
+      <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Solicitar saque</h1>
+      <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">Saldo disponível: {{ vlrDisponivel }} · valores em custódia entram no saldo assim que o cliente confirma a conclusão.</p>
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;display:grid;gap:20px">
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Valor do saque <span style="color:#d92d20">*</span></label>
+          <input placeholder="0,00" style="width:100%;padding:12px 13px;border:1px solid #d0d5dd;border-radius:8px;font:600 16px/1.4 'Public Sans',sans-serif">
+          <div style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3;margin-top:6px">Mínimo de R$ 20,00 · máximo {{ vlrDisponivel }}</div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">Destino</label>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <label style="display:flex;gap:11px;align-items:center;padding:13px 15px;border:1.5px solid oklch(0.55 0.17 152);border-radius:10px;background:oklch(0.985 0.008 152);cursor:pointer"><input type="radio" name="destino" checked="{{ true }}" style="accent-color:oklch(0.55 0.17 152)"><span><span style="display:block;font:600 14px/1.2 'Public Sans',sans-serif">Chave Pix · CPF ***.456.789-**</span><span style="display:block;font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">Crédito em até 1 dia útil · sem tarifa</span></span></label>
+            <label style="display:flex;gap:11px;align-items:center;padding:13px 15px;border:1px solid #d0d5dd;border-radius:10px;background:#fff;cursor:pointer"><input type="radio" name="destino" style="accent-color:oklch(0.55 0.17 152)"><span><span style="display:block;font:600 14px/1.2 'Public Sans',sans-serif">Conta bancária · Banco 001 ag. 1234 c/c 56789-0</span><span style="display:block;font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">Crédito em até 2 dias úteis · TED sem tarifa</span></span></label>
+          </div>
+        </div>
+        <div style="padding:14px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0;font:400 13px/1.6 'Public Sans',sans-serif;color:#475467">A taxa de intermediação de {{ taxaPct }} já foi descontada no repasse de cada contratação concluída. O saque em si não tem custo.</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onClick="{{ goCarteira }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Cancelar</button>
+        <button onClick="{{ confirmarSaque }}" style="flex:1;padding:13px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Confirmar saque</button>
+      </div>
+    </div>
+    </sc-if>
+    <sc-if value="{{ saqueEnviado }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:48px;text-align:center">
+      <div style="width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:oklch(0.96 0.03 152);border:1px solid oklch(0.88 0.06 152);display:flex;align-items:center;justify-content:center;font:700 22px/1 'Public Sans',sans-serif;color:oklch(0.44 0.15 152)">✓</div>
+      <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Saque solicitado</h1>
+      <p style="margin:0 auto 28px;max-width:50ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">{{ vlrDisponivel }} a caminho da sua chave Pix. Você recebe uma notificação quando o crédito for confirmado — normalmente em até 1 dia útil.</p>
+      <button onClick="{{ goCarteira }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Voltar à carteira</button>
     </div>
     </sc-if>
   </div>
@@ -967,17 +1310,17 @@ a:hover{color:oklch(0.44 0.15 152)}
       </div>
     </div>
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
-      <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px 175px 95px 135px;gap:12px;padding:13px 20px;background:#f9fafb;border-bottom:1px solid #e4e7ec;font:700 11px/1 'JetBrains Mono',monospace;color:#667085">
-        <span>SERVIÇO</span><span>{{ colParte }}</span><span>STATUS</span><span>VALOR</span><span>AÇÃO</span>
+      <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,110px) minmax(0,130px) minmax(0,80px) minmax(0,116px) minmax(0,110px);gap:12px;padding:13px 20px;background:#f9fafb;border-bottom:1px solid #e4e7ec;font:700 11px/1 'JetBrains Mono',monospace;color:#667085">
+        <span>SERVIÇO</span><span>{{ colParte }}</span><span>STATUS</span><span>VALOR</span><span>PAGAMENTO</span><span>AÇÃO</span>
       </div>
       <sc-for list="{{ contratacoes }}" as="ct" hint-placeholder-count="5">
-        <div style="display:grid;grid-template-columns:minmax(0,1fr) 150px 175px 95px 135px;gap:12px;padding:16px 20px;border-bottom:1px solid #f2f4f7;align-items:center">
-          <div>
-            <div style="font:600 14px/1.35 'Public Sans',sans-serif">{{ ct.servico }}</div>
+        <div style="display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,110px) minmax(0,130px) minmax(0,80px) minmax(0,116px) minmax(0,110px);gap:12px;padding:16px 20px;border-bottom:1px solid #f2f4f7;align-items:center">
+          <div onClick="{{ ct.abrirDetalhe }}" style="cursor:pointer">
+            <div style="font:600 14px/1.35 'Public Sans',sans-serif" style-hover="color:oklch(0.44 0.15 152)">{{ ct.servico }}</div>
             <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">#{{ ct.id }} · {{ ct.cat }} · {{ ct.data }}</div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:26px;height:26px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+            <div style="width:26px;height:26px;flex:none;border-radius:50%;background:{{ ct.avBg }};border:1px solid {{ ct.avBd }};display:flex;align-items:center;justify-content:center;font:700 10px/1 'Public Sans',sans-serif;color:{{ ct.avFg }}">{{ ct.ini }}</div>
             <span style="font:500 13px/1.3 'Public Sans',sans-serif;color:#475467">{{ ct.parte }}</span>
           </div>
           <div>
@@ -985,13 +1328,19 @@ a:hover{color:oklch(0.44 0.15 152)}
           </div>
           <div style="font:700 14px/1 'Public Sans',sans-serif">{{ ct.valor }}</div>
           <div>
+            <span onClick="{{ ct.verTransacao }}" style="display:inline-block;padding:5px 10px;border-radius:999px;font:700 11px/1.4 'Public Sans',sans-serif;background:{{ ct.pgBg }};color:{{ ct.pgFg }};border:1px solid {{ ct.pgBd }};cursor:pointer">{{ ct.pgLabel }}</span>
+          </div>
+          <div>
             <span onClick="{{ ct.acao }}" style="font:600 13px/1.3 'Public Sans',sans-serif;color:oklch(0.52 0.16 152);cursor:pointer">{{ ct.acaoLabel }}</span>
           </div>
         </div>
       </sc-for>
     </div>
     <div style="margin-top:16px;padding:16px 20px;background:#fff;border:1px solid #e4e7ec;border-radius:12px">
-      <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">HISTÓRICO DA CONTRATAÇÃO #101</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px">
+        <span style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3">HISTÓRICO DA CONTRATAÇÃO #101</span>
+        <span onClick="{{ goContratacaoDetalhe }}" style="font:600 12px/1 'Public Sans',sans-serif;color:oklch(0.52 0.16 152);cursor:pointer">Abrir detalhe completo →</span>
+      </div>
       <div style="display:flex;align-items:center;gap:0">
         <div style="flex:1;display:flex;align-items:center;gap:10px">
           <div style="width:10px;height:10px;border-radius:50%;background:oklch(0.55 0.17 152)"></div>
@@ -1001,6 +1350,11 @@ a:hover{color:oklch(0.44 0.15 152)}
         <div style="flex:1;display:flex;align-items:center;gap:10px">
           <div style="width:10px;height:10px;border-radius:50%;background:oklch(0.55 0.17 152)"></div>
           <div><div style="font:600 12px/1.2 'Public Sans',sans-serif">Aceito</div><div style="font:400 11px/1.2 'JetBrains Mono',monospace;color:#98a2b3;margin-top:3px">02/09 16:40</div></div>
+          <div style="flex:1;height:2px;background:oklch(0.55 0.17 152)"></div>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;gap:10px">
+          <div style="width:10px;height:10px;border-radius:50%;background:#175cd3"></div>
+          <div><div style="font:600 12px/1.2 'Public Sans',sans-serif;color:#175cd3">Pago · em custódia</div><div style="font:400 11px/1.2 'JetBrains Mono',monospace;color:#98a2b3;margin-top:3px">02/09 16:58</div></div>
           <div style="flex:1;height:2px;background:oklch(0.55 0.17 152)"></div>
         </div>
         <div style="flex:1;display:flex;align-items:center;gap:10px">
@@ -1027,7 +1381,17 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">CONFIRMAR OU CONTESTAR</div>
     <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Marcos Vieira sinalizou a conclusão</h1>
     <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">Instalação de chuveiro elétrico · contratação #101 · R$ 180</p>
-    <div style="padding:14px 16px;border-radius:10px;background:#fff6ed;border:1px solid #f9dbaf;font:500 14px/1.55 'Public Sans',sans-serif;color:#c4320a;margin-bottom:20px">Você tem 5 dias corridos para confirmar ou contestar. Sem resposta, o sistema confirma automaticamente em 13/09/2026.</div>
+    <div style="padding:14px 16px;border-radius:10px;background:#fff6ed;border:1px solid #f9dbaf;font:500 14px/1.55 'Public Sans',sans-serif;color:#c4320a;margin-bottom:16px">Você tem 5 dias corridos para confirmar ou contestar. Sem resposta, o sistema confirma automaticamente em 13/09/2026.</div>
+    <div style="display:flex;gap:16px;align-items:center;padding:16px 18px;border-radius:10px;background:#eff8ff;border:1px solid #b2ddff;margin-bottom:20px">
+      <div style="flex:1;min-width:0">
+        <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#175cd3;margin-bottom:8px">VALOR EM CUSTÓDIA</div>
+        <p style="margin:0;font:400 13px/1.6 'Public Sans',sans-serif;color:#175cd3">Pago por você em 02/09 e retido pela plataforma desde então. Ao confirmar, o repasse é automático: {{ liquido101 }} para Marcos Vieira e {{ taxa101 }} de taxa de intermediação ({{ taxaPct }}).</p>
+      </div>
+      <div style="flex:none;text-align:right">
+        <div style="font:800 26px/1 'Public Sans',sans-serif;letter-spacing:-0.02em;color:#175cd3">{{ vlr101 }}</div>
+        <div onClick="{{ goTransacao }}" style="margin-top:8px;font:600 12px/1 'Public Sans',sans-serif;color:#175cd3;cursor:pointer;text-decoration:underline">ver transação</div>
+      </div>
+    </div>
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;margin-bottom:16px">
       <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">OBSERVAÇÕES FINAIS DO PROFISSIONAL</div>
       <p style="margin:0 0 20px;font:400 15px/1.65 'Public Sans',sans-serif;color:#344054">Chuveiro instalado e testado. Troquei o disjuntor para 32 A porque o antigo era subdimensionado — sem custo adicional. Deixei o manual e a nota na bancada da cozinha.</p>
@@ -1041,7 +1405,7 @@ a:hover{color:oklch(0.44 0.15 152)}
       <button onClick="{{ goAvaliar }}" style="flex:1;padding:15px;border-radius:9px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Confirmar recebimento</button>
       <button onClick="{{ goContestar }}" style="padding:15px 22px;border-radius:9px;border:1px solid #fda29b;background:#fff;color:#b42318;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Contestar conclusão</button>
     </div>
-    <p style="margin:14px 0 0;font:400 13px/1.5 'Public Sans',sans-serif;color:#98a2b3">Ao confirmar, o status vira CONCLUÍDO, a data de conclusão é registrada e o fluxo de avaliação é disparado automaticamente.</p>
+    <p style="margin:14px 0 0;font:400 13px/1.5 'Public Sans',sans-serif;color:#98a2b3">Ao confirmar, o status vira CONCLUÍDO, a data de conclusão é registrada, o valor em custódia é repassado ao profissional e o fluxo de avaliação é disparado automaticamente.</p>
   </div>
   </sc-if>
 
@@ -1097,7 +1461,7 @@ a:hover{color:oklch(0.44 0.15 152)}
           <div style="width:36px;height:36px;flex:none;border-radius:50%;background:#101828;display:flex;align-items:center;justify-content:center;font:700 11px/1 'Public Sans',sans-serif;color:#fff">AD</div>
           <div>
             <div style="font:600 14px/1 'Public Sans',sans-serif;margin-bottom:5px">Administração FreeLanceNow <span style="font-weight:400;color:#98a2b3">· mediação · aguardando</span></div>
-            <p style="margin:0;font:400 14px/1.6 'Public Sans',sans-serif;color:#667085">Disputa na fila de moderação. A decisão pode manter o status CONCLUÍDO ou reverter para EM ANDAMENTO. Prazo de análise: até 3 dias úteis.</p>
+            <p style="margin:0;font:400 14px/1.6 'Public Sans',sans-serif;color:#667085">Disputa na fila de moderação. O valor pago permanece retido em custódia — não há repasse nem reembolso até a decisão. O administrador pode manter o status CONCLUÍDO, liberando o repasse, ou reverter para EM ANDAMENTO. Prazo de análise: até 3 dias úteis.</p>
           </div>
         </div>
       </div>
@@ -1117,9 +1481,9 @@ a:hover{color:oklch(0.44 0.15 152)}
   <div style="max-width:680px;margin:0 auto;padding:32px 24px 64px">
     <sc-if value="{{ !avaliacaoEnviada }}" hint-placeholder-val="{{ true }}">
     <div>
-      <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">AVALIAÇÃO DE SERVIÇO</div>
-      <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Como foi o serviço?</h1>
-      <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">Instalação de chuveiro elétrico · Marcos Vieira · concluído em 09/09/2026</p>
+      <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">{{ avalTag }}</div>
+      <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">{{ avalTitulo }}</h1>
+      <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">{{ avalSub }}</p>
       <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:28px">
         <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:12px">Nota <span style="color:#d92d20">*</span></label>
         <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -1129,9 +1493,9 @@ a:hover{color:oklch(0.44 0.15 152)}
         </div>
         <div style="font:500 13px/1 'Public Sans',sans-serif;color:#667085;margin-bottom:26px">{{ notaLabel }}</div>
         <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Comentário</label>
-        <textarea rows="5" placeholder="Conte como foi a experiência: pontualidade, comunicação, qualidade do serviço." style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.55 'Public Sans',sans-serif;resize:vertical"></textarea>
+        <textarea rows="5" placeholder="{{ avalPlaceholder }}" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.55 'Public Sans',sans-serif;resize:vertical"></textarea>
         <div style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Opcional · até 500 caracteres</div>
-        <div style="margin-top:20px;padding:14px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0;font:400 13px/1.6 'Public Sans',sans-serif;color:#475467">Avaliações não podem ser editadas depois de publicadas e só são aceitas em até 7 dias após a conclusão.</div>
+        <div style="margin-top:20px;padding:14px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0;font:400 13px/1.6 'Public Sans',sans-serif;color:#475467">{{ avalRegra }}</div>
       </div>
       <div style="display:flex;gap:10px;margin-top:20px">
         <button onClick="{{ goContratacoes }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Cancelar</button>
@@ -1143,10 +1507,10 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:48px;text-align:center">
       <div style="font:400 40px/1 'Public Sans',sans-serif;color:oklch(0.55 0.17 152);margin-bottom:16px">★★★★★</div>
       <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Avaliação publicada</h1>
-      <p style="margin:0 auto 28px;max-width:50ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">Sua avaliação já aparece no perfil de Marcos Vieira e a média dele foi recalculada. Obrigado por contribuir com a reputação da plataforma.</p>
+      <p style="margin:0 auto 28px;max-width:50ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">{{ avalOkTexto }}</p>
       <div style="display:flex;gap:10px;justify-content:center">
-        <button onClick="{{ goPerfilFreela }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver no perfil</button>
-        <button onClick="{{ goFeed }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Voltar ao início</button>
+        <button onClick="{{ avalVerPerfil }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">{{ avalOkBotao }}</button>
+        <button onClick="{{ goInicio }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Voltar ao início</button>
       </div>
     </div>
     </sc-if>
@@ -1192,7 +1556,7 @@ a:hover{color:oklch(0.44 0.15 152)}
         <div style="padding:14px 16px;border-bottom:1px solid #e4e7ec"><input placeholder="Buscar conversa" style="width:100%;padding:9px 11px;border:1px solid #d0d5dd;border-radius:7px;font:400 13px/1.2 'Public Sans',sans-serif"></div>
         <sc-for list="{{ conversas }}" as="cv" hint-placeholder-count="4">
           <div style="padding:14px 16px;border-bottom:1px solid #f2f4f7;display:flex;gap:11px;align-items:center;cursor:pointer;background:{{ cv.fundo }}">
-            <div style="width:38px;height:38px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+            <div style="width:38px;height:38px;flex:none;border-radius:50%;background:{{ cv.avBg }};border:1px solid {{ cv.avBd }};display:flex;align-items:center;justify-content:center;font:700 13px/1 'Public Sans',sans-serif;color:{{ cv.avFg }}">{{ cv.ini }}</div>
             <div style="flex:1;min-width:0">
               <div style="display:flex;justify-content:space-between;gap:8px"><span style="font:600 13px/1.3 'Public Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ cv.nome }}</span><span style="font:400 11px/1.3 'Public Sans',sans-serif;color:#98a2b3;flex:none">{{ cv.hora }}</span></div>
               <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:3px">{{ cv.previa }}</div>
@@ -1202,7 +1566,7 @@ a:hover{color:oklch(0.44 0.15 152)}
       </div>
       <div style="display:flex;flex-direction:column">
         <div style="padding:14px 20px;border-bottom:1px solid #e4e7ec;display:flex;align-items:center;gap:12px">
-          <div style="width:36px;height:36px;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+          <div style="width:36px;height:36px;flex:none;border-radius:50%;background:oklch(0.95 0.035 200);border:1px solid oklch(0.89 0.055 200);display:flex;align-items:center;justify-content:center;font:700 13px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 200)">MV</div>
           <div><div style="font:700 14px/1.2 'Public Sans',sans-serif">Marcos Vieira</div><div style="font:400 12px/1.2 'Public Sans',sans-serif;color:#98a2b3;margin-top:2px">Eletricista · responde em até 3 h</div></div>
           <button onClick="{{ goServico }}" style="margin-left:auto;padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Ver serviço</button>
         </div>
@@ -1226,23 +1590,31 @@ a:hover{color:oklch(0.44 0.15 152)}
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden;margin-bottom:20px">
       <div style="height:140px;background:repeating-linear-gradient(135deg,#eef0f3 0 12px,#f7f8fa 12px 24px)"></div>
       <div style="padding:0 28px 24px;display:flex;gap:20px;align-items:flex-end;margin-top:-40px">
-        <div style="width:100px;height:100px;flex:none;border-radius:16px;border:4px solid #fff;background:repeating-linear-gradient(135deg,#eef0f3 0 8px,#f7f8fa 8px 16px)"></div>
+        <div style="width:100px;height:100px;flex:none;border-radius:16px;border:4px solid #fff;background:{{ perfilCli.avBg }};display:flex;align-items:center;justify-content:center;font:700 34px/1 'Public Sans',sans-serif;color:{{ perfilCli.avFg }}">{{ perfilCli.ini }}</div>
         <div style="flex:1;padding-bottom:6px">
           <div style="display:flex;align-items:center;gap:10px">
-            <h1 style="margin:0;font:700 26px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Construtora Meridiano</h1>
-            <span style="padding:4px 10px;border-radius:999px;background:#eff8ff;color:#175cd3;border:1px solid #b2ddff;font:700 10px/1 'JetBrains Mono',monospace">CNPJ VERIFICADO</span>
+            <h1 style="margin:0;font:700 26px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">{{ perfilCli.nome }}</h1>
+            <span style="padding:4px 10px;border-radius:999px;background:#eff8ff;color:#175cd3;border:1px solid #b2ddff;font:700 10px/1 'JetBrains Mono',monospace;white-space:nowrap">{{ perfilCli.selo }}</span>
           </div>
-          <div style="font:500 14px/1.4 'Public Sans',sans-serif;color:#475467;margin-top:6px">Cliente empresa · Construção civil · Guará, DF</div>
-          <div style="font:400 13px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:4px">Na plataforma desde março de 2026 · 46 contratações · paga em média em 2 dias</div>
+          <div style="font:500 14px/1.4 'Public Sans',sans-serif;color:#475467;margin-top:6px">{{ perfilCli.linha }}</div>
+          <div style="font:400 13px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:4px">{{ perfilCli.meta }}</div>
         </div>
-        <button onClick="{{ goMensagens }}" style="flex:none;padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Enviar mensagem</button>
+        <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px">
+          <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ true }}">
+          <button onClick="{{ goEditarPerfil }}" style="padding:11px 18px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Editar perfil</button>
+          </sc-if>
+          <sc-if value="{{ isFreelaRole }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ goMensagens }}" style="padding:11px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Enviar mensagem</button>
+          <span onClick="{{ goDenunciar }}" style="font:600 12px/1 'Public Sans',sans-serif;color:#98a2b3;cursor:pointer" style-hover="color:#b42318">Denunciar perfil</span>
+          </sc-if>
+        </div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:20px;align-items:start">
       <main style="display:flex;flex-direction:column;gap:16px">
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px">
-          <h2 style="margin:0 0 12px;font:700 16px/1 'Public Sans',sans-serif">Sobre a empresa</h2>
-          <p style="margin:0;font:400 15px/1.7 'Public Sans',sans-serif;color:#344054;max-width:74ch;text-wrap:pretty">Construtora de médio porte com quatro obras residenciais ativas no Distrito Federal. Contratamos serviços elétricos, hidráulicos e de limpeza pós-obra de forma recorrente, com pagamento em até 5 dias após a conclusão.</p>
+          <h2 style="margin:0 0 12px;font:700 16px/1 'Public Sans',sans-serif">{{ perfilCli.tituloSobre }}</h2>
+          <p style="margin:0;font:400 15px/1.7 'Public Sans',sans-serif;color:#344054;max-width:74ch;text-wrap:pretty">{{ perfilCli.sobre }}</p>
         </div>
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px">
           <h2 style="margin:0 0 6px;font:700 16px/1 'Public Sans',sans-serif">O que costuma contratar</h2>
@@ -1257,21 +1629,21 @@ a:hover{color:oklch(0.44 0.15 152)}
           <h2 style="margin:0 0 14px;font:700 16px/1 'Public Sans',sans-serif">Avaliações recebidas de profissionais</h2>
           <div style="padding:16px;border:1px solid #eaecf0;border-radius:10px;background:#fcfcfd">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-              <span style="font:600 14px/1 'Public Sans',sans-serif">Marcos Vieira</span>
+              <span style="font:600 14px/1 'Public Sans',sans-serif">{{ perfilCli.avAutor }}</span>
               <span style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.5 0.15 152)">★★★★★</span>
-              <span style="margin-left:auto;font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">19/08/2026</span>
+              <span style="margin-left:auto;font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">{{ perfilCli.avData }}</span>
             </div>
-            <p style="margin:0;font:400 14px/1.6 'Public Sans',sans-serif;color:#344054">Escopo bem definido e pagamento no prazo combinado. Voltaria a atender.</p>
+            <p style="margin:0;font:400 14px/1.6 'Public Sans',sans-serif;color:#344054">{{ perfilCli.avTexto }}</p>
           </div>
         </div>
       </main>
       <aside style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
         <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">TRANSPARÊNCIA</div>
         <div style="display:grid;gap:12px">
-          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Contratações</span><strong style="font-weight:700;color:#101828">46</strong></div>
-          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Nota como cliente</span><strong style="font-weight:700;color:#101828">4,9★</strong></div>
-          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Cancelamentos</span><strong style="font-weight:700;color:#101828">1</strong></div>
-          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Disputas abertas</span><strong style="font-weight:700;color:#101828">1</strong></div>
+          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Contratações</span><strong style="font-weight:700;color:#101828">{{ perfilCli.contratacoes }}</strong></div>
+          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Nota como cliente</span><strong style="font-weight:700;color:#101828">{{ perfilCli.nota }}</strong></div>
+          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Cancelamentos</span><strong style="font-weight:700;color:#101828">{{ perfilCli.cancelamentos }}</strong></div>
+          <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Disputas abertas</span><strong style="font-weight:700;color:#101828">{{ perfilCli.disputas }}</strong></div>
         </div>
       </aside>
     </div>
@@ -1319,7 +1691,7 @@ a:hover{color:oklch(0.44 0.15 152)}
           <sc-for list="{{ solicitacoes }}" as="sol" hint-placeholder-count="2">
             <div style="padding:18px 20px;border-bottom:1px solid #f2f4f7">
               <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-                <div style="width:32px;height:32px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:{{ sol.avBg }};border:1px solid {{ sol.avBd }};display:flex;align-items:center;justify-content:center;font:700 11px/1 'Public Sans',sans-serif;color:{{ sol.avFg }}">{{ sol.ini }}</div>
                 <div><div style="font:600 14px/1.2 'Public Sans',sans-serif">{{ sol.cliente }}</div><div style="font:400 12px/1.2 'Public Sans',sans-serif;color:#98a2b3;margin-top:2px">{{ sol.tipo }}</div></div>
                 <span style="margin-left:auto;padding:5px 10px;border-radius:999px;background:#fff6ed;border:1px solid #f9dbaf;font:700 11px/1 'Public Sans',sans-serif;color:#c4320a">{{ sol.prazo }}</span>
               </div>
@@ -1349,6 +1721,19 @@ a:hover{color:oklch(0.44 0.15 152)}
         </div>
       </main>
       <aside style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">CARTEIRA</div>
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:10px">
+            <span style="font:400 13px/1.3 'Public Sans',sans-serif;color:#475467">Em custódia</span>
+            <span style="font:700 16px/1 'Public Sans',sans-serif;color:#175cd3">{{ vlrCustodia }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding-top:10px;border-top:1px solid #f2f4f7">
+            <span style="font:400 13px/1.3 'Public Sans',sans-serif;color:#475467">Disponível para saque</span>
+            <span style="font:700 16px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152)">{{ vlrDisponivel }}</span>
+          </div>
+          <p style="margin:12px 0 0;font:400 12px/1.5 'Public Sans',sans-serif;color:#667085">Valores em custódia caem no saldo quando o cliente confirma a conclusão, já com a taxa de {{ taxaPct }} descontada.</p>
+          <button onClick="{{ goCarteira }}" style="width:100%;margin-top:12px;padding:10px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Abrir carteira</button>
+        </div>
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
           <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">DESEMPENHO DOS ANÚNCIOS</div>
           <div style="display:flex;flex-direction:column;gap:14px">
@@ -1486,7 +1871,7 @@ a:hover{color:oklch(0.44 0.15 152)}
       <sc-for list="{{ solicitacoes }}" as="sol" hint-placeholder-count="2">
         <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px">
           <div style="display:flex;align-items:flex-start;gap:14px;margin-bottom:16px">
-            <div style="width:44px;height:44px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+            <div style="width:44px;height:44px;flex:none;border-radius:50%;background:{{ sol.avBg }};border:1px solid {{ sol.avBd }};display:flex;align-items:center;justify-content:center;font:700 15px/1 'Public Sans',sans-serif;color:{{ sol.avFg }}">{{ sol.ini }}</div>
             <div style="flex:1">
               <div style="font:700 16px/1.3 'Public Sans',sans-serif">{{ sol.cliente }}</div>
               <div style="font:400 13px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">{{ sol.tipo }} · solicitação #{{ sol.id }}</div>
@@ -1506,10 +1891,11 @@ a:hover{color:oklch(0.44 0.15 152)}
             </div>
           </div>
           <div style="font:700 10px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:7px">DESCRIÇÃO DA DEMANDA</div>
-          <p style="margin:0 0 18px;font:400 14px/1.65 'Public Sans',sans-serif;color:#344054">{{ sol.desc }}</p>
+          <p style="margin:0 0 16px;font:400 14px/1.65 'Public Sans',sans-serif;color:#344054">{{ sol.desc }}</p>
+          <div style="padding:12px 14px;border-radius:9px;background:#eff8ff;border:1px solid #b2ddff;font:400 13px/1.6 'Public Sans',sans-serif;color:#175cd3;margin-bottom:16px">Ao aceitar, o cliente é notificado para pagar {{ sol.valor }} em custódia. O serviço entra em execução quando o pagamento for confirmado, e o repasse cai na sua carteira depois que o cliente confirmar a conclusão.</div>
           <div style="display:flex;gap:8px">
             <button onClick="{{ goContratacoes }}" style="padding:11px 20px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Aceitar solicitação</button>
-            <button style="padding:11px 20px;border-radius:8px;border:1px solid #fda29b;background:#fff;color:#b42318;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Recusar</button>
+            <button onClick="{{ goContratacoes }}" style="padding:11px 20px;border-radius:8px;border:1px solid #fda29b;background:#fff;color:#b42318;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Recusar</button>
             <button onClick="{{ goMensagens }}" style="padding:11px 20px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Perguntar ao cliente</button>
           </div>
         </div>
@@ -1522,7 +1908,7 @@ a:hover{color:oklch(0.44 0.15 152)}
   <div style="max-width:720px;margin:0 auto;padding:32px 24px 64px">
     <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">CONCLUSÃO DO SERVIÇO</div>
     <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Marcar como concluído</h1>
-    <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">Instalação de chuveiro elétrico · Ana Lopes · contratação #101 · R$ 180</p>
+    <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">Instalação de ventilador de teto · Ana Lopes · contratação #107 · R$ 280</p>
     <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;display:grid;gap:20px">
       <div>
         <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Observações finais</label>
@@ -1545,6 +1931,474 @@ a:hover{color:oklch(0.44 0.15 152)}
   </div>
   </sc-if>
 
+  <sc-if value="{{ isPropostas }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1200px;margin:0 auto;padding:24px">
+    <div style="margin-bottom:20px">
+      <h1 style="margin:0 0 4px;font:700 26px/1.2 'Public Sans',sans-serif;letter-spacing:-0.025em">Minhas demandas</h1>
+      <p style="margin:0;max-width:84ch;font:400 14px/1.4 'Public Sans',sans-serif;color:#667085">Cada demanda publicada no feed recebe propostas de profissionais da categoria. Aceitar uma proposta cria a contratação e leva ao pagamento em custódia.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start">
+      <aside style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ demandas }}" as="dm" hint-placeholder-count="3">
+          <div onClick="{{ dm.abrir }}" style="background:#fff;border:1.5px solid {{ dm.bd }};border-radius:12px;padding:16px;cursor:pointer" style-hover="border-color:#98a2b3">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">
+              <span style="font:700 10px/1 'JetBrains Mono',monospace;color:#98a2b3">{{ dm.cat }}</span>
+              <span style="padding:4px 9px;border-radius:999px;font:700 10px/1 'JetBrains Mono',monospace;background:{{ dm.stBg }};color:{{ dm.stFg }};border:1px solid {{ dm.stBd }}">{{ dm.status }}</span>
+            </div>
+            <div style="font:600 15px/1.35 'Public Sans',sans-serif;margin-bottom:8px">{{ dm.titulo }}</div>
+            <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085">{{ dm.orcamento }} · prazo {{ dm.prazo }} · publicada {{ dm.publicada }}</div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f2f4f7;display:flex;align-items:center;justify-content:space-between">
+              <span style="font:600 13px/1 'Public Sans',sans-serif;color:{{ dm.corProp }}">{{ dm.qtdLabel }}</span>
+              <span style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.52 0.16 152)">→</span>
+            </div>
+          </div>
+        </sc-for>
+        <div onClick="{{ goPublicar }}" style="border:1.5px dashed #d0d5dd;border-radius:12px;padding:16px;text-align:center;cursor:pointer;font:600 13px/1 'Public Sans',sans-serif;color:#667085" style-hover="border-color:oklch(0.55 0.17 152);color:oklch(0.44 0.15 152)">+ Publicar nova demanda</div>
+      </aside>
+
+      <main style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:22px 24px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px">
+            <div style="min-width:0">
+              <h2 style="margin:0 0 6px;font:700 19px/1.3 'Public Sans',sans-serif;letter-spacing:-0.02em">{{ demandaSel.titulo }}</h2>
+              <p style="margin:0;max-width:78ch;font:400 14px/1.6 'Public Sans',sans-serif;color:#475467;text-wrap:pretty">{{ demandaSel.texto }}</p>
+            </div>
+            <button onClick="{{ goPublicar }}" style="flex:none;padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Editar demanda</button>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+            <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">{{ demandaSel.cat }}</span>
+            <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">{{ demandaSel.orcamento }}</span>
+            <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">prazo {{ demandaSel.prazo }}</span>
+            <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">{{ demandaSel.local }}</span>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px">
+          <span style="font:700 12px/1 'JetBrains Mono',monospace;color:#98a2b3">{{ demandaSel.qtdLabel }}</span>
+          <div style="flex:1;height:1px;background:#e4e7ec"></div>
+          <sc-for list="{{ ordens }}" as="o" hint-placeholder-count="3">
+            <span onClick="{{ o.aplicar }}" style="flex:none;padding:6px 12px;border-radius:999px;border:1px solid {{ o.bd }};background:{{ o.bg }};font:600 12px/1 'Public Sans',sans-serif;color:{{ o.fg }};cursor:pointer;white-space:nowrap">{{ o.label }}</span>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ semPropostas }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px dashed #d0d5dd;border-radius:12px;padding:48px 24px;text-align:center">
+            <div style="font:700 16px/1.3 'Public Sans',sans-serif;margin-bottom:8px">Nenhuma proposta ainda</div>
+            <p style="margin:0 auto 20px;max-width:46ch;font:400 14px/1.6 'Public Sans',sans-serif;color:#667085">A demanda foi publicada há {{ demandaSel.publicada }} e já apareceu para os profissionais da categoria. Você também pode chamar alguém direto.</p>
+            <button onClick="{{ goBuscaProf }}" style="padding:11px 20px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">Buscar profissionais</button>
+          </div>
+        </sc-if>
+
+        <sc-for list="{{ propostas }}" as="pr" hint-placeholder-count="4">
+          <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
+            <div style="padding:18px 22px;display:flex;gap:14px;align-items:flex-start">
+              <div style="width:48px;height:48px;flex:none;border-radius:50%;background:{{ pr.avBg }};border:1px solid {{ pr.avBd }};display:flex;align-items:center;justify-content:center;font:700 17px/1 'Public Sans',sans-serif;color:{{ pr.avFg }}">{{ pr.ini }}</div>
+              <div style="flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                  <span onClick="{{ pr.verPerfil }}" style="font:700 16px/1.3 'Public Sans',sans-serif;cursor:pointer">{{ pr.nome }}</span>
+                  <span style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.5 0.15 152)">{{ pr.nota }}★</span>
+                  <span style="font:400 13px/1 'Public Sans',sans-serif;color:#98a2b3">({{ pr.aval }} avaliações · {{ pr.entregas }} entregas)</span>
+                  <sc-if value="{{ pr.destaque }}" hint-placeholder-val="{{ false }}">
+                    <span style="padding:4px 9px;border-radius:999px;background:oklch(0.96 0.03 152);color:oklch(0.4 0.13 152);font:700 10px/1 'JetBrains Mono',monospace">{{ pr.destaque }}</span>
+                  </sc-if>
+                </div>
+                <div style="font:400 13px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:4px">{{ pr.titulo }} · {{ pr.local }}</div>
+              </div>
+              <div style="flex:none;text-align:right">
+                <div style="font:800 22px/1 'Public Sans',sans-serif;letter-spacing:-0.02em">{{ pr.valor }}</div>
+                <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">em {{ pr.prazo }} · enviada {{ pr.quando }}</div>
+              </div>
+            </div>
+            <p style="margin:0;padding:0 22px 14px;font:400 14px/1.65 'Public Sans',sans-serif;color:#344054;text-wrap:pretty">{{ pr.mensagem }}</p>
+            <div style="padding:0 22px 16px;display:flex;gap:8px;flex-wrap:wrap">
+              <sc-for list="{{ pr.tags }}" as="tg" hint-placeholder-count="2">
+                <span style="padding:5px 10px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:500 12px/1 'Public Sans',sans-serif;color:#475467">{{ tg }}</span>
+              </sc-for>
+            </div>
+            <div style="border-top:1px solid #f2f4f7;padding:12px 22px;display:flex;align-items:center;gap:10px">
+              <button onClick="{{ goPagamento }}" style="padding:10px 18px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Aceitar proposta</button>
+              <button onClick="{{ goMensagens }}" style="padding:10px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Conversar</button>
+              <button onClick="{{ pr.verPerfil }}" style="padding:10px 18px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Ver perfil</button>
+              <span onClick="{{ goPropostas }}" style="margin-left:auto;font:600 13px/1 'Public Sans',sans-serif;color:#98a2b3;cursor:pointer" style-hover="color:#b42318">Recusar</span>
+            </div>
+          </div>
+        </sc-for>
+
+        <sc-if value="{{ temPropostas }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:14px 18px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0;font:400 13px/1.6 'Public Sans',sans-serif;color:#475467">Ao aceitar uma proposta, as demais são recusadas automaticamente e a demanda sai do feed. O valor combinado fica em custódia até você confirmar a conclusão.</div>
+        </sc-if>
+      </main>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isEnviarProposta }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:760px;margin:0 auto;padding:32px 24px 64px">
+    <sc-if value="{{ !propostaEnviada }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">RESPOSTA A DEMANDA ABERTA</div>
+      <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Enviar proposta</h1>
+      <p style="margin:0 0 24px;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">O cliente compara todas as propostas recebidas e escolhe uma. Você é notificado da decisão.</p>
+
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px 22px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+          <div style="width:38px;height:38px;flex:none;border-radius:50%;background:oklch(0.95 0.035 302);border:1px solid oklch(0.89 0.055 302);display:flex;align-items:center;justify-content:center;font:700 13px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 302)">AL</div>
+          <div>
+            <div style="font:700 14px/1.2 'Public Sans',sans-serif">Ana Lopes</div>
+            <div style="font:400 12px/1.2 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">Cliente · Pessoa física · Taguatinga, DF</div>
+          </div>
+          <span style="margin-left:auto;padding:5px 10px;border-radius:999px;background:#fff6ed;color:#c4320a;border:1px solid #f9dbaf;font:700 10px/1 'JetBrains Mono',monospace">PROCURA-SE</span>
+        </div>
+        <p style="margin:0 0 14px;font:400 14px/1.65 'Public Sans',sans-serif;color:#344054;text-wrap:pretty">Quadro de distribuição do apartamento vive desarmando. Queria alguém para avaliar e trocar se precisar. Tenho disponibilidade no fim de semana.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">Elétrica</span>
+          <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">R$ 600 a R$ 800</span>
+          <span style="padding:6px 11px;border-radius:7px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'Public Sans',sans-serif;color:#344054">prazo 2 dias</span>
+          <span style="padding:6px 11px;border-radius:7px;background:oklch(0.96 0.03 152);font:600 12px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152)">Combina com seus serviços</span>
+        </div>
+      </div>
+
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;display:grid;gap:20px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Valor da proposta (R$) <span style="color:#d92d20">*</span></label>
+            <input placeholder="720,00" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+            <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Orçamento previsto pelo cliente: R$ 600 a R$ 800</div>
+          </div>
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Prazo de execução <span style="color:#d92d20">*</span></label>
+            <select style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif;background:#fff">
+              <option>1 dia</option>
+              <option selected="selected">2 dias</option>
+              <option>3 dias</option>
+              <option>5 dias</option>
+            </select>
+            <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Contado a partir da confirmação do pagamento</div>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Mensagem ao cliente <span style="color:#d92d20">*</span></label>
+          <textarea rows="5" placeholder="Explique o que está incluso, como você trabalha e o que precisa do cliente no dia." style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.55 'Public Sans',sans-serif;resize:vertical"></textarea>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Até 600 caracteres · não inclua telefone, e-mail ou link de contato</div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">O que está incluso</label>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <label style="display:flex;align-items:center;gap:10px;font:400 14px/1.4 'Public Sans',sans-serif;color:#344054"><input type="checkbox" checked="checked" style="accent-color:oklch(0.55 0.17 152)">Mão de obra e deslocamento</label>
+            <label style="display:flex;align-items:center;gap:10px;font:400 14px/1.4 'Public Sans',sans-serif;color:#344054"><input type="checkbox" style="accent-color:oklch(0.55 0.17 152)">Material (disjuntores, DR, DPS)</label>
+            <label style="display:flex;align-items:center;gap:10px;font:400 14px/1.4 'Public Sans',sans-serif;color:#344054"><input type="checkbox" checked="checked" style="accent-color:oklch(0.55 0.17 152)">Laudo técnico assinado</label>
+            <label style="display:flex;align-items:center;gap:10px;font:400 14px/1.4 'Public Sans',sans-serif;color:#344054"><input type="checkbox" checked="checked" style="accent-color:oklch(0.55 0.17 152)">Garantia de 90 dias</label>
+          </div>
+        </div>
+        <div style="padding:14px;border-radius:10px;background:#eff8ff;border:1px solid #b2ddff;font:400 13px/1.6 'Public Sans',sans-serif;color:#175cd3">Esta demanda já recebeu 4 propostas. A proposta fica válida por 7 dias e pode ser retirada enquanto o cliente não decidir. Aceita a proposta, a contratação é criada e o cliente paga em custódia.</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onClick="{{ goFeedFreela }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Cancelar</button>
+        <button onClick="{{ enviarProposta }}" style="flex:1;padding:13px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Enviar proposta</button>
+      </div>
+    </div>
+    </sc-if>
+    <sc-if value="{{ propostaEnviada }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:44px 40px;text-align:center">
+      <div style="width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:oklch(0.96 0.03 152);border:1px solid oklch(0.88 0.06 152);display:flex;align-items:center;justify-content:center;font:400 26px/1 'Public Sans',sans-serif;color:oklch(0.44 0.15 152)">✓</div>
+      <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Proposta enviada</h1>
+      <p style="margin:0 auto 28px;max-width:52ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">Ana Lopes recebeu sua proposta de R$ 720 em 2 dias. Se ela aceitar, a contratação aparece em Contratações já aguardando o pagamento em custódia.</p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onClick="{{ goFeedFreela }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Voltar ao feed</button>
+        <button onClick="{{ goContratacoes }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver contratações</button>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isContratacao }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:1100px;margin:0 auto;padding:24px 24px 64px">
+    <div style="font:400 13px/1 'Public Sans',sans-serif;color:#98a2b3;margin-bottom:18px"><span onClick="{{ goContratacoes }}" style="cursor:pointer;color:#667085">{{ tituloContratacoes }}</span> / <span style="color:#475467">#{{ ctSel.id }}</span></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:20px">
+      <div style="min-width:0">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span style="display:inline-block;padding:5px 11px;border-radius:999px;font:700 11px/1.4 'Public Sans',sans-serif;background:{{ ctSel.bg }};color:{{ ctSel.fg }};border:1px solid {{ ctSel.bd }}">{{ ctSel.label }}</span>
+          <span style="font:600 11px/1 'JetBrains Mono',monospace;color:#98a2b3;white-space:nowrap">CONTRATAÇÃO #{{ ctSel.id }}</span>
+        </div>
+        <h1 style="margin:0 0 6px;font:700 28px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">{{ ctSel.servico }}</h1>
+        <p style="margin:0;font:400 14px/1.5 'Public Sans',sans-serif;color:#667085">{{ ctSel.cat }} · {{ parteMin }} {{ ctSel.parte }} · data combinada {{ ctSel.data }}</p>
+      </div>
+      <button onClick="{{ ctSel.acao }}" style="flex:none;padding:12px 20px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 14px/1 'Public Sans',sans-serif;cursor:pointer">{{ ctSel.acaoLabel }}</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start">
+      <main style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px">
+          <h2 style="margin:0 0 20px;font:700 16px/1 'Public Sans',sans-serif">Linha do tempo</h2>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ ctTimeline }}" as="tl" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:22px minmax(0,1fr);gap:14px">
+                <div style="display:flex;flex-direction:column;align-items:center">
+                  <div style="width:13px;height:13px;border-radius:50%;background:{{ tl.bola }};border:2px solid {{ tl.aro }};flex:none;margin-top:2px"></div>
+                  <div style="flex:1;width:2px;background:{{ tl.linha }};min-height:26px"></div>
+                </div>
+                <div style="padding-bottom:20px">
+                  <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+                    <span style="font:600 14px/1.3 'Public Sans',sans-serif;color:{{ tl.corTitulo }}">{{ tl.titulo }}</span>
+                    <span style="font:400 11px/1.3 'JetBrains Mono',monospace;color:#98a2b3">{{ tl.quando }}</span>
+                  </div>
+                  <div style="font:400 13px/1.55 'Public Sans',sans-serif;color:#667085;margin-top:4px;max-width:72ch">{{ tl.desc }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px">
+          <h2 style="margin:0 0 10px;font:700 16px/1 'Public Sans',sans-serif">Escopo combinado</h2>
+          <p style="margin:0;max-width:76ch;font:400 15px/1.7 'Public Sans',sans-serif;color:#344054;text-wrap:pretty">{{ ctSel.escopo }}</p>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px">
+          <h2 style="margin:0 0 6px;font:700 16px/1 'Public Sans',sans-serif">Registros do serviço</h2>
+          <p style="margin:0 0 16px;font:400 13px/1.5 'Public Sans',sans-serif;color:#667085">Comprovantes e fotos anexados na conclusão ficam disponíveis para as duas partes e para a moderação em caso de disputa.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+            <div style="aspect-ratio:4/3;border-radius:8px;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 8px,#f7f8fa 8px 16px);display:flex;align-items:flex-end;padding:10px"><span style="font:500 10px/1 'JetBrains Mono',monospace;color:#667085;background:#fff;padding:4px 7px;border-radius:4px;border:1px solid #e4e7ec">foto — antes</span></div>
+            <div style="aspect-ratio:4/3;border-radius:8px;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 8px,#f7f8fa 8px 16px);display:flex;align-items:flex-end;padding:10px"><span style="font:500 10px/1 'JetBrains Mono',monospace;color:#667085;background:#fff;padding:4px 7px;border-radius:4px;border:1px solid #e4e7ec">foto — depois</span></div>
+            <div style="aspect-ratio:4/3;border-radius:8px;border:1px dashed #d0d5dd;background:#fcfcfd;display:flex;align-items:center;justify-content:center;font:500 11px/1 'JetBrains Mono',monospace;color:#98a2b3">sem anexo</div>
+          </div>
+        </div>
+      </main>
+
+      <aside style="display:flex;flex-direction:column;gap:16px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">PAGAMENTO</div>
+          <div style="display:grid;gap:10px">
+            <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Valor do serviço</span><strong style="font-weight:700;color:#101828">{{ ctSel.valor }}</strong></div>
+            <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467"><span>Taxa da plataforma</span><span style="font-weight:600;color:#475467">{{ ctSel.txt }}</span></div>
+            <div style="display:flex;justify-content:space-between;font:400 13px/1 'Public Sans',sans-serif;color:#475467;padding-top:10px;border-top:1px solid #f2f4f7"><span>{{ colLiquido }}</span><strong style="font-weight:700;color:#101828">{{ ctSel.liq }}</strong></div>
+          </div>
+          <div style="margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <span style="display:inline-block;padding:5px 10px;border-radius:999px;font:700 11px/1.4 'Public Sans',sans-serif;background:{{ ctSel.pgBg }};color:{{ ctSel.pgFg }};border:1px solid {{ ctSel.pgBd }}">{{ ctSel.pgLabel }}</span>
+            <span onClick="{{ goTransacao }}" style="font:600 13px/1 'Public Sans',sans-serif;color:oklch(0.52 0.16 152);cursor:pointer">Ver transação →</span>
+          </div>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:14px">{{ colParte }}</div>
+          <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px">
+            <div style="width:44px;height:44px;flex:none;border-radius:50%;background:{{ ctSel.avBg }};border:1px solid {{ ctSel.avBd }};display:flex;align-items:center;justify-content:center;font:700 15px/1 'Public Sans',sans-serif;color:{{ ctSel.avFg }}">{{ ctSel.ini }}</div>
+            <div style="min-width:0">
+              <div style="font:700 14px/1.2 'Public Sans',sans-serif">{{ ctSel.parte }}</div>
+              <div style="font:400 12px/1.3 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">{{ ctSel.parteSub }}</div>
+            </div>
+          </div>
+          <button onClick="{{ goMensagens }}" style="width:100%;padding:11px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Abrir conversa</button>
+          <button onClick="{{ ctSel.verPerfil }}" style="width:100%;margin-top:8px;padding:11px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Ver perfil</button>
+        </div>
+
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">PROBLEMAS</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span onClick="{{ goDisputa }}" style="font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer" style-hover="color:#101828">Abrir ou acompanhar disputa</span>
+            <span onClick="{{ denunciarContratacao }}" style="font:600 13px/1 'Public Sans',sans-serif;color:#475467;cursor:pointer" style-hover="color:#b42318">Denunciar esta contratação</span>
+          </div>
+          <p style="margin:14px 0 0;font:400 12px/1.55 'Public Sans',sans-serif;color:#98a2b3">Disputas abertas congelam o valor em custódia até a decisão da moderação.</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isEditarPerfil }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:820px;margin:0 auto;padding:32px 24px 64px">
+    <div style="font:600 12px/1 'JetBrains Mono',monospace;color:oklch(0.52 0.16 152);margin-bottom:10px">DADOS DA CONTA</div>
+    <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Editar perfil</h1>
+    <p style="margin:0 0 24px;max-width:74ch;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">{{ editarSub }}</p>
+
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;display:grid;gap:22px">
+      <div style="display:flex;gap:18px;align-items:center">
+        <div style="width:84px;height:84px;flex:none;border-radius:50%;background:oklch(0.96 0.03 152);border:1px solid oklch(0.9 0.05 152);display:flex;align-items:center;justify-content:center;font:700 28px/1 'Public Sans',sans-serif;color:oklch(0.42 0.14 152)">{{ roleInitials }}</div>
+        <div>
+          <div style="font:600 14px/1.3 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">Foto de perfil</div>
+          <div style="display:flex;gap:8px">
+            <button style="padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Enviar foto</button>
+            <button style="padding:9px 15px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#667085;font:600 13px/1 'Public Sans',sans-serif;cursor:pointer">Remover</button>
+          </div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:8px">JPG ou PNG quadrado, mínimo 400×400 px</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Nome completo <span style="color:#d92d20">*</span></label>
+          <input value="{{ roleLabel }}" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Telefone <span style="color:#d92d20">*</span></label>
+          <input placeholder="(61) 90000-0000" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">E-mail</label>
+          <input value="{{ emailPerfil }}" disabled="disabled" style="width:100%;padding:11px 13px;border:1px solid #e4e7ec;border-radius:8px;background:#f9fafb;color:#667085;font:400 14px/1.4 'Public Sans',sans-serif">
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">O e-mail é a chave de login e não pode ser alterado aqui</div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Cidade e UF <span style="color:#d92d20">*</span></label>
+          <input value="{{ cidadePerfil }}" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">{{ bioLabel }}</label>
+        <textarea rows="5" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.55 'Public Sans',sans-serif;resize:vertical">{{ bioValor }}</textarea>
+        <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Aparece no topo do seu perfil público · até 600 caracteres</div>
+      </div>
+
+      <sc-if value="{{ isFreelaRole }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid;gap:22px;padding-top:6px;border-top:1px solid #f2f4f7">
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">Categorias em que você atua</label>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <sc-for list="{{ catsPerfil }}" as="cp" hint-placeholder-count="4">
+              <span onClick="{{ cp.toggle }}" style="padding:9px 15px;border-radius:999px;border:1.5px solid {{ cp.bd }};background:{{ cp.bg }};font:600 13px/1 'Public Sans',sans-serif;color:{{ cp.fg }};cursor:pointer">{{ cp.nome }}</span>
+            </sc-for>
+          </div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:8px">Você só recebe demandas do feed nas categorias selecionadas</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Valor base da visita (R$)</label>
+            <input value="180,00" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+          </div>
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Raio de atendimento</label>
+            <select style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif;background:#fff">
+              <option>até 10 km</option>
+              <option selected="selected">até 25 km</option>
+              <option>até 50 km</option>
+              <option>todo o DF</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">Documentos e certificações</label>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;background:oklch(0.985 0.008 152);border:1px solid oklch(0.9 0.05 152)">
+            <span style="font:700 10px/1 'JetBrains Mono',monospace;color:oklch(0.4 0.13 152);padding:5px 9px;border-radius:999px;background:oklch(0.96 0.03 152)">VERIFICADO</span>
+            <span style="font:400 13px/1.5 'Public Sans',sans-serif;color:#344054">Documento com foto e certificado NR-10 aprovados em 14/02/2026.</span>
+          </div>
+          <div style="border:1.5px dashed #d0d5dd;border-radius:10px;padding:20px;text-align:center;background:#fcfcfd;cursor:pointer;margin-top:10px">
+            <div style="font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:5px">Enviar outro certificado</div>
+            <div style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">PDF ou imagem · análise em até 2 dias úteis</div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <sc-if value="{{ isCliente }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;gap:22px;padding-top:6px;border-top:1px solid #f2f4f7">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Tipo de conta</label>
+            <select style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif;background:#fff">
+              <option selected="selected">Pessoa física</option>
+              <option>Empresa</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">CPF</label>
+            <input value="000.000.000-00" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+          </div>
+        </div>
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Endereço padrão de atendimento</label>
+          <input value="QNL 12, Taguatinga Norte — DF" style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.4 'Public Sans',sans-serif">
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Preenchido automaticamente nas solicitações · só é revelado ao profissional depois do aceite</div>
+        </div>
+      </div>
+      </sc-if>
+
+      <div style="padding:14px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0;font:400 13px/1.6 'Public Sans',sans-serif;color:#475467">Alterações no nome e na foto passam por revisão automática antes de aparecerem no perfil público. Avaliações e histórico de contratações não são afetados.</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <button onClick="{{ voltarPerfil }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Cancelar</button>
+      <button onClick="{{ voltarPerfil }}" style="flex:1;padding:13px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Salvar alterações</button>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isDenunciar }}" hint-placeholder-val="{{ false }}">
+  <div style="max-width:720px;margin:0 auto;padding:32px 24px 64px">
+    <sc-if value="{{ !denunciaEnviada }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <div style="font:600 12px/1 'JetBrains Mono',monospace;color:#b42318;margin-bottom:10px">DENÚNCIA À MODERAÇÃO</div>
+      <h1 style="margin:0 0 6px;font:700 30px/1.2 'Public Sans',sans-serif;letter-spacing:-0.028em">Denunciar conteúdo</h1>
+      <p style="margin:0 0 24px;max-width:70ch;font:400 15px/1.5 'Public Sans',sans-serif;color:#667085">A denúncia entra na fila de moderação da plataforma. Nada é removido automaticamente: um administrador analisa o caso antes de qualquer ação.</p>
+
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:24px;display:grid;gap:22px">
+        <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:10px;background:#f9fafb;border:1px solid #eaecf0">
+          <div style="width:40px;height:40px;flex:none;border-radius:8px;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 6px,#f7f8fa 6px 12px)"></div>
+          <div style="min-width:0">
+            <div style="font:700 10px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:5px">CONTEÚDO DENUNCIADO</div>
+            <div style="font:600 14px/1.3 'Public Sans',sans-serif">{{ denunciaAlvo }}</div>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:10px">Motivo <span style="color:#d92d20">*</span></label>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ motivos }}" as="mo" hint-placeholder-count="5">
+              <div onClick="{{ mo.escolher }}" style="display:flex;gap:12px;align-items:flex-start;padding:13px 15px;border:1.5px solid {{ mo.bd }};border-radius:10px;background:{{ mo.bg }};cursor:pointer">
+                <div style="width:16px;height:16px;flex:none;margin-top:2px;border-radius:50%;border:1.5px solid {{ mo.aro }};display:flex;align-items:center;justify-content:center">
+                  <div style="width:8px;height:8px;border-radius:50%;background:{{ mo.dot }}"></div>
+                </div>
+                <div style="min-width:0">
+                  <div style="font:600 14px/1.3 'Public Sans',sans-serif;color:#101828">{{ mo.nome }}</div>
+                  <div style="font:400 13px/1.5 'Public Sans',sans-serif;color:#667085;margin-top:3px">{{ mo.desc }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">O que aconteceu <span style="color:#d92d20">*</span></label>
+          <textarea rows="5" placeholder="Descreva o ocorrido com o máximo de detalhe: datas, mensagens trocadas e o que foi combinado." style="width:100%;padding:11px 13px;border:1px solid #d0d5dd;border-radius:8px;font:400 14px/1.55 'Public Sans',sans-serif;resize:vertical"></textarea>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:5px">Mínimo 40 caracteres · a outra parte não vê o texto da denúncia</div>
+        </div>
+
+        <div>
+          <label style="display:block;font:600 13px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:8px">Provas (opcional)</label>
+          <div style="border:1.5px dashed #d0d5dd;border-radius:10px;padding:24px;text-align:center;background:#fcfcfd;cursor:pointer">
+            <div style="font:600 14px/1 'Public Sans',sans-serif;color:#344054;margin-bottom:6px">Arraste prints ou fotos</div>
+            <div style="font:400 12px/1 'Public Sans',sans-serif;color:#98a2b3">JPG, PNG ou PDF · até 5 arquivos</div>
+          </div>
+        </div>
+
+        <div style="padding:14px;border-radius:10px;background:#fffaeb;border:1px solid #fedf89;font:400 13px/1.6 'Public Sans',sans-serif;color:#b54708">Denúncias falsas ou repetidas sem fundamento podem levar à suspensão da sua conta. Em caso de disputa sobre serviço já pago, use a contestação da contratação — o dinheiro fica retido até a decisão.</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button onClick="{{ voltarDenuncia }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Cancelar</button>
+        <button onClick="{{ enviarDenuncia }}" style="flex:1;padding:13px;border-radius:8px;border:none;background:#b42318;color:#fff;font:700 15px/1 'Public Sans',sans-serif;cursor:pointer">Enviar denúncia</button>
+      </div>
+    </div>
+    </sc-if>
+    <sc-if value="{{ denunciaEnviada }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:44px 40px;text-align:center">
+      <div style="width:56px;height:56px;margin:0 auto 20px;border-radius:50%;background:#f9fafb;border:1px solid #e4e7ec;display:flex;align-items:center;justify-content:center;font:400 24px/1 'Public Sans',sans-serif;color:#475467">✓</div>
+      <h1 style="margin:0 0 10px;font:700 26px/1.25 'Public Sans',sans-serif;letter-spacing:-0.025em">Denúncia registrada</h1>
+      <p style="margin:0 auto 10px;max-width:52ch;font:400 15px/1.6 'Public Sans',sans-serif;color:#667085">O caso entrou na fila de moderação e recebe resposta em até 48 horas úteis. Você é notificado da decisão.</p>
+      <div style="display:inline-block;margin-bottom:28px;padding:7px 13px;border-radius:8px;background:#f9fafb;border:1px solid #eaecf0;font:600 12px/1 'JetBrains Mono',monospace;color:#475467">PROTOCOLO DEN-2026-0417</div>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <button onClick="{{ goInicio }}" style="padding:13px 22px;border-radius:8px;border:none;background:oklch(0.55 0.17 152);color:#fff;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Voltar ao início</button>
+        <button onClick="{{ goNotificacoes }}" style="padding:13px 22px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 15px/1 'Public Sans',sans-serif;cursor:pointer">Ver meus avisos</button>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
 </div>
 </sc-if>
 
@@ -1562,6 +2416,7 @@ a:hover{color:oklch(0.44 0.15 152)}
     <nav style="display:flex;flex-direction:column;gap:2px;margin-bottom:22px">
       <span onClick="{{ goAdminUsuarios }}" style="padding:10px 12px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#d0d5dd;cursor:pointer;background:{{ navUsuarios }}" style-hover="background:#1d2939;color:#fff">Usuários</span>
       <span onClick="{{ goAdminCategorias }}" style="padding:10px 12px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#d0d5dd;cursor:pointer;background:{{ navCategorias }}" style-hover="background:#1d2939;color:#fff">Categorias</span>
+      <span onClick="{{ goAdminTransacoes }}" style="padding:10px 12px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#d0d5dd;cursor:pointer;background:{{ navTransacoes }}" style-hover="background:#1d2939;color:#fff">Transações</span>
       <span onClick="{{ goAdminModeracao }}" style="padding:10px 12px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#d0d5dd;cursor:pointer;background:{{ navModeracao }};display:flex;align-items:center" style-hover="background:#1d2939;color:#fff">Moderação<span style="margin-left:auto;min-width:18px;padding:0 5px;border-radius:9px;background:#d92d20;color:#fff;font:700 10px/18px 'Public Sans',sans-serif;text-align:center">3</span></span>
       <span onClick="{{ goAdminRelatorios }}" style="padding:10px 12px;border-radius:8px;font:600 13px/1 'Public Sans',sans-serif;color:#d0d5dd;cursor:pointer;background:{{ navRelatorios }}" style-hover="background:#1d2939;color:#fff">Relatórios</span>
     </nav>
@@ -1591,7 +2446,7 @@ a:hover{color:oklch(0.44 0.15 152)}
         <sc-for list="{{ adminUsuarios }}" as="u" hint-placeholder-count="6">
           <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1.45fr) 84px 92px 152px;gap:10px;padding:14px 16px;border-bottom:1px solid #f2f4f7;align-items:center">
             <div style="display:flex;align-items:center;gap:10px">
-              <div style="width:30px;height:30px;flex:none;border-radius:50%;border:1px solid #e4e7ec;background:repeating-linear-gradient(135deg,#eef0f3 0 5px,#f7f8fa 5px 10px)"></div>
+              <div style="width:30px;height:30px;flex:none;border-radius:50%;background:{{ u.avBg }};border:1px solid {{ u.avBd }};display:flex;align-items:center;justify-content:center;font:700 11px/1 'Public Sans',sans-serif;color:{{ u.avFg }}">{{ u.ini }}</div>
               <div style="min-width:0">
                 <div style="font:600 13px/1.3 'Public Sans',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ u.nome }}</div>
                 <div style="font:400 11px/1.3 'JetBrains Mono',monospace;color:#98a2b3;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="cadastro em {{ u.cadastro }}">{{ u.contratacoes }} contr.</div>
@@ -1646,6 +2501,67 @@ a:hover{color:oklch(0.44 0.15 152)}
             </span>
           </div>
         </sc-for>
+      </div>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isAdminTransacoes }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:22px">
+        <div>
+          <h1 style="margin:0 0 4px;font:700 26px/1.2 'Public Sans',sans-serif;letter-spacing:-0.025em">Transações e custódia</h1>
+          <p style="margin:0;max-width:82ch;font:400 14px/1.4 'Public Sans',sans-serif;color:#667085">Movimentação financeira da plataforma. A receita vem da taxa de {{ taxaPct }} retida em cada contratação concluída com sucesso.</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <select style="padding:10px 13px;border:1px solid #d0d5dd;border-radius:8px;font:500 14px/1.2 'Public Sans',sans-serif;background:#fff"><option>Últimos 30 dias</option><option>Últimos 90 dias</option><option>Este ano</option></select>
+          <button style="flex:none;padding:10px 16px;border-radius:8px;border:1px solid #d0d5dd;background:#fff;color:#344054;font:600 14px/1 'Public Sans',sans-serif;white-space:nowrap;cursor:pointer">Exportar CSV</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:20px">
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">VOLUME TRANSACIONADO</div>
+          <div style="font:800 26px/1.1 'Public Sans',sans-serif;letter-spacing:-0.03em">{{ admVolume }}</div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:8px">812 contratações pagas no período</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">TAXA RETIDA (RECEITA)</div>
+          <div style="font:800 26px/1.1 'Public Sans',sans-serif;letter-spacing:-0.03em;color:oklch(0.42 0.14 152)">{{ admReceita }}</div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:8px">{{ taxaPct }} sobre contratações concluídas</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">EM CUSTÓDIA AGORA</div>
+          <div style="font:800 26px/1.1 'Public Sans',sans-serif;letter-spacing:-0.03em;color:#175cd3">{{ admCustodia }}</div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:8px">47 serviços em execução</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;padding:20px">
+          <div style="font:700 11px/1 'JetBrains Mono',monospace;color:#98a2b3;margin-bottom:12px">RETIDO EM DISPUTA</div>
+          <div style="font:800 26px/1.1 'Public Sans',sans-serif;letter-spacing:-0.03em;color:#b42318">{{ admDisputa }}</div>
+          <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#667085;margin-top:8px">3 casos aguardando mediação</div>
+        </div>
+      </div>
+      <div style="background:#fff;border:1px solid #e4e7ec;border-radius:12px;overflow:hidden">
+        <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,80px) minmax(0,72px) minmax(0,116px);gap:12px;padding:13px 20px;background:#f9fafb;border-bottom:1px solid #e4e7ec;font:700 11px/1 'JetBrains Mono',monospace;color:#667085">
+          <span>TRANSAÇÃO</span><span>CONTRATAÇÃO</span><span>VALOR</span><span>TAXA</span><span>SITUAÇÃO</span>
+        </div>
+        <sc-for list="{{ admTransacoes }}" as="t" hint-placeholder-count="5">
+          <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.4fr) minmax(0,80px) minmax(0,72px) minmax(0,116px);gap:12px;padding:15px 20px;border-bottom:1px solid #f2f4f7;align-items:center">
+            <div style="min-width:0">
+              <div style="font:500 12px/1.3 'JetBrains Mono',monospace;color:#344054;overflow-wrap:anywhere">{{ t.id }}</div>
+              <div style="font:400 11px/1.3 'JetBrains Mono',monospace;color:#98a2b3;margin-top:4px">{{ t.data }}</div>
+            </div>
+            <div style="min-width:0">
+              <div style="font:600 14px/1.35 'Public Sans',sans-serif">{{ t.servico }}</div>
+              <div style="font:400 12px/1.4 'Public Sans',sans-serif;color:#98a2b3;margin-top:3px">#{{ t.ct }} · {{ t.cliente }} → {{ t.freela }} · {{ t.metodo }}</div>
+            </div>
+            <span style="font:700 14px/1.2 'Public Sans',sans-serif">{{ t.bruto }}</span>
+            <span style="font:500 13px/1.2 'Public Sans',sans-serif;color:oklch(0.42 0.14 152)">{{ t.taxa }}</span>
+            <span style="display:inline-block;padding:5px 11px;border-radius:999px;font:700 11px/1.4 'Public Sans',sans-serif;background:{{ t.bg }};color:{{ t.fg }};border:1px solid {{ t.bd }};justify-self:start">{{ t.label }}</span>
+          </div>
+        </sc-for>
+        <div style="padding:16px 20px;display:flex;gap:16px;flex-wrap:wrap;font:400 12px/1.6 'Public Sans',sans-serif;color:#667085">
+          <span>O repasse é automático na confirmação da conclusão.</span>
+          <span>Valores em disputa permanecem retidos até a decisão do administrador.</span>
+        </div>
       </div>
     </div>
     </sc-if>
@@ -1771,7 +2687,7 @@ a:hover{color:oklch(0.44 0.15 152)}
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Landing&quot;,&quot;Login&quot;,&quot;Feed do cliente&quot;,&quot;Feed do freelancer&quot;,&quot;Painel do freelancer&quot;,&quot;Painel administrativo&quot;],&quot;default&quot;:&quot;Landing&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Protótipo&quot;},&quot;nomeCliente&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Ana Lopes&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Dados de demonstração&quot;},&quot;nomeFreelancer&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Marcos Vieira&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Dados de demonstração&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;telaInicial&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Landing&quot;,&quot;Login&quot;,&quot;Feed do cliente&quot;,&quot;Feed do freelancer&quot;,&quot;Painel do freelancer&quot;,&quot;Propostas recebidas&quot;,&quot;Enviar proposta&quot;,&quot;Detalhe da contratação&quot;,&quot;Editar perfil&quot;,&quot;Denunciar conteúdo&quot;,&quot;Pagamento em custódia&quot;,&quot;Carteira do freelancer&quot;,&quot;Painel administrativo&quot;,&quot;Transações (admin)&quot;],&quot;default&quot;:&quot;Landing&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Protótipo&quot;},&quot;taxaPlataforma&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:10,&quot;min&quot;:5,&quot;max&quot;:20,&quot;step&quot;:1,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Regras de negócio&quot;}}">
 class Component extends DCLogic {
   state = {
     screen: null,
@@ -1783,7 +2699,32 @@ class Component extends DCLogic {
     busca: '', filtroCat: null, forcarVazio: false,
     servicoId: 11, freelaId: null,
     servicosVazio: false, formErros: false,
-    solicitacaoEnviada: false, avaliacaoEnviada: false, nota: 5
+    solicitacaoEnviada: false, avaliacaoEnviada: false, nota: 5,
+    precoMin: 100, precoMax: 700, notaMin: 4.5,
+    metodoPgto: 'pix', saqueEnviado: false,
+    demandaId: 1, propostaEnviada: false, ordemProp: 'Melhor avaliação',
+    contratacaoId: 101, denunciaAlvo: '', motivoDenuncia: 'ofensivo', denunciaEnviada: false,
+    catsAtivas: ['Elétrica']
+  };
+
+  demandas = [
+    { id: 1, titulo: 'Quadro de distribuição vive desarmando', cat: 'Elétrica', orcamento: 'R$ 600 a R$ 800', prazo: '2 dias', publicada: 'há 2 h', local: 'Taguatinga, DF', status: 'ABERTA', texto: 'Quadro de distribuição do apartamento vive desarmando. Queria alguém para avaliar e trocar se precisar. Tenho disponibilidade no fim de semana.' },
+    { id: 2, titulo: 'Instalação de 3 tomadas 220 V na cozinha', cat: 'Elétrica', orcamento: 'R$ 250 a R$ 400', prazo: '1 dia', publicada: 'há 20 min', local: 'Taguatinga, DF', status: 'ABERTA', texto: 'Preciso de três tomadas 220 V na bancada da cozinha, para forno e cooktop. Parede de alvenaria e o quadro fica a uns 8 metros.' },
+    { id: 3, titulo: 'Diária de limpeza residencial', cat: 'Limpeza / diarista', orcamento: 'R$ 160', prazo: '1 dia', publicada: 'há 12 d', local: 'Taguatinga, DF', status: 'ENCERRADA', texto: 'Apartamento de 2 quartos, limpeza completa com passadoria leve. Demanda encerrada: contratei Juliana Prado.' }
+  ];
+
+  propostasPorDemanda = {
+    1: [
+      { nome: 'Marcos Vieira', fid: 1, titulo: 'Eletricista predial e residencial', local: 'Taguatinga, DF', nota: '4,9', aval: 87, entregas: 132, valor: 'R$ 720', prazo: '2 dias', quando: 'há 1 h', destaque: 'MELHOR AVALIADO', mensagem: 'Faço a avaliação do quadro na mesma visita. Confirmada a troca, instalo quadro novo com disjuntores dimensionados por circuito, DR e DPS, e deixo todos os circuitos identificados. Laudo assinado incluso no valor.', tags: ['Material por sua conta', 'Laudo NR-10', 'Garantia de 90 dias'] },
+      { nome: 'Sérgio Amaral', fid: 1, titulo: 'Eletricista e instalador', local: 'Guará, DF', nota: '4,8', aval: 64, entregas: 96, valor: 'R$ 790', prazo: '1 dia', quando: 'há 6 h', destaque: 'MAIS RÁPIDO', mensagem: 'Trabalho com equipe de dois, então o serviço sai em um dia só. Material incluso no valor, com DR e DPS de marca reconhecida.', tags: ['Material incluso', 'Equipe de 2', 'Garantia de 1 ano'] },
+      { nome: 'Bruno Teixeira', fid: 1, titulo: 'Eletricista residencial', local: 'Ceilândia, DF', nota: '4,6', aval: 38, entregas: 51, valor: 'R$ 580', prazo: '3 dias', quando: 'há 4 h', destaque: '', mensagem: 'Consigo atender no sábado de manhã. O valor cobre mão de obra e disjuntores comuns; DR e DPS entram à parte se você quiser.', tags: ['Atende fim de semana', 'Sem laudo técnico'] },
+      { nome: 'Renato Lima', fid: 1, titulo: 'Serviços elétricos gerais', local: 'Samambaia, DF', nota: '4,3', aval: 15, entregas: 21, valor: 'R$ 460', prazo: '2 dias', quando: 'há 1 d', destaque: 'MENOR PREÇO', mensagem: 'Faço por 460 à vista. Avalio o quadro e troco o que estiver ruim, material por sua conta.', tags: ['Material por sua conta'] }
+    ],
+    2: [],
+    3: [
+      { nome: 'Juliana Prado', fid: 2, titulo: 'Diarista e limpeza pós-obra', local: 'Águas Claras, DF', nota: '4,8', aval: 154, entregas: 210, valor: 'R$ 160', prazo: '1 dia', quando: 'há 12 d', destaque: 'PROPOSTA ACEITA', mensagem: 'Levo os produtos, sem custo extra. Faço os dois quartos, banheiros, cozinha e passadoria leve na mesma diária.', tags: ['Material incluso', 'Passadoria leve'] },
+      { nome: 'Tatiane Moreira', fid: 2, titulo: 'Diarista', local: 'Taguatinga, DF', nota: '4,5', aval: 29, entregas: 44, valor: 'R$ 140', prazo: '1 dia', quando: 'há 12 d', destaque: '', mensagem: 'Atendo na semana toda. Produtos por conta do cliente.', tags: ['Material por sua conta'] }
+    ]
   };
 
   go = (screen, extra) => this.setState(Object.assign({ screen }, extra || {}));
@@ -1822,27 +2763,53 @@ class Component extends DCLogic {
 
   notificacoes = [
     { id: 1, tag: 'Conclusão', titulo: 'Marcos Vieira sinalizou a conclusão do serviço', texto: 'Instalação de chuveiro elétrico · confirme o recebimento em até 5 dias corridos.', tempo: 'agora', novo: true, acao: 'Confirmar recebimento' },
-    { id: 2, tag: 'Solicitação', titulo: 'Rafael Andrade aceitou sua solicitação', texto: 'Caça-vazamento sem quebra · agendado para 12/09 às 09h.', tempo: '3 h', novo: true, acao: 'Ver contratação' },
+    { id: 2, tag: 'Pagamento', titulo: 'Rafael Andrade aceitou sua solicitação', texto: 'Caça-vazamento sem quebra · pague R$ 220 em custódia para o serviço iniciar em 12/09.', tempo: '3 h', novo: true, acao: 'Pagar em custódia', rota: 'pagamento' },
     { id: 3, tag: 'Avaliação', titulo: 'Avalie o serviço concluído', texto: 'Diária de limpeza residencial com Juliana Prado · prazo de 7 dias para avaliar.', tempo: '1 d', novo: true, acao: 'Avaliar agora' },
-    { id: 4, tag: 'Solicitação', titulo: 'Solicitação expirada sem resposta', texto: 'O profissional não respondeu em 48 horas. A solicitação foi cancelada automaticamente.', tempo: '2 d', novo: false, acao: 'Buscar outro profissional' },
-    { id: 5, tag: 'Conta', titulo: 'Seu e-mail foi confirmado', texto: 'Conta ativa. Ative a autenticação em dois fatores para mais segurança.', tempo: '6 d', novo: false, acao: 'Ativar 2FA' }
+    { id: 4, tag: 'Solicitação', titulo: 'Solicitação expirada sem resposta', texto: 'O profissional não respondeu em 48 horas. A solicitação foi cancelada automaticamente.', tempo: '2 d', novo: false, acao: 'Buscar outro profissional', rota: 'busca' },
+    { id: 5, tag: 'Conta', titulo: 'Seu e-mail foi confirmado', texto: 'Conta ativa. Complete seu perfil para agilizar as próximas solicitações.', tempo: '6 d', novo: false, acao: 'Revisar meu perfil', rota: 'editarPerfil' },
+    { id: 6, tag: 'Proposta', titulo: '4 profissionais responderam sua demanda', texto: 'Quadro de distribuição vive desarmando · propostas de R$ 460 a R$ 790, prazos de 1 a 3 dias.', tempo: '1 h', novo: true, acao: 'Comparar propostas', rota: 'propostas' }
   ];
 
   notificacoesFreela = [
     { id: 1, tag: 'Solicitação', titulo: 'Nova solicitação de Ana Lopes', texto: 'Instalação de chuveiro elétrico · você tem 41 h para aceitar ou recusar.', tempo: 'agora', novo: true, acao: 'Responder solicitação', rota: 'solicitacoesRecebidas' },
-    { id: 2, tag: 'Conclusão', titulo: 'Ana Lopes confirmou a conclusão do serviço', texto: 'Contratação #101 · Instalação de chuveiro elétrico · R$ 180 liberados.', tempo: '4 h', novo: true, acao: 'Ver contratação', rota: 'contratacoes' },
+    { id: 2, tag: 'Pagamento', titulo: 'Repasse liberado na sua carteira', texto: 'Contratação #101 · Ana Lopes confirmou a conclusão · valor líquido creditado após a taxa de intermediação.', tempo: '4 h', novo: true, acao: 'Ver carteira', rota: 'carteira' },
     { id: 3, tag: 'Avaliação', titulo: 'Nova avaliação recebida: 5 estrelas', texto: 'Pedro Nunes avaliou a diária de limpeza residencial. Sua média subiu para 4,9.', tempo: '1 d', novo: true, acao: 'Ver perfil público', rota: 'perfilFreela' },
     { id: 4, tag: 'Disputa', titulo: 'Ana Lopes contestou a conclusão do #105', texto: 'Limpeza pós-obra completa · responda com justificativa de até 300 caracteres.', tempo: '2 d', novo: false, acao: 'Responder à disputa', rota: 'disputa' },
     { id: 5, tag: 'Conta', titulo: 'Seu anúncio foi aprovado', texto: 'Troca de quadro de distribuição já aparece nas buscas da categoria Elétrica.', tempo: '6 d', novo: false, acao: 'Ver meus serviços', rota: 'meusServicos' }
   ];
 
   contratacoes = [
-    { id: 101, servico: 'Instalação de chuveiro elétrico', parte: 'Marcos Vieira', cliente: 'Ana Lopes', cat: 'Elétrica', status: 'AGUARDANDO_CONFIRMACAO', data: '08/09/2026', valor: 'R$ 180' },
-    { id: 102, servico: 'Caça-vazamento sem quebra', parte: 'Rafael Andrade', cliente: 'Ana Lopes', cat: 'Encanamento', status: 'EM_ANDAMENTO', data: '12/09/2026', valor: 'R$ 220' },
-    { id: 103, servico: 'Configuração de rede para escritório', parte: 'Camila Rocha', cliente: 'Construtora Meridiano', cat: 'TI e informática', status: 'PENDENTE', data: '18/09/2026', valor: 'R$ 480' },
-    { id: 104, servico: 'Diária de limpeza residencial', parte: 'Juliana Prado', cliente: 'Pedro Nunes', cat: 'Limpeza / diarista', status: 'CONCLUIDO', data: '30/08/2026', valor: 'R$ 160' },
-    { id: 105, servico: 'Limpeza pós-obra completa', parte: 'Juliana Prado', cliente: 'Ana Lopes', cat: 'Limpeza / diarista', status: 'EM_DISPUTA', data: '22/08/2026', valor: 'R$ 380' },
-    { id: 106, servico: 'Troca de quadro de distribuição', parte: 'Marcos Vieira', cliente: 'Construtora Meridiano', cat: 'Elétrica', status: 'RECUSADO', data: '15/08/2026', valor: 'R$ 640' }
+    { id: 102, servico: 'Caça-vazamento sem quebra', parte: 'Rafael Andrade', cliente: 'Ana Lopes', cat: 'Encanamento', status: 'AGUARDANDO_PAGAMENTO', data: '12/09/2026', valor: 'R$ 220', pgto: 'AGUARDANDO' },
+    { id: 101, servico: 'Instalação de chuveiro elétrico', parte: 'Marcos Vieira', cliente: 'Ana Lopes', cat: 'Elétrica', status: 'AGUARDANDO_CONFIRMACAO', data: '08/09/2026', valor: 'R$ 180', pgto: 'CUSTODIA' },
+    { id: 107, servico: 'Instalação de ventilador de teto', parte: 'Marcos Vieira', cliente: 'Ana Lopes', cat: 'Elétrica', status: 'EM_ANDAMENTO', data: '16/09/2026', valor: 'R$ 280', pgto: 'CUSTODIA' },
+    { id: 103, servico: 'Configuração de rede para escritório', parte: 'Camila Rocha', cliente: 'Construtora Meridiano', cat: 'TI e informática', status: 'PENDENTE', data: '18/09/2026', valor: 'R$ 480', pgto: 'SEM' },
+    { id: 104, servico: 'Diária de limpeza residencial', parte: 'Juliana Prado', cliente: 'Pedro Nunes', cat: 'Limpeza / diarista', status: 'CONCLUIDO', data: '30/08/2026', valor: 'R$ 160', pgto: 'LIBERADO' },
+    { id: 105, servico: 'Limpeza pós-obra completa', parte: 'Juliana Prado', cliente: 'Ana Lopes', cat: 'Limpeza / diarista', status: 'EM_DISPUTA', data: '22/08/2026', valor: 'R$ 380', pgto: 'RETIDO' },
+    { id: 106, servico: 'Troca de quadro de distribuição', parte: 'Marcos Vieira', cliente: 'Construtora Meridiano', cat: 'Elétrica', status: 'RECUSADO', data: '15/08/2026', valor: 'R$ 640', pgto: 'SEM' }
+  ];
+
+  extratoFreela = [
+    { data: '09/09/2026 08:41', ct: 107, servico: 'Instalação de ventilador de teto', parte: 'Ana Lopes', metodo: 'Cartão de crédito', bruto: 280, pgto: 'CUSTODIA' },
+    { data: '02/09/2026 16:58', ct: 101, servico: 'Instalação de chuveiro elétrico', parte: 'Ana Lopes', metodo: 'Pix', bruto: 180, pgto: 'CUSTODIA' },
+    { data: '30/08/2026 11:04', ct: 98, servico: 'Revisão elétrica preventiva', parte: 'Escola Semear', metodo: 'Pix', bruto: 320, pgto: 'LIBERADO' },
+    { data: '24/08/2026 09:12', ct: 94, servico: 'Troca de quadro de distribuição', parte: 'Construtora Meridiano', metodo: 'Boleto', bruto: 640, pgto: 'LIBERADO' },
+    { data: '12/08/2026 15:47', ct: 91, servico: 'Instalação de chuveiro elétrico', parte: 'Pedro Nunes', metodo: 'Pix', bruto: 180, pgto: 'LIBERADO' }
+  ];
+
+  extratoCliente = [
+    { data: '09/09/2026 08:41', ct: 102, servico: 'Caça-vazamento sem quebra', parte: 'Rafael Andrade', metodo: 'aguardando método', bruto: 220, pgto: 'AGUARDANDO' },
+    { data: '02/09/2026 16:58', ct: 101, servico: 'Instalação de chuveiro elétrico', parte: 'Marcos Vieira', metodo: 'Pix', bruto: 180, pgto: 'CUSTODIA' },
+    { data: '28/08/2026 10:22', ct: 107, servico: 'Instalação de ventilador de teto', parte: 'Marcos Vieira', metodo: 'Cartão de crédito', bruto: 280, pgto: 'CUSTODIA' },
+    { data: '22/08/2026 14:05', ct: 105, servico: 'Limpeza pós-obra completa', parte: 'Juliana Prado', metodo: 'Pix', bruto: 380, pgto: 'RETIDO' },
+    { data: '30/07/2026 09:38', ct: 96, servico: 'Diária de limpeza residencial', parte: 'Juliana Prado', metodo: 'Pix', bruto: 160, pgto: 'LIBERADO' }
+  ];
+
+  transacoesAdmin = [
+    { id: 'TRX-2026-0909-0412', data: '09/09/2026 08:41', ct: 102, servico: 'Caça-vazamento sem quebra', cliente: 'Ana Lopes', freela: 'Rafael Andrade', metodo: 'Pix', bruto: 220, pgto: 'AGUARDANDO' },
+    { id: 'TRX-2026-0902-0388', data: '02/09/2026 16:58', ct: 101, servico: 'Instalação de chuveiro elétrico', cliente: 'Ana Lopes', freela: 'Marcos Vieira', metodo: 'Pix', bruto: 180, pgto: 'CUSTODIA' },
+    { id: 'TRX-2026-0828-0361', data: '28/08/2026 10:22', ct: 107, servico: 'Instalação de ventilador de teto', cliente: 'Ana Lopes', freela: 'Marcos Vieira', metodo: 'Cartão', bruto: 280, pgto: 'CUSTODIA' },
+    { id: 'TRX-2026-0822-0344', data: '22/08/2026 14:05', ct: 105, servico: 'Limpeza pós-obra completa', cliente: 'Ana Lopes', freela: 'Juliana Prado', metodo: 'Pix', bruto: 380, pgto: 'RETIDO' },
+    { id: 'TRX-2026-0730-0298', data: '30/07/2026 09:38', ct: 96, servico: 'Diária de limpeza residencial', cliente: 'Pedro Nunes', freela: 'Juliana Prado', metodo: 'Pix', bruto: 160, pgto: 'LIBERADO' }
   ];
 
   solicitacoes = [
@@ -1877,10 +2844,10 @@ class Component extends DCLogic {
   moderacao = [
     { id: 1, tipo: 'Avaliação', alvo: 'Avaliação de Pedro Nunes sobre Diego Farias', motivo: 'Linguagem ofensiva', reporter: 'Diego Farias', data: '24/08/2026', trecho: '“Serviço mal feito e o profissional foi [conteúdo reportado]...”' },
     { id: 2, tipo: 'Serviço', alvo: 'Anúncio “Serviço elétrico urgente 24h”', motivo: 'Conteúdo fora dos Termos de Uso', reporter: 'Sistema', data: '25/08/2026', trecho: 'Anúncio com contato de WhatsApp na descrição, contornando a plataforma.' },
-    { id: 3, tipo: 'Disputa', alvo: 'Contratação #105 · Limpeza pós-obra completa', motivo: 'Cliente contestou a conclusão', reporter: 'Ana Lopes', data: '23/08/2026', trecho: 'Cliente alega que dois quartos não foram limpos. Freelancer anexou fotos.' }
+    { id: 3, tipo: 'Disputa', alvo: 'Contratação #105 · Limpeza pós-obra completa', motivo: 'Cliente contestou a conclusão', reporter: 'Ana Lopes', data: '23/08/2026', trecho: 'Cliente alega que dois quartos não foram limpos. Freelancer anexou fotos. R$ 380,00 retidos em custódia até a decisão.' }
   ];
 
-  TELAS = { 'Landing': ['landing', null], 'Login': ['login', null], 'Feed do cliente': ['feed', 'cliente'], 'Feed do freelancer': ['feedFreela', 'freelancer'], 'Painel do freelancer': ['freelaDash', 'freelancer'], 'Painel administrativo': ['adminUsuarios', 'admin'] };
+  TELAS = { 'Landing': ['landing', null], 'Login': ['login', null], 'Feed do cliente': ['feed', 'cliente'], 'Feed do freelancer': ['feedFreela', 'freelancer'], 'Painel do freelancer': ['freelaDash', 'freelancer'], 'Pagamento em custódia': ['pagamento', 'cliente'], 'Carteira do freelancer': ['carteira', 'freelancer'], 'Painel administrativo': ['adminUsuarios', 'admin'], 'Transações (admin)': ['adminTransacoes', 'admin'], 'Propostas recebidas': ['propostas', 'cliente'], 'Enviar proposta': ['enviarProposta', 'freelancer'], 'Detalhe da contratação': ['contratacao', 'cliente'], 'Editar perfil': ['editarPerfil', 'cliente'], 'Denunciar conteúdo': ['denunciar', 'cliente'] };
 
   renderVals() {
     const inicial = this.TELAS[this.props.telaInicial] || this.TELAS['Landing'];
@@ -1898,13 +2865,32 @@ class Component extends DCLogic {
       { n: 1, titulo: 'Cadastro', desc: 'Crie a conta como cliente ou freelancer em menos de um minuto.' },
       { n: 2, titulo: 'Busca', desc: 'Filtre por categoria, localização, preço e reputação.' },
       { n: 3, titulo: 'Solicitação', desc: 'Envie a demanda. O profissional responde em até 48h.' },
-      { n: 4, titulo: 'Execução', desc: 'Acompanhe o status do serviço do início ao fim.' },
-      { n: 5, titulo: 'Avaliação', desc: 'Avalie em até 7 dias e ajude a construir a reputação.' }
+      { n: 4, titulo: 'Pagamento', desc: 'Pague no app. O valor fica em custódia até você confirmar.' },
+      { n: 5, titulo: 'Execução', desc: 'Acompanhe o status do serviço do início ao fim.' },
+      { n: 6, titulo: 'Avaliação', desc: 'Confirme, o repasse é automático e você avalia em até 7 dias.' }
     ];
     const isFreela = s.signupRole === 'freelancer';
+    const taxa = Math.max(0, Number(this.props.taxaPlataforma == null ? 10 : this.props.taxaPlataforma));
+    const brl = n => 'R$ ' + Number(n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const num = p => Number(String(p).replace(/[^0-9]/g, ''));
+    const taxaDe = v => v * taxa / 100;
+    const liqDe = v => v - taxaDe(v);
+    const PG = {
+      AGUARDANDO: { pgLabel: 'Aguardando', pgBg: '#fffaeb', pgFg: '#b54708', pgBd: '#fedf89' },
+      CUSTODIA: { pgLabel: 'Em custódia', pgBg: '#eff8ff', pgFg: '#175cd3', pgBd: '#b2ddff' },
+      LIBERADO: { pgLabel: 'Liberado', pgBg: '#ecfdf3', pgFg: '#067647', pgBd: '#abefc6' },
+      RETIDO: { pgLabel: 'Retido · disputa', pgBg: '#fef3f2', pgFg: '#b42318', pgBd: '#fecdca' },
+      SEM: { pgLabel: 'Sem cobrança', pgBg: '#f9fafb', pgFg: '#475467', pgBd: '#e4e7ec' }
+    };
+    const linhaExtrato = t => Object.assign({}, t, PG[t.pgto] || PG.SEM, {
+      label: (PG[t.pgto] || PG.SEM).pgLabel, bg: (PG[t.pgto] || PG.SEM).pgBg,
+      fg: (PG[t.pgto] || PG.SEM).pgFg, bd: (PG[t.pgto] || PG.SEM).pgBd,
+      bruto: brl(t.bruto), taxa: '− ' + brl(taxaDe(t.bruto)), liquido: brl(liqDe(t.bruto))
+    });
     const STATUS = {
       PENDENTE: { label: 'Pendente', bg: '#fffaeb', fg: '#b54708', bd: '#fedf89' },
       ACEITO: { label: 'Aceito', bg: '#eff8ff', fg: '#175cd3', bd: '#b2ddff' },
+      AGUARDANDO_PAGAMENTO: { label: 'Aguardando pagamento', bg: '#eff8ff', fg: '#175cd3', bd: '#b2ddff' },
       EM_ANDAMENTO: { label: 'Em andamento', bg: '#eff8ff', fg: '#175cd3', bd: '#b2ddff' },
       AGUARDANDO_CONFIRMACAO: { label: 'Aguardando confirmação', bg: '#fff6ed', fg: '#c4320a', bd: '#f9dbaf' },
       CONCLUIDO: { label: 'Concluído', bg: '#ecfdf3', fg: '#067647', bd: '#abefc6' },
@@ -1925,9 +2911,21 @@ class Component extends DCLogic {
       18: 'Formatação com instalação de sistema e programas essenciais, backup completo dos arquivos antes do processo e limpeza física do equipamento.'
     };
     const souFreela = s.role === 'freelancer';
+    const HUES = [152, 248, 32, 302, 200, 95];
+    const av = nome => {
+      const n = String(nome || '?').trim();
+      const partes = n.split(/\s+/);
+      const ini = ((partes[0] || '?')[0] + (partes.length > 1 ? partes[partes.length - 1][0] : '')).toUpperCase();
+      let h = 0;
+      for (let i = 0; i < n.length; i++) h = (h * 31 + n.charCodeAt(i)) % 9973;
+      const H = HUES[h % HUES.length];
+      return { ini, avBg: 'oklch(0.95 0.035 ' + H + ')', avFg: 'oklch(0.42 0.14 ' + H + ')', avBd: 'oklch(0.89 0.055 ' + H + ')' };
+    };
+    const comAv = campo => x => Object.assign({}, x, av(x[campo]));
     const ACAO_CLIENTE = {
       PENDENTE: ['Cancelar solicitação', 'contratacoes'],
-      ACEITO: ['Ver detalhes', 'contratacoes'],
+      ACEITO: ['Pagar agora', 'pagamento'],
+      AGUARDANDO_PAGAMENTO: ['Pagar agora', 'pagamento'],
       EM_ANDAMENTO: ['Ver detalhes', 'contratacoes'],
       AGUARDANDO_CONFIRMACAO: ['Confirmar recebimento', 'confirmar'],
       CONCLUIDO: ['Avaliar serviço', 'avaliar'],
@@ -1936,17 +2934,19 @@ class Component extends DCLogic {
     };
     const ACAO_FREELA = {
       PENDENTE: ['Responder solicitação', 'solicitacoesRecebidas'],
-      ACEITO: ['Marcar como concluído', 'concluir'],
+      ACEITO: ['Aguardando pagamento', 'contratacoes'],
+      AGUARDANDO_PAGAMENTO: ['Aguardando pagamento', 'contratacoes'],
       EM_ANDAMENTO: ['Marcar como concluído', 'concluir'],
       AGUARDANDO_CONFIRMACAO: ['Aguardando o cliente', 'contratacoes'],
-      CONCLUIDO: ['Ver detalhes', 'contratacoes'],
+      CONCLUIDO: ['Avaliar cliente', 'avaliar'],
       EM_DISPUTA: ['Responder à disputa', 'disputa'],
-      RECUSADO: ['Ver detalhes', 'contratacoes']
+      RECUSADO: ['Ver detalhes', 'contratacao']
     };
     const ACAO = souFreela ? ACAO_FREELA : ACAO_CLIENTE;
     const contratacoes = this.contratacoes.map(stamp).map(c => {
       const a = ACAO[c.status] || ACAO.PENDENTE;
-      return Object.assign({}, c, { parte: souFreela ? (c.cliente || c.parte) : c.parte, acaoLabel: a[0], acao: () => this.go(a[1]) });
+      const nomeParte = souFreela ? (c.cliente || c.parte) : c.parte;
+      return Object.assign({}, c, PG[c.pgto] || PG.SEM, av(nomeParte), { parte: nomeParte, acaoLabel: a[0], acao: () => this.setState({ screen: a[1], contratacaoId: c.id }), verTransacao: () => this.go('transacao'), abrirDetalhe: () => this.setState({ screen: 'contratacao', contratacaoId: c.id }) });
     });
     const NOTA_LABEL = { 1: 'Ruim', 2: 'Regular', 3: 'Bom', 4: 'Muito bom', 5: 'Excelente' };
     const estrelas = [1, 2, 3, 4, 5].map(n => ({
@@ -1969,8 +2969,38 @@ class Component extends DCLogic {
     const freelaSel = this.freelancers.find(f => f.id === (s.freelaId || servicoSel.fid)) || this.freelancers[0];
     const termo = s.busca.trim().toLowerCase();
     const filtroCat = s.filtroCat;
+    const DOM_MIN = 100, DOM_MAX = 700;
+    const pMin = Math.max(DOM_MIN, Math.min(Number(s.precoMin) || DOM_MIN, DOM_MAX));
+    const pMax = Math.max(pMin, Math.min(Number(s.precoMax) || DOM_MAX, DOM_MAX));
+    const pct = v => ((v - DOM_MIN) / (DOM_MAX - DOM_MIN) * 100).toFixed(1) + '%';
+    const faixasRapidas = [
+      { label: 'até R$ 200', min: DOM_MIN, max: 200 },
+      { label: 'R$ 200 – 400', min: 200, max: 400 },
+      { label: 'acima de R$ 400', min: 400, max: DOM_MAX }
+    ].map(f => {
+      const ativa = pMin === f.min && pMax === f.max;
+      return Object.assign({}, f, {
+        bd: ativa ? 'oklch(0.55 0.17 152)' : '#d0d5dd',
+        bg: ativa ? 'oklch(0.97 0.025 152)' : '#fff',
+        fg: ativa ? 'oklch(0.42 0.14 152)' : '#475467',
+        aplicar: () => this.setState({ precoMin: f.min, precoMax: f.max, forcarVazio: false })
+      });
+    });
+    const notasMin = [
+      { label: '4,5★', v: 4.5 }, { label: '4★', v: 4 }, { label: '3★', v: 3 }
+    ].map(n => {
+      const ativa = Number(s.notaMin) === n.v;
+      return Object.assign({}, n, {
+        bd: ativa ? 'oklch(0.55 0.17 152)' : '#d0d5dd',
+        bg: ativa ? 'oklch(0.97 0.025 152)' : '#fff',
+        fg: ativa ? 'oklch(0.42 0.14 152)' : '#475467',
+        aplicar: () => this.setState({ notaMin: n.v, forcarVazio: false })
+      });
+    });
     let resultados = this.servicos.filter(x =>
       (!filtroCat || x.cat === filtroCat) &&
+      num(x.preco) >= pMin && num(x.preco) <= pMax &&
+      Number(String(x.nota).replace(',', '.')) >= Number(s.notaMin) &&
       (!termo || (x.titulo + ' ' + x.cat + ' ' + x.freela).toLowerCase().includes(termo)));
     if (s.forcarVazio) resultados = [];
     const ST_SRV = {
@@ -1981,20 +3011,208 @@ class Component extends DCLogic {
     const listaServicos = s.servicosVazio ? [] : this.meusServicos.map(m => Object.assign({}, m, ST_SRV[m.status], {
       barra: Math.round(Math.min(100, m.vistas / 13)) + '%'
     }));
+    const METODOS = [
+      { id: 'pix', nome: 'Pix', desc: 'Baixa imediata. O profissional é liberado para iniciar na hora.', prazo: 'imediato' },
+      { id: 'cartao', nome: 'Cartão de crédito', desc: 'Em até 3x sem juros. Aprovação em minutos.', prazo: 'até 3x' },
+      { id: 'boleto', nome: 'Boleto bancário', desc: 'O serviço só inicia após a compensação.', prazo: '1 a 3 dias' }
+    ].map(m => {
+      const sel = s.metodoPgto === m.id;
+      return Object.assign({}, m, {
+        sel,
+        bd: sel ? 'oklch(0.55 0.17 152)' : '#d0d5dd',
+        bg: sel ? 'oklch(0.985 0.008 152)' : '#fff',
+        dot: sel ? 'oklch(0.55 0.17 152)' : 'transparent',
+        escolher: () => this.setState({ metodoPgto: m.id })
+      });
+    });
+    const VLR_102 = 220, VLR_101 = 180;
+    const custodiaFreela = 180 + 280;
+    const disponivelFreela = 1842;
+    const brutoMes = 3180;
+    const cardsFreela = [
+      { rotulo: 'EM CUSTÓDIA', valor: brl(custodiaFreela), nota: '2 serviços pagos e em execução ou aguardando confirmação do cliente.' },
+      { rotulo: 'DISPONÍVEL PARA SAQUE', valor: brl(disponivelFreela), nota: 'Crédito em até 1 dia útil na chave Pix cadastrada.' },
+      { rotulo: 'RECEBIDO NO MÊS', valor: brl(liqDe(brutoMes)), nota: 'Bruto ' + brl(brutoMes) + ' · taxa de ' + taxa + '% retida: ' + brl(taxaDe(brutoMes)) + '.' }
+    ];
+    const cardsCliente = [
+      { rotulo: 'EM CUSTÓDIA', valor: brl(custodiaFreela), nota: '2 contratações pagas e em execução. O valor só é repassado na sua confirmação.' },
+      { rotulo: 'AGUARDANDO PAGAMENTO', valor: brl(VLR_102), nota: '1 contratação aceita esperando o pagamento para iniciar.' },
+      { rotulo: 'PAGO NOS ÚLTIMOS 30 DIAS', valor: brl(1040), nota: '5 contratações · o cliente não paga taxa de intermediação.' }
+    ];
+    const ST_DEM = { ABERTA: { stBg: '#ecfdf3', stFg: '#067647', stBd: '#abefc6' }, ENCERRADA: { stBg: '#f9fafb', stFg: '#475467', stBd: '#e4e7ec' } };
+    const propsDe = id => this.propostasPorDemanda[id] || [];
+    const qtdLabelDe = n => n === 0 ? 'Nenhuma proposta ainda' : (n === 1 ? '1 proposta recebida' : n + ' propostas recebidas');
+    const demandas = this.demandas.map(d => {
+      const n = propsDe(d.id).length;
+      return Object.assign({}, d, ST_DEM[d.status] || ST_DEM.ABERTA, {
+        qtd: n, qtdLabel: qtdLabelDe(n),
+        corProp: n ? 'oklch(0.44 0.15 152)' : '#98a2b3',
+        bd: s.demandaId === d.id ? 'oklch(0.55 0.17 152)' : '#e4e7ec',
+        abrir: () => this.setState({ demandaId: d.id })
+      });
+    });
+    const demandaBase = this.demandas.find(d => d.id === s.demandaId) || this.demandas[0];
+    const listaProp = propsDe(demandaBase.id);
+    const ordenada = listaProp.slice();
+    const numBR = v => Number(String(v).replace(/[^0-9]/g, ''));
+    if (s.ordemProp === 'Menor preço') ordenada.sort((a, b) => numBR(a.valor) - numBR(b.valor));
+    if (s.ordemProp === 'Melhor avaliação') ordenada.sort((a, b) => Number(b.nota.replace(',', '.')) - Number(a.nota.replace(',', '.')));
+    if (s.ordemProp === 'Menor prazo') ordenada.sort((a, b) => parseInt(a.prazo) - parseInt(b.prazo));
+    const ordens = ['Melhor avaliação', 'Menor preço', 'Menor prazo'].map(label => {
+      const ativa = s.ordemProp === label;
+      return { label, aplicar: () => this.setState({ ordemProp: label }),
+        bd: ativa ? 'oklch(0.55 0.17 152)' : '#d0d5dd',
+        bg: ativa ? 'oklch(0.97 0.025 152)' : '#fff',
+        fg: ativa ? 'oklch(0.42 0.14 152)' : '#475467' };
+    });
+    const CT_DATAS = {
+      101: ['02/09 14:12', '02/09 16:40', '02/09 16:58', '08/09 09:03', '08/09 17:22'],
+      102: ['08/09 10:20', '08/09 12:05'],
+      103: ['09/09 11:31'],
+      104: ['26/07 09:10', '26/07 10:02', '30/07 09:38', '30/08 08:00', '30/08 16:20', '31/08 09:05'],
+      105: ['20/08 15:00', '20/08 17:22', '22/08 08:30', '22/08 09:15', '22/08 14:05'],
+      106: ['15/08 09:44'],
+      107: ['26/08 19:40', '27/08 08:15', '28/08 10:22', '16/09 08:00']
+    };
+    const CT_ESCOPO = {
+      101: 'Instalação de chuveiro elétrico 220 V no banheiro da suíte, com verificação do ponto, conferência do disjuntor e teste de aquecimento. Aparelho comprado pela cliente. Prédio sem elevador, 3º andar.',
+      102: 'Localização de vazamento na área de serviço por geofone, sem quebra desnecessária, com relatório do ponto exato e orçamento do reparo em separado.',
+      103: 'Cabeamento estruturado e configuração de rede para escritório de 12 pontos, com rack, roteador e Wi-Fi mesh. Documentação da rede entregue ao final.',
+      104: 'Diária de limpeza residencial em apartamento de 2 quartos, incluindo banheiros, cozinha, áreas comuns e passadoria leve. Produtos por conta da profissional.',
+      105: 'Limpeza pós-obra completa em apartamento de 3 quartos: remoção de resíduos de tinta e cimento, vidros, rodapés e área de serviço.',
+      106: 'Substituição do quadro de distribuição de 12 disjuntores em unidade de obra, com DR, DPS e laudo técnico assinado.',
+      107: 'Instalação de dois ventiladores de teto já comprados pela cliente, com fixação em laje e ligação no ponto de luz existente.'
+    };
+    const CT_SUB = { 'Marcos Vieira': 'Freelancer · Elétrica · 4,9★', 'Juliana Prado': 'Freelancer · Limpeza · 4,8★', 'Rafael Andrade': 'Freelancer · Encanamento · 4,7★', 'Camila Rocha': 'Freelancer · TI · 5,0★', 'Ana Lopes': 'Cliente · Pessoa física · 4,9★', 'Construtora Meridiano': 'Cliente empresa · CNPJ verificado', 'Pedro Nunes': 'Cliente · Pessoa física' };
+    const PASSOS = [
+      { titulo: 'Solicitação enviada', desc: 'O cliente descreveu a demanda e definiu data e endereço.' },
+      { titulo: 'Aceita pelo profissional', desc: 'Prazo de 48 horas para responder. Sem resposta, a solicitação é cancelada.' },
+      { titulo: 'Pagamento em custódia', desc: 'O valor sai da conta do cliente e fica retido pela plataforma.' },
+      { titulo: 'Execução iniciada', desc: 'O profissional confirmou o início do serviço na data combinada.' },
+      { titulo: 'Conclusão sinalizada', desc: 'O profissional marcou como concluído e anexou os registros.' },
+      { titulo: 'Confirmação e repasse', desc: 'O cliente confirma em até 5 dias e o valor líquido é creditado.' }
+    ];
+    const TL = { PENDENTE: [1, 1], ACEITO: [2, 2], AGUARDANDO_PAGAMENTO: [2, 2], EM_ANDAMENTO: [4, 4], AGUARDANDO_CONFIRMACAO: [5, 5], CONCLUIDO: [6, -1], EM_DISPUTA: [5, 5], RECUSADO: [1, -1] };
+    const ctBase = this.contratacoes.find(c => c.id === s.contratacaoId) || this.contratacoes[1];
+    const ctStatus = stamp(ctBase);
+    const ctParte = souFreela ? (ctBase.cliente || ctBase.parte) : ctBase.parte;
+    const ctAcao = (souFreela ? ACAO_FREELA : ACAO_CLIENTE)[ctBase.status] || ACAO_CLIENTE.PENDENTE;
+    const ctVal = numBR(ctBase.valor);
+    const par = TL[ctBase.status] || TL.PENDENTE;
+    const ctDatas = CT_DATAS[ctBase.id] || [];
+    const encerrado = ctBase.status === 'RECUSADO';
+    const ctTimeline = PASSOS.map((p, i) => {
+      const feito = i < par[0], atual = i === par[1];
+      const disputa = ctBase.status === 'EM_DISPUTA' && i === 5;
+      return {
+        titulo: disputa ? 'Contestado pelo cliente' : p.titulo,
+        desc: disputa ? 'A conclusão foi contestada. O valor segue retido até a decisão da moderação.' : (encerrado && i === 1 ? 'O profissional recusou a solicitação. Nenhuma cobrança foi feita.' : p.desc),
+        quando: feito ? (ctDatas[i] || '—') : (atual ? 'em aberto' : '—'),
+        bola: disputa ? '#b42318' : (feito ? 'oklch(0.55 0.17 152)' : (atual ? '#c4320a' : '#fff')),
+        aro: disputa ? '#fecdca' : (feito ? 'oklch(0.9 0.05 152)' : (atual ? '#f9dbaf' : '#e4e7ec')),
+        linha: i < par[0] - 1 ? 'oklch(0.85 0.06 152)' : '#eaecf0',
+        corTitulo: disputa ? '#b42318' : (feito ? '#101828' : (atual ? '#c4320a' : '#98a2b3'))
+      };
+    });
+    const ctSel = Object.assign({}, ctBase, ctStatus, PG[ctBase.pgto] || PG.SEM, av(ctParte), {
+      parte: ctParte,
+      parteSub: CT_SUB[ctParte] || 'Perfil na plataforma',
+      escopo: CT_ESCOPO[ctBase.id] || '',
+      txt: '− ' + brl(taxaDe(ctVal)),
+      liq: brl(liqDe(ctVal)),
+      acaoLabel: ctAcao[0],
+      acao: () => this.go(ctAcao[1]),
+      verPerfil: () => this.go(souFreela ? 'perfilCliente' : 'perfilFreela')
+    });
+    const MOTIVOS = [
+      { id: 'ofensivo', nome: 'Conteúdo ofensivo ou discriminatório', desc: 'Linguagem agressiva, ameaça ou preconceito em mensagens, anúncio ou avaliação.' },
+      { id: 'fora', nome: 'Contato ou pagamento fora da plataforma', desc: 'Tentativa de combinar por telefone ou receber por fora, sem custódia.' },
+      { id: 'falso', nome: 'Anúncio não corresponde ao serviço', desc: 'Preço, escopo ou qualificação divergentes do que foi entregue.' },
+      { id: 'avaliacao', nome: 'Avaliação falsa ou injusta', desc: 'Avaliação de quem não contratou, ou fora do contexto do serviço.' },
+      { id: 'outro', nome: 'Outro motivo', desc: 'Descreva o caso no campo abaixo para a moderação analisar.' }
+    ].map(m => {
+      const sel = s.motivoDenuncia === m.id;
+      return Object.assign({}, m, {
+        escolher: () => this.setState({ motivoDenuncia: m.id }),
+        bd: sel ? 'oklch(0.55 0.17 152)' : '#e4e7ec',
+        bg: sel ? 'oklch(0.985 0.008 152)' : '#fff',
+        aro: sel ? 'oklch(0.55 0.17 152)' : '#d0d5dd',
+        dot: sel ? 'oklch(0.55 0.17 152)' : 'transparent'
+      });
+    });
+    const catsPerfil = ['Elétrica', 'Encanamento', 'Limpeza / diarista', 'TI e informática'].map(nome => {
+      const on = s.catsAtivas.indexOf(nome) >= 0;
+      return { nome, bd: on ? 'oklch(0.55 0.17 152)' : '#d0d5dd', bg: on ? 'oklch(0.97 0.025 152)' : '#fff', fg: on ? 'oklch(0.42 0.14 152)' : '#475467',
+        toggle: () => this.setState({ catsAtivas: on ? this.state.catsAtivas.filter(x => x !== nome) : this.state.catsAtivas.concat([nome]) }) };
+    });
+    const admVolumeN = 184320;
     return {
+      metodos: METODOS,
+      isPix: s.metodoPgto === 'pix',
+      isCartao: s.metodoPgto === 'cartao',
+      isBoleto: s.metodoPgto === 'boleto',
+      metodoNome: (METODOS.find(m => m.sel) || METODOS[0]).nome,
+      trxId: 'TRX-2026-0909-0412',
+      taxaPct: taxa + '%',
+      vlrServico: brl(VLR_102),
+      vlrTaxa: brl(taxaDe(VLR_102)),
+      vlrLiquido: brl(liqDe(VLR_102)),
+      vlr101: brl(VLR_101),
+      taxa101: brl(taxaDe(VLR_101)),
+      liquido101: brl(liqDe(VLR_101)),
+      vlrCustodia: brl(custodiaFreela),
+      vlrDisponivel: brl(disponivelFreela),
+      cardsCarteira: souFreela ? cardsFreela : cardsCliente,
+      extrato: (souFreela ? this.extratoFreela : this.extratoCliente).map(linhaExtrato),
+      colBruto: souFreela ? 'VALOR BRUTO' : 'VALOR PAGO',
+      colLiquido: souFreela ? 'LÍQUIDO' : 'REPASSE',
+      tituloCarteira: souFreela ? 'Carteira' : 'Pagamentos',
+      subCarteira: souFreela
+        ? 'Todo pagamento entra em custódia e cai no seu saldo quando o cliente confirma a conclusão, já com a taxa de ' + taxa + '% descontada.'
+        : 'Você paga dentro do app. O valor fica em custódia na plataforma e só vai para o profissional depois da sua confirmação.',
+      notaExtrato: souFreela
+        ? 'A taxa de intermediação de ' + taxa + '% é retida no repasse de cada contratação concluída. Saques não têm tarifa.'
+        : 'O cliente não paga taxa. A taxa de ' + taxa + '% é retida do valor repassado ao profissional no momento da conclusão.',
+      admVolume: brl(admVolumeN),
+      admReceita: brl(taxaDe(admVolumeN)),
+      admCustodia: brl(11640),
+      admDisputa: brl(1980),
+      admTransacoes: this.transacoesAdmin.map(linhaExtrato),
+      faixaLabel: brl(pMin).replace(',00', '') + ' – ' + brl(pMax).replace(',00', ''),
+      faixaLeft: pct(pMin), faixaRight: pct(pMax),
+      faixaWidth: (((pMax - pMin) / (DOM_MAX - DOM_MIN)) * 100).toFixed(1) + '%',
+      precoMin: pMin, precoMax: pMax,
+      faixasRapidas, notasMin,
+      setPrecoMin: e => this.setState({ precoMin: e.target.value, forcarVazio: false }),
+      setPrecoMax: e => this.setState({ precoMax: e.target.value, forcarVazio: false }),
+      isPagamento: s.screen === 'pagamento',
+      isPagamentoOk: s.screen === 'pagamentoOk',
+      isTransacao: s.screen === 'transacao',
+      isCarteira: s.screen === 'carteira',
+      isSaque: s.screen === 'saque',
+      isAdminTransacoes: s.screen === 'adminTransacoes',
+      navTransacoes: s.screen === 'adminTransacoes' ? '#1d2939' : 'transparent',
+      saqueEnviado: s.saqueEnviado,
+      goPagamento: () => this.go('pagamento'),
+      goTransacao: () => this.go('transacao'),
+      goCarteira: () => this.go('carteira'),
+      goSaque: () => this.go('saque', { saqueEnviado: false }),
+      goAdminTransacoes: () => this.go('adminTransacoes'),
+      pagar: () => this.go('pagamentoOk'),
+      confirmarSaque: () => this.setState({ saqueEnviado: true }),
       categorias, etapas,
       role: s.role,
-      roleLabel: s.role === 'freelancer' ? (this.props.nomeFreelancer || 'Marcos Vieira') : (s.role === 'admin' ? 'Administrador' : (this.props.nomeCliente || 'Ana Lopes')),
+      roleLabel: s.role === 'freelancer' ? 'Marcos Vieira' : (s.role === 'admin' ? 'Administrador' : 'Ana Lopes'),
       roleInitials: s.role === 'freelancer' ? 'MV' : (s.role === 'admin' ? 'AD' : 'AL'),
       roleSub: s.role === 'freelancer' ? 'Freelancer · Elétrica' : (s.role === 'admin' ? 'Acesso restrito' : 'Cliente · Pessoa física'),
-      isApp: ['feed', 'feedFreela', 'publicar', 'busca', 'buscaProfissionais', 'servico', 'perfilFreela', 'perfilCliente', 'solicitar', 'contratacoes', 'confirmar', 'contestar', 'disputa', 'avaliar', 'notificacoes', 'mensagens', 'freelaDash', 'meusServicos', 'servicoForm', 'solicitacoesRecebidas', 'concluir'].includes(s.screen),
-      isAdminApp: ['adminUsuarios', 'adminCategorias', 'adminModeracao', 'adminRelatorios'].includes(s.screen),
+      isApp: ['feed', 'feedFreela', 'publicar', 'busca', 'buscaProfissionais', 'servico', 'perfilFreela', 'perfilCliente', 'solicitar', 'contratacoes', 'confirmar', 'contestar', 'disputa', 'avaliar', 'notificacoes', 'mensagens', 'freelaDash', 'meusServicos', 'servicoForm', 'solicitacoesRecebidas', 'concluir', 'pagamento', 'pagamentoOk', 'transacao', 'carteira', 'saque', 'propostas', 'enviarProposta', 'contratacao', 'editarPerfil', 'denunciar'].includes(s.screen),
+      isAdminApp: ['adminUsuarios', 'adminCategorias', 'adminModeracao', 'adminRelatorios', 'adminTransacoes'].includes(s.screen),
       isCliente: s.role === 'cliente',
       isFreelaRole: s.role === 'freelancer',
       isFeed: s.screen === 'feed',
       isFeedFreela: s.screen === 'feedFreela',
       isPublicar: s.screen === 'publicar',
-      feedDemandas: this.feedDemandas.map(d => Object.assign({}, d, {
+      feedDemandas: this.feedDemandas.map(d => Object.assign({}, d, av(d.autor), {
         combina: d.match === 'Combina com seus serviços',
         corMatch: d.match === 'Combina com seus serviços' ? 'oklch(0.42 0.14 152)' : '#98a2b3',
         fundoMatch: d.match === 'Combina com seus serviços' ? 'oklch(0.96 0.03 152)' : '#f2f4f7'
@@ -2035,20 +3253,21 @@ class Component extends DCLogic {
       isAdminCategorias: s.screen === 'adminCategorias',
       isAdminModeracao: s.screen === 'adminModeracao',
       isAdminRelatorios: s.screen === 'adminRelatorios',
-      feedItens: this.feed,
-      notificacoes, conversas,
+      feedItens: this.feed.map(comAv('autor')),
+      freelaAv: av(freelaSel.nome),
+      notificacoes, conversas: conversas.map(comAv('nome')),
       contratacoes,
       notaLabel: NOTA_LABEL[s.nota] || '',
-      solicitacoes: this.solicitacoes,
+      solicitacoes: this.solicitacoes.map(comAv('cliente')),
       meusServicosLista: listaServicos,
       servicosVazio: s.servicosVazio,
-      freelancers: this.freelancers.map(withProf),
-      resultados: resultados.map(withOpen), semResultado: resultados.length === 0,
+      freelancers: this.freelancers.map(withProf).map(comAv('nome')),
+      resultados: resultados.map(withOpen).map(comAv('freela')), semResultado: resultados.length === 0,
       qtdResultados: resultados.length,
       busca: s.busca, filtroCat,
       servicoSel: Object.assign({}, servicoSel, { descLonga: DESCR[servicoSel.id] || DESCR[11] }), freelaSel,
       servicosDoFreela: this.servicos.filter(x => x.fid === freelaSel.id).map(withOpen),
-      adminUsuarios: this.adminUsuarios.map(u => Object.assign({}, u,
+      adminUsuarios: this.adminUsuarios.map(u => Object.assign({}, u, av(u.nome),
         u.status === 'Ativo' ? { bg: '#ecfdf3', fg: '#067647', bd: '#abefc6', acaoStatus: 'Suspender' }
                              : { bg: '#fef3f2', fg: '#b42318', bd: '#fecdca', acaoStatus: 'Reativar' },
         { corExcluir: u.contratacoes > 0 ? '#d0d5dd' : '#b42318',
@@ -2088,11 +3307,68 @@ class Component extends DCLogic {
       forcarVazio: () => this.setState({ forcarVazio: true }),
       toggleServicosVazio: () => this.setState({ servicosVazio: !this.state.servicosVazio }),
       validarForm: () => this.setState({ formErros: true }),
-      publicarServico: () => this.setState({ screen: 'meusServicos', formErros: false }),
+      publicarServico: () => this.setState({ screen: souFreela ? 'meusServicos' : 'propostas', formErros: false, demandaId: 2 }),
       enviarSolicitacao: () => this.setState({ solicitacaoEnviada: true }),
       enviarAvaliacao: () => this.setState({ avaliacaoEnviada: true }),
       abrirServico: id => this.setState({ screen: 'servico', servicoId: id }),
       abrirFreela: id => this.setState({ screen: 'perfilFreela', freelaId: id }),
+      isPropostas: s.screen === 'propostas',
+      demandas, ordens,
+      demandaSel: Object.assign({}, demandaBase, { qtdLabel: qtdLabelDe(listaProp.length) }),
+      propostas: ordenada.map(p => Object.assign({}, p, av(p.nome), { verPerfil: () => this.setState({ screen: 'perfilFreela', freelaId: p.fid }) })),
+      semPropostas: listaProp.length === 0,
+      temPropostas: listaProp.length > 0,
+      goPropostas: () => this.go('propostas'),
+      goContratacaoDetalhe: () => this.setState({ screen: 'contratacao', contratacaoId: 101 }),
+      isEnviarProposta: s.screen === 'enviarProposta',
+      propostaEnviada: s.propostaEnviada,
+      goEnviarProposta: () => this.go('enviarProposta', { propostaEnviada: false }),
+      enviarProposta: () => this.setState({ propostaEnviada: true }),
+      isContratacao: s.screen === 'contratacao',
+      ctSel, ctTimeline,
+      isEditarPerfil: s.screen === 'editarPerfil',
+      goEditarPerfil: () => this.go('editarPerfil'),
+      voltarPerfil: () => this.go(souFreela ? 'perfilFreela' : 'perfilCliente'),
+      editarSub: souFreela
+        ? 'O que você muda aqui aparece no seu perfil público e nas buscas por profissionais da sua categoria.'
+        : 'Seus dados aparecem para o profissional depois que ele aceita a solicitação. Antes disso, só o primeiro nome e a cidade ficam visíveis.',
+      emailPerfil: souFreela ? 'marcos.vieira@email.com' : 'ana.lopes@email.com',
+      cidadePerfil: souFreela ? 'Taguatinga, DF' : 'Taguatinga, DF',
+      bioLabel: souFreela ? 'Descrição profissional' : 'Sobre você',
+      bioValor: souFreela
+        ? 'Doze anos em instalações e manutenção elétrica residencial. Atendimento com nota fiscal e garantia de 90 dias no serviço executado.'
+        : 'Moro em apartamento próprio e contrato serviços de manutenção com frequência. Prefiro combinar tudo por escrito antes da visita.',
+      catsPerfil,
+      isDenunciar: s.screen === 'denunciar',
+      denunciaEnviada: s.denunciaEnviada,
+      denunciaAlvo: s.denunciaAlvo || 'Conteúdo selecionado na plataforma',
+      motivos: MOTIVOS,
+      goDenunciar: () => this.go('denunciar', { denunciaEnviada: false }),
+      denunciarContratacao: () => this.setState({ screen: 'denunciar', denunciaEnviada: false, denunciaAlvo: 'Contratação #' + ctBase.id + ' · ' + ctBase.servico }),
+      parteMin: souFreela ? 'cliente' : 'profissional',
+      perfilCli: souFreela
+        ? Object.assign({}, av('Construtora Meridiano'), { nome: 'Construtora Meridiano', selo: 'CNPJ VERIFICADO', linha: 'Cliente empresa · Construção civil · Guará, DF', meta: 'Na plataforma desde março de 2026 · 46 contratações · paga em média em 2 dias', tituloSobre: 'Sobre a empresa', sobre: 'Construtora de médio porte com quatro obras residenciais ativas no Distrito Federal. Contratamos serviços elétricos, hidráulicos e de limpeza pós-obra de forma recorrente, com pagamento em até 5 dias após a conclusão.', contratacoes: '46', nota: '4,9★', cancelamentos: '1', disputas: '1', avAutor: 'Marcos Vieira', avData: '19/08/2026', avTexto: 'Escopo bem definido e pagamento no prazo combinado. Voltaria a atender.' })
+        : Object.assign({}, av('Ana Lopes'), { nome: 'Ana Lopes', selo: 'CPF VERIFICADO', linha: 'Cliente · Pessoa física · Taguatinga, DF', meta: 'Na plataforma desde março de 2026 · 9 contratações · paga em média em 1 dia', tituloSobre: 'Sobre você', sobre: 'Moro em apartamento próprio e contrato serviços de manutenção com frequência. Prefiro combinar tudo por escrito antes da visita e costumo liberar o pagamento no mesmo dia da conclusão.', contratacoes: '9', nota: '4,9★', cancelamentos: '0', disputas: '1', avAutor: 'Juliana Prado', avData: '30/08/2026', avTexto: 'Cliente organizada, deixou o apartamento liberado no horário combinado e confirmou a conclusão no mesmo dia.' }),
+      denunciarPerfil: () => this.setState({ screen: 'denunciar', denunciaEnviada: false, denunciaAlvo: 'Perfil de ' + freelaSel.nome }),
+      denunciarServico: () => this.setState({ screen: 'denunciar', denunciaEnviada: false, denunciaAlvo: 'Anúncio “' + servicoSel.titulo + '”' }),
+      enviarDenuncia: () => this.setState({ denunciaEnviada: true }),
+      voltarDenuncia: () => this.go(souFreela ? 'feedFreela' : 'feed'),
+      avalTag: souFreela ? 'AVALIAÇÃO DO CLIENTE' : 'AVALIAÇÃO DE SERVIÇO',
+      avalTitulo: souFreela ? 'Como foi atender este cliente?' : 'Como foi o serviço?',
+      avalSub: souFreela
+        ? 'Diária de limpeza residencial · Pedro Nunes · concluído em 30/08/2026'
+        : 'Instalação de chuveiro elétrico · Marcos Vieira · concluído em 09/09/2026',
+      avalPlaceholder: souFreela
+        ? 'Clareza do pedido, acesso ao local, pontualidade no pagamento.'
+        : 'Conte como foi a experiência: pontualidade, comunicação, qualidade do serviço.',
+      avalRegra: souFreela
+        ? 'A avaliação do cliente entra no perfil dele e ajuda outros profissionais a decidir. Só é aceita em até 7 dias após a conclusão.'
+        : 'Avaliações não podem ser editadas depois de publicadas e só são aceitas em até 7 dias após a conclusão.',
+      avalOkTexto: souFreela
+        ? 'Sua avaliação já aparece no perfil de Pedro Nunes e a média dele foi recalculada.'
+        : 'Sua avaliação já aparece no perfil de Marcos Vieira e a média dele foi recalculada. Obrigado por contribuir com a reputação da plataforma.',
+      avalOkBotao: souFreela ? 'Ver perfil do cliente' : 'Ver no perfil',
+      avalVerPerfil: () => this.go(souFreela ? 'perfilCliente' : 'perfilFreela'),
       go: this.go,
       goFeed: () => this.go('feed'),
       goBusca: () => this.go('busca', { forcarVazio: false }),

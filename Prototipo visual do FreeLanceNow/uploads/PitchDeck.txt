@@ -1,0 +1,166 @@
+FreeLanceNow
+Conectando Demandas a Talentos de Forma Simples e Segura
+PROJETO DE ENGENHARIA DE SOFTWARE | EQUIPE FREELANCER
+
+-- 1 of 14 --
+
+Serviços Cotidianos e Urgências: Extrema dificuldade de
+encontrar profissionais de confiança para situações
+adversas (como eletricistas, encanadores e diaristas) de
+forma rápida.
+Invisibilidade profissional: Profissionais autônomos e
+prestadores de serviços gerais têm barreiras para divulgar
+seu trabalho e alcançar novos clientes.
+Complexidade de Plataformas: As opções atuais de
+mercado são excessivamente burocráticas ou focadas
+puramente no ambiente digital.
+O PROBLEMA DO MERCADO
+
+-- 2 of 14 --
+
+Um marketplace generalista planejado para cobrir todas as etapas do trabalho sob demanda:
+Agilidade
+Contratação direta em poucos
+cliques para resolver urgências
+domésticas imediatas.
+Acessibilidade
+Interface responsiva
+multiplataforma desenvolvida
+para Web e dispositivos móveis.
+Confiabilidade
+Mecanismos claros de validação
+que garantem a integridade das
+operações e perfis.
+A SOLUÇÃO: FREELANCENOW
+
+-- 3 of 14 --
+
+25MTrabalhadores por Conta Própria no Brasil
+Uma força de trabalho massiva que precisa de digitalização
+profissional rápida e justa para expandir sua carteira de clientes
+locais.
+A Lacuna Corporativa: Pequenas e médias empresas
+enfrentam sérias dificuldades operacionais para encontrar e
+contratar prestadores de serviços básicos de forma pontual e
+imediata.
+OPORTUNIDADE DE MERCADO
+
+-- 4 of 14 --
+
+Diferenciais Estratégicos 	FreeLanceNow 	Classificados Comuns 	Plataformas Digitais
+Foco Estruturado em Serviços Gerais
+Custódia Segura de Valores (Escrow)
+Sistema Antifraude de Avaliação Mútua
+Contratação Rápida e Sem Burocracia
+ANÁLISE COMPETITIVA
+
+-- 5 of 14 --
+
+Busca Inteligente
+Filtros dinâmicos cruzando
+categorias, localização geográfica,
+faixas de preço e reputação
+técnica.
+Gestão Autônoma
+Ambiente simplificado onde o
+profissional gerencia seu
+portfólio e mantém até 20
+anúncios ativos simultâneos.
+Consolidação de Perfil
+Histórico unificado exibindo a
+média de estrelas e feedbacks
+recebidos de ponta a ponta.
+ECOSSISTEMA COMPLETO
+
+-- 6 of 14 --
+
+3sTempo Limite para a Tomada de Decisão
+Foco estrito em usabilidade técnica. O fluxo da aplicação foi
+desenhado para eliminar gargalos, permitindo fechar acordos
+de forma instantânea.
+O Ciclo da Operação
+1. Autenticação Rápida de Usuário
+2. Filtro Direto por Proximidade ou Categoria
+3. Abertura e Execução da Ordem de Serviço
+4. Entrega e Confirmação de Encerramento
+5. Fechamento com Reputação Mútua
+EXPERIÊNCIA FLUIDA
+
+-- 7 of 14 --
+
+Arquitetura Altamente Expansível: Estrutura modular
+baseada em microsserviços/API-First, facilitando futuras
+implementações sem impactos ao sistema principal.
+Segurança sob Medida: Aplicação de diretrizes rigorosas
+de criptografia de senhas e tokens estáveis de controle de
+acesso de ponta a ponta.
+Persistência e Desempenho: Armazenamento otimizado
+de dados estruturados e de mídia com foco em consultas
+ágeis de alta performance.
+ARQUITETURA E ROBUSTEZ TÉCNICA
+
+-- 8 of 14 --
+
+Garantia de estabilidade sistêmica através de desacoplamento e consultas indexadas ao banco de dados.
+MÉTRICAS DE SUCESSO (SLAS)
+
+-- 9 of 14 --
+
+Parcerias de Base
+Atração de prestadores de
+serviço locais via parcerias com
+grandes lojas de materiais de
+construção e suprimentos
+domésticos.
+Marketing Hiperlocal
+Campanhas digitais focadas e
+georreferenciadas por bairros
+para capturar demandas
+residenciais urgentes.
+Indicação Premiada
+Benefícios mútuos em taxas
+reduzidas para profissionais e
+cupons especiais para clientes
+que trazem novos usuários.
+ESTRATÉGIA DE CRESCIMENTO
+
+-- 10 of 14 --
+
+Monetização Transacional Direct-to-App: A receita
+principal do ecossistema é gerada por meio de uma taxa
+fixa percentual retida diretamente sobre cada contrato
+executado com sucesso.
+Garantia por Meio de Escrow: O cliente realiza a transação
+financeira no início do ciclo; o capital fica retido em
+custódia segura pela plataforma e é repassado
+automaticamente ao profissional logo após o encerramento
+do serviço.
+MODELO DE NEGÓCIO
+
+-- 11 of 14 --
+
+"A reputação legítima é o coração definitivo
+para o funcionamento estável de qualquer
+marketplace."
+Para mitigar avaliações fraudulentas ou perfis falsificados de
+alta pontuação, o ecossistema estabelece que apenas usuários
+que efetivamente concluíram ordens de serviço mútuas
+recebem permissão de avaliação dentro de uma janela crítica
+de até 7 dias.
+A REGRA DE OURO DA CONFIANÇA
+
+-- 12 of 14 --
+
+Equipe dedicada ao mapeamento de regras, modelagem e engenharia do FreeLanceNow:
+Desenvolvimento pautado em Engenharia de Software e arquitetura sustentável de código.
+O TIME POR TRÁS
+
+-- 13 of 14 --
+
+Perguntas?
+FreeLanceNow: Conectando Demandas a Talentos
+Agradecemos a atenção da banca avaliadora.
+Contato: fabio.rocha@a.ucb.br
+
+-- 14 of 14 --
+

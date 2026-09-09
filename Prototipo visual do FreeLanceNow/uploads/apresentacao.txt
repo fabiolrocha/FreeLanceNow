@@ -1,0 +1,170 @@
+
+
+=== ppt/slides/slide1.xml ===
+ 
+ 
+ DOCUMENTO DE ARQUITETURA DE SOFTWARE 
+ FreeLanceNow 
+ Plataforma digital (web e mobile) que conecta clientes a profissionais freelancers de serviços gerais. 
+ Modelo arquitetural 4+1 (Kruchten) 
+ Equipe FreeLanceNow • Versão 1.1 • 2026 
+
+=== ppt/slides/slide2.xml ===
+ 
+ 
+ 01 · INTRODUÇÃO 
+ Finalidade e Escopo 
+ Finalidade 
+ Fornecer uma visão arquitetural abrangente do sistema, capturando e comunicando as principais decisões de projeto e os critérios que as fundamentaram, abrangendo hardware e software. 
+ Escopo 
+ Plataforma web e mobile que conecta clientes a freelancers de serviços gerais 
+ PRINCIPAIS FUNCIONALIDADES 
+ Cadastro e autenticação 
+ Cadastro de serviços 
+ Busca e contratação 
+ Avaliação de serviços 
+ Painel administrativo 
+
+=== ppt/slides/slide3.xml ===
+ 
+ 
+ 02 · REQUISITOS ARQUITETURAIS 
+ Linguagens &amp; Tecnologias 
+ Back-end 
+ Java + Spring Boot (API REST e regras de negócio) 
+ Front-end 
+ HTML5, JavaScript (ES6+) e Tailwind CSS, responsivo 
+ Persistência 
+ PostgreSQL 15 + ORM 
+ Segurança 
+ JWT com 2FA, bcrypt, HTTPS (TLS 1.2+), LGPD 
+ Plataforma 
+ Docker e Nginx (reverse proxy) 
+ Estilo / i18n 
+ Arquitetura REST e estrutura preparada para idiomas 
+
+=== ppt/slides/slide4.xml ===
+ 
+ 
+ 03 · VISÃO DE CASOS DE USO 
+ Casos de Uso do Sistema 
+ UC01 
+ Cadastro e Autenticação 
+ Registro e login seguro de usuários por perfil. 
+ UC02 
+ Cadastro de Serviços 
+ Freelancer publica e detalha seus serviços. 
+ UC03 
+ Busca e Contratação 
+ Cliente encontra e solicita um serviço. 
+ UC04 
+ Avaliação de Serviços 
+ Cliente avalia o serviço após a conclusão. 
+ UC05 
+ Painel Administrativo 
+ Gestão e administração da plataforma. 
+
+=== ppt/slides/slide5.xml ===
+ 
+ 
+ 04 · VISÃO LÓGICA 
+ Visão Geral — Pacotes e Camadas 
+ Arquitetura em camadas com separação clara de responsabilidades entre apresentação, negócio e dados. 
+ Apresentação 
+ Front-end web responsivo (HTML5, JS, Tailwind CSS) 
+ Controle / API REST 
+ Controllers Spring MVC — recebem requisições e orquestram 
+ Negócio (Services) 
+ Regras de negócio, validações e fluxos da aplicação 
+ Persistência / Dados 
+ Repositórios via ORM sobre o PostgreSQL 15 
+ Fluxo da requisição 
+ As requisições descem da camada de apresentação até os dados; 
+ cada camada conhece apenas a imediatamente inferior. 
+ Organizado em pacotes por domínio: usuários, serviços, contratações e avaliações. 
+
+=== ppt/slides/slide6.xml ===
+ 
+ 
+ 05 · VISÃO DE IMPLANTAÇÃO 
+ Topologia de Implantação 
+ Dispositivo do Usuário 
+ Navegador web ou smartphone iOS/Android, layout responsivo. 
+ › 
+ Servidor de Aplicação 
+ Linux + Spring Boot/Tomcat e front-end estático, atrás do Nginx. 
+ › 
+ Servidor de Banco 
+ PostgreSQL 15 dedicado, via JDBC pela rede interna (porta 5432). 
+ › 
+ Serviços Externos 
+ SMTP, notificações em tempo real e object storage de imagens. 
+ Comunicação exclusivamente via HTTPS (TLS 1.2+) entre cliente e servidor de aplicação. 
+
+=== ppt/slides/slide7.xml ===
+ 
+ 
+ 06 · DIMENSIONAMENTO 
+ Dimensionamento &amp; Performance 
+ VOLUME ESTIMADO 
+ 5.000 
+ usuários cadastrados 
+ 1.500 
+ acessos diários 
+ 200 
+ acessos simultâneos (pico) 
+ 2.000 
+ serviços ativos 
+ 800 
+ contratações por mês 
+ 15 min 
+ sessão média do usuário 
+ PERFORMANCE ALVO 
+ ≤ 3s 
+ Carregar página (P95) 
+ ≤ 3s 
+ Busca de serviços (P95) 
+ ≤ 5s 
+ Contratação completa 
+ ≤ 10s 
+ Notificação ao freelancer 
+ 99,0% 
+ Disponibilidade (h. comercial) 
+
+=== ppt/slides/slide8.xml ===
+ 
+ 
+ 07 · ATRIBUTOS DE QUALIDADE 
+ Qualidade (QoS) 
+ Escalabilidade 
+ API escalável horizontalmente atrás de balanceador e réplicas de leitura no PostgreSQL. 
+ Confiabilidade 
+ Backup diário, transações ACID nas operações críticas e monitoramento de saúde. 
+ Portabilidade 
+ Layout responsivo (Tailwind) com um único código-base para web e mobile. 
+ Segurança 
+ JWT com expiração, 2FA, bcrypt, HTTPS e aceite de termos conforme a LGPD. 
+ Usabilidade 
+ Fluxos simples — até 3 cliques à ação principal — com feedback visual imediato. 
+
+=== ppt/slides/slide9.xml ===
+ 
+ 
+ 08 · PROTÓTIPO 
+ Protótipo — Telas e Fluxos 
+ Principais Telas 
+ Busca de Serviços 
+ Perfil do Freelancer 
+ Perfil da Empresa 
+ Dashboard da Empresa 
+ Meus Projetos 
+ Publicar Novo Projeto 
+ Busca de Profissional 
+ Login e Cadastro (Freelancer / Empresa) 
+ Fluxos de Usuário 
+ VISITANTE 
+ Acessa → Cadastrar/Entrar → preenche credenciais → redirecionado conforme o tipo de conta. 
+ CLIENTE 
+ Busca/filtra → analisa perfil → solicita serviço → recebe notificação → avalia o serviço. 
+ FREELANCER 
+ Dashboard → adiciona serviço (form + fotos) → publica → aceita ou recusa solicitações em até 48h. 
