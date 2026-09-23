@@ -1,0 +1,1313 @@
+<title>Roadmap FreeLanceNow</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8fa; --surface:#ffffff; --surface-2:#f9fafb; --surface-3:#f2f4f7;
+  --ink:#101828; --ink-2:#475467; --ink-3:#667085; --ink-4:#98a2b3;
+  --line:#e4e7ec; --line-2:#d0d5dd; --track:#eaecf0;
+  --brand:oklch(0.55 0.17 152); --brand-strong:oklch(0.47 0.15 152); --brand-ink:oklch(0.42 0.14 152);
+  --brand-soft:oklch(0.965 0.03 152); --brand-line:oklch(0.86 0.07 152); --on-brand:#ffffff;
+  --a-decisao-bg:#fffaeb; --a-decisao-fg:#b54708;
+  --a-back-bg:#eef4ff;    --a-back-fg:#3538cd;
+  --a-react-bg:#f0f9ff;   --a-react-fg:#026aa2;
+  --a-vue-bg:#f0fdf9;     --a-vue-fg:#107569;
+  --a-infra-bg:#f2f4f7;   --a-infra-fg:#344054;
+  --a-qa-bg:#fff1f3;      --a-qa-fg:#c01048;
+  --a-docs-bg:#f4f3ff;    --a-docs-fg:#5925dc;
+  --v1-bg:#eff8ff; --v1-fg:#175cd3; --v1-line:#b2ddff;
+  --warn-bg:#fffaeb; --warn-fg:#b54708; --warn-line:#fedf89;
+  --bad-bg:#fef3f2; --bad-fg:#b42318; --bad-line:#fecdca;
+  --shadow:0 1px 2px rgba(16,24,40,.06);
+  --glass:rgba(247,248,250,.9);
+  --sans:'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0c111d; --surface:#161b26; --surface-2:#1b2130; --surface-3:#1f242f;
+    --ink:#f5f5f6; --ink-2:#cecfd2; --ink-3:#94969c; --ink-4:#6c7079;
+    --line:#262c38; --line-2:#333741; --track:#262c38;
+    --brand:oklch(0.70 0.16 152); --brand-strong:oklch(0.76 0.15 152); --brand-ink:oklch(0.80 0.13 152);
+    --brand-soft:oklch(0.28 0.05 152); --brand-line:oklch(0.42 0.09 152); --on-brand:#0c111d;
+    --a-decisao-bg:#2d2208; --a-decisao-fg:#fdb022;
+    --a-back-bg:#1c2050;    --a-back-fg:#a4bcfd;
+    --a-react-bg:#062c41;   --a-react-fg:#7cd4fd;
+    --a-vue-bg:#0a2e2a;     --a-vue-fg:#5fe9d0;
+    --a-infra-bg:#1f242f;   --a-infra-fg:#cecfd2;
+    --a-qa-bg:#3b0a1a;      --a-qa-fg:#fea3b4;
+    --a-docs-bg:#27115f;    --a-docs-fg:#bdb4fe;
+    --v1-bg:#102a56; --v1-fg:#84caff; --v1-line:#1849a9;
+    --warn-bg:#2d2208; --warn-fg:#fdb022; --warn-line:#93370d;
+    --bad-bg:#3b0a0a; --bad-fg:#fda29b; --bad-line:#912018;
+    --shadow:0 1px 2px rgba(0,0,0,.4);
+    --glass:rgba(12,17,29,.88);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0c111d; --surface:#161b26; --surface-2:#1b2130; --surface-3:#1f242f;
+  --ink:#f5f5f6; --ink-2:#cecfd2; --ink-3:#94969c; --ink-4:#6c7079;
+  --line:#262c38; --line-2:#333741; --track:#262c38;
+  --brand:oklch(0.70 0.16 152); --brand-strong:oklch(0.76 0.15 152); --brand-ink:oklch(0.80 0.13 152);
+  --brand-soft:oklch(0.28 0.05 152); --brand-line:oklch(0.42 0.09 152); --on-brand:#0c111d;
+  --a-decisao-bg:#2d2208; --a-decisao-fg:#fdb022;
+  --a-back-bg:#1c2050;    --a-back-fg:#a4bcfd;
+  --a-react-bg:#062c41;   --a-react-fg:#7cd4fd;
+  --a-vue-bg:#0a2e2a;     --a-vue-fg:#5fe9d0;
+  --a-infra-bg:#1f242f;   --a-infra-fg:#cecfd2;
+  --a-qa-bg:#3b0a1a;      --a-qa-fg:#fea3b4;
+  --a-docs-bg:#27115f;    --a-docs-fg:#bdb4fe;
+  --v1-bg:#102a56; --v1-fg:#84caff; --v1-line:#1849a9;
+  --warn-bg:#2d2208; --warn-fg:#fdb022; --warn-line:#93370d;
+  --bad-bg:#3b0a0a; --bad-fg:#fda29b; --bad-line:#912018;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --glass:rgba(12,17,29,.88);
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html{-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand-ink)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+
+.page{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,48px);padding-block:28px 72px}
+
+/* ---------- topo ---------- */
+.marca{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.marca-f{width:28px;height:28px;border-radius:8px;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;font:800 15px/1 var(--sans)}
+.marca-n{font:700 18px/1 var(--sans);letter-spacing:-0.02em}
+.marca-n span{color:var(--brand)}
+.marca-sep{width:1px;height:18px;background:var(--line-2);margin-inline:4px}
+.marca-ctx{font:500 12px/1.3 var(--mono);color:var(--ink-3);letter-spacing:.02em}
+
+.topo{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,380px);gap:clamp(24px,4vw,56px);align-items:start}
+.eyebrow{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--brand-ink);margin:0 0 14px}
+h1{font:800 clamp(32px,4.4vw,48px)/1.06 var(--sans);letter-spacing:-0.03em;margin:0 0 16px;text-wrap:balance}
+.lead{font-size:17px;color:var(--ink-2);max-width:58ch;margin:0}
+
+.painel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.p-rot{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:0 0 10px}
+.p-linha{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.p-pct{font:800 40px/1 var(--sans);letter-spacing:-0.03em;font-variant-numeric:tabular-nums}
+.p-conta{font:500 13px/1.3 var(--mono);color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+.segmentos{display:flex;gap:2px;height:10px}
+.seg{flex-basis:0;min-width:3px;background:var(--track);border-radius:3px;overflow:hidden}
+.seg i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s ease}
+.seg-leg{display:flex;justify-content:space-between;font:500 11px/1 var(--mono);color:var(--ink-4);margin-top:8px}
+.proximo{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.px-fase{font:500 12px/1.3 var(--mono);color:var(--ink-3);margin:0 0 4px}
+.px-tit{font-weight:600;margin:0 0 12px;text-wrap:pretty}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer;line-height:1.2}
+.btn:hover{background:var(--surface-2)}
+.btn-pri{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.btn-pri:hover{background:var(--brand-strong);border-color:var(--brand-strong)}
+.btn-min{padding:6px 10px;font-size:13px}
+
+/* ---------- ponto de partida ---------- */
+.partida{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:clamp(20px,3vw,40px);margin-top:40px;padding-top:32px;border-top:1px solid var(--line)}
+.sec-rot{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin:0 0 14px}
+.entregue{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.entregue li{display:flex;gap:10px;align-items:baseline;font-size:14px;color:var(--ink-2)}
+.entregue li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--brand);transform:translateY(-1px)}
+.entregue b{color:var(--ink);font-weight:600}
+.stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stack > div{background:var(--surface);padding:14px 16px}
+.sk-rot{font:500 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:0 0 8px}
+.sk-val{font:700 16px/1.25 var(--sans);letter-spacing:-0.01em;margin:0 0 4px}
+.sk-nota{font-size:12.5px;color:var(--ink-3);margin:0}
+.pend{display:inline-block;font:600 10.5px/1 var(--mono);padding:3px 6px;border-radius:5px;background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-line);vertical-align:1px;margin-left:4px;letter-spacing:.02em}
+.stack-obs{font-size:13px;color:var(--ink-3);margin:10px 0 0}
+
+/* ---------- referência rápida ---------- */
+.ref{margin-top:28px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.ref > summary{cursor:pointer;list-style:none;padding:14px 18px;display:flex;align-items:center;gap:10px;font-weight:600}
+.ref > summary::-webkit-details-marker{display:none}
+.ref > summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(-45deg);transition:transform .15s}
+.ref[open] > summary::before{transform:rotate(45deg)}
+.ref-sub{font-weight:400;color:var(--ink-3);font-size:13.5px}
+.ref-corpo{padding:4px 18px 20px;display:grid;gap:22px}
+.ref h4{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:0 0 10px}
+.fluxo{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.st{font:500 12px/1 var(--mono);padding:5px 8px;border-radius:6px;border:1px solid var(--line-2);background:var(--surface-2);white-space:nowrap}
+.st-novo{border-style:dashed;border-color:var(--v1-line);background:var(--v1-bg);color:var(--v1-fg)}
+.st-fim{border-color:var(--brand-line);background:var(--brand-soft);color:var(--brand-ink)}
+.st-alerta{border-color:var(--bad-line);background:var(--bad-bg);color:var(--bad-fg)}
+.st-mudo{color:var(--ink-3)}
+.seta{color:var(--ink-4);font:500 13px/1 var(--mono)}
+.desvios{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px;font-size:13.5px;color:var(--ink-2)}
+.desvios li{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.ref-nota{font-size:13px;color:var(--ink-3);margin:10px 0 0}
+.numeros{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin:0}
+.numeros > div{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.numeros dt{font:700 20px/1.1 var(--mono);letter-spacing:-0.02em;margin:0 0 6px;font-variant-numeric:tabular-nums}
+.numeros dd{margin:0;font-size:13px;color:var(--ink-2)}
+.numeros small{display:block;font:500 11px/1.3 var(--mono);color:var(--ink-4);margin-top:4px}
+
+/* ---------- layout principal ---------- */
+.layout{display:grid;grid-template-columns:232px minmax(0,1fr);gap:clamp(28px,4vw,56px);margin-top:36px}
+.indice{position:sticky;top:calc(env(safe-area-inset-top,0px) + 20px);align-self:start;max-height:calc(100vh - 40px);overflow:auto;padding-right:4px}
+.i-banda{font:600 11px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-4);margin:18px 0 6px 8px}
+.i-banda:first-child{margin-top:0}
+.i-item{display:grid;grid-template-columns:22px minmax(0,1fr) auto;column-gap:8px;row-gap:5px;align-items:center;padding:7px 8px;border-radius:8px;text-decoration:none;color:var(--ink-2);font-size:13.5px}
+.i-item:hover{background:var(--surface-3)}
+.i-num{font:600 12px/1 var(--mono);color:var(--ink-4);text-align:right}
+.i-tit{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.i-cont{font:500 11px/1 var(--mono);color:var(--ink-4);font-variant-numeric:tabular-nums}
+.i-barra{grid-column:2 / 4;height:3px;background:var(--track);border-radius:2px;overflow:hidden}
+.i-barra i{display:block;height:100%;width:0;background:var(--brand)}
+.i-item.atual{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);color:var(--ink);font-weight:600}
+.i-item.atual .i-num{color:var(--brand-ink)}
+.i-item.completa .i-num{color:var(--brand-ink)}
+.i-item.vazia{opacity:.45}
+
+.barra{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-block:12px;display:grid;gap:10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-weight:600;font-size:13px;cursor:pointer;line-height:1.1}
+.chip:hover{border-color:var(--ink-4)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.chip .n{font:500 11px/1 var(--mono);opacity:.7}
+.chip .pt{width:7px;height:7px;border-radius:50%}
+.controles{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.busca{flex:1 1 220px;min-width:0;padding:8px 12px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);font-size:14px}
+.busca::placeholder{color:var(--ink-4)}
+.alternar{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.ir-fase{display:none;padding:8px 10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);font-size:14px;max-width:100%}
+.sinc{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-3);margin-left:auto}
+.sinc .pt{width:7px;height:7px;border-radius:50%;background:var(--ink-4)}
+.sinc.ok .pt{background:var(--brand)}
+.sinc.lei .pt{background:var(--warn-fg)}
+.link-btn{background:none;border:0;padding:0;color:var(--brand-ink);font-weight:600;font-size:12.5px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+
+.painel-sinc{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;margin-top:16px;display:grid;gap:10px}
+.painel-sinc p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.painel-sinc textarea{width:100%;min-height:84px;padding:10px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2);font:12.5px/1.5 var(--mono);resize:vertical}
+.ps-acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ps-msg{font-size:13px;color:var(--brand-ink);min-height:1em}
+.aviso-sinc{margin:12px 0 0;padding:10px 12px;border-radius:8px;background:var(--warn-bg);color:var(--warn-fg);border:1px solid var(--warn-line);font-size:13.5px}
+
+/* ---------- fases ---------- */
+.fase{padding-block:36px;border-bottom:1px solid var(--line);scroll-margin-top:130px}
+.fase:last-child{border-bottom:0}
+.f-cab{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:6px 16px;align-items:start}
+.f-num{grid-row:1 / 3;width:48px;height:48px;border-radius:12px;border:1px solid var(--line-2);background:var(--surface);display:grid;place-items:center;font:700 18px/1 var(--mono);color:var(--ink-2);font-variant-numeric:tabular-nums}
+.fase.completa .f-num{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
+.f-topo{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px}
+.f-rot{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3)}
+.banda{font:600 11px/1 var(--mono);padding:4px 7px;border-radius:5px;letter-spacing:.03em;border:1px solid var(--line-2);color:var(--ink-2);background:var(--surface-2)}
+.banda-mvp{background:var(--brand-soft);color:var(--brand-ink);border-color:var(--brand-line)}
+.banda-v1{background:var(--v1-bg);color:var(--v1-fg);border-color:var(--v1-line)}
+.banda-futuro{border-style:dashed;background:transparent;color:var(--ink-3)}
+.f-ok{font:600 11px/1 var(--mono);color:var(--brand-ink)}
+.fase h2{grid-column:2;font:700 clamp(20px,2.4vw,24px)/1.2 var(--sans);letter-spacing:-0.02em;margin:0;text-wrap:balance}
+.f-recolher{grid-column:3;grid-row:1 / 3;align-self:center}
+.f-info{grid-column:2 / 4;display:grid;gap:8px;margin-top:6px}
+.f-obj{margin:0;color:var(--ink-2);max-width:68ch}
+.f-pronto{margin:0;font-size:13.5px;color:var(--ink-3);max-width:74ch}
+.f-pronto b{color:var(--brand-ink);font-weight:600}
+.f-prog{display:flex;align-items:center;gap:12px;margin-top:4px}
+.f-trilho{flex:1;height:6px;background:var(--track);border-radius:3px;overflow:hidden;max-width:420px}
+.f-trilho i{display:block;height:100%;width:0;background:var(--brand);transition:width .3s ease}
+.f-cont{font:500 12px/1 var(--mono);color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.f-corpo{margin-top:22px;padding-left:64px}
+.grupo + .grupo{margin-top:22px}
+.grupo h3{font:600 12px/1 var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin:0 0 10px}
+.lista{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.tarefa + .tarefa{border-top:1px solid var(--line)}
+.tarefa:first-child .t-rotulo{border-radius:11px 11px 0 0}
+.tarefa:last-child .t-rotulo{border-radius:0 0 11px 11px}
+.tarefa:only-child .t-rotulo{border-radius:11px}
+.t-rotulo{display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px;padding:13px 16px;cursor:pointer}
+.t-rotulo:hover{background:var(--surface-2)}
+.t-rotulo input{appearance:none;-webkit-appearance:none;width:20px;height:20px;margin:1px 0 0;border:1.5px solid var(--line-2);border-radius:6px;background:var(--surface);display:grid;place-content:center;cursor:pointer;transition:background .12s,border-color .12s}
+.t-rotulo input::after{content:"";width:10px;height:5px;border-left:2px solid var(--on-brand);border-bottom:2px solid var(--on-brand);transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .12s}
+.t-rotulo input:checked{background:var(--brand);border-color:var(--brand)}
+.t-rotulo input:checked::after{transform:translateY(-1px) rotate(-45deg) scale(1)}
+.t-rotulo input:disabled{cursor:not-allowed;opacity:.6}
+.t-rotulo input:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.t-titulo{font-weight:500;text-wrap:pretty}
+.t-det{font-size:13.5px;color:var(--ink-2);margin-top:3px;text-wrap:pretty}
+.t-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:7px}
+.area{font:600 11px/1 var(--sans);padding:4px 7px;border-radius:5px;letter-spacing:.01em}
+.area-decisao{background:var(--a-decisao-bg);color:var(--a-decisao-fg)}
+.area-back{background:var(--a-back-bg);color:var(--a-back-fg)}
+.area-react{background:var(--a-react-bg);color:var(--a-react-fg)}
+.area-vue{background:var(--a-vue-bg);color:var(--a-vue-fg)}
+.area-infra{background:var(--a-infra-bg);color:var(--a-infra-fg)}
+.area-qa{background:var(--a-qa-bg);color:var(--a-qa-fg)}
+.area-docs{background:var(--a-docs-bg);color:var(--a-docs-fg)}
+.pt-decisao{background:var(--a-decisao-fg)} .pt-back{background:var(--a-back-fg)} .pt-react{background:var(--a-react-fg)}
+.pt-vue{background:var(--a-vue-fg)} .pt-infra{background:var(--a-infra-fg)} .pt-qa{background:var(--a-qa-fg)} .pt-docs{background:var(--a-docs-fg)}
+.ref-t{font:500 11.5px/1.3 var(--mono);color:var(--ink-3)}
+.tid{font:500 11px/1 var(--mono);color:var(--ink-4);margin-left:auto}
+.feita .t-titulo{color:var(--ink-3);text-decoration:line-through;text-decoration-color:var(--ink-4);text-decoration-thickness:1px}
+.feita .t-det{color:var(--ink-4)}
+.flash .t-rotulo{animation:flash 1.6s ease}
+@keyframes flash{0%,40%{background:var(--brand-soft)}100%{background:transparent}}
+@media (prefers-reduced-motion: reduce){ .flash .t-rotulo{animation:none;background:var(--brand-soft)} .seg i,.f-trilho i{transition:none} }
+
+.vazio{padding:48px 0;text-align:center;color:var(--ink-3)}
+.vazio p{margin:0 0 12px}
+
+.rodape{margin-top:48px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3);display:grid;gap:6px;max-width:80ch}
+.rodape p{margin:0}
+.rodape code{font:500 12px/1 var(--mono);background:var(--surface-3);padding:2px 5px;border-radius:4px;color:var(--ink-2)}
+
+@media (max-width: 980px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .indice{display:none}
+  .ir-fase{display:block}
+  .barra{position:static}
+  .fase{scroll-margin-top:16px}
+}
+@media (max-width: 860px){
+  .topo{grid-template-columns:minmax(0,1fr)}
+  .partida{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width: 620px){
+  .f-cab{grid-template-columns:40px minmax(0,1fr)}
+  .f-num{width:40px;height:40px;font-size:15px;border-radius:10px}
+  .f-recolher{grid-column:1 / 3;grid-row:auto;justify-self:start}
+  .f-info{grid-column:1 / 3}
+  .f-corpo{padding-left:0}
+  .t-rotulo{padding:12px 14px}
+  .sinc{margin-left:0}
+  .tid{margin-left:0}
+}
+</style>
+
+<div class="page">
+  <div class="marca">
+    <div class="marca-f">F</div>
+    <span class="marca-n">FreeLance<span>Now</span></span>
+    <span class="marca-sep"></span>
+    <span class="marca-ctx">Grupo 2 · GPE17M80586</span>
+  </div>
+
+  <header class="topo">
+    <div>
+      <p class="eyebrow">Plano de construção</p>
+      <h1>Do protótipo à versão 1.0 no ar</h1>
+      <p class="lead">O caminho completo do FreeLanceNow: alinhar a stack, montar a base, entregar o MVP e depois pagamentos em custódia, painel administrativo, segurança, testes, deploy e a documentação final. Cada fase diz o que precisa estar pronto para seguir para a próxima.</p>
+    </div>
+    <aside class="painel" aria-label="Progresso geral">
+      <p class="p-rot">Progresso geral</p>
+      <div class="p-linha">
+        <span class="p-pct" id="pPct">0%</span>
+        <span class="p-conta" id="pConta">0 de 0 tarefas</span>
+      </div>
+      <div class="segmentos" id="segmentos" role="img" aria-label="Progresso por fase"></div>
+      <div class="seg-leg"><span>Fase 0</span><span>Fase 17</span></div>
+      <div class="proximo" id="proximo">
+        <p class="p-rot">Próximo passo</p>
+        <p class="px-fase" id="pxFase"></p>
+        <p class="px-tit" id="pxTit"></p>
+        <button class="btn btn-pri btn-min" id="pxIr" type="button">Ir para a tarefa</button>
+      </div>
+    </aside>
+  </header>
+
+  <section class="partida" aria-label="Ponto de partida">
+    <div>
+      <p class="sec-rot">Já entregue</p>
+      <ul class="entregue">
+        <li><span><b>Documento de Visão</b> · v1.1</span></li>
+        <li><span><b>Casos de Uso</b> UC01–UC06 · v1.2</span></li>
+        <li><span><b>Documento de Arquitetura</b> (4+1) · v1.1</span></li>
+        <li><span><b>Business Model Canvas</b>, pitch deck e apresentação</span></li>
+        <li><span><b>Protótipo navegável</b> · 42 telas de cliente, freelancer e admin</span></li>
+      </ul>
+    </div>
+    <div>
+      <p class="sec-rot">Stack combinada com o professor</p>
+      <div class="stack">
+        <div><p class="sk-rot">App web</p><p class="sk-val">React + TypeScript</p><p class="sk-nota">Clientes e freelancers <span class="pend">confirmar F0</span></p></div>
+        <div><p class="sk-rot">Painel admin</p><p class="sk-val">Vue 3 + TypeScript</p><p class="sk-nota">Administração, só desktop <span class="pend">confirmar F0</span></p></div>
+        <div><p class="sk-rot">API</p><p class="sk-val">Spring Boot 3</p><p class="sk-nota">Java 21 sugerido <span class="pend">confirmar F0</span></p></div>
+        <div><p class="sk-rot">Banco</p><p class="sk-val">PostgreSQL</p><p class="sk-nota">Sugestão <span class="pend">decidir F0</span></p></div>
+      </div>
+      <p class="stack-obs">Substitui a stack do Documento de Arquitetura (HTML5, JavaScript e Tailwind). Os pontos em aberto são as primeiras tarefas da Fase 0.</p>
+    </div>
+  </section>
+
+  <details class="ref" id="ref">
+    <summary>Referência rápida <span class="ref-sub">— status, prazos e metas usados nas tarefas</span></summary>
+    <div class="ref-corpo">
+      <div>
+        <h4>Contratação</h4>
+        <div class="fluxo">
+          <span class="st">PENDENTE</span><span class="seta">→</span>
+          <span class="st">ACEITO</span><span class="seta">→</span>
+          <span class="st st-novo">AGUARDANDO_PAGAMENTO</span><span class="seta">→</span>
+          <span class="st">EM_ANDAMENTO</span><span class="seta">→</span>
+          <span class="st">AGUARDANDO_CONFIRMACAO</span><span class="seta">→</span>
+          <span class="st st-fim">CONCLUIDO</span>
+        </div>
+        <ul class="desvios">
+          <li><span class="st">PENDENTE</span><span class="seta">→</span><span class="st st-mudo">RECUSADO</span> o freelancer recusa</li>
+          <li><span class="st">PENDENTE</span><span class="seta">→</span><span class="st st-mudo">CANCELADO</span> 48 h sem resposta ou o cliente desiste</li>
+          <li><span class="st">AGUARDANDO_CONFIRMACAO</span><span class="seta">→</span><span class="st st-alerta">EM_DISPUTA</span><span class="seta">→</span><span class="st st-fim">CONCLUIDO</span> ou <span class="st">EM_ANDAMENTO</span> por decisão do admin</li>
+        </ul>
+        <p class="ref-nota">O status tracejado entra na Fase 10. Até lá o fluxo vai direto de ACEITO para EM_ANDAMENTO (UC06 · S01).</p>
+      </div>
+      <div>
+        <h4>Pagamento</h4>
+        <div class="fluxo">
+          <span class="st">AGUARDANDO</span><span class="seta">→</span>
+          <span class="st">CUSTODIA</span><span class="seta">→</span>
+          <span class="st st-fim">LIBERADO</span>
+        </div>
+        <ul class="desvios">
+          <li><span class="st">CUSTODIA</span><span class="seta">→</span><span class="st st-alerta">RETIDO</span><span class="seta">→</span><span class="st st-fim">LIBERADO</span> ou <span class="st st-mudo">ESTORNADO</span> quando há disputa</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Prazos, limites e metas</h4>
+        <dl class="numeros">
+          <div><dt>48 h</dt><dd>para o freelancer aceitar ou recusar</dd><small>UC03 · RN02</small></div>
+          <div><dt>5 dias</dt><dd>para o cliente confirmar a conclusão</dd><small>UC06 · RN02</small></div>
+          <div><dt>7 dias</dt><dd>de janela para avaliar</dd><small>UC04 · RN02</small></div>
+          <div><dt>20</dt><dd>serviços ativos por freelancer</dd><small>UC02 · RN01</small></div>
+          <div><dt>5 × 5 MB</dt><dd>fotos JPG ou PNG por serviço</dd><small>UC02 · A01</small></div>
+          <div><dt>10%</dt><dd>de taxa, descontada do repasse</dd><small>Protótipo · ajustável de 5 a 20%</small></div>
+          <div><dt>≤ 3 s</dt><dd>busca e carregamento de página (P95)</dd><small>Arquitetura §8</small></div>
+          <div><dt>≤ 10 s</dt><dd>para a notificação chegar</dd><small>Arquitetura §8</small></div>
+          <div><dt>200</dt><dd>acessos simultâneos no pico</dd><small>Arquitetura §8 · 99% de disponibilidade</small></div>
+        </dl>
+      </div>
+    </div>
+  </details>
+
+  <div class="layout">
+    <nav class="indice" id="indice" aria-label="Fases"></nav>
+    <main>
+      <div class="barra" id="barra">
+        <div class="chips" id="chips" role="group" aria-label="Filtrar por área"></div>
+        <div class="controles">
+          <input class="busca" id="busca" type="search" placeholder="Buscar tarefa, tela ou regra (ex.: RN02, Pix, 48 h)" aria-label="Buscar tarefas">
+          <label class="alternar" for="ocultar"><input type="checkbox" id="ocultar"> Ocultar concluídas</label>
+          <select class="ir-fase" id="irFase" aria-label="Ir para a fase"></select>
+          <span class="sinc" id="sinc"><span class="pt"></span><span id="sincTxt">Salvo neste navegador</span> · <button class="link-btn" id="abrirSinc" type="button" aria-expanded="false" aria-controls="painelSinc">copiar ou colar</button></span>
+        </div>
+      </div>
+
+      <div class="painel-sinc" id="painelSinc" hidden>
+        <p>Leve o progresso para outro navegador, junte com o de um colega ou cole na conversa com o Claude para ele saber onde vocês pararam. Colar só marca tarefas, nunca desmarca.</p>
+        <textarea id="txtSinc" aria-label="Progresso em texto" placeholder='Cole aqui o progresso copiado (ex.: {"feitos":["f0-01","f0-02"]})'></textarea>
+        <div class="ps-acoes">
+          <button class="btn btn-min" id="copiar" type="button">Copiar meu progresso</button>
+          <button class="btn btn-min" id="aplicar" type="button">Marcar as tarefas coladas</button>
+          <span class="ps-msg" id="psMsg" role="status"></span>
+        </div>
+      </div>
+      <p class="aviso-sinc" id="avisoSinc" hidden></p>
+
+      <div id="fases"></div>
+      <div class="vazio" id="vazio" hidden>
+        <p>Nenhuma tarefa com esses filtros.</p>
+        <button class="btn btn-min" id="limpar" type="button">Limpar filtros</button>
+      </div>
+
+      <footer class="rodape">
+        <p>Montado a partir do Documento de Visão v1.1, dos Casos de Uso v1.2, do Documento de Arquitetura v1.1, do pitch deck e do protótipo navegável. A stack da documentação foi desconsiderada, conforme combinado.</p>
+        <p>Cada tarefa tem um código, como <code>f3-01</code>. Use o código para pedir a próxima etapa ao Claude ou para citar a tarefa num commit.</p>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var AREAS = {
+    decisao: 'Decisão',
+    back: 'Back-end',
+    react: 'React',
+    vue: 'Vue · admin',
+    infra: 'Infra',
+    qa: 'Qualidade',
+    docs: 'Docs'
+  };
+  var BANDAS = { base: 'Fundação', mvp: 'MVP', v1: 'Versão 1.0', futuro: 'Futuro' };
+
+  /* Para marcar uma tarefa como concluída direto no arquivo, adicione feito: true ao item. */
+  var FASES = [
+    { id: 'f0', n: 0, banda: 'base', titulo: 'Alinhamento e decisões',
+      objetivo: 'Fechar as decisões que travam todo o resto antes de escrever a primeira linha de código.',
+      pronto: 'stack, corte do MVP, papéis e ferramentas registrados em ADRs e validados com o professor.',
+      grupos: [
+        { nome: 'Stack e arquitetura', itens: [
+          { id: 'f0-01', a: 'decisao', t: 'Confirmar com o professor como React e Vue dividem o front-end', d: 'Sugestão: React no app de clientes e freelancers e Vue no painel administrativo — duas SPAs consumindo a mesma API.' },
+          { id: 'f0-02', a: 'decisao', t: 'Confirmar a linguagem do back-end', d: 'Spring Boot roda em Java ou Kotlin; o TypeScript fica nos dois fronts. Sugestão: Java 21 + Spring Boot 3.' },
+          { id: 'f0-03', a: 'decisao', t: 'Escolher o banco de dados', d: 'Sugestão: PostgreSQL — atende as transações ACID exigidas na contratação e na conclusão.', r: 'UC06 · RE03' },
+          { id: 'f0-04', a: 'decisao', t: 'Escolher Maven ou Gradle no back e npm ou pnpm nos fronts' },
+          { id: 'f0-05', a: 'docs', t: 'Registrar cada decisão como um ADR curto em /docs/adr', d: 'Contexto, decisão e consequências — vira anexo do Documento de Arquitetura.' }
+        ] },
+        { nome: 'Escopo', itens: [
+          { id: 'f0-06', a: 'decisao', t: 'Fechar o corte do MVP a partir das prioridades do Documento de Visão', d: 'Crítico entra no MVP, Importante na versão 1.0, Útil fica para o futuro.', r: 'Visão §5' },
+          { id: 'f0-07', a: 'docs', t: 'Consolidar as regras de negócio dos seis casos de uso e do protótipo numa lista única', r: 'UC01–UC06' },
+          { id: 'f0-08', a: 'docs', t: 'Listar os fluxos que o protótipo tem e os casos de uso não cobrem', d: 'Pagamento em custódia, carteira e saque, demandas e propostas, mensagens, notificações e denúncias.' },
+          { id: 'f0-09', a: 'decisao', t: 'Definir a taxa da plataforma e quem a paga', d: 'O protótipo usa 10% (ajustável de 5 a 20%), descontados do repasse ao freelancer; o cliente não paga taxa.' }
+        ] },
+        { nome: 'Equipe e processo', itens: [
+          { id: 'f0-10', a: 'decisao', t: 'Distribuir papéis entre os cinco integrantes', d: 'Exemplo: dois no back-end, um no React, um no Vue e um em qualidade, documentação e deploy.' },
+          { id: 'f0-11', a: 'decisao', t: 'Definir a cadência de trabalho', d: 'Sprints de duas semanas, com revisão junto ao professor no fim de cada uma.' },
+          { id: 'f0-12', a: 'infra', t: 'Criar o quadro de tarefas com as fases deste roadmap como épicos', d: 'GitHub Projects ou Jira.' },
+          { id: 'f0-13', a: 'decisao', t: 'Pesquisar desde já gateway de pagamento e hospedagem gratuitos', d: 'A escolha final acontece nas fases 10 e 14, mas a aprovação de conta sandbox pode demorar.' }
+        ] }
+      ] },
+
+    { id: 'f1', n: 1, banda: 'base', titulo: 'Fundação do projeto',
+      objetivo: 'Repositório organizado, três projetos rodando localmente e um pipeline que valida cada pull request.',
+      pronto: 'o docker compose sobe banco, e-mail e storage; API, app React e painel Vue conversam entre si; CI verde; esqueleto publicado em homologação.',
+      grupos: [
+        { nome: 'Repositório e padrões', itens: [
+          { id: 'f1-01', a: 'infra', t: 'Organizar o repositório em monorepo', d: '/api (Spring Boot), /web (React), /admin (Vue), /docs e /infra — os documentos atuais vão para /docs.' },
+          { id: 'f1-02', a: 'infra', t: 'Adicionar .gitignore e limpar .DS_Store e as cópias duplicadas em /uploads' },
+          { id: 'f1-03', a: 'infra', t: 'Proteger a main: pull request obrigatório com uma revisão e Conventional Commits' },
+          { id: 'f1-04', a: 'docs', t: 'Templates de pull request e issue, mais um README raiz explicando como rodar tudo' },
+          { id: 'f1-05', a: 'infra', t: 'EditorConfig, ESLint e Prettier nos fronts, Spotless no back' }
+        ] },
+        { nome: 'API · Spring Boot', itens: [
+          { id: 'f1-06', a: 'back', t: 'Gerar o projeto no Spring Initializr', d: 'Web, Security, Data JPA, Validation, Actuator, Flyway e o driver do banco.' },
+          { id: 'f1-07', a: 'back', t: 'Criar os pacotes por domínio', d: 'usuarios, servicos, demandas, contratacoes, pagamentos, avaliacoes, notificacoes, mensagens e admin.', r: 'Arquitetura §5' },
+          { id: 'f1-08', a: 'back', t: 'Separar controller, service e repository, com DTOs na borda da API', d: 'Nenhuma entidade JPA sai direto na resposta.' },
+          { id: 'f1-09', a: 'back', t: 'Tratamento global de erros no formato Problem Details (RFC 9457) e validação com Bean Validation' },
+          { id: 'f1-10', a: 'back', t: 'Documentação automática da API com springdoc (Swagger UI)' },
+          { id: 'f1-11', a: 'back', t: 'Perfis dev, test e prod, com configuração só por variáveis de ambiente' }
+        ] },
+        { nome: 'App web · React', itens: [
+          { id: 'f1-12', a: 'react', t: 'Criar o app React + TypeScript com Vite' },
+          { id: 'f1-13', a: 'react', t: 'Configurar React Router, TanStack Query e React Hook Form com Zod' },
+          { id: 'f1-14', a: 'react', t: 'Extrair os design tokens do protótipo para um pacote compartilhado', d: 'Verde da marca, neutros, Public Sans, JetBrains Mono, raios e sombras — o Vue usa o mesmo pacote.' },
+          { id: 'f1-15', a: 'react', t: 'Componentes base', d: 'Botão, campo, seleção, badge de status, card, modal, toast e estado vazio.' },
+          { id: 'f1-16', a: 'react', t: 'Desenhar os layouts de celular', d: 'O protótipo só cobre desktop (largura mínima de 880 px) e a Arquitetura exige layout responsivo.', r: 'Arquitetura §9' },
+          { id: 'f1-17', a: 'react', t: 'i18n com chaves em pt-BR desde o primeiro componente', r: 'Arquitetura §3' }
+        ] },
+        { nome: 'Painel admin · Vue', itens: [
+          { id: 'f1-18', a: 'vue', t: 'Criar o painel Vue 3 + TypeScript com Vite, Vue Router e Pinia' },
+          { id: 'f1-19', a: 'vue', t: 'Aplicar os mesmos design tokens do app React' },
+          { id: 'f1-20', a: 'infra', t: 'Gerar um cliente HTTP tipado a partir do OpenAPI e usar nos dois fronts', d: 'Com openapi-typescript, uma mudança na API quebra a compilação dos fronts, não a produção.' }
+        ] },
+        { nome: 'Ambiente local e CI', itens: [
+          { id: 'f1-21', a: 'infra', t: 'docker-compose com PostgreSQL, Mailpit e MinIO', d: 'Banco, caixa de e-mails de teste e storage compatível com S3 para as fotos.' },
+          { id: 'f1-22', a: 'back', t: 'Seed com os dados do protótipo', d: 'Marcos Vieira, Ana Lopes, Construtora Meridiano, Juliana Prado e as categorias Elétrica, Encanamento, Limpeza e TI.' },
+          { id: 'f1-23', a: 'infra', t: 'GitHub Actions: build, lint e testes dos três projetos em cada pull request' },
+          { id: 'f1-24', a: 'infra', t: 'Publicar o esqueleto dos três apps em homologação já na primeira sprint', d: 'Evita descobrir problemas de deploy só na reta final.' }
+        ] }
+      ] },
+
+    { id: 'f2', n: 2, banda: 'base', titulo: 'Modelo de dados',
+      objetivo: 'Um único modelo de dados que cubra os casos de uso documentados e tudo o que o protótipo mostra.',
+      pronto: 'DER aprovado, migrações aplicando do zero num banco vazio e dicionário de dados preenchido.',
+      grupos: [
+        { nome: 'Modelagem', itens: [
+          { id: 'f2-01', a: 'back', t: 'Unificar os diagramas de classes de UC01, UC02 e UC03 num DER', r: 'Arquitetura §6' },
+          { id: 'f2-02', a: 'back', t: 'Incluir as entidades que só existem no protótipo', d: 'Demanda, Proposta, Pagamento, Lançamento, Carteira, Saque, Conversa, Mensagem, Notificação, Denúncia e AuditLog.' },
+          { id: 'f2-03', a: 'docs', t: 'Documentar as máquinas de estado da contratação e do pagamento', d: 'Base na Referência rápida do topo desta página.' },
+          { id: 'f2-04', a: 'docs', t: 'Preencher o dicionário de dados', d: 'A seção 9 do Documento de Visão aparece no sumário, mas está vazia.', r: 'Visão §9' }
+        ] },
+        { nome: 'Migrações · Flyway', itens: [
+          { id: 'f2-05', a: 'back', t: 'V1 — usuario, perfil_cliente, perfil_freelancer, categoria, servico e servico_foto' },
+          { id: 'f2-06', a: 'back', t: 'V2 — demanda, proposta, contratacao e contratacao_historico' },
+          { id: 'f2-07', a: 'back', t: 'V3 — avaliacao (mútua) e resposta_avaliacao' },
+          { id: 'f2-08', a: 'back', t: 'V4 — pagamento, lancamento, carteira e saque' },
+          { id: 'f2-09', a: 'back', t: 'V5 — notificacao, conversa, mensagem, denuncia, audit_log e aceite_termos' },
+          { id: 'f2-10', a: 'back', t: 'Índices para a busca', d: 'Categoria, cidade, preço e nota média, mais busca textual em português (tsvector ou pg_trgm).', r: 'Meta: busca P95 ≤ 3 s' },
+          { id: 'f2-11', a: 'back', t: 'Garantir regras no próprio banco com constraints', d: 'E-mail único, uma avaliação por contratação e autor, uma solicitação pendente por cliente e serviço.' }
+        ] }
+      ] },
+
+    { id: 'f3', n: 3, banda: 'mvp', titulo: 'Contas, login e perfis',
+      objetivo: 'Qualquer pessoa cria conta como cliente ou freelancer, entra com segurança e completa o perfil.',
+      pronto: 'cadastro, login, recuperação de senha e perfis funcionando de ponta a ponta, com testes das regras RN01 a RN03 do UC01.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f3-01', a: 'back', t: 'Cadastro com e-mail único, senha forte e tipo de conta obrigatório', d: 'Senha com no mínimo 8 caracteres, letras e números.', r: 'UC01 · RN01–RN03' },
+          { id: 'f3-02', a: 'back', t: 'Senhas com bcrypt e aceite dos Termos e da Política gravado com data e versão', r: 'UC01 · RE01 · RE02' },
+          { id: 'f3-03', a: 'back', t: 'Login com JWT (token de acesso curto + refresh token) e logout' },
+          { id: 'f3-04', a: 'back', t: 'Confirmação de e-mail e recuperação de senha por link com validade', r: 'UC01 · A01' },
+          { id: 'f3-05', a: 'back', t: 'Perfis de acesso Cliente, Freelancer e Administrador', d: 'Administrador nunca nasce do cadastro comum: só por seed ou promovido por outro admin.', r: 'UC05 · RN01' },
+          { id: 'f3-06', a: 'back', t: 'Completar perfil', d: 'Freelancer: categorias, bio, habilidades, foto e raio de atendimento. Cliente: localização e o que costuma contratar.', r: 'UC01 · S02' },
+          { id: 'f3-07', a: 'back', t: 'Cliente pessoa física (CPF) ou empresa (CNPJ), com validação dos dígitos' },
+          { id: 'f3-08', a: 'back', t: 'Editar perfil e trocar a foto (upload para o storage)' },
+          { id: 'f3-09', a: 'back', t: 'Bloquear o login de conta suspensa e limitar tentativas de senha' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f3-10', a: 'react', t: 'Landing', d: 'Hero, “Como funciona” em seis etapas, categorias e a chamada “Você é profissional?”.', r: 'Tela: Landing' },
+          { id: 'f3-11', a: 'react', t: 'Login com a mensagem “E-mail ou senha incorretos”', r: 'UC01 · E02' },
+          { id: 'f3-12', a: 'react', t: 'Cadastro em duas etapas: tipo de conta e formulário', d: 'Com o aviso “Este e-mail já está cadastrado. Deseja fazer login?”.', r: 'UC01 · E01' },
+          { id: 'f3-13', a: 'react', t: 'Recuperar senha', r: 'Tela: Recuperar senha' },
+          { id: 'f3-14', a: 'react', t: 'Completar perfil logo após o cadastro' },
+          { id: 'f3-15', a: 'react', t: 'Editar perfil', r: 'Tela: Editar perfil' },
+          { id: 'f3-16', a: 'react', t: 'Layout logado com navegação por papel', d: 'Cabeçalho, menu, avatar e sair; rotas protegidas e redirecionamento conforme o tipo de conta.' }
+        ] }
+      ] },
+
+    { id: 'f4', n: 4, banda: 'mvp', titulo: 'Serviços do freelancer',
+      objetivo: 'O freelancer publica e gerencia os serviços que os clientes vão encontrar na busca.',
+      pronto: 'criar, editar, salvar rascunho, desativar e reativar funcionando, com fotos e o limite de 20 ativos.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f4-01', a: 'back', t: 'CRUD de serviço com as validações do formulário', d: 'Título até 80, categoria obrigatória, descrição até 500, valor maior que zero e prazo em dias.', r: 'UC02 · I01' },
+          { id: 'f4-02', a: 'back', t: 'Status Rascunho, Ativo e Desativado, com no máximo 20 ativos por freelancer', r: 'UC02 · RN01' },
+          { id: 'f4-03', a: 'back', t: 'Até 5 fotos JPG ou PNG de até 5 MB cada', r: 'UC02 · A01' },
+          { id: 'f4-04', a: 'back', t: 'Listar só as categorias ativas criadas pelo admin', r: 'UC02 · RN02' },
+          { id: 'f4-05', a: 'back', t: 'Contar visualizações e pedidos de cada serviço' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f4-06', a: 'react', t: 'Painel do freelancer', d: 'Saudação, solicitações pendentes, serviços ativos e ganhos do mês.', r: 'Tela: Painel do freelancer' },
+          { id: 'f4-07', a: 'react', t: 'Meus serviços, com o estado vazio “Você ainda não publicou nenhum serviço”', r: 'Tela: Meus serviços' },
+          { id: 'f4-08', a: 'react', t: 'Formulário de serviço que destaca os campos obrigatórios e permite salvar rascunho', r: 'UC02 · E01' },
+          { id: 'f4-09', a: 'react', t: 'Desativar e reativar com confirmação dentro da página', r: 'UC02 · S02' }
+        ] }
+      ] },
+
+    { id: 'f5', n: 5, banda: 'mvp', titulo: 'Busca e descoberta',
+      objetivo: 'O cliente encontra o serviço ou o profissional certo em poucos cliques.',
+      pronto: 'busca com filtros, detalhe do serviço, perfis e feeds prontos; P95 da busca abaixo de 3 s com os dados de seed.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f5-01', a: 'back', t: 'Busca de serviços por texto, categoria, faixa de preço, nota mínima e localização', d: 'Paginada e ordenável.', r: 'UC03 · S01' },
+          { id: 'f5-02', a: 'back', t: 'Busca de profissionais por habilidades', d: 'A procura ativa de talentos, diferente da busca por serviços prontos.', r: 'Arquitetura §10' },
+          { id: 'f5-03', a: 'back', t: 'Detalhe do serviço com dados do freelancer e avaliações' },
+          { id: 'f5-04', a: 'back', t: 'Perfis públicos do freelancer e do cliente', r: 'UC03 · S02' },
+          { id: 'f5-05', a: 'back', t: 'Feed do cliente (serviços da região) e feed do freelancer (demandas compatíveis)' },
+          { id: 'f5-06', a: 'back', t: 'Sugerir categorias relacionadas quando a busca não encontra nada', r: 'UC03 · A01' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f5-07', a: 'react', t: 'Busca de serviços com filtros em tempo real e o estado “Nenhum serviço encontrado”', r: 'Tela: Busca de serviços' },
+          { id: 'f5-08', a: 'react', t: 'Busca de profissionais', r: 'Tela: Busca de profissionais' },
+          { id: 'f5-09', a: 'react', t: 'Detalhe do serviço com “O que está incluído”, avaliações e “Solicitar serviço”' },
+          { id: 'f5-10', a: 'react', t: 'Perfil do freelancer: sobre, serviços oferecidos, portfólio e avaliações' },
+          { id: 'f5-11', a: 'react', t: 'Perfil do cliente com as avaliações recebidas de profissionais' },
+          { id: 'f5-12', a: 'react', t: 'Feed do cliente e feed do freelancer', r: 'Telas: Feed do cliente · Feed do freelancer' }
+        ] }
+      ] },
+
+    { id: 'f6', n: 6, banda: 'mvp', titulo: 'Solicitação, demandas e propostas',
+      objetivo: 'O cliente contrata de dois jeitos: solicitando um serviço pronto ou publicando uma demanda e escolhendo uma proposta.',
+      pronto: 'solicitação, aceite, recusa, cancelamento em 48 h e propostas funcionando, com todo o histórico de status gravado.',
+      grupos: [
+        { nome: 'Máquina de estados', itens: [
+          { id: 'f6-01', a: 'back', t: 'Centralizar as transições de status da contratação num único serviço', d: 'Qualquer transição fora da sequência é recusada.', r: 'UC06 · RN05' },
+          { id: 'f6-02', a: 'back', t: 'Prever o status AGUARDANDO_PAGAMENTO, desligado por configuração até a Fase 10' },
+          { id: 'f6-03', a: 'back', t: 'Gravar cada mudança de status com data, hora e autor (cliente, freelancer ou sistema)', r: 'UC06 · RE01' }
+        ] },
+        { nome: 'Solicitação direta', itens: [
+          { id: 'f6-04', a: 'back', t: 'Enviar solicitação com data futura, descrição até 300 caracteres e endereço opcional', r: 'UC03 · I01' },
+          { id: 'f6-05', a: 'back', t: 'Impedir uma segunda solicitação pendente ao mesmo freelancer no mesmo serviço', r: 'UC03 · RN01' },
+          { id: 'f6-06', a: 'back', t: 'Aceitar ou recusar com motivo opcional; na recusa, sugerir outros profissionais da categoria', r: 'UC03 · E01' },
+          { id: 'f6-07', a: 'back', t: 'Tarefa agendada que cancela a solicitação após 48 h sem resposta e avisa o cliente', r: 'UC03 · RN02' },
+          { id: 'f6-08', a: 'back', t: 'Cliente cancela a solicitação enquanto ela estiver pendente' }
+        ] },
+        { nome: 'Demandas e propostas', itens: [
+          { id: 'f6-09', a: 'back', t: 'Cliente publica demanda com título, categoria, orçamento, prazo e local', d: 'Status Aberta ou Encerrada.' },
+          { id: 'f6-10', a: 'back', t: 'Freelancer envia proposta; ao aceitar uma, a demanda encerra e vira contratação' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f6-11', a: 'react', t: 'Solicitar serviço e a confirmação “Solicitação enviada”', r: 'Tela: Solicitar serviço' },
+          { id: 'f6-12', a: 'react', t: 'Solicitações recebidas com aceitar, recusar e o tempo restante das 48 h', r: 'Tela: Solicitações recebidas' },
+          { id: 'f6-13', a: 'react', t: 'Minhas contratações e Serviços contratados, com a ação certa para cada status', r: 'Tela: Minhas contratações' },
+          { id: 'f6-14', a: 'react', t: 'Detalhe da contratação com a linha do tempo de seis passos e o escopo combinado', r: 'Tela: Detalhe da contratação' },
+          { id: 'f6-15', a: 'react', t: 'Publicar demanda e Minhas demandas' },
+          { id: 'f6-16', a: 'react', t: 'Propostas recebidas (por avaliação, preço ou prazo) e Enviar proposta', r: 'Telas: Propostas · Enviar proposta' }
+        ] }
+      ] },
+
+    { id: 'f7', n: 7, banda: 'mvp', titulo: 'Execução, conclusão e disputa',
+      objetivo: 'Fica claro quem marca o serviço como concluído, quem confirma e o que acontece quando há discordância.',
+      pronto: 'iniciar, concluir, confirmar, confirmar automaticamente em 5 dias e contestar funcionando, sempre em transação.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f7-01', a: 'back', t: 'Iniciar serviço: ACEITO → EM_ANDAMENTO, com aviso ao cliente', r: 'UC06 · S01' },
+          { id: 'f7-02', a: 'back', t: 'Marcar como concluído com observações e comprovante (JPG, PNG ou PDF)', d: 'O status vai para AGUARDANDO_CONFIRMACAO.' },
+          { id: 'f7-03', a: 'back', t: 'Confirmar recebimento: CONCLUIDO e data_conclusao gravados na mesma transação', r: 'UC06 · RE03' },
+          { id: 'f7-04', a: 'back', t: 'Tarefa agendada: confirmação automática após 5 dias sem resposta do cliente', r: 'UC06 · RN02' },
+          { id: 'f7-05', a: 'back', t: 'Contestar conclusão com motivo obrigatório e evidência; o freelancer responde em até 300 caracteres', d: 'O status vai para EM_DISPUTA e o admin é avisado.', r: 'UC06 · E01' },
+          { id: 'f7-06', a: 'back', t: 'Avisar as duas partes quando a data combinada passar sem conclusão', r: 'UC06 · E02' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f7-07', a: 'react', t: 'Marcar como concluído (freelancer)', r: 'Tela: Marcar como concluído' },
+          { id: 'f7-08', a: 'react', t: 'Confirmar recebimento (cliente)' },
+          { id: 'f7-09', a: 'react', t: 'Contestar conclusão e “Contestação registrada”', r: 'Tela: Contestar conclusão' },
+          { id: 'f7-10', a: 'react', t: 'Acompanhar disputa, para cliente e freelancer' }
+        ] }
+      ] },
+
+    { id: 'f8', n: 8, banda: 'mvp', titulo: 'Avaliações e fechamento do MVP',
+      objetivo: 'Reputação que só vem de serviço concluído — a regra de ouro do pitch.',
+      pronto: 'avaliação mútua funcionando com prazos e média; ciclo completo do MVP demonstrado ao professor.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f8-01', a: 'back', t: 'Avaliar de 1 a 5 estrelas, com comentário opcional até 500, só em contratação CONCLUIDO', r: 'UC04 · RE01' },
+          { id: 'f8-02', a: 'back', t: 'Avaliação mútua: o freelancer também avalia o cliente', r: 'Pitch · Regra de ouro' },
+          { id: 'f8-03', a: 'back', t: 'Uma avaliação por contratação e por autor, sem edição depois de publicada', r: 'UC04 · RN01' },
+          { id: 'f8-04', a: 'back', t: 'Janela de 7 dias, suspensa durante disputa e encerrada por tarefa agendada', r: 'UC04 · RN02 · UC06 · RN03' },
+          { id: 'f8-05', a: 'back', t: 'Média aritmética com uma casa decimal guardada no perfil', r: 'UC04 · RN03' },
+          { id: 'f8-06', a: 'back', t: 'Resposta do freelancer com até 200 caracteres', r: 'UC04 · S01' },
+          { id: 'f8-07', a: 'back', t: 'Barrar linguagem ofensiva antes de publicar', r: 'UC04 · E01' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f8-08', a: 'react', t: 'Tela de avaliação com estrelas e “Avaliação publicada”', r: 'Tela: Avaliar' },
+          { id: 'f8-09', a: 'react', t: 'Avaliações no perfil, com a resposta do freelancer' }
+        ] },
+        { nome: 'Fechamento do MVP', itens: [
+          { id: 'f8-10', a: 'qa', t: 'Teste de ponta a ponta do ciclo sem pagamento', d: 'Cadastro → busca → solicitação → aceite → execução → conclusão → avaliação.' },
+          { id: 'f8-11', a: 'decisao', t: 'Demonstrar o MVP ao professor e registrar o retorno' },
+          { id: 'f8-12', a: 'infra', t: 'Marcar a versão v0.1.0 (MVP) no repositório' }
+        ] }
+      ] },
+
+    { id: 'f9', n: 9, banda: 'v1', titulo: 'Notificações e mensagens',
+      objetivo: 'Ninguém precisa recarregar a página para saber o que mudou.',
+      pronto: 'notificações no app e por e-mail chegando em até 10 s; chat por contratação funcionando.',
+      grupos: [
+        { nome: 'Notificações', itens: [
+          { id: 'f9-01', a: 'back', t: 'Notificações no app com tipo, texto, link de ação e lida ou não lida' },
+          { id: 'f9-02', a: 'back', t: 'Entrega em tempo real por WebSocket (STOMP) ou SSE', r: 'Meta: notificação ≤ 10 s' },
+          { id: 'f9-03', a: 'back', t: 'E-mails transacionais', d: 'Boas-vindas, confirmação, recuperação de senha, nova solicitação, aceite, conclusão, disputa, avaliação e suspensão.' },
+          { id: 'f9-04', a: 'react', t: 'Central de notificações com contador no cabeçalho', r: 'Tela: Notificações' }
+        ] },
+        { nome: 'Mensagens', itens: [
+          { id: 'f9-05', a: 'back', t: 'Conversa por contratação, com histórico e confirmação de leitura' },
+          { id: 'f9-06', a: 'back', t: 'Alertar quando a mensagem traz telefone, e-mail ou link de WhatsApp', d: 'Combinar por fora tira o pagamento da custódia — o protótipo já prevê essa denúncia automática.' },
+          { id: 'f9-07', a: 'react', t: 'Mensagens: lista de conversas e chat', r: 'Tela: Mensagens' },
+          { id: 'f9-08', a: 'react', t: 'Preferências de notificação por e-mail' }
+        ] }
+      ] },
+
+    { id: 'f10', n: 10, banda: 'v1', titulo: 'Pagamentos em custódia',
+      objetivo: 'O cliente paga no app, o valor fica retido e é repassado ao freelancer, já sem a taxa, quando o cliente confirma.',
+      pronto: 'Pix, cartão e boleto funcionando em sandbox; liberação, retenção em disputa, estorno e saque testados; ledger batendo com o gateway.',
+      grupos: [
+        { nome: 'Decisões', itens: [
+          { id: 'f10-01', a: 'decisao', t: 'Escolher o gateway', d: 'Precisa de sandbox, Pix, cartão, boleto e split ou subcontas para marketplace — por exemplo Asaas, Mercado Pago ou Pagar.me.' },
+          { id: 'f10-02', a: 'decisao', t: 'Validar o modelo de custódia com o gateway', d: 'O dinheiro fica retido no gateway, não numa conta própria da plataforma.' },
+          { id: 'f10-03', a: 'decisao', t: 'Definir a política de reembolso', d: 'Cancelamento antes do início, disputa decidida a favor do cliente e boleto vencido.' }
+        ] },
+        { nome: 'API', itens: [
+          { id: 'f10-04', a: 'back', t: 'Ativar o status AGUARDANDO_PAGAMENTO: aceite → pagamento → EM_ANDAMENTO' },
+          { id: 'f10-05', a: 'back', t: 'Cobrança Pix com QR Code, copia e cola e expiração' },
+          { id: 'f10-06', a: 'back', t: 'Cartão em até 3x com tokenização do gateway', d: 'Nenhum dado de cartão passa pelo nosso servidor.' },
+          { id: 'f10-07', a: 'back', t: 'Boleto com linha digitável; o serviço só começa após a compensação' },
+          { id: 'f10-08', a: 'back', t: 'Webhook do gateway com verificação de assinatura e idempotência', d: 'Um evento repetido nunca credita duas vezes.' },
+          { id: 'f10-09', a: 'back', t: 'Ledger com bruto, taxa e líquido por contratação, em centavos inteiros' },
+          { id: 'f10-10', a: 'back', t: 'Liberar o repasse na confirmação do cliente ou na confirmação automática', r: 'UC06 · Observações' },
+          { id: 'f10-11', a: 'back', t: 'Reter o valor em disputa; a decisão do admin libera ou estorna ao cliente' },
+          { id: 'f10-12', a: 'back', t: 'Carteira do freelancer: disponível, em custódia e recebido no mês' },
+          { id: 'f10-13', a: 'back', t: 'Saque via Pix para a chave cadastrada, sem tarifa e com status acompanhável' },
+          { id: 'f10-14', a: 'back', t: 'Conciliação diária entre gateway e ledger, com alerta de divergência' }
+        ] },
+        { nome: 'Telas · React', itens: [
+          { id: 'f10-15', a: 'react', t: 'Pagar para iniciar o serviço, com escolha entre Pix, cartão e boleto', r: 'Tela: Pagamento em custódia' },
+          { id: 'f10-16', a: 'react', t: 'Telas de Pix (QR, copiar código, atualização automática), cartão e boleto' },
+          { id: 'f10-17', a: 'react', t: 'Pagamento confirmado e comprovante da transação' },
+          { id: 'f10-18', a: 'react', t: 'Carteira do freelancer com extrato de bruto, taxa e líquido', r: 'Tela: Carteira do freelancer' },
+          { id: 'f10-19', a: 'react', t: 'Solicitar saque e “Saque solicitado”', r: 'Tela: Solicitar saque' },
+          { id: 'f10-20', a: 'react', t: 'Extrato do cliente: pago, em custódia e aguardando' }
+        ] },
+        { nome: 'Testes', itens: [
+          { id: 'f10-21', a: 'qa', t: 'Roteiro de testes em sandbox', d: 'Aprovado, recusado, expirado, webhook duplicado, estorno e disputa.' }
+        ] }
+      ] },
+
+    { id: 'f11', n: 11, banda: 'v1', titulo: 'Painel administrativo e moderação',
+      objetivo: 'O administrador controla usuários, categorias, conteúdo, disputas e dinheiro num painel próprio.',
+      pronto: 'todas as telas de admin do protótipo funcionando no Vue, com cada ação gravada no log de auditoria.',
+      grupos: [
+        { nome: 'API', itens: [
+          { id: 'f11-01', a: 'back', t: 'Rotas /admin acessíveis só ao perfil Administrador' },
+          { id: 'f11-02', a: 'back', t: 'Usuários: buscar por nome ou e-mail, filtrar por tipo e status, suspender, reativar e excluir', r: 'UC05 · I01' },
+          { id: 'f11-03', a: 'back', t: 'Excluir só contas sem atividade; com contratação ativa, sugerir suspensão', r: 'UC05 · RN02 · E01' },
+          { id: 'f11-04', a: 'back', t: 'Categorias: criar, renomear e desativar sem afetar os serviços existentes', r: 'UC05 · S01' },
+          { id: 'f11-05', a: 'back', t: 'Fila de moderação de avaliações, serviços, perfis e contratações denunciados', r: 'UC05 · S02' },
+          { id: 'f11-06', a: 'back', t: 'Mediação de disputa: manter CONCLUIDO ou voltar para EM_ANDAMENTO, liberando ou estornando', r: 'UC06 · E01' },
+          { id: 'f11-07', a: 'back', t: 'Relatórios por período com exportação CSV', d: 'Usuários, serviços, contratações, avaliações e receita da plataforma.', r: 'UC05 · A01' },
+          { id: 'f11-08', a: 'back', t: 'Lista de transações e valores em custódia com filtro por status' },
+          { id: 'f11-09', a: 'back', t: 'Log de auditoria de toda ação administrativa: quem, quando e o quê', r: 'UC05 · RE01' },
+          { id: 'f11-10', a: 'back', t: 'Ajustar a taxa da plataforma pelo painel' }
+        ] },
+        { nome: 'Painel · Vue', itens: [
+          { id: 'f11-11', a: 'vue', t: 'Layout do painel (só desktop) e login restrito', r: 'UC05 · 8.2' },
+          { id: 'f11-12', a: 'vue', t: 'Gerenciamento de usuários com confirmação de cada ação', r: 'Tela: Gerenciamento de usuários' },
+          { id: 'f11-13', a: 'vue', t: 'Categorias de serviço', r: 'Tela: Categorias de serviço' },
+          { id: 'f11-14', a: 'vue', t: 'Fila de moderação e disputas', r: 'Tela: Fila de moderação' },
+          { id: 'f11-15', a: 'vue', t: 'Relatórios e métricas com gráficos e exportação CSV', r: 'Tela: Relatórios e métricas' },
+          { id: 'f11-16', a: 'vue', t: 'Transações e custódia', r: 'Tela: Transações e custódia' },
+          { id: 'f11-17', a: 'vue', t: 'Consulta ao log de auditoria' }
+        ] },
+        { nome: 'Denúncias no app', itens: [
+          { id: 'f11-18', a: 'react', t: 'Denunciar serviço, perfil, avaliação ou contratação com os cinco motivos do protótipo', r: 'Tela: Denunciar conteúdo' },
+          { id: 'f11-19', a: 'back', t: 'API de denúncias que impede o mesmo usuário de denunciar o mesmo item duas vezes' }
+        ] }
+      ] },
+
+    { id: 'f12', n: 12, banda: 'v1', titulo: 'Segurança e LGPD',
+      objetivo: 'Proteger contas, dados pessoais e dinheiro, e cumprir a LGPD citada em todos os documentos.',
+      pronto: '2FA disponível, checklist OWASP revisado, scan sem achados graves e exportação e exclusão de dados funcionando.',
+      grupos: [
+        { nome: 'Segurança', itens: [
+          { id: 'f12-01', a: 'back', t: '2FA opcional por aplicativo autenticador (TOTP), com códigos de recuperação', r: 'UC01 · RE01' },
+          { id: 'f12-02', a: 'infra', t: 'HTTPS obrigatório, HSTS, CORS restrito aos dois fronts e cabeçalhos de segurança' },
+          { id: 'f12-03', a: 'back', t: 'Limite de requisições em login, cadastro, recuperação de senha e pagamento' },
+          { id: 'f12-04', a: 'back', t: 'Validar uploads pelo conteúdo real, limitar tamanho e remover metadados das fotos' },
+          { id: 'f12-05', a: 'qa', t: 'Revisar o OWASP Top 10 e rodar o OWASP ZAP em homologação' },
+          { id: 'f12-06', a: 'infra', t: 'Dependabot ativo e segredos só em variáveis de ambiente e secrets do CI' }
+        ] },
+        { nome: 'LGPD', itens: [
+          { id: 'f12-07', a: 'docs', t: 'Escrever Termos de Uso e Política de Privacidade, versionados', r: 'UC01 · RE02' },
+          { id: 'f12-08', a: 'back', t: 'Exportar meus dados e excluir ou anonimizar a conta' },
+          { id: 'f12-09', a: 'back', t: 'Mascarar CPF, CNPJ e chave Pix nas respostas e manter dados pessoais fora dos logs' },
+          { id: 'f12-10', a: 'react', t: 'Tela de privacidade e segurança', d: '2FA, consentimentos, exportar dados e excluir conta.' }
+        ] }
+      ] },
+
+    { id: 'f13', n: 13, banda: 'v1', titulo: 'Qualidade e testes',
+      objetivo: 'Provar com testes que as regras de negócio e as metas de desempenho da Arquitetura são cumpridas.',
+      pronto: 'cobertura mínima no CI, jornadas E2E verdes e relatório de carga mostrando as metas de P95.',
+      grupos: [
+        { nome: 'Automatizados', itens: [
+          { id: 'f13-01', a: 'qa', t: 'Cada regra de negócio com pelo menos um teste unitário (JUnit 5 + Mockito)' },
+          { id: 'f13-02', a: 'qa', t: 'Testes de integração com banco real via Testcontainers' },
+          { id: 'f13-03', a: 'qa', t: 'Testes de componentes com Vitest: Testing Library no React e Vue Test Utils no admin' },
+          { id: 'f13-04', a: 'qa', t: 'E2E com Playwright: jornadas do cliente, do freelancer e do admin' },
+          { id: 'f13-05', a: 'qa', t: 'Cobertura mínima no CI (por exemplo, 70% no back com JaCoCo)' }
+        ] },
+        { nome: 'Não funcionais', itens: [
+          { id: 'f13-06', a: 'qa', t: 'Teste de carga com k6: 200 usuários simultâneos', d: 'Busca e página com P95 ≤ 3 s, contratação ≤ 5 s.', r: 'Arquitetura §8' },
+          { id: 'f13-07', a: 'qa', t: 'Acessibilidade WCAG AA: contraste, navegação por teclado e leitor de tela' },
+          { id: 'f13-08', a: 'qa', t: 'Testar em celular, tablet e desktop, no Chrome, Safari e Firefox', r: 'Visão · Portabilidade' },
+          { id: 'f13-09', a: 'qa', t: 'Teste de usabilidade com cinco pessoas de fora da equipe', d: 'Meta da Arquitetura: chegar à ação principal em até 3 cliques.' },
+          { id: 'f13-10', a: 'docs', t: 'Plano de testes e relatório de resultados' }
+        ] }
+      ] },
+
+    { id: 'f14', n: 14, banda: 'v1', titulo: 'Deploy e operação',
+      objetivo: 'Produção estável, com backup, monitoramento e caminho de volta se algo der errado.',
+      pronto: 'homologação e produção separadas, deploy automático, backup testado e alerta de indisponibilidade ativo.',
+      grupos: [
+        { nome: 'Infraestrutura', itens: [
+          { id: 'f14-01', a: 'decisao', t: 'Escolher a hospedagem gratuita', d: 'Fronts: Vercel, Netlify ou Cloudflare Pages. API: Render, Railway ou Fly.io. Banco: Neon, Supabase ou Railway. Fotos: Cloudflare R2 ou Supabase Storage. E-mail: Resend ou Brevo.' },
+          { id: 'f14-02', a: 'infra', t: 'Dockerfile multi-stage da API e build estático dos dois fronts' },
+          { id: 'f14-03', a: 'infra', t: 'Homologação e produção separadas, cada uma com seu banco e suas chaves' },
+          { id: 'f14-04', a: 'infra', t: 'Domínio próprio com HTTPS' },
+          { id: 'f14-05', a: 'infra', t: 'Deploy contínuo: develop vai para homologação, tag na main vai para produção' },
+          { id: 'f14-06', a: 'infra', t: 'Migrações Flyway executadas no deploy' },
+          { id: 'f14-07', a: 'infra', t: 'Webhook do gateway configurado para a URL pública de cada ambiente' }
+        ] },
+        { nome: 'Operação', itens: [
+          { id: 'f14-08', a: 'infra', t: 'Backup diário do banco e um teste de restauração documentado', r: 'Arquitetura §9' },
+          { id: 'f14-09', a: 'infra', t: 'Health check do Actuator com monitor externo de disponibilidade', r: 'Meta: 99%' },
+          { id: 'f14-10', a: 'infra', t: 'Rastreamento de erros (Sentry) nos três apps e logs estruturados' },
+          { id: 'f14-11', a: 'docs', t: 'Runbook: rollback, restauração de backup e troca de segredos' },
+          { id: 'f14-12', a: 'infra', t: 'Dados de demonstração em homologação: contas de cliente, freelancer e admin' }
+        ] }
+      ] },
+
+    { id: 'f15', n: 15, banda: 'v1', titulo: 'Documentação final',
+      objetivo: 'Documentos acadêmicos que descrevem o sistema que realmente foi construído.',
+      pronto: 'Visão, Casos de Uso e Arquitetura na versão 2.0, diagramas refeitos, API documentada e manual do usuário pronto.',
+      grupos: [
+        { nome: 'Documentos existentes', itens: [
+          { id: 'f15-01', a: 'docs', t: 'Documento de Arquitetura 2.0 com a stack real', d: 'React, Vue, TypeScript e Spring Boot no lugar de HTML, JavaScript e Tailwind; camadas e implantação atualizadas.' },
+          { id: 'f15-02', a: 'docs', t: 'Remover os textos de modelo que ficaram na Arquitetura', d: '“[Sigla] – [Nome do Projeto]”, “Tabela 2 – Exemplo de requisitos”, as instruções da Visão Lógica e os “Enumerar os itens…”.' },
+          { id: 'f15-03', a: 'docs', t: 'Acrescentar à Arquitetura a Visão de Processo e a Visão de Dados que a Tabela 1 promete', d: 'Tarefas agendadas, WebSocket, webhooks e o DER.' },
+          { id: 'f15-04', a: 'docs', t: 'Documento de Visão 2.0', d: 'Descrever a revisão 1.1 (está sem observação), preencher Dicionário de Dados e Manual de Arquitetura e corrigir a numeração das seções.' },
+          { id: 'f15-05', a: 'docs', t: 'Tirar pagamentos, chat e notificações da lista de funcionalidades futuras da Visão', r: 'Visão §5.4' },
+          { id: 'f15-06', a: 'docs', t: 'Casos de Uso 2.0: atualizar UC03 e UC06', d: 'O pagamento deixa de ser combinado fora da plataforma e entra o status AGUARDANDO_PAGAMENTO.', r: 'UC03 · Obs. · UC06' },
+          { id: 'f15-07', a: 'docs', t: 'Especificar os casos de uso novos', d: 'Pagamento em custódia, Carteira e saque, Demandas e propostas, Mensagens, Notificações e Denúncias.' },
+          { id: 'f15-08', a: 'docs', t: 'Refazer os diagramas conforme o implementado', d: 'Casos de uso, classes, sequência, implantação, DER e estados.' }
+        ] },
+        { nome: 'Documentação técnica', itens: [
+          { id: 'f15-09', a: 'docs', t: 'README de cada projeto, guia de instalação local e guia de contribuição' },
+          { id: 'f15-10', a: 'docs', t: 'Publicar a documentação da API (OpenAPI)' },
+          { id: 'f15-11', a: 'docs', t: 'Revisar os ADRs, incluindo a justificativa de usar React e Vue' },
+          { id: 'f15-12', a: 'docs', t: 'Changelog e notas da versão 1.0' }
+        ] },
+        { nome: 'Para quem usa', itens: [
+          { id: 'f15-13', a: 'docs', t: 'Manual do usuário com prints: cliente, freelancer e administrador' },
+          { id: 'f15-14', a: 'react', t: 'Página de ajuda com as regras que o usuário sente no dia a dia', d: 'Custódia, taxa, 48 h para responder, 5 dias para confirmar e 7 dias para avaliar.' }
+        ] }
+      ] },
+
+    { id: 'f16', n: 16, banda: 'v1', titulo: 'Entrega e apresentação',
+      objetivo: 'Versão 1.0 no ar e uma apresentação que não depende de sorte.',
+      pronto: 'v1.0.0 em produção, demonstração ensaiada e todos os entregáveis enviados.',
+      grupos: [
+        { nome: 'Reta final', itens: [
+          { id: 'f16-01', a: 'qa', t: 'Congelar funcionalidades e fazer um mutirão de correção de bugs' },
+          { id: 'f16-02', a: 'infra', t: 'Publicar a v1.0.0 em produção' },
+          { id: 'f16-03', a: 'docs', t: 'Roteiro de demonstração com contas prontas de cliente, freelancer e admin' },
+          { id: 'f16-04', a: 'docs', t: 'Gravar um vídeo da demonstração como plano B da apresentação ao vivo' },
+          { id: 'f16-05', a: 'docs', t: 'Atualizar pitch deck e apresentação com prints e números reais' },
+          { id: 'f16-06', a: 'decisao', t: 'Ensaiar a apresentação para a banca' },
+          { id: 'f16-07', a: 'docs', t: 'Entregar repositório, links de produção, documentação e API' },
+          { id: 'f16-08', a: 'decisao', t: 'Retrospectiva final da equipe' }
+        ] }
+      ] },
+
+    { id: 'f17', n: 17, banda: 'futuro', titulo: 'Depois da versão 1.0',
+      objetivo: 'Ideias que já aparecem nos documentos e ficam para quando o essencial estiver pronto.',
+      pronto: 'cada item vira um épico próprio quando for priorizado.',
+      grupos: [
+        { nome: 'Backlog', itens: [
+          { id: 'f17-01', a: 'back', t: 'Login com Google', r: 'UC01 · Obs.' },
+          { id: 'f17-02', a: 'back', t: 'Busca por proximidade com mapa (PostGIS)', r: 'Visão §5.4' },
+          { id: 'f17-03', a: 'react', t: 'PWA instalável com notificações push no celular' },
+          { id: 'f17-04', a: 'react', t: 'Aplicativo nativo para Android e iOS', r: 'Visão §5.4' },
+          { id: 'f17-05', a: 'back', t: 'Destaque patrocinado de serviços e plano premium para freelancers', r: 'UC02 · Obs.' },
+          { id: 'f17-06', a: 'back', t: 'Indicação premiada: cupom para clientes e taxa menor para profissionais', r: 'Pitch · Crescimento' },
+          { id: 'f17-07', a: 'back', t: 'Perfil de agência de emprego', r: 'Visão · ST03' },
+          { id: 'f17-08', a: 'back', t: 'Verificação de identidade com selo de CPF ou CNPJ verificado' },
+          { id: 'f17-09', a: 'back', t: 'Arbitragem de disputas com prazo definido', r: 'UC06 · Obs.' },
+          { id: 'f17-10', a: 'vue', t: 'BI e detecção de fraude no painel', r: 'UC05 · Obs.' },
+          { id: 'f17-11', a: 'react', t: 'Outros idiomas sobre a estrutura de i18n já pronta' }
+        ] }
+      ] }
+  ];
+
+  /* ---------- índices ---------- */
+  var TODAS = [];
+  var BASE = {};
+  FASES.forEach(function (f) {
+    f.total = 0;
+    f.grupos.forEach(function (g) {
+      g.itens.forEach(function (it) {
+        TODAS.push({ it: it, f: f, g: g });
+        BASE[it.id] = !!it.feito;
+        f.total++;
+      });
+    });
+  });
+  var POR_ID = {};
+  TODAS.forEach(function (x) { POR_ID[x.it.id] = x; });
+
+  /* ---------- estado ---------- */
+  var CHAVE = 'freelancenow-roadmap-v1';
+  var estado = {
+    feitosLocal: {}, feitosDb: {}, fonte: 'local', somenteLeitura: false, erroSinc: '',
+    filtro: 'todas', busca: '', ocultar: false, recolhidas: {}
+  };
+  try {
+    var salvo = JSON.parse(localStorage.getItem(CHAVE) || '{}');
+    if (salvo.feitos && typeof salvo.feitos === 'object') estado.feitosLocal = salvo.feitos;
+    if (salvo.filtro && (salvo.filtro === 'todas' || AREAS[salvo.filtro])) estado.filtro = salvo.filtro;
+    estado.ocultar = !!salvo.ocultar;
+    if (Array.isArray(salvo.recolhidas)) salvo.recolhidas.forEach(function (id) { estado.recolhidas[id] = true; });
+  } catch (e) { /* armazenamento indisponível: segue sem lembrar */ }
+
+  function salvarLocal() {
+    try {
+      localStorage.setItem(CHAVE, JSON.stringify({
+        feitos: estado.feitosLocal, filtro: estado.filtro, ocultar: estado.ocultar,
+        recolhidas: Object.keys(estado.recolhidas).filter(function (k) { return estado.recolhidas[k]; })
+      }));
+    } catch (e) { /* ignora */ }
+  }
+
+  function feito(id) {
+    var m = estado.fonte === 'db' ? estado.feitosDb : estado.feitosLocal;
+    if (Object.prototype.hasOwnProperty.call(m, id)) return !!m[id];
+    return !!BASE[id];
+  }
+
+  /* ---------- helpers ---------- */
+  function el(tag, attrs) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v == null || v === false) return;
+      if (k === 'class') n.className = v;
+      else if (k === 'text') n.textContent = v;
+      else n.setAttribute(k, v === true ? '' : v);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null || c === false) continue;
+      n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+    }
+    return n;
+  }
+  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+  function pct(a, b) { return b ? Math.round(a / b * 100) : 0; }
+  var suave = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- montagem ---------- */
+  var NOS = {};
+  var FNOS = {};
+  var INOS = {};
+  var SNOS = {};
+
+  function montarTarefa(it) {
+    var input = el('input', { type: 'checkbox', id: 'cb-' + it.id });
+    input.addEventListener('change', function () { definir(it.id, input.checked); });
+    var meta = el('div', { class: 't-meta' },
+      el('span', { class: 'area area-' + it.a, text: AREAS[it.a] }),
+      it.r ? el('span', { class: 'ref-t', text: it.r }) : null,
+      el('span', { class: 'tid', text: it.id })
+    );
+    var texto = el('div', null,
+      el('div', { class: 't-titulo', text: it.t }),
+      it.d ? el('div', { class: 't-det', text: it.d }) : null,
+      meta
+    );
+    var li = el('li', { class: 'tarefa', id: 'tarefa-' + it.id },
+      el('label', { class: 't-rotulo', for: 'cb-' + it.id }, input, texto)
+    );
+    NOS[it.id] = { li: li, input: input, hay: norm([it.t, it.d, it.r, it.id, AREAS[it.a]].join(' ')) };
+    return li;
+  }
+
+  function montarFase(f) {
+    var recolher = el('button', { class: 'btn btn-min f-recolher', type: 'button', 'aria-controls': 'corpo-' + f.id });
+    recolher.addEventListener('click', function () {
+      estado.recolhidas[f.id] = !estado.recolhidas[f.id];
+      salvarLocal(); atualizar();
+    });
+    var trilho = el('div', { class: 'f-trilho' }, el('i'));
+    var cont = el('span', { class: 'f-cont' });
+    var ok = el('span', { class: 'f-ok', text: 'Concluída' });
+    var cab = el('div', { class: 'f-cab' },
+      el('div', { class: 'f-num', text: String(f.n) }),
+      el('div', { class: 'f-topo' },
+        el('span', { class: 'f-rot', text: 'Fase ' + f.n }),
+        el('span', { class: 'banda banda-' + f.banda, text: BANDAS[f.banda] }),
+        ok
+      ),
+      el('h2', { text: f.titulo }),
+      recolher,
+      el('div', { class: 'f-info' },
+        el('p', { class: 'f-obj', text: f.objetivo }),
+        el('p', { class: 'f-pronto' }, el('b', { text: 'Pronto quando: ' }), f.pronto),
+        el('div', { class: 'f-prog' }, trilho, cont)
+      )
+    );
+    var corpo = el('div', { class: 'f-corpo', id: 'corpo-' + f.id });
+    var grupos = f.grupos.map(function (g) {
+      var ul = el('ul', { class: 'lista' });
+      g.itens.forEach(function (it) { ul.appendChild(montarTarefa(it)); });
+      var gEl = el('div', { class: 'grupo' }, el('h3', { text: g.nome }), ul);
+      corpo.appendChild(gEl);
+      return { g: g, el: gEl };
+    });
+    var sec = el('section', { class: 'fase', id: 'fase-' + f.n, 'aria-labelledby': 'h-' + f.id }, cab, corpo);
+    cab.querySelector('h2').id = 'h-' + f.id;
+    FNOS[f.id] = { sec: sec, corpo: corpo, recolher: recolher, trilho: trilho.firstChild, cont: cont, ok: ok, grupos: grupos };
+    return sec;
+  }
+
+  function montar() {
+    var fases = $('fases');
+    FASES.forEach(function (f) { fases.appendChild(montarFase(f)); });
+
+    // índice lateral
+    var indice = $('indice');
+    var bandaAtual = null;
+    FASES.forEach(function (f) {
+      if (f.banda !== bandaAtual) {
+        bandaAtual = f.banda;
+        indice.appendChild(el('p', { class: 'i-banda', text: BANDAS[f.banda] }));
+      }
+      var barra = el('span', { class: 'i-barra' }, el('i'));
+      var cont = el('span', { class: 'i-cont' });
+      var a = el('a', { class: 'i-item', href: '#fase-' + f.n },
+        el('span', { class: 'i-num', text: String(f.n) }),
+        el('span', { class: 'i-tit', text: f.titulo, title: f.titulo }),
+        cont, barra
+      );
+      INOS[f.id] = { a: a, cont: cont, barra: barra.firstChild };
+      indice.appendChild(a);
+    });
+
+    // seletor de fase (telas estreitas)
+    var sel = $('irFase');
+    sel.appendChild(el('option', { value: '', text: 'Ir para a fase…' }));
+    FASES.forEach(function (f) { sel.appendChild(el('option', { value: String(f.n), text: 'Fase ' + f.n + ' · ' + f.titulo })); });
+    sel.addEventListener('change', function () {
+      if (sel.value === '') return;
+      var alvo = $('fase-' + sel.value);
+      sel.value = '';
+      if (alvo) alvo.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'start' });
+    });
+
+    // barra segmentada
+    var segs = $('segmentos');
+    FASES.forEach(function (f) {
+      var s = el('div', { class: 'seg' }, el('i'));
+      s.style.flexGrow = String(f.total);
+      SNOS[f.id] = s;
+      segs.appendChild(s);
+    });
+
+    // chips de área
+    var chips = $('chips');
+    var totais = { todas: TODAS.length };
+    TODAS.forEach(function (x) { totais[x.it.a] = (totais[x.it.a] || 0) + 1; });
+    ['todas'].concat(Object.keys(AREAS)).forEach(function (k) {
+      var b = el('button', { class: 'chip', type: 'button', 'data-area': k, 'aria-pressed': 'false' },
+        k === 'todas' ? null : el('span', { class: 'pt pt-' + k }),
+        k === 'todas' ? 'Todas' : AREAS[k],
+        el('span', { class: 'n', text: String(totais[k] || 0) })
+      );
+      b.addEventListener('click', function () { estado.filtro = k; salvarLocal(); atualizar(); });
+      chips.appendChild(b);
+    });
+
+    var busca = $('busca');
+    var t;
+    busca.addEventListener('input', function () {
+      clearTimeout(t);
+      t = setTimeout(function () { estado.busca = norm(busca.value.trim()); atualizar(); }, 120);
+    });
+    var ocultar = $('ocultar');
+    ocultar.checked = estado.ocultar;
+    ocultar.addEventListener('change', function () { estado.ocultar = ocultar.checked; salvarLocal(); atualizar(); });
+
+    $('limpar').addEventListener('click', limparFiltros);
+    $('pxIr').addEventListener('click', irParaProxima);
+
+    var abrir = $('abrirSinc');
+    abrir.addEventListener('click', function () {
+      var p = $('painelSinc');
+      p.hidden = !p.hidden;
+      abrir.setAttribute('aria-expanded', String(!p.hidden));
+      $('psMsg').textContent = '';
+    });
+    $('copiar').addEventListener('click', copiarProgresso);
+    $('aplicar').addEventListener('click', aplicarColado);
+  }
+
+  /* ---------- filtros ---------- */
+  function casa(it) {
+    if (estado.filtro !== 'todas' && it.a !== estado.filtro) return false;
+    if (estado.busca && NOS[it.id].hay.indexOf(estado.busca) === -1) return false;
+    return true;
+  }
+  function filtrando() { return estado.filtro !== 'todas' || !!estado.busca || estado.ocultar; }
+  function limparFiltros() {
+    estado.filtro = 'todas'; estado.busca = ''; estado.ocultar = false;
+    $('busca').value = ''; $('ocultar').checked = false;
+    salvarLocal(); atualizar();
+  }
+
+  /* ---------- atualização ---------- */
+  var proxima = null;
+
+  function atualizar() {
+    var feitosTotal = 0;
+    var algumVisivel = false;
+
+    FASES.forEach(function (f) {
+      var fn = FNOS[f.id];
+      var feitosFase = 0;
+      var visiveisFase = 0;
+      fn.grupos.forEach(function (gr) {
+        var visiveisGrupo = 0;
+        gr.g.itens.forEach(function (it) {
+          var n = NOS[it.id];
+          var ok = feito(it.id);
+          if (ok) feitosFase++;
+          n.input.checked = ok;
+          n.input.disabled = estado.somenteLeitura;
+          n.li.classList.toggle('feita', ok);
+          var vis = casa(it) && !(estado.ocultar && ok);
+          n.li.hidden = !vis;
+          if (vis) visiveisGrupo++;
+        });
+        gr.el.hidden = visiveisGrupo === 0;
+        visiveisFase += visiveisGrupo;
+      });
+      feitosTotal += feitosFase;
+      var completa = feitosFase === f.total;
+      var recolhida = !!estado.recolhidas[f.id];
+      fn.sec.classList.toggle('completa', completa);
+      fn.ok.hidden = !completa;
+      fn.trilho.style.width = pct(feitosFase, f.total) + '%';
+      fn.cont.textContent = feitosFase + ' de ' + f.total;
+      fn.corpo.hidden = recolhida;
+      fn.recolher.textContent = recolhida ? 'Expandir' : 'Recolher';
+      fn.recolher.setAttribute('aria-expanded', String(!recolhida));
+      fn.sec.hidden = filtrando() && visiveisFase === 0;
+      if (!fn.sec.hidden) algumVisivel = true;
+
+      var ino = INOS[f.id];
+      ino.cont.textContent = feitosFase + '/' + f.total;
+      ino.barra.style.width = pct(feitosFase, f.total) + '%';
+      ino.a.classList.toggle('completa', completa);
+      ino.a.classList.toggle('vazia', filtrando() && visiveisFase === 0);
+
+      SNOS[f.id].firstChild.style.width = pct(feitosFase, f.total) + '%';
+      SNOS[f.id].title = 'Fase ' + f.n + ' · ' + f.titulo + ' — ' + feitosFase + ' de ' + f.total;
+    });
+
+    $('vazio').hidden = algumVisivel;
+    $('pPct').textContent = pct(feitosTotal, TODAS.length) + '%';
+    $('pConta').textContent = feitosTotal + ' de ' + TODAS.length + ' tarefas';
+
+    // próximo passo: primeira tarefa aberta fora do backlog futuro
+    proxima = null;
+    for (var i = 0; i < TODAS.length; i++) {
+      var x = TODAS[i];
+      if (x.f.banda !== 'futuro' && !feito(x.it.id)) { proxima = x; break; }
+    }
+    FASES.forEach(function (f) { INOS[f.id].a.classList.toggle('atual', !!proxima && proxima.f === f); });
+    if (proxima) {
+      $('pxFase').textContent = 'Fase ' + proxima.f.n + ' · ' + proxima.f.titulo + ' · ' + proxima.it.id;
+      $('pxTit').textContent = proxima.it.t;
+      $('pxIr').hidden = false;
+    } else {
+      $('pxFase').textContent = 'Fases 0 a 16 concluídas';
+      $('pxTit').textContent = 'Versão 1.0 entregue. O que sobra está no backlog da Fase 17.';
+      $('pxIr').hidden = true;
+    }
+
+    // chips
+    Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-area') === estado.filtro));
+    });
+
+    // sincronização
+    var sinc = $('sinc');
+    sinc.classList.toggle('ok', estado.fonte === 'db' && !estado.somenteLeitura);
+    sinc.classList.toggle('lei', estado.somenteLeitura);
+    $('sincTxt').textContent = estado.somenteLeitura ? 'Somente leitura'
+      : (estado.fonte === 'db' ? 'Sincronizado com quem abre esta página' : 'Salvo neste navegador');
+    $('aplicar').disabled = estado.somenteLeitura;
+    var aviso = $('avisoSinc');
+    aviso.textContent = estado.erroSinc;
+    aviso.hidden = !estado.erroSinc;
+  }
+
+  function irParaProxima() {
+    if (!proxima) return;
+    var id = proxima.it.id;
+    var n = NOS[id];
+    if (n.li.hidden) limparFiltros();
+    if (estado.recolhidas[proxima.f.id]) { estado.recolhidas[proxima.f.id] = false; salvarLocal(); atualizar(); }
+    n.li.scrollIntoView({ behavior: suave ? 'smooth' : 'auto', block: 'center' });
+    n.li.classList.remove('flash');
+    void n.li.offsetWidth;
+    n.li.classList.add('flash');
+    try { n.input.focus({ preventScroll: true }); } catch (e) { n.input.focus(); }
+  }
+
+  /* ---------- gravação ---------- */
+  var db = null;
+  var fila = {};
+
+  function definir(id, valor) {
+    if (estado.somenteLeitura) { atualizar(); return; }
+    estado.erroSinc = '';
+    if (estado.fonte === 'db') {
+      estado.feitosDb = Object.assign({}, estado.feitosDb);
+      estado.feitosDb[id] = valor;
+      atualizar();
+      return gravarDb(id);
+    }
+    estado.feitosLocal[id] = valor;
+    salvarLocal();
+    atualizar();
+    return Promise.resolve();
+  }
+
+  function espera(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  function gravarDb(id) {
+    var f = fila[id] || (fila[id] = { voando: false, deNovo: false });
+    if (f.voando) { f.deNovo = true; return Promise.resolve(); }
+    f.voando = true;
+    function uma() {
+      f.deNovo = false;
+      var corpo = { feito: !!estado.feitosDb[id], em: new Date().toISOString() };
+      var ref = db.doc('progresso/' + id);
+      return ref.set(corpo).catch(function (e) {
+        if (e && e.code === 'unavailable') return espera(400 + Math.random() * 600).then(function () { return ref.set(corpo); });
+        throw e;
+      }).then(function () { if (f.deNovo) return uma(); });
+    }
+    return uma().catch(function (e) {
+      var c = e && e.code;
+      if (c === 'invalid_argument' || c === 'not_granted' || c === 'revoked') {
+        estado.somenteLeitura = true;
+        estado.erroSinc = 'Você pode acompanhar o progresso, mas não marcar tarefas nesta página.';
+      } else {
+        estado.erroSinc = 'A última marcação não foi salva. Confira a conexão e marque de novo.';
+      }
+      atualizar();
+    }).then(function () { f.voando = false; });
+  }
+
+  function conectar() {
+    var c = window.claude;
+    if (!c || typeof c.use !== 'function') return;
+    Promise.resolve().then(function () { return c.use('db'); }).then(function (ns) {
+      if (!ns) return;
+      db = ns;
+      db.collection('progresso').onSnapshot(function (snap) {
+        var m = {};
+        snap.docs.forEach(function (d) {
+          var b = d.data();
+          if (b && typeof b.feito === 'boolean') m[d.id] = b.feito;
+        });
+        estado.feitosDb = m;
+        estado.fonte = 'db';
+        atualizar();
+      }, function () {
+        estado.fonte = 'local';
+        estado.erroSinc = 'A sincronização parou. Recarregue a página para voltar a ver o progresso da equipe.';
+        atualizar();
+      });
+    }).catch(function () { /* segue só com o navegador */ });
+  }
+
+  /* ---------- copiar / colar ---------- */
+  function idsFeitos() { return TODAS.filter(function (x) { return feito(x.it.id); }).map(function (x) { return x.it.id; }); }
+
+  function copiarProgresso() {
+    var txt = JSON.stringify({ projeto: 'FreeLanceNow', feitos: idsFeitos() });
+    var area = $('txtSinc');
+    var msg = $('psMsg');
+    var falhou = function () {
+      area.value = txt;
+      area.focus(); area.select();
+      msg.textContent = 'Não deu para copiar sozinho: o texto está selecionado acima, é só copiar.';
+    };
+    try {
+      navigator.clipboard.writeText(txt).then(function () {
+        msg.textContent = 'Progresso copiado (' + idsFeitos().length + ' tarefas concluídas).';
+      }, falhou);
+    } catch (e) { falhou(); }
+  }
+
+  function aplicarColado() {
+    var msg = $('psMsg');
+    var achados = ($('txtSinc').value.match(/\bf\d{1,2}-\d{2}\b/g) || []).filter(function (id, i, arr) {
+      return POR_ID[id] && arr.indexOf(id) === i;
+    });
+    var novos = achados.filter(function (id) { return !feito(id); });
+    if (!achados.length) { msg.textContent = 'Nenhum código de tarefa encontrado no texto colado.'; return; }
+    if (!novos.length) { msg.textContent = 'Essas tarefas já estavam marcadas.'; return; }
+    var cadeia = Promise.resolve();
+    novos.forEach(function (id) { cadeia = cadeia.then(function () { return definir(id, true); }); });
+    cadeia.then(function () {
+      msg.textContent = novos.length === 1 ? '1 tarefa marcada.' : novos.length + ' tarefas marcadas.';
+      $('txtSinc').value = '';
+    });
+  }
+
+  montar();
+  atualizar();
+  conectar();
+})();
+</script>
