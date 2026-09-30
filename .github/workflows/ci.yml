@@ -1,0 +1,72 @@
+name: CI
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: node ../scripts/verify-documents.mjs
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run build
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-failures
+          path: web/test-results/
+          retention-days: 7
+  api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: freelancenow_test
+          POSTGRES_USER: freelancenow
+          POSTGRES_PASSWORD: test-password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U freelancenow -d freelancenow_test"
+          --health-interval 5s --health-timeout 5s --health-retries 15
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/freelancenow_test
+      DB_USERNAME: freelancenow
+      DB_PASSWORD: test-password
+      JWT_SECRET: ci-test-key-at-least-thirty-two-bytes-long
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: api/pom.xml
+      - run: ./mvnw --batch-mode test
+        working-directory: api
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: api-test-failures
+          path: api/target/surefire-reports/
+          retention-days: 7

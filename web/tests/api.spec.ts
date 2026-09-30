@@ -1,0 +1,42 @@
+import { test, expect } from '@playwright/test'
+test.skip(process.env.E2E_DATA_MODE !== 'api', 'Requer API e banco locais')
+test('cadastro, perfil e anúncio persistem no PostgreSQL e sobrevivem ao reload', async ({
+  page,
+}) => {
+  const email = `e2e-${crypto.randomUUID()}@example.test`,
+    title = `Serviço integrado ${Date.now()}`
+  await page.goto('/cadastro?tipo=freelancer')
+  await page.getByLabel('Nome completo').fill('Profissional Teste')
+  await page.getByLabel(/^E-mail/).fill(email)
+  await page.getByLabel('Telefone').fill('61999990000')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+  await page.getByLabel('Cidade e UF').fill('Taguatinga, DF')
+  await page.getByLabel('Descrição profissional').fill('Perfil criado por um teste integrado.')
+  await page.getByRole('button', { name: 'Salvar perfil' }).click()
+  await page.goto('/meus-servicos/novo')
+  await page.getByLabel('Título do serviço').fill(title)
+  await page.getByLabel('Categoria').selectOption({ label: 'Elétrica' })
+  await page
+    .getByLabel('Descrição detalhada')
+    .fill('Anúncio persistido pela API real no banco PostgreSQL.')
+  await page.getByLabel('Valor estimado').fill('123.45')
+  await page.getByRole('button', { name: 'Publicar serviço', exact: true }).click()
+  await expect(page).toHaveURL(/\/meus-servicos$/)
+  await page.reload()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  await page.getByRole('button', { name: 'Desativar', exact: true }).click()
+  await expect(page.getByText('Desativado', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(email)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto('/meus-servicos')
+  await page.getByRole('button', { name: 'Publicar', exact: true }).click()
+  await page.goto(`/servicos?q=${encodeURIComponent(title)}`)
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+})

@@ -1,0 +1,177 @@
+[
+  {
+    "path": "BMC.png",
+    "bytes": 1527451,
+    "sha256": "42f3491d60975b0ae39373ddac50e2528f370b3bc5357c53390a9f817c27532a",
+    "preserved_path": "docs/originais/BMC.png"
+  },
+  {
+    "path": "Documento Casos de Uso Final.docx",
+    "bytes": 7879803,
+    "sha256": "a59f38058533dedc127b574a562d45c515e9982820fafed206a87bb044f5847f",
+    "extraction": "docs/referencias/textos/e9805b19-Documento Casos de Uso Final.txt",
+    "embedded_images": 7,
+    "preserved_path": "docs/originais/Documento Casos de Uso Final.docx"
+  },
+  {
+    "path": "Documento de Arquitetura.docx",
+    "bytes": 1107325,
+    "sha256": "39fd757852419bb41a33dda33dcbb52c7742287ce5805ef134bb9cc2789bc81b",
+    "extraction": "docs/referencias/textos/86fede3f-Documento de Arquitetura.txt",
+    "embedded_images": 11,
+    "preserved_path": "docs/originais/Documento de Arquitetura.docx"
+  },
+  {
+    "path": "Documento de Visão Final.doc",
+    "bytes": 305664,
+    "sha256": "f7c5dd1fa3d68c16db8b84ac3c66437c71237c1f5697331810a81c02c64d6aca",
+    "preserved_path": "docs/originais/Documento de Visão Final.doc"
+  },
+  {
+    "path": "FreeLanceNOW PDF.pdf",
+    "bytes": 4566237,
+    "sha256": "72c1b84f35e2dab61c736f90a8da76f56ce8318f0828158e4bce897ef034e6b6",
+    "extraction": "docs/referencias/textos/fe9a1c99-FreeLanceNOW PDF.txt",
+    "pages": 3,
+    "preserved_path": "docs/originais/FreeLanceNOW PDF.pdf"
+  },
+  {
+    "path": "FreeLanceNOW.docx",
+    "bytes": 3771660,
+    "sha256": "0691c0b46a7a00a77c0d93e0956fe4a6981fe7569cdd840ecc24cd03bc446903",
+    "extraction": "docs/referencias/textos/4f609a13-FreeLanceNOW.txt",
+    "embedded_images": 6,
+    "preserved_path": "docs/originais/FreeLanceNOW.docx"
+  },
+  {
+    "path": "FreeLanceNow Apresentacao Documentação.pptx",
+    "bytes": 156984,
+    "sha256": "1733a2290a01dd001a0171a66ed56a457accd81e868a1dcbdadd2e64ac0ca019",
+    "extraction": "docs/referencias/textos/6d05729a-FreeLanceNow Apresentacao Documentação.txt",
+    "embedded_images": 22,
+    "preserved_path": "docs/originais/FreeLanceNow Apresentacao Documentação.pptx"
+  },
+  {
+    "path": "FreeLanceNow Pitch Deck Definitivo.pdf",
+    "bytes": 617410,
+    "sha256": "34723315294e9b62b8e09a2d4b7f2a710bddf839e8d4a912581a44169fa87762",
+    "extraction": "docs/referencias/textos/cdd543c5-FreeLanceNow Pitch Deck Definitivo.txt",
+    "pages": 14,
+    "preserved_path": "docs/originais/FreeLanceNow Pitch Deck Definitivo.pdf"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/.thumbnail",
+    "bytes": 23742,
+    "sha256": "b81d6867560d177a243dccf1c7db71761c3026d99f37783d977505f00b614e15",
+    "preserved_path": "docs/prototipo/.thumbnail"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/FreeLanceNow Prototipo.dc.html",
+    "bytes": 327559,
+    "sha256": "374d7ddfb6aeb19f0f07467d2f9f4346dc942ea0d0514f34bf8936c345f72dd0",
+    "preserved_path": "docs/prototipo/FreeLanceNow Prototipo.dc.html"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/support.js",
+    "bytes": 69150,
+    "sha256": "8fe7df74405f3c55f49b7249c74ea1397e65d07dea2b1bd3b4a489bec2e28cbe",
+    "preserved_path": "docs/prototipo/support.js"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/Arquitetura.docx",
+    "bytes": 1107325,
+    "sha256": "39fd757852419bb41a33dda33dcbb52c7742287ce5805ef134bb9cc2789bc81b",
+    "embedded_images": 11,
+    "preserved_path": "docs/prototipo/uploads/Arquitetura.docx"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/Arquitetura.txt",
+    "bytes": 20311,
+    "sha256": "caf90603d18f2bf5aaee2947c2dc6be85f915e669a3f3131e4ac09d45c83944e",
+    "preserved_path": "docs/prototipo/uploads/Arquitetura.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/CasosDeUso.docx",
+    "bytes": 7879803,
+    "sha256": "a59f38058533dedc127b574a562d45c515e9982820fafed206a87bb044f5847f",
+    "embedded_images": 7,
+    "preserved_path": "docs/prototipo/uploads/CasosDeUso.docx"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/CasosDeUso.txt",
+    "bytes": 32414,
+    "sha256": "9c9fdb29a439b50483dfe4da1a6cdb92a59f6b80f40d025e45cac8616957b3be",
+    "preserved_path": "docs/prototipo/uploads/CasosDeUso.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/FreeLanceNOW.docx",
+    "bytes": 3771660,
+    "sha256": "0691c0b46a7a00a77c0d93e0956fe4a6981fe7569cdd840ecc24cd03bc446903",
+    "embedded_images": 6,
+    "preserved_path": "docs/prototipo/uploads/FreeLanceNOW.docx"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/FreeLanceNOW.txt",
+    "bytes": 1980,
+    "sha256": "bc56d93035a55f011879f408f225cab43d56aa2390d11e815313a5fe55dbb9f6",
+    "preserved_path": "docs/prototipo/uploads/FreeLanceNOW.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/PitchDeck.pdf",
+    "bytes": 617410,
+    "sha256": "34723315294e9b62b8e09a2d4b7f2a710bddf839e8d4a912581a44169fa87762",
+    "pages": 14,
+    "preserved_path": "docs/prototipo/uploads/PitchDeck.pdf"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/PitchDeck.txt",
+    "bytes": 4966,
+    "sha256": "50120235f97db1093c852c762617dd13f3ab2d974161ca1ed88f8f0b12e8beef",
+    "preserved_path": "docs/prototipo/uploads/PitchDeck.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/apresentacao.pptx",
+    "bytes": 156984,
+    "sha256": "1733a2290a01dd001a0171a66ed56a457accd81e868a1dcbdadd2e64ac0ca019",
+    "embedded_images": 22,
+    "preserved_path": "docs/prototipo/uploads/apresentacao.pptx"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/apresentacao.txt",
+    "bytes": 4818,
+    "sha256": "e091787cdb38808b7a2c24e7b69df2f1cb5c0ce8a2658d58a1ea69377a33acb9",
+    "preserved_path": "docs/prototipo/uploads/apresentacao.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/casos-de-uso.docx",
+    "bytes": 7879803,
+    "sha256": "a59f38058533dedc127b574a562d45c515e9982820fafed206a87bb044f5847f",
+    "embedded_images": 7,
+    "preserved_path": "docs/prototipo/uploads/casos-de-uso.docx"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/casos-de-uso.txt",
+    "bytes": 32515,
+    "sha256": "07c0c3fd65ba4e3d15ec18f7df9cf2063835abe12ec23b7e9373594b558cc593",
+    "preserved_path": "docs/prototipo/uploads/casos-de-uso.txt"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/pitch-deck.pdf",
+    "bytes": 617410,
+    "sha256": "34723315294e9b62b8e09a2d4b7f2a710bddf839e8d4a912581a44169fa87762",
+    "pages": 14,
+    "preserved_path": "docs/prototipo/uploads/pitch-deck.pdf"
+  },
+  {
+    "path": "Prototipo visual do FreeLanceNow/uploads/pitch-deck.txt",
+    "bytes": 4966,
+    "sha256": "50120235f97db1093c852c762617dd13f3ab2d974161ca1ed88f8f0b12e8beef",
+    "preserved_path": "docs/prototipo/uploads/pitch-deck.txt"
+  },
+  {
+    "path": "Roadmap FreeLanceNow.html",
+    "bytes": 87078,
+    "sha256": "de38b41d16553daffaa25850c60fe2c319b636d82883f2b2097a6c85e592e600",
+    "preserved_path": "docs/legado/Roadmap FreeLanceNow.html"
+  }
+]

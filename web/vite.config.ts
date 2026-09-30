@@ -1,0 +1,14 @@
+import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv } from 'vite'
+
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => ({
+  plugins: [react()],
+  server: {
+    host: '127.0.0.1',
+    proxy: {
+      '/api': loadEnv(mode, process.cwd(), '').API_PROXY_TARGET || 'http://localhost:8081',
+      '/actuator': loadEnv(mode, process.cwd(), '').API_PROXY_TARGET || 'http://localhost:8081',
+    },
+  },
+}))

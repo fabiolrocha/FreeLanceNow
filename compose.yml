@@ -1,0 +1,74 @@
+name: freelancenow
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: freelancenow
+      POSTGRES_USER: ${DB_USERNAME:-freelancenow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-freelancenow-local}
+    ports:
+      - "127.0.0.1:${DB_PORT:-5435}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d freelancenow"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+  api:
+    build: ./api
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_URL: jdbc:postgresql://db:5432/freelancenow
+      DB_USERNAME: ${DB_USERNAME:-freelancenow}
+      DB_PASSWORD: ${DB_PASSWORD:-freelancenow-local}
+      JWT_SECRET: ${JWT_SECRET:-freelancenow-local-development-key-change-before-deploy-2026}
+      PORT: 8081
+      SEED_DEMO: "true"
+    ports:
+      - "127.0.0.1:${API_PORT:-8081}:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_DATA_MODE: ${VITE_DATA_MODE:-mock}
+    ports:
+      - "127.0.0.1:${WEB_PORT:-5173}:80"
+    depends_on:
+      - api
+  db-test:
+    image: postgres:15-alpine
+    profiles: [test]
+    environment:
+      POSTGRES_DB: freelancenow_test
+      POSTGRES_USER: freelancenow
+      POSTGRES_PASSWORD: test-password
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U freelancenow -d freelancenow_test"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+  api-test:
+    image: maven:3.9-eclipse-temurin-21
+    profiles: [test]
+    working_dir: /workspace
+    command: ["./mvnw", "--batch-mode", "test"]
+    environment:
+      DB_URL: jdbc:postgresql://db-test:5432/freelancenow_test
+      DB_USERNAME: freelancenow
+      DB_PASSWORD: test-password
+      JWT_SECRET: test-only-jwt-key-at-least-thirty-two-bytes
+    volumes:
+      - ./api:/workspace
+      - maven_cache:/root/.m2
+    depends_on:
+      db-test:
+        condition: service_healthy
+volumes:
+  postgres_data:
+  maven_cache:
