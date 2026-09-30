@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Esquema implementado na migração `V1__initial_schema.sql`; categorias iniciais em `V2__seed_categories.sql`.
+Esquema implementado na migração `V1__initial_schema.sql`; categorias iniciais em `V2__categories.sql`.
 
 ```mermaid
 erDiagram
