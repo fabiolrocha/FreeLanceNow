@@ -4,6 +4,8 @@ Seis integrantes informados pelo líder: **você (gestor/líder), Caio, Arthur A
 
 A base de código já foi criada. As tarefas desta semana são **revisar, ajustar, completar os cenários e validar a entrega**; não precisam reconstruir os scaffolds. Cada pessoa abre PRs pequenos sobre a branch-base compartilhada após sua integração.
 
+**Prazo final: 18/11/2026.** A tabela abaixo cobre o marco inicial de 07/10. A partir de 08/10, a distribuição proposta para integrar o restante do sistema está nos cards F01–F10 do [backlog](backlog.md), com datas no [roadmap](roadmap.md).
+
 | Pessoa | Área principal e resultado até 06/10 | Tarefas | Arquivos sob coordenação | Revisor |
 |---|---|---|---|---|
 | Você — gestor/líder | Fechar escopo/imagens, coordenar contratos entre áreas, integrar PRs e preparar apresentação | G01–G04 | README, Compose, `.github/`, roadmap/equipe/decisões | Enzo + donos das áreas |
@@ -26,4 +28,4 @@ O revisor verifica execução e critério de aceite, não apenas leitura do diff
 
 ## Comunicação sugerida
 
-Reunião curta em 01/10 para confirmar responsáveis e imagens; atualização diária com feito/próximo/bloqueio; integração conjunta em 05/10; congelamento de escopo em 06/10 às 17h. O gestor abre os cards do [backlog](backlog.md) no quadro escolhido e substitui os nomes por responsáveis confirmados. Nenhum convite ou mensagem foi enviado automaticamente aos integrantes.
+Reunião curta em 01/10 para confirmar responsáveis e imagens; atualização diária com feito/próximo/bloqueio; integração conjunta em 05/10; congelamento do marco inicial em 06/10 às 17h. Depois de 07/10, revisar cada marco semanal do roadmap. Concluir novas funcionalidades até 11/11, congelar a versão final em 16/11, ensaiar em 17/11 e entregar em 18/11. O gestor abre os cards do [backlog](backlog.md) no quadro escolhido e substitui os nomes por responsáveis confirmados. Nenhum convite ou mensagem foi enviado automaticamente aos integrantes.

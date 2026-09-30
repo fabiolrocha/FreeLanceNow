@@ -1,6 +1,8 @@
-# Backlog da entrega de 07/10
+# Backlog — marco de 07/10 e entrega final de 18/11/2026
 
 P0 bloqueia a entrega; P1 melhora a versão sem ampliar o produto. **Base entregue** indica código inicial disponível, não aceite automático pelo responsável. Os IDs são prontos para usar como título de issue (`W01 — revisar busca e filtros`, por exemplo). Não há tarefas financeiras reais nesta semana.
+
+Os cards G01–G04, A01–A03, B01–B03, W01–W06 e Q01–Q04 cobrem o **marco inicial de 07/10**. Os cards F01–F10 cobrem as integrações planejadas para a **entrega final de 18/11/2026**.
 
 | ID | Prioridade / dono | Trabalho sobre a base | Dependência | Critério de aceite | Estimativa |
 |---|---|---|---|---|---|
@@ -29,19 +31,19 @@ P0 bloqueia a entrega; P1 melhora a versão sem ampliar o produto. **Base entreg
 
 Uma tarefa termina quando satisfaz seu aceite, passa as verificações relevantes, atualiza documentos/tipos afetados e recebe revisão de outro integrante. Dados de teste são fictícios; não commitar `.env`, tokens, builds ou logs. O PR deve explicar o comportamento e a validação executada.
 
-## Backlog após 07/10
+## Integrações planejadas até 18/11
 
-| ID futuro | Área | Resultado necessário |
-|---|---|---|
-| F01 | Contratação | Persistir UC03/UC06, histórico, participantes e snapshots |
-| F02 | Prazos | Jobs idempotentes48h/5 dias com testes de relógio |
-| F03 | Avaliação | UC04 persistente, média/nota, janela/imutabilidade e resposta |
-| F04 | Admin | Provisionar admin, gerenciar categorias/usuários e registrar auditoria |
-| F05 | Moderação | Denúncias/disputas persistentes e autorização para decisão |
-| F06 | Catálogo | Upload até 5 imagens/5 MB, storage e paginação real no web |
-| F07 | Comunicação | Recuperação de senha/verificação de e-mail, mensagens e notificações |
-| F08 | Demandas | Refinar contrato e persistir demandas/propostas com unicidade |
-| F09 | Financeiro | Escolher gateway, especificar comissão, webhooks/reembolsos/ledger e conciliação |
-| F10 | Operação | Termos definitivos, retenção, backup, observabilidade, rate limit e teste de carga |
+| ID | Área | Resultado necessário | Período sugerido | Responsáveis propostos |
+|---|---|---|---|---|
+| F01 | Contratação | Persistir UC03/UC06, histórico, participantes e snapshots | 08–14/10 | Felipe + Arthur |
+| F02 | Prazos | Jobs idempotentes de 48h/5 dias com testes de relógio | 08–14/10 | Felipe + Enzo |
+| F03 | Avaliação | UC04 persistente, média/nota, janela/imutabilidade e resposta | 15–21/10 | Felipe + Arthur |
+| F04 | Admin | Provisionar admin, gerenciar categorias/usuários e registrar auditoria | 15–21/10 | Caio + Arthur Almirante |
+| F05 | Moderação | Denúncias/disputas persistentes e autorização para decisão | 15–21/10 | Caio + Enzo |
+| F06 | Catálogo | Upload até 5 imagens/5 MB, storage e paginação real no web | 22–28/10 | Felipe + Arthur Almirante |
+| F07 | Comunicação | Recuperação de senha/verificação de e-mail, mensagens e notificações | 22–28/10 | Caio + Arthur |
+| F08 | Demandas | Refinar contrato e persistir demandas/propostas com unicidade | 15–21/10 | Felipe + Arthur |
+| F09 | Financeiro | Gateway de testes, comissão, webhooks/reembolsos/ledger e conciliação | Decisões em 08–09/10; implementação em 29/10–04/11 | Líder + Felipe + Caio + Arthur Almirante |
+| F10 | Operação | Termos, retenção, backup, observabilidade, rate limit e teste de carga | 05–11/11 | Líder + Caio + Felipe + Enzo |
 
-As etapas futuras precisam de novo prazo e estimativa; não são promessas de conclusão em 07/10.
+Datas e responsáveis são exemplos de planejamento a validar com a disponibilidade do grupo. A entrega final em **18/11/2026** é o prazo informado pelo líder. Reservar **12–16/11** para regressão e correções, **17/11** para ensaio e **18/11** para entrega. Cada card F01–F10 inclui integração da respectiva tela React à API e testes de aceite; funcionalidade só mockada não encerra esses cards. O financeiro será demonstrado no sandbox do gateway escolhido.

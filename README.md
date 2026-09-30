@@ -2,7 +2,7 @@
 
 Marketplace acadêmico de serviços gerais: clientes encontram profissionais e freelancers publicam seus serviços. Este monorepositório reúne o frontend **React web**, a API **Java / Spring Boot**, PostgreSQL e a documentação do Grupo 2.
 
-**Entrega prevista: quarta-feira, 7 de outubro de 2026.** A primeira entrega contempla a aplicação web navegável com dados simulados e uma API inicial persistente para cadastro, login, perfis, categorias e anúncios. React Native ficou fora desta entrega por decisão do líder.
+**Entrega final: quarta-feira, 18 de novembro de 2026.** O marco intermediário de **7 de outubro** contempla a aplicação web navegável com dados simulados e uma API inicial persistente para cadastro, login, perfis, categorias e anúncios. O [roadmap](docs/roadmap.md) distribui as demais integrações até novembro, com datas sugeridas por etapa. React Native ficou fora deste projeto por decisão do líder.
 
 ## Começar
 

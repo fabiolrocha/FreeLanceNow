@@ -5,14 +5,14 @@ Atualizada em **30/09/2026**. Esta pasta concentra a especificação e o planeja
 | Documento | Uso |
 |---|---|
 | [Leitura do projeto](leitura-do-projeto.md) | Síntese das fontes, duplicatas, lacunas e conflitos |
-| [Escopo](escopo.md) | Produto, primeira entrega e trabalho futuro |
+| [Escopo](escopo.md) | Produto, marco intermediário e entrega final |
 | [Requisitos](requisitos.md) | Regras dos casos de uso e rastreabilidade |
 | [Arquitetura](arquitetura.md) | Sistemas, módulos, integração e infraestrutura |
 | [Dados](dados.md) | Banco atual e entidades futuras |
 | [API](api.md) | Endpoints, payloads, erros e autenticação |
 | [Frontend](frontend.md) | Rotas, componentes, design e modos de dados |
 | [Imagens](imagens.md) | Inventário visual e decisões pendentes |
-| [Roadmap](roadmap.md) | Cronograma até 07/10 e fases seguintes |
+| [Roadmap](roadmap.md) | Datas sugeridas por etapa e entrega final em 18/11/2026 |
 | [Equipe](equipe.md) | Responsáveis, fronteiras de arquivos e revisores |
 | [Backlog](backlog.md) | Tarefas, dependências e critérios de aceite |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis e Git |
