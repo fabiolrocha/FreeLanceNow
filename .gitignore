@@ -1,0 +1,14 @@
+.DS_Store
+.work/
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+target/
+playwright-report/
+test-results/
+*.log
+.idea/
+*.iml
+coverage/

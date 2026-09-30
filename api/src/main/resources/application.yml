@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: freelancenow-api
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5435/freelancenow}
+    username: ${DB_USERNAME:freelancenow}
+    password: ${DB_PASSWORD}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+server:
+  port: ${PORT:8081}
+  error:
+    include-message: never
+    include-stacktrace: never
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    issuer: freelancenow-api
+    ttl-seconds: 900
+  cors-origins: ${CORS_ORIGINS:http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174}
+  seed-demo: ${SEED_DEMO:false}

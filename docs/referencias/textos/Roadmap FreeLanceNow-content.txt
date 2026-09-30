@@ -1,0 +1,39 @@
+Roadmap FreeLanceNow F FreeLance Now Grupo 2 · GPE17M80586
+Plano de construção
+Do protótipo à versão 1.0 no ar
+O caminho completo do FreeLanceNow: alinhar a stack, montar a base, entregar o MVP e depois pagamentos em custódia, painel administrativo, segurança, testes, deploy e a documentação final. Cada fase diz o que precisa estar pronto para seguir para a próxima.
+Progresso geral 0% 0 de 0 tarefas Fase 0 Fase 17
+Próximo passo
+
+Ir para a tarefa
+
+Já entregue
+Documento de Visão · v1.1
+Casos de Uso UC01–UC06 · v1.2
+Documento de Arquitetura (4+1) · v1.1
+Business Model Canvas , pitch deck e apresentação
+Protótipo navegável · 42 telas de cliente, freelancer e admin
+Stack combinada com o professor
+App web
+React + TypeScript
+Clientes e freelancers confirmar F0
+Painel admin
+Vue 3 + TypeScript
+Administração, só desktop confirmar F0
+API
+Spring Boot 3
+Java 21 sugerido confirmar F0
+Banco
+PostgreSQL
+Sugestão decidir F0
+Substitui a stack do Documento de Arquitetura (HTML5, JavaScript e Tailwind). Os pontos em aberto são as primeiras tarefas da Fase 0. Referência rápida — status, prazos e metas usados nas tarefas Contratação PENDENTE → ACEITO → AGUARDANDO_PAGAMENTO → EM_ANDAMENTO → AGUARDANDO_CONFIRMACAO → CONCLUIDO
+PENDENTE → RECUSADO o freelancer recusa
+PENDENTE → CANCELADO 48 h sem resposta ou o cliente desiste
+AGUARDANDO_CONFIRMACAO → EM_DISPUTA → CONCLUIDO ou EM_ANDAMENTO por decisão do admin
+O status tracejado entra na Fase 10. Até lá o fluxo vai direto de ACEITO para EM_ANDAMENTO (UC06 · S01). Pagamento AGUARDANDO → CUSTODIA → LIBERADO
+CUSTODIA → RETIDO → LIBERADO ou ESTORNADO quando há disputa Prazos, limites e metas 48 h para o freelancer aceitar ou recusar UC03 · RN02 5 dias para o cliente confirmar a conclusão UC06 · RN02 7 dias de janela para avaliar UC04 · RN02 20 serviços ativos por freelancer UC02 · RN01 5 × 5 MB fotos JPG ou PNG por serviço UC02 · A01 10% de taxa, descontada do repasse Protótipo · ajustável de 5 a 20% ≤ 3 s busca e carregamento de página (P95) Arquitetura §8 ≤ 10 s para a notificação chegar Arquitetura §8 200 acessos simultâneos no pico Arquitetura §8 · 99% de disponibilidade Ocultar concluídas Salvo neste navegador · copiar ou colar
+Leve o progresso para outro navegador, junte com o de um colega ou cole na conversa com o Claude para ele saber onde vocês pararam. Colar só marca tarefas, nunca desmarca. Copiar meu progresso Marcar as tarefas coladas
+
+Nenhuma tarefa com esses filtros. Limpar filtros
+Montado a partir do Documento de Visão v1.1, dos Casos de Uso v1.2, do Documento de Arquitetura v1.1, do pitch deck e do protótipo navegável. A stack da documentação foi desconsiderada, conforme combinado.
+Cada tarefa tem um código, como f3-01 . Use o código para pedir a próxima etapa ao Claude ou para citar a tarefa num commit.

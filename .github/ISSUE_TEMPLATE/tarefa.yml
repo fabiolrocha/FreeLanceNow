@@ -1,0 +1,30 @@
+name: Tarefa da equipe
+description: Trabalho com responsável, dependências e critérios de aceite
+title: '[ID] — '
+body:
+  - type: input
+    id: responsavel
+    attributes:
+      label: Responsável
+      placeholder: Nome do integrante e revisor
+    validations:
+      required: true
+  - type: textarea
+    id: resultado
+    attributes:
+      label: Resultado esperado
+      description: Referencie docs/backlog.md e descreva o comportamento.
+    validations:
+      required: true
+  - type: textarea
+    id: aceite
+    attributes:
+      label: Critérios de aceite e validação
+      placeholder: Cenários e comandos que demonstram a conclusão.
+    validations:
+      required: true
+  - type: input
+    id: dependencias
+    attributes:
+      label: Dependências e prazo
+      placeholder: Cards necessários e data prevista

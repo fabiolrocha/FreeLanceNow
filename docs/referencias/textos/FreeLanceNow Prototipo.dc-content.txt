@@ -1,0 +1,158 @@
+F FreeLance Now Como funciona Categorias Para profissionais Entrar Cadastrar
+25 MILHÕES DE AUTÔNOMOS NO BRASIL
+Conectando demandas a talentos de forma simples e segura.
+Encontre eletricistas, encanadores, diaristas e profissionais de TI de confiança. Contrate em poucos cliques, acompanhe o serviço e avalie no fim. Buscar {{ c.nome }} foto — profissional em serviço 2.000 serviços ativos na plataforma 4,8 ★ nota média dos profissionais
+
+Como funciona
+Do primeiro clique à avaliação final, em seis etapas. 0{{ e.n }} {{ e.titulo }} {{ e.desc }}
+
+Você é profissional?
+Publique até 20 serviços, receba solicitações e construa sua reputação. Sem mensalidade — a plataforma só cobra sobre contratos concluídos. Criar perfil de freelancer FreeLanceNow · Projeto de Engenharia de Software · Equipe FreeLancer Termos de Uso Política de Privacidade (LGPD) F FreeLanceNow SEGURANÇA E CONFIANÇA
+O serviço certo, com quem você pode confiar.
+Pagamento em custódia: o valor sai da sua conta, fica retido pela plataforma e só é repassado ao profissional quando você confirma a conclusão. Senhas com hash bcrypt, autenticação por token e 2FA opcional, dados tratados conforme a LGPD. foto — cliente e profissional
+Entrar
+Bem-vindo de volta. Escolha o perfil para navegar no protótipo. E-mail Senha E-mail ou senha incorretos. Verifique e tente novamente. Manter conectado Esqueci minha senha Entrar ENTRAR NO PROTÓTIPO COMO Cliente Freelancer Admin
+Não tem conta? Cadastre-se
+Criar conta
+O tipo de conta é obrigatório e define seu painel. C Sou cliente Pessoa física ou empresa que precisa contratar serviços. F Sou freelancer Ofereço serviços e quero receber solicitações de contratação.
+Já tenho conta. Entrar PASSO 1 DE 2 · DADOS DA CONTA
+{{ signupTitulo }}
+{{ signupSub }} Nome completo * Até 100 caracteres E-mail * Este e-mail já está cadastrado. Deseja fazer login ou redefinir a senha ? Telefone * Senha * Mínimo de 8 caracteres, com letras e números. Li e aceito os Termos de Uso e a Política de Privacidade . Autorizo o tratamento dos meus dados para intermediação de serviços, conforme a LGPD. Voltar Criar conta ver e-mail já cadastrado PASSO 2 DE 2 · COMPLETAR PERFIL
+Conta criada.
+{{ completarSub }} Enviar foto de perfil {{ completarLabel1 }} {{ c.nome }} Localização {{ completarLabel2 }} Salvar e ativar conta Preencher depois RECUPERAÇÃO DE ACESSO
+Recuperar senha
+Informe o e-mail cadastrado. Enviaremos um link de redefinição válido por 30 minutos. E-mail Enviar link de redefinição Link enviado. Verifique sua caixa de entrada e a pasta de spam. O link expira em 30 minutos. Voltar para o login
+Voltar ao login F FreeLanceNow ⌕ Início Serviços Profissionais Demandas Contratações Pagamentos Início Painel Serviços Solicitações Contratações Carteira Mensagens Avisos {{ naoLidas }} {{ roleInitials }} {{ roleLabel }} {{ roleSub }} {{ roleInitials }} {{ roleLabel }} {{ roleSub }} Ver meu perfil → 9 contratações 4,9 ★ como cliente MINHAS DEMANDAS {{ dm.titulo }} {{ dm.qtd }} CATEGORIAS {{ c.nome }} {{ c.ativos }} {{ roleInitials }} Descreva o que você precisa… Publicar SEU FEED Relevantes {{ p.ini }} {{ p.autor }} · {{ p.tempo }} {{ p.cargo }} {{ p.tipo }}
+{{ p.texto }} {{ p.img }} {{ p.preco }} prazo {{ p.prazo }} ♡ {{ p.curtidas }} Comentar ({{ p.coment }}) Salvar {{ p.cta }} PAGAMENTO PENDENTE Caça-vazamento sem quebra Rafael Andrade · #102 · {{ vlrServico }} Aceito. O serviço inicia após o pagamento em custódia. Pagar agora EM ANDAMENTO Instalação de chuveiro elétrico Marcos Vieira · R$ 180 Aguardando sua confirmação Confirmar recebimento Ver todas as contratações PROFISSIONAIS PARA VOCÊ {{ f.ini }} {{ f.nome }} {{ f.cat }} · {{ f.nota }}★ Ver DICA DE SEGURANÇA
+Combine tudo pela plataforma. Solicitações registradas garantem histórico, avaliação verificada e mediação em caso de disputa. {{ roleInitials }} {{ roleLabel }} Eletricista predial e residencial Ver meu perfil público → 4,9 ★ 87 avaliações 132 entregas ATALHOS Solicitações 2 Meus serviços 2/20 Contratações 3 Painel completo → {{ roleInitials }} Conte o que você faz… Publicar DEMANDAS ABERTAS Minhas categorias Tudo {{ d.ini }} {{ d.autor }} · {{ d.tempo }} {{ d.cargo }} {{ d.tipo }}
+{{ d.texto }} {{ d.img }} {{ d.cat }} {{ d.preco }} prazo {{ d.prazo }} {{ d.match }} {{ d.propostas }} propostas enviadas Comentar ({{ d.coment }}) Salvar Enviar proposta RESPONDER AGORA Instalação de chuveiro elétrico Ana Lopes · R$ 180 41 h para aceitar ou recusar Ver solicitação SERVIÇO A CONCLUIR Instalação de ventilador de teto Ana Lopes · #107 · R$ 280 Marcar como concluído COMO GANHAR VISIBILIDADE
+Publique fotos dos serviços concluídos e responda solicitações em menos de 3 horas. Perfis com resposta rápida aparecem primeiro nas buscas. FEED · PUBLICAÇÃO
+{{ publicarTitulo }}
+{{ publicarSub }} {{ roleInitials }} {{ roleLabel }} {{ roleSub }} · publicação pública {{ publicarLabel }} * Até 500 caracteres Categoria * Selecione Elétrica Encanamento Limpeza / diarista TI e informática {{ publicarValorLabel }} Prazo (dias) Localização Fotos Arraste até 5 imagens ou clique para enviar JPG ou PNG · máx. 5 MB cada A publicação aparece no feed do outro lado da plataforma — quem se interessar envia uma solicitação ou proposta, que entra no seu painel para aceite. Conteúdo com contato externo é removido pela moderação. Cancelar Salvar rascunho {{ publicarBotao }} Filtros Limpar CATEGORIA {{ c.nome }} {{ c.ativos }} FAIXA DE PREÇO {{ faixaLabel }} MÍNIMO — MÁXIMO {{ fx.label }} AVALIAÇÃO MÍNIMA {{ nm.label }} LOCALIZAÇÃO ver estado vazio (A01)
+Busca de serviços
+{{ qtdResultados }} serviços encontrados · resultados em 0,4 s Ordenar por Melhor avaliados Menor preço Mais próximos ⌕
+Nenhum serviço encontrado para sua busca.
+Tente termos mais gerais, amplie a faixa de preço ou veja categorias relacionadas. {{ c.nome }} Limpar filtros {{ r.cat }} {{ r.titulo }} {{ r.ini }} {{ r.freela }} {{ r.nota }}★ ({{ r.aval }}) {{ r.preco }} entrega em {{ r.prazo }} · {{ r.local }} Ver
+Busca de profissionais
+Pesquisa ativa por talento: filtre por habilidade, reputação e localização em vez de serviço fechado. Nota 4,5+ Nota 4,0+ Qualquer nota Buscar talentos {{ f.ini }} {{ f.nome }} {{ f.nota }}★ · {{ f.aval }} AVALIAÇÕES {{ f.titulo }} {{ f.local }} · na plataforma desde {{ f.desde }} · {{ f.entregas }} serviços entregues
+{{ f.resumo }} {{ f.skills }} {{ f.preco }} a partir de Ver perfil Enviar mensagem Serviços / {{ servicoSel.cat }} / {{ servicoSel.titulo }} foto do serviço 1 de 5 — máx. 5 MB, JPG ou PNG (A01) {{ servicoSel.cat }}
+{{ servicoSel.titulo }} {{ servicoSel.nota }}★ {{ servicoSel.aval }} avaliações · {{ servicoSel.local }} · entrega em {{ servicoSel.prazo }}
+Descrição do serviço
+{{ servicoSel.descLonga }}
+O que está incluído
+Visita técnica e diagnóstico no local
+Mão de obra e materiais de fixação
+Teste de funcionamento com o cliente presente
+Garantia de 90 dias sobre o serviço executado
+Avaliações ({{ servicoSel.aval }}) AL Ana Lopes ★★★★★ 02/09/2026 · contratação verificada
+Explicou tudo antes de começar, deixou o ambiente limpo e testou o funcionamento comigo. Recomendo. Resposta do profissional
+Obrigado, Ana. Qualquer dúvida sobre o disjuntor novo, me chame. CM Construtora Meridiano ★★★★ ★ 18/08/2026 · contratação verificada
+Serviço bem executado. Chegou trinta minutos depois do combinado, mas avisou antes. {{ servicoSel.preco }} valor estimado · pode variar após visita técnica Prazo de entrega {{ servicoSel.prazo }} Responde em até 3 h Atende em {{ servicoSel.local }} Solicitar serviço Tirar uma dúvida
+O profissional tem até 48 h para aceitar ou recusar. Depois disso a solicitação é cancelada automaticamente. Denunciar este anúncio {{ freelaAv.ini }} {{ freelaSel.nome }} {{ freelaSel.titulo }} {{ freelaSel.nota }} nota {{ freelaSel.entregas }} entregas {{ freelaSel.desde }} desde Ver perfil completo capa do perfil {{ freelaAv.ini }}
+{{ freelaSel.nome }} PERFIL VERIFICADO {{ freelaSel.titulo }} {{ freelaSel.local }} · {{ freelaSel.nota }}★ ({{ freelaSel.aval }} avaliações) · {{ freelaSel.entregas }} serviços entregues Mensagem Solicitar serviço Denunciar perfil Meus serviços Editar perfil Esta é a visão pública do seu perfil
+Sobre
+{{ freelaSel.resumo }} HABILIDADES {{ freelaSel.skills }}
+Serviços oferecidos {{ sv.titulo }} {{ sv.preco }} {{ sv.prazo }}
+Portfólio
+Registros de serviços concluídos enviados pelo profissional. REPUTAÇÃO {{ freelaSel.nota }} ★★★★★ 5★ 86% 4★ 11% 3★ 2% 2★ 1% 1★ 0% HISTÓRICO NA PLATAFORMA Serviços entregues {{ freelaSel.entregas }} Taxa de aceite 94% Cancelamentos 2 Disputas abertas 0 SOLICITAÇÃO DE SERVIÇO
+Solicitar serviço
+{{ servicoSel.titulo }} · {{ freelaSel.nome }} · {{ servicoSel.preco }} Data desejada * Somente datas futuras Descrição da demanda * Até 300 caracteres Endereço Opcional — obrigatório apenas para serviços presenciais O profissional tem até 48 horas para aceitar ou recusar. Você não pode manter duas solicitações pendentes para o mesmo serviço com o mesmo profissional. Cancelar Confirmar solicitação ✓
+Solicitação enviada
+{{ freelaSel.nome }} foi notificado por e-mail e push. Você recebe um aviso assim que houver resposta — o prazo é de 48 horas. Se ele aceitar, você paga o valor em custódia aqui no app e o serviço entra em execução. Ver minhas contratações Continuar buscando PAGAMENTO · CONTRATAÇÃO #102
+Pagar para iniciar o serviço
+Rafael Andrade aceitou sua solicitação. O pagamento é feito aqui, dentro do app: o valor fica retido em custódia pela plataforma e só é repassado ao profissional depois que você confirmar a conclusão. MÉTODO DE PAGAMENTO {{ m.nome }} {{ m.desc }} {{ m.prazo }} QR Code Pix Escaneie o QR ou copie o código 00020126360014BR.GOV.BCB.PIX0114freelancenow52040000530398654042200 Copiar código Baixa automática em segundos Número do cartão Validade CVV Parcelas 1x sem juros 2x sem juros 3x sem juros Nome impresso no cartão O serviço só entra em execução depois que o boleto for compensado — o que leva de 1 a 3 dias úteis. Para agendamentos urgentes, prefira Pix. Gerar boleto COMO FUNCIONA A CUSTÓDIA 1 Você paga agora
+O valor sai da sua conta e entra na custódia da plataforma. O profissional é avisado e inicia o serviço. 2 O dinheiro fica retido
+Nem você nem o profissional movimentam o valor durante a execução. Em caso de disputa, ele permanece retido até a mediação. 3 Repasse na conclusão
+Quando você confirma o recebimento, a plataforma retém a taxa e repassa o restante automaticamente ao profissional. RESUMO DA CONTRATAÇÃO Caça-vazamento sem quebra Rafael Andrade · Encanamento data desejada 12/09/2026 QNL 12, Taguatinga Norte — DF Valor do serviço {{ vlrServico }} Taxa para o cliente isento Total a pagar {{ vlrServico }} Pagar {{ vlrServico }} Cancelar Do valor repassado na conclusão, a plataforma retém {{ taxaPct }} de taxa de intermediação. O profissional recebe {{ vlrLiquido }} líquidos. Transação via HTTPS · dados de pagamento não são armazenados pela plataforma ✓
+Pagamento em custódia
+{{ vlrServico }} foram retidos pela plataforma. Rafael Andrade já foi notificado e pode iniciar o serviço — o valor só é repassado quando você confirmar a conclusão. COMPROVANTE {{ trxId }} Contratação #102 · Caça-vazamento sem quebra Método {{ metodoNome }} Data e hora 09/09/2026 08:41 Status EM CUSTÓDIA Ver minhas contratações Ver comprovante Pagamentos / {{ trxId }} DETALHE DA TRANSAÇÃO
+{{ vlrServico }} em custódia
+{{ trxId }} · contratação #102 · Caça-vazamento sem quebra EM CUSTÓDIA COMPOSIÇÃO DO VALOR Valor pago pelo cliente {{ vlrServico }} Taxa de intermediação FreeLanceNow ({{ taxaPct }}) − {{ vlrTaxa }} Repasse ao profissional na conclusão {{ vlrLiquido }} HISTÓRICO DA TRANSAÇÃO Pagamento autorizado {{ metodoNome }} · 09/09/2026 08:41 · autor: cliente Valor retido em custódia 09/09/2026 08:41 · autor: sistema · contratação passou para EM ANDAMENTO Repasse ao profissional pendente · disparado quando o cliente confirmar a conclusão Saque para a conta do profissional pendente · solicitado pelo profissional na carteira PARTES AL Ana Lopes Cliente · pagou RA Rafael Andrade Profissional · recebe na conclusão Baixar recibo em PDF Ver contratação Abrir disputa sobre o valor Toda movimentação da transação é gravada em log com data, hora e responsável — cliente, profissional ou sistema.
+{{ tituloCarteira }}
+{{ subCarteira }} Solicitar saque Pagar pendente · #102 {{ k.rotulo }} {{ k.valor }} {{ k.nota }} Extrato Últimos 30 dias Últimos 90 dias Este ano Exportar CSV DATA CONTRATAÇÃO {{ colBruto }} TAXA {{ colLiquido }} SITUAÇÃO {{ t.data }} {{ t.servico }} #{{ t.ct }} · {{ t.parte }} · {{ t.metodo }} {{ t.bruto }} {{ t.taxa }} {{ t.liquido }} {{ t.label }} {{ notaExtrato }} CARTEIRA · SAQUE
+Solicitar saque
+Saldo disponível: {{ vlrDisponivel }} · valores em custódia entram no saldo assim que o cliente confirma a conclusão. Valor do saque * Mínimo de R$ 20,00 · máximo {{ vlrDisponivel }} Destino Chave Pix · CPF ***.456.789-** Crédito em até 1 dia útil · sem tarifa Conta bancária · Banco 001 ag. 1234 c/c 56789-0 Crédito em até 2 dias úteis · TED sem tarifa A taxa de intermediação de {{ taxaPct }} já foi descontada no repasse de cada contratação concluída. O saque em si não tem custo. Cancelar Confirmar saque ✓
+Saque solicitado
+{{ vlrDisponivel }} a caminho da sua chave Pix. Você recebe uma notificação quando o crédito for confirmado — normalmente em até 1 dia útil. Voltar à carteira
+{{ tituloContratacoes }}
+{{ subContratacoes }} Todas Em andamento Concluídas SERVIÇO {{ colParte }} STATUS VALOR PAGAMENTO AÇÃO {{ ct.servico }} #{{ ct.id }} · {{ ct.cat }} · {{ ct.data }} {{ ct.ini }} {{ ct.parte }} {{ ct.label }} {{ ct.valor }} {{ ct.pgLabel }} {{ ct.acaoLabel }} HISTÓRICO DA CONTRATAÇÃO #101 Abrir detalhe completo → Pendente 02/09 14:12 Aceito 02/09 16:40 Pago · em custódia 02/09 16:58 Em andamento 08/09 09:03 Aguardando confirmação 08/09 17:22 Concluído — CONFIRMAR OU CONTESTAR
+Marcos Vieira sinalizou a conclusão
+Instalação de chuveiro elétrico · contratação #101 · R$ 180 Você tem 5 dias corridos para confirmar ou contestar. Sem resposta, o sistema confirma automaticamente em 13/09/2026. VALOR EM CUSTÓDIA
+Pago por você em 02/09 e retido pela plataforma desde então. Ao confirmar, o repasse é automático: {{ liquido101 }} para Marcos Vieira e {{ taxa101 }} de taxa de intermediação ({{ taxaPct }}). {{ vlr101 }} ver transação OBSERVAÇÕES FINAIS DO PROFISSIONAL
+Chuveiro instalado e testado. Troquei o disjuntor para 32 A porque o antigo era subdimensionado — sem custo adicional. Deixei o manual e a nota na bancada da cozinha. COMPROVANTE ANEXADO foto — chuveiro instalado pdf — recibo do serviço Confirmar recebimento Contestar conclusão
+Ao confirmar, o status vira CONCLUÍDO, a data de conclusão é registrada, o valor em custódia é repassado ao profissional e o fluxo de avaliação é disparado automaticamente. CONTESTAÇÃO
+Contestar conclusão
+Contratação #101 · Instalação de chuveiro elétrico · Marcos Vieira Motivo da contestação * Evidência Arraste arquivos ou clique para enviar JPG, PNG ou PDF · até 5 MB cada · opcional Ao contestar, o status vira EM DISPUTA. O profissional pode responder com justificativa de até 300 caracteres e um administrador é notificado para mediação. A avaliação fica suspensa até a decisão. Voltar Enviar contestação EM DISPUTA · MEDIAÇÃO EM ANDAMENTO
+Contestação registrada
+Contratação #101 · aberta em 09/09/2026 · aguardando análise do administrador AL Ana Lopes · cliente · 09/09 08:14
+O chuveiro esquenta, mas o disjuntor desarma quando ligo no modo inverno. Preciso que volte para ajustar. evidencia-1.jpg video-desarme.mp4 MV Marcos Vieira · freelancer · 09/09 10:02
+O disjuntor do quadro é de 32 A, mas o cabo do ramal é de 4 mm². No modo inverno o consumo passa do limite do cabo. Posso retornar sem custo para trocar o ramal, mas o material é por conta da cliente. AD Administração FreeLanceNow · mediação · aguardando
+Disputa na fila de moderação. O valor pago permanece retido em custódia — não há repasse nem reembolso até a decisão. O administrador pode manter o status CONCLUÍDO, liberando o repasse, ou reverter para EM ANDAMENTO. Prazo de análise: até 3 dias úteis. Adicionar informação à disputa Enviar Voltar às contratações {{ avalTag }}
+{{ avalTitulo }}
+{{ avalSub }} Nota * ★ {{ notaLabel }} Comentário Opcional · até 500 caracteres {{ avalRegra }} Cancelar Enviar avaliação ★★★★★
+Avaliação publicada
+{{ avalOkTexto }} {{ avalOkBotao }} Voltar ao início
+Notificações
+{{ naoLidas }} não lidas · entregues por push e e-mail em até 10 segundos Marcar todas como lidas {{ n.tag }} {{ n.titulo }} {{ n.tempo }}
+{{ n.texto }} {{ n.acao }} →
+Mensagens
+Tela adicional, não prevista nos casos de uso — negociação de detalhes antes da solicitação formal. {{ cv.ini }} {{ cv.nome }} {{ cv.hora }} {{ cv.previa }} MV Marcos Vieira Eletricista · responde em até 3 h Ver serviço Boa tarde! O chuveiro é 220 V? Já tem ponto instalado no banheiro? Sim, 220 V e o ponto já existe. É troca de um antigo que queimou. Perfeito. Consigo quinta à tarde. Pode abrir a solicitação com data para 10/09 que eu confirmo. SOLICITAÇÃO #101 CRIADA · 08/09 17:22 Enviar {{ perfilCli.ini }}
+{{ perfilCli.nome }} {{ perfilCli.selo }} {{ perfilCli.linha }} {{ perfilCli.meta }} Editar perfil Enviar mensagem Denunciar perfil
+{{ perfilCli.tituloSobre }}
+{{ perfilCli.sobre }}
+O que costuma contratar
+Categorias com histórico de contratação nos últimos 12 meses. {{ c.nome }}
+Avaliações recebidas de profissionais {{ perfilCli.avAutor }} ★★★★★ {{ perfilCli.avData }}
+{{ perfilCli.avTexto }} TRANSPARÊNCIA Contratações {{ perfilCli.contratacoes }} Nota como cliente {{ perfilCli.nota }} Cancelamentos {{ perfilCli.cancelamentos }} Disputas abertas {{ perfilCli.disputas }}
+Bom dia, Marcos.
+Você tem 2 solicitações aguardando resposta e 1 serviço a concluir. Adicionar serviço SOLICITAÇÕES ABERTAS 2 prazo de 48 h para responder EM ANDAMENTO 3 R$ 1.040 em execução CONCLUÍDOS NO MÊS 11 R$ 3.180 faturados SUA NOTA 4,9 ★ 87 avaliações · 94% de aceite Solicitações aguardando resposta Ver todas {{ sol.ini }} {{ sol.cliente }} {{ sol.tipo }} {{ sol.prazo }} {{ sol.servico }}
+{{ sol.desc }} data {{ sol.data }} · {{ sol.endereco }} · {{ sol.valor }} Aceitar Recusar Perguntar antes Serviços em andamento Ver contratações Instalação de chuveiro elétrico Ana Lopes · #101 · prazo 10/09/2026 · R$ 180 Marcar como concluído CARTEIRA Em custódia {{ vlrCustodia }} Disponível para saque {{ vlrDisponivel }}
+Valores em custódia caem no saldo quando o cliente confirma a conclusão, já com a taxa de {{ taxaPct }} descontada. Abrir carteira DESEMPENHO DOS ANÚNCIOS {{ ms.titulo }} {{ ms.vistas }} LIMITE DE ANÚNCIOS 2 de 20 ativos
+Um freelancer pode manter até 20 serviços ativos simultâneos nesta versão.
+Meus serviços
+2 ativos · 1 rascunho · 1 desativado · limite de 20 ativos alternar estado vazio Adicionar serviço
+Você ainda não publicou nenhum serviço
+Publique seu primeiro anúncio para aparecer nas buscas dos clientes. Leva menos de dois minutos. Publicar primeiro serviço {{ ms.titulo }} {{ ms.status }} {{ ms.cat }} · {{ ms.preco }} · entrega em {{ ms.prazo }} {{ ms.vistas }} visualizações · {{ ms.pedidos }} solicitações recebidas Editar {{ ms.toggleLabel }} CADASTRO DE SERVIÇO
+Adicionar serviço
+O serviço fica visível nas buscas assim que for publicado. Preencha todos os campos obrigatórios para publicar. Título * {{ msgErro }}Até 80 caracteres Categoria * Selecione uma categoria Elétrica Encanamento Limpeza / diarista TI e informática Categorias são definidas pelo administrador Prazo de entrega * Descrição detalhada * Até 500 caracteres Valor estimado (R$) * Fotos do serviço + Até 5 fotos · JPG ou PNG · máx. 5 MB cada (A01) Cancelar Salvar rascunho Publicar serviço
+Solicitações recebidas
+Você tem até 48 horas para aceitar ou recusar. Sem resposta, a solicitação é cancelada automaticamente. {{ sol.ini }} {{ sol.cliente }} {{ sol.tipo }} · solicitação #{{ sol.id }} {{ sol.prazo }} SERVIÇO SOLICITADO {{ sol.servico }} {{ sol.valor }} DATA E LOCAL {{ sol.data }} {{ sol.endereco }} DESCRIÇÃO DA DEMANDA
+{{ sol.desc }} Ao aceitar, o cliente é notificado para pagar {{ sol.valor }} em custódia. O serviço entra em execução quando o pagamento for confirmado, e o repasse cai na sua carteira depois que o cliente confirmar a conclusão. Aceitar solicitação Recusar Perguntar ao cliente CONCLUSÃO DO SERVIÇO
+Marcar como concluído
+Instalação de ventilador de teto · Ana Lopes · contratação #107 · R$ 280 Observações finais Opcional Comprovante ou foto Arraste arquivos ou clique para enviar JPG, PNG ou PDF · opcional Ao confirmar, o status vai para AGUARDANDO CONFIRMAÇÃO e o cliente é notificado. Ele tem 5 dias corridos para confirmar ou contestar — sem resposta, o sistema confirma automaticamente. Cancelar Confirmar conclusão
+Minhas demandas
+Cada demanda publicada no feed recebe propostas de profissionais da categoria. Aceitar uma proposta cria a contratação e leva ao pagamento em custódia. {{ dm.cat }} {{ dm.status }} {{ dm.titulo }} {{ dm.orcamento }} · prazo {{ dm.prazo }} · publicada {{ dm.publicada }} {{ dm.qtdLabel }} → + Publicar nova demanda
+{{ demandaSel.titulo }}
+{{ demandaSel.texto }} Editar demanda {{ demandaSel.cat }} {{ demandaSel.orcamento }} prazo {{ demandaSel.prazo }} {{ demandaSel.local }} {{ demandaSel.qtdLabel }} {{ o.label }} Nenhuma proposta ainda
+A demanda foi publicada há {{ demandaSel.publicada }} e já apareceu para os profissionais da categoria. Você também pode chamar alguém direto. Buscar profissionais {{ pr.ini }} {{ pr.nome }} {{ pr.nota }}★ ({{ pr.aval }} avaliações · {{ pr.entregas }} entregas) {{ pr.destaque }} {{ pr.titulo }} · {{ pr.local }} {{ pr.valor }} em {{ pr.prazo }} · enviada {{ pr.quando }}
+{{ pr.mensagem }} {{ tg }} Aceitar proposta Conversar Ver perfil Recusar Ao aceitar uma proposta, as demais são recusadas automaticamente e a demanda sai do feed. O valor combinado fica em custódia até você confirmar a conclusão. RESPOSTA A DEMANDA ABERTA
+Enviar proposta
+O cliente compara todas as propostas recebidas e escolhe uma. Você é notificado da decisão. AL Ana Lopes Cliente · Pessoa física · Taguatinga, DF PROCURA-SE
+Quadro de distribuição do apartamento vive desarmando. Queria alguém para avaliar e trocar se precisar. Tenho disponibilidade no fim de semana. Elétrica R$ 600 a R$ 800 prazo 2 dias Combina com seus serviços Valor da proposta (R$) * Orçamento previsto pelo cliente: R$ 600 a R$ 800 Prazo de execução * 1 dia 2 dias 3 dias 5 dias Contado a partir da confirmação do pagamento Mensagem ao cliente * Até 600 caracteres · não inclua telefone, e-mail ou link de contato O que está incluso Mão de obra e deslocamento Material (disjuntores, DR, DPS) Laudo técnico assinado Garantia de 90 dias Esta demanda já recebeu 4 propostas. A proposta fica válida por 7 dias e pode ser retirada enquanto o cliente não decidir. Aceita a proposta, a contratação é criada e o cliente paga em custódia. Cancelar Enviar proposta ✓
+Proposta enviada
+Ana Lopes recebeu sua proposta de R$ 720 em 2 dias. Se ela aceitar, a contratação aparece em Contratações já aguardando o pagamento em custódia. Voltar ao feed Ver contratações {{ tituloContratacoes }} / #{{ ctSel.id }} {{ ctSel.label }} CONTRATAÇÃO #{{ ctSel.id }}
+{{ ctSel.servico }}
+{{ ctSel.cat }} · {{ parteMin }} {{ ctSel.parte }} · data combinada {{ ctSel.data }} {{ ctSel.acaoLabel }}
+Linha do tempo {{ tl.titulo }} {{ tl.quando }} {{ tl.desc }}
+Escopo combinado
+{{ ctSel.escopo }}
+Registros do serviço
+Comprovantes e fotos anexados na conclusão ficam disponíveis para as duas partes e para a moderação em caso de disputa. foto — antes foto — depois sem anexo PAGAMENTO Valor do serviço {{ ctSel.valor }} Taxa da plataforma {{ ctSel.txt }} {{ colLiquido }} {{ ctSel.liq }} {{ ctSel.pgLabel }} Ver transação → {{ colParte }} {{ ctSel.ini }} {{ ctSel.parte }} {{ ctSel.parteSub }} Abrir conversa Ver perfil PROBLEMAS Abrir ou acompanhar disputa Denunciar esta contratação
+Disputas abertas congelam o valor em custódia até a decisão da moderação. DADOS DA CONTA
+Editar perfil
+{{ editarSub }} {{ roleInitials }} Foto de perfil Enviar foto Remover JPG ou PNG quadrado, mínimo 400×400 px Nome completo * Telefone * E-mail O e-mail é a chave de login e não pode ser alterado aqui Cidade e UF * {{ bioLabel }} {{ bioValor }} Aparece no topo do seu perfil público · até 600 caracteres Categorias em que você atua {{ cp.nome }} Você só recebe demandas do feed nas categorias selecionadas Valor base da visita (R$) Raio de atendimento até 10 km até 25 km até 50 km todo o DF Documentos e certificações VERIFICADO Documento com foto e certificado NR-10 aprovados em 14/02/2026. Enviar outro certificado PDF ou imagem · análise em até 2 dias úteis Tipo de conta Pessoa física Empresa CPF Endereço padrão de atendimento Preenchido automaticamente nas solicitações · só é revelado ao profissional depois do aceite Alterações no nome e na foto passam por revisão automática antes de aparecerem no perfil público. Avaliações e histórico de contratações não são afetados. Cancelar Salvar alterações DENÚNCIA À MODERAÇÃO
+Denunciar conteúdo
+A denúncia entra na fila de moderação da plataforma. Nada é removido automaticamente: um administrador analisa o caso antes de qualquer ação. CONTEÚDO DENUNCIADO {{ denunciaAlvo }} Motivo * {{ mo.nome }} {{ mo.desc }} O que aconteceu * Mínimo 40 caracteres · a outra parte não vê o texto da denúncia Provas (opcional) Arraste prints ou fotos JPG, PNG ou PDF · até 5 arquivos Denúncias falsas ou repetidas sem fundamento podem levar à suspensão da sua conta. Em caso de disputa sobre serviço já pago, use a contestação da contratação — o dinheiro fica retido até a decisão. Cancelar Enviar denúncia ✓
+Denúncia registrada
+O caso entrou na fila de moderação e recebe resposta em até 48 horas úteis. Você é notificado da decisão. PROTOCOLO DEN-2026-0417 Voltar ao início Ver meus avisos F FreeLanceNow PAINEL ADMIN GESTÃO Usuários Categorias Transações Moderação 3 Relatórios AUDITORIA Todas as ações são gravadas em log com data, hora e responsável. Sair do painel
+Gerenciamento de usuários
+6 de 5.028 contas · painel disponível apenas em navegador desktop Todos os tipos Cliente Freelancer Todos os status Ativo Suspenso Exportar CSV NOME E-MAIL TIPO STATUS AÇÕES {{ u.ini }} {{ u.nome }} {{ u.contratacoes }} contr. {{ u.email }} {{ u.tipo }} {{ u.status }} Ver {{ u.acaoStatus }} Excluir Exclusão bloqueada · Construtora Meridiano
+A conta possui 3 contratações com status EM ANDAMENTO e 46 contratações concluídas no histórico. Contas com histórico devem ser suspensas, não excluídas. Suspender conta Cancelar operação
+Categorias de serviço
+Serviços vinculados a categorias desativadas permanecem no ar, mas a categoria não aparece em novos cadastros. Nova categoria CATEGORIA SERVIÇOS ATIVOS STATUS AÇÕES {{ cat.nome }} {{ cat.servicos }} {{ cat.status }} Editar nome {{ cat.acao }}
+Transações e custódia
+Movimentação financeira da plataforma. A receita vem da taxa de {{ taxaPct }} retida em cada contratação concluída com sucesso. Últimos 30 dias Últimos 90 dias Este ano Exportar CSV VOLUME TRANSACIONADO {{ admVolume }} 812 contratações pagas no período TAXA RETIDA (RECEITA) {{ admReceita }} {{ taxaPct }} sobre contratações concluídas EM CUSTÓDIA AGORA {{ admCustodia }} 47 serviços em execução RETIDO EM DISPUTA {{ admDisputa }} 3 casos aguardando mediação TRANSAÇÃO CONTRATAÇÃO VALOR TAXA SITUAÇÃO {{ t.id }} {{ t.data }} {{ t.servico }} #{{ t.ct }} · {{ t.cliente }} → {{ t.freela }} · {{ t.metodo }} {{ t.bruto }} {{ t.taxa }} {{ t.label }} O repasse é automático na confirmação da conclusão. Valores em disputa permanecem retidos até a decisão do administrador.
+Fila de moderação
+3 itens reportados aguardando decisão · manter ou remover o conteúdo, ou mediar a disputa. {{ mo.tipo }} {{ mo.alvo }} {{ mo.data }} MOTIVO DO REPORTE {{ mo.motivo }} reportado por {{ mo.reporter }} CONTEÚDO {{ mo.trecho }} Manter conteúdo Remover conteúdo Manter CONCLUÍDO Reverter para EM ANDAMENTO Ver histórico
+Relatórios e métricas
+Período: agosto de 2026 · dados consolidados diariamente Últimos 30 dias Últimos 90 dias Ano corrente Exportar CSV USUÁRIOS CADASTRADOS 5.028 +312 no período SERVIÇOS ATIVOS 2.041 +87 no período CONTRATAÇÕES NO MÊS 812 meta de 800 atingida AVALIAÇÕES REGISTRADAS 694 85% das conclusões Contratações por semana agosto de 2026 {{ g.v }} {{ g.label }} Contratações por categoria {{ cg.nome }} {{ cg.qtd }} Log de auditoria · últimas ações administrativas 25/08 14:32 Conta de Diego Farias suspensa por reincidência de reportes admin@freelancenow 24/08 09:07 Categoria “Chaveiro” desativada admin@freelancenow 23/08 18:44 Anúncio removido por violação dos Termos de Uso admin@freelancenow 22/08 11:20 Exportação de relatório mensal em CSV admin@freelancenow

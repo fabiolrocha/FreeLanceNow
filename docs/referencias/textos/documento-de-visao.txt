@@ -1,0 +1,401 @@
+FreeLanceNow
+
+Documento de Visão
+
+Versão 1.1
+
+
+
+
+
+
+
+
+
+
+
+
+	Revisões do Documento
+Revisões são melhoramentos na estrutura do documento e também no seu conteúdo. O objetivo primário desta tabela é a fácil identificação da versão do documento. Toda modificação no documento deve constar nesta tabela.
+Versão
+Data
+Autores
+Observações
+1.0
+17/03/2026
+Equipe Freelance
+Versão inicial do documento
+1.1
+12/05/2026
+Equipe Freelance
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Auditorias do Documento
+Auditorias são inspeções formais conduzidas pela equipe de Qualidade e Conformidade da Empresa, e tem por objetivo garantir a qualidade dos artefatos gerados durante o processo de desenvolvimento do mesmo. Toda modificação no documento deve constar nesta tabela.
+
+
+Versão
+Data
+Autores
+E-mail
+Observações
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sumário
+ TOC \o "1-3" \h \z  HYPERLINK \l "_Toc493517254" 1.	Introdução	 PAGEREF _Toc493517254 \h 4
+ HYPERLINK \l "_Toc493517255" 1.1	Finalidade	 PAGEREF _Toc493517255 \h 4
+ HYPERLINK \l "_Toc493517256" 1.2	Escopo	 PAGEREF _Toc493517256 \h 4
+ HYPERLINK \l "_Toc493517257" 1.3	Definições, Acrônimos e Abreviações	 PAGEREF _Toc493517257 \h 4
+ HYPERLINK \l "_Toc493517258" 1.4	Referências	 PAGEREF _Toc493517258 \h 4
+ HYPERLINK \l "_Toc493517259" 1.4.1	Especificações Suplementares	 PAGEREF _Toc493517259 \h 4
+ HYPERLINK \l "_Toc493517260" 2.	Contextualização	 PAGEREF _Toc493517260 \h 5
+ HYPERLINK \l "_Toc493517261" 2.1	Descrição do Problema	 PAGEREF _Toc493517261 \h 5
+ HYPERLINK \l "_Toc493517262" 2.2	Sentença de Posição do Produto	 PAGEREF _Toc493517262 \h 5
+ HYPERLINK \l "_Toc493517263" 3.	Descrição dos Stakeholders e dos Usuários	 PAGEREF _Toc493517263 \h 5
+ HYPERLINK \l "_Toc493517264" 3.1	Principais Stakeholders e Usuários	 PAGEREF _Toc493517264 \h 5
+ HYPERLINK \l "_Toc493517265" 3.2	Necessidades Chave dos Stakeholders e dos Usuários	 PAGEREF _Toc493517265 \h 6
+ HYPERLINK \l "_Toc493517266" 4.	Visão Geral do Produto	 PAGEREF _Toc493517266 \h 7
+ HYPERLINK \l "_Toc493517267" 4.1	Perspectiva do Produto	 PAGEREF _Toc493517267 \h 7
+ HYPERLINK \l "_Toc493517268" 4.2	Estimativa de Custo Inicial	 PAGEREF _Toc493517268 \h 8
+ HYPERLINK \l "_Toc493517269" 4.3	Suposições e dependências	 PAGEREF _Toc493517269 \h 8
+ HYPERLINK \l "_Toc493517270" 4.4	Premissas e Dependências	 PAGEREF _Toc493517270 \h 8
+ HYPERLINK \l "_Toc493517271" 5.	Precedência e Prioridades	 PAGEREF _Toc493517271 \h 9
+ HYPERLINK \l "_Toc493517272" 6.	Requisitos Não-Funcionais do Produto	 PAGEREF _Toc493517272 \h 10
+ HYPERLINK \l "_Toc493517273" 7.	Restrições Técnicas	 PAGEREF _Toc493517273 \h 10
+ HYPERLINK \l "_Toc493517274" 7.1	Padrões Aplicáveis	 PAGEREF _Toc493517274 \h 10
+ HYPERLINK \l "_Toc493517275" 7.2	Restrições Aplicáveis	 PAGEREF _Toc493517275 \h 10
+ HYPERLINK \l "_Toc493517276" 8.	Manual de Arquitetura	 PAGEREF _Toc493517276 \h 10
+ HYPERLINK \l "_Toc493517277" 8.1	Visão de Implementação	 PAGEREF _Toc493517277 \h 10
+ HYPERLINK \l "_Toc493517278" 8.2	Mecanismo Arquiteturais	 PAGEREF _Toc493517278 \h 11
+ HYPERLINK \l "_Toc493517279" 9.	Dicionário de Dados	 PAGEREF _Toc493517279 \h 11
+ HYPERLINK \l "_Toc493517280" 9.1	Finalidade	 PAGEREF _Toc493517280 \h 11
+ HYPERLINK \l "_Toc493517281" 9.2	Nome da Tabela	 PAGEREF _Toc493517281 \h 11
+
+ REF  nomeDocumento \h  \* MERGEFORMAT Documento de Visão
+Introdução
+Finalidade
+A finalidade deste documento é definir a visão que os Stakeholders têm do produto, em termos das funcionalidades e necessidades do sistema. Ele descreve a Visão do Sistema da plataforma de Freelancers de Serviços Gerais, apresentando os objetivos do projeto, os stakeholders envolvidos, o escopo do sistema e as necessidades que a solução pretende atender.
+
+Objetivos do Projeto
+O FreeLanceNow tem como objetivo principal conectar clientes e profissionais freelancers de maneira rápida, simples e segura, facilitando a contratação de serviços gerais através de uma plataforma digital acessível via web e dispositivos móveis.
+Os objetivos específicos do sistema são:
+Facilitar a divulgação de serviços realizados por freelancers.
+Permitir que clientes encontrem profissionais de forma rápida através de filtros e categorias.
+Centralizar o processo de busca, contratação e avaliação de serviços.
+Oferecer uma experiência intuitiva e responsiva para diferentes dispositivos.
+Garantir maior segurança e confiabilidade nas interações entre usuários.
+Possibilitar futuras expansões da plataforma com novas funcionalidades e integrações.
+
+
+Escopo
+O documento apresenta uma visão geral do sistema, que será uma plataforma digital voltada para conectar pessoas que precisam de serviços gerais com profissionais freelancers que oferecem esses serviços. A plataforma permitirá o cadastro de profissionais, busca por serviços, contratação e avaliação dos trabalhos realizados.
+Definições, Acrônimos e Abreviações
+
+Freelancer: Profissional autônomo que presta serviços de forma independente.
+
+Contextualização
+Descrição do Problema
+Problemas
+Dificuldade em encontrar profissionais confiáveis.
+Profissionais autônomos com dificuldade para divulgar seus serviços e encontrar novos clientes.
+Sistemas confusos e cheios de erros.
+Pessoas Atingidas
+Pessoas que precisam de serviços domésticos ou técnicos e profissionais autônomos que trabalham com serviços gerais
+Cujo impacto é
+Perda de renda para freelancers ociosos, atrasos em projetos para contratantes sem profissional disponível
+Uma solução bem-sucedida traria
+Um aplicativo que conecte diretamente contratantes e freelancers
+Contratante com mais facilidades em encontrar o que precisam em curto espaço de tempo.
+
+Sentença de Posição do Produto
+
+Para
+Freelancers de qualquer área e contratantes que precisam de mão de obra temporária.
+O
+FreelanceNow é uma plataforma Web e Mobile de marketplace de trabalho temporário e freelance.
+Que
+Permite publicar vagas, buscar profissionais, negociar condições e avaliar resultados em um só lugar.
+Diferente de
+Plataformas especializadas em uma área específica ou com barreiras de entrada elevadas para novos usuários.
+Nosso produto
+É generalista, acessível e focado em simplicidade, atendendo qualquer área profissional com experiência de uso fluida.
+Diferenciais da Plataforma
+O FreeLanceNow busca se destacar por oferecer uma plataforma acessível, intuitiva e generalista, permitindo a conexão entre clientes e freelancers de diversas áreas profissionais.
+Os principais diferenciais do sistema incluem:
+Interface simples e responsiva.
+Plataforma acessível via web e dispositivos móveis.
+Sistema de avaliação de profissionais.
+Busca com filtros inteligentes.
+Facilidade de cadastro e publicação de serviços.
+Estrutura preparada para expansão futura.
+Experiência de uso simplificada para usuários iniciantes.
+
+Descrição dos Stakeholders e dos Usuários
+
+Principais Stakeholders e Usuários
+
+Identificação
+Responsabilidades
+Stakeholders
+ST01
+Encontrar oportunidades de trabalho temporário de forma rápida e segura.
+Freelancer
+ST02
+Contratar profissionais qualificados para demandas temporárias com agilidade.
+Empresa
+ST03
+Gerenciar e oferecer portfólio de profissionais para contratantes na plataforma.
+Agência de Emprego
+ST04
+Monitorar operações, moderar usuários e garantir qualidade da plataforma.
+ Administrador do Sistema
+ST05
+Desenvolver, testar e manter o sistema dentro do prazo e escopo definidos.
+Equipe de Desenvolvimento
+ST06
+Garantir retorno financeiro e crescimento sustentável da plataforma.
+Investidores
+ST07
+Assegurar que as relações de trabalho intermediadas estejam em conformidade legal.
+Órgãos Reguladores
+
+
+
+
+
+
+4.1.1 Perfis de Usuário
+Cliente - Usuário responsável por buscar profissionais, solicitar serviços, acompanhar contratações e avaliar freelancers após a conclusão do serviço.
+Freelancer - Usuário responsável por cadastrar serviços, gerenciar solicitações recebidas, atualizar informações profissionais e acompanhar avaliações dos clientes.
+Administrador - Usuário responsável pelo gerenciamento geral da plataforma, moderação de conteúdos, controle de usuários e monitoramento das operações do sistema.
+
+4.2 Necessidades Chave dos Stakeholders e dos Usuários
+No.
+Descrição
+Prioridade do Cliente
+(Crítico, Útil e Importante)
+Observações
+
+Cadastro de usuários (clientes e freelancers) com informações básicas de perfil.
+Crítico
+-
+
+Busca de profissionais por categoria de serviço (ex.: eletricista, limpeza, pintura).
+Crítico
+-
+
+Cadastro e publicação de serviços ofertados pelos freelancers.
+Crítico
+-
+
+Solicitação e contratação de serviços pelos clientes.
+Crítico
+-
+
+Sistema de avaliação dos serviços realizados para garantir qualidade.
+Crítico
+-
+
+Perfil detalhado dos profissionais com histórico de avaliações.
+Importante
+-
+
+Painel administrativo para gerenciamento da plataforma.
+Importante
+-
+
+Interface responsiva acessível via web (desktop e mobile).
+Importante
+-
+
+Visão Geral do Produto
+Perspectiva do Produto
+
+Resumo das funcionalidades do Produto
+Necessidades
+Funcionalidades Correspondentes
+Cadastro de usuários
+Formulário de cadastro com dados pessoais, tipo de conta (cliente ou freelancer) e autenticação.
+Busca por profissionais
+Sistema de busca e filtro por categoria de serviço, localização e avaliação.
+Cadastro de serviços
+Área de gerenciamento onde o freelancer cadastra e edita os serviços ofertados.
+Solicitação de contratação
+Fluxo de solicitação de serviço pelo cliente com confirmação pelo freelancer.
+Avaliação de serviços
+Sistema de avaliação por estrelas e comentários após a conclusão do serviço.
+Perfil profissional detalhado
+Página de perfil exibindo informações, habilidades, fotos e histórico de avaliações.
+Painel administrativo
+Interface para o administrador gerenciar usuários, serviços e moderações.
+Acesso mobile/web
+Interface responsiva compatível com navegadores desktop e dispositivos móveis.
+Fluxo Geral do Sistema. O funcionamento básico do sistema ocorre da seguinte forma:
+O usuário realiza cadastro na plataforma como cliente ou freelancer.
+O freelancer cadastra e publica os serviços oferecidos.
+O cliente acessa o sistema e realiza buscas utilizando filtros e categorias.
+O cliente visualiza os detalhes do serviço e envia uma solicitação de contratação.
+O freelancer recebe a solicitação e pode aceitar ou recusar o serviço.
+Após a realização do serviço, o cliente pode registrar uma avaliação do profissional.
+O administrador acompanha e gerencia as operações da plataforma.
+
+Suposições e dependências
+Acesso à internet
+Usuários ativos e com perfis atualizados
+Extenso servidor web e banco de dados para armazenamento de dados de usuários.
+
+Premissas e Dependências
+O sistema deverá utilizar os seguintes padrões de premissas e dependências:
+
+Máquina do Desenvolvedor: Sistema operacional compatível com as tecnologias escolhidas pela equipe.
+Tecnológicas: O sistema será desenvolvido com tecnologias definidas pela equipe e aprovadas pelo professor orientador.
+Prazo: O desenvolvimento seguirá o cronograma da disciplina, com entregas parciais ao longo do semestre.
+Recursos: A equipe é composta por estudantes, sem orçamento disponível para infraestrutura paga inicialmente.
+Legais: As relações de trabalho intermediadas devem respeitar a legislação trabalhista brasileira vigente.
+Privacidade: O sistema deverá garantir a proteção dos dados dos usuários em conformidade com a LGPD.
+Acessibilidade: O aplicativo deverá ter interface acessível para usuários com diferentes graus de letramento digital.
+Máquina do Servidor:
+Aplicação web.
+Banco de Dados Postgres.
+
+5.4 Funcionalidades Futuras
+O FreeLanceNow foi projetado considerando futuras expansões e melhorias funcionais, entre elas:
+Login social utilizando Google e Facebook.
+Sistema integrado de pagamentos.
+Chat em tempo real entre clientes e freelancers.
+Sistema de geolocalização para busca de profissionais próximos.
+Destaque patrocinado de serviços.
+Plano premium para freelancers.
+Aplicativo mobile nativo para Android e iOS.
+Sistema de notificações push em tempo real.
+
+
+
+Precedência e Prioridades
+
+Crítico
+Funcionalidades essenciais para o funcionamento básico da plataforma. Devem ser entregues obrigatoriamente.
+
+Importante
+Funcionalidades que agregam valor significativo ao produto e devem ser implementadas se possível.
+
+Útil
+Situações que não são necessárias, mas que se houver tempo podem ser implementadas.
+
+No.
+Funcionalidade
+Prioridade do Cliente
+Entrega
+
+Cadastro e autenticação de usuários
+Crítico
+x
+
+Cadastro de serviços pelo freelancer
+Crítico
+x
+
+Sistema de avaliação de serviços
+Crítico
+x
+
+Interface responsiva (mobile/web)
+Importante
+x
+
+Requisitos Não-Funcionais do Produto
+Requisitos de Desempenho: Tempo de resposta inferior a 3 segundos para buscas e carregamento de perfis.
+Requisitos de Usabilidade: Interface intuitiva para perfis técnicos e não técnicos, com fluxos simplificados de cadastro e busca.
+Requisitos de Confiabilidade: Dados de contratos e avaliações devem ser armazenados com backup automático.
+Requisitos de Segurança: Autenticação segura (2FA opcional), criptografia de dados sensíveis e conformidade com LGPD
+Requisitos de Escalabilidade: Arquitetura preparada para suportar crescimento da base de usuários sem refatoração completa.
+Requisitos de Portabilidade: Aplicativo responsivo e funcional em iOS, Android e principais navegadores web. 7.1 Restrições e Riscos do Projeto
+Durante o desenvolvimento e utilização da plataforma, alguns riscos podem impactar o projeto:
+Baixa adesão inicial de usuários.
+Problemas relacionados à segurança e vazamento de dados.
+Instabilidade do sistema em períodos de alto acesso.
+Dependência de conexão com internet.
+Publicação de conteúdos inadequados por usuários.
+Dificuldade na validação da qualidade dos serviços oferecidos pelos freelancers.
+Possíveis mudanças em legislações relacionadas à proteção de dados.
+
+Controle de documento
+Versão
+Data
+Autor
+Descrição
+1.0
+Março/2026
+Equipe do projeto
+Versão inicial do documento de visão.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Página PAGE1 de NUMPAGES8
+
+
+
+
+
+Nome do Sistema: FreeLanceNow
+ REF  nomeDocumento \h  \* MERGEFORMAT Documento de Visão
+Versão 1.0
+Página PAGE2 de NUMPAGES8
