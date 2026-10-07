@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../app/store'
 import { demoUsers, professionals } from '../../data/fixtures'
-import { Avatar, Field, PageTitle } from '../../components/ui'
+import { Avatar, Field, PageTitle, Empty } from '../../components/ui'
 import { exportCsv } from '../../data/exportCsv'
 
 export function AdminUsers() {
@@ -173,6 +173,7 @@ export function AdminModeration() {
         return []
       }
     })
+  const disputes = contracts.filter((c) => c.status === 'EM_DISPUTA')
   function decide(id: string, status: string) {
     const next = reports.map((r) => (r.id === id ? { ...r, status } : r))
     setReports(next)
@@ -203,26 +204,26 @@ export function AdminModeration() {
             )}
           </article>
         ))}
-        {contracts
-          .filter((c) => c.status === 'EM_DISPUTA')
-          .map((c) => (
-            <article className="panel" key={c.id}>
-              <span className="badge red">Disputa</span>
-              <h2>{c.title}</h2>
-              <p>{c.dispute}</p>
-              <div className="row">
-                <button className="button" onClick={() => transition(c.id, 'CONCLUIDO')}>
-                  Confirmar conclusão
-                </button>
-                <button
-                  className="button secondary"
-                  onClick={() => transition(c.id, 'EM_ANDAMENTO')}
-                >
-                  Voltar para execução
-                </button>
-              </div>
-            </article>
-          ))}
+        {disputes.map((c) => (
+          <article className="panel" key={c.id}>
+            <span className="badge red">Disputa</span>
+            <h2>{c.title}</h2>
+            <p>{c.dispute}</p>
+            <div className="row">
+              <button className="button" onClick={() => transition(c.id, 'CONCLUIDO')}>
+                Confirmar conclusão
+              </button>
+              <button className="button secondary" onClick={() => transition(c.id, 'EM_ANDAMENTO')}>
+                Voltar para execução
+              </button>
+            </div>
+          </article>
+        ))}
+        {!reports.length && !disputes.length && (
+          <Empty title="Fila vazia">
+            <p>Nenhuma denúncia ou disputa aguardando análise.</p>
+          </Empty>
+        )}
       </div>
     </>
   )

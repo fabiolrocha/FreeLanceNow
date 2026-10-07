@@ -7,6 +7,9 @@ import { futureDate, money, nowIso } from '../../domain/rules'
 
 export function Demands() {
   const { demands, user, proposals } = useApp()
+  const visible = demands.filter((d) =>
+    user?.role === 'CLIENT' ? d.clientId === user.id : d.status === 'OPEN',
+  )
   return (
     <>
       <PageTitle
@@ -22,25 +25,27 @@ export function Demands() {
       />
       <SimulationNotice />
       <div className="stack">
-        {demands
-          .filter((d) => (user?.role === 'CLIENT' ? d.clientId === user.id : d.status === 'OPEN'))
-          .map((d) => (
-            <article className="panel" key={d.id}>
-              <span className="badge">{d.status === 'OPEN' ? 'Aberta' : 'Encerrada'}</span>
-              <h2>{d.title}</h2>
-              <p>{d.description}</p>
-              <p>
-                {money(d.budget)} · {d.days} dias · {d.city}
-              </p>
-              <Link to={`/demandas/${d.id}`}>
-                {user?.role === 'CLIENT'
-                  ? `${proposals.filter((p) => p.demandId === d.id).length} propostas recebidas`
-                  : 'Ver demanda e enviar proposta'}
-              </Link>
-            </article>
-          ))}
+        {visible.map((d) => (
+          <article className="panel" key={d.id}>
+            <span className="badge">{d.status === 'OPEN' ? 'Aberta' : 'Encerrada'}</span>
+            <h2>{d.title}</h2>
+            <p>{d.description}</p>
+            <p>
+              {money(d.budget)} · {d.days} dias · {d.city}
+            </p>
+            <Link to={`/demandas/${d.id}`}>
+              {user?.role === 'CLIENT'
+                ? `${proposals.filter((p) => p.demandId === d.id).length} propostas recebidas`
+                : 'Ver demanda e enviar proposta'}
+            </Link>
+          </article>
+        ))}
       </div>
-      {!demands.length && <Empty title="Nenhuma demanda publicada" />}
+      {!visible.length && (
+        <Empty
+          title={user?.role === 'CLIENT' ? 'Nenhuma demanda publicada' : 'Nenhuma demanda aberta'}
+        />
+      )}
     </>
   )
 }
@@ -110,9 +115,22 @@ export function DemandDetail() {
   const { id } = useParams(),
     { user, demands, proposals, setProposals, setDemands, addContract, notify } = useApp(),
     navigate = useNavigate()
-  const d = demands.find((d) => d.id === id),
-    [error, setError] = useState('')
+  const [error, setError] = useState('')
+  // Clients see only their own demands; freelancers see open ones or those they already answered.
+  const d = demands.find(
+    (d) =>
+      d.id === id &&
+      (user?.role === 'ADMIN' ||
+        d.clientId === user?.id ||
+        (user?.role === 'FREELANCER' &&
+          (d.status === 'OPEN' ||
+            proposals.some((p) => p.demandId === d.id && p.freelancerId === user.id)))),
+  )
   if (!d) return <Empty title="Demanda não encontrada" />
+  const isOwner = user?.role === 'ADMIN' || d.clientId === user?.id
+  const visibleProposals = proposals.filter(
+    (p) => p.demandId === id && (isOwner || p.freelancerId === user?.id),
+  )
   function accept(pid: string) {
     const p = proposals.find((p) => p.id === pid)
     if (!p || !user || d!.clientId !== user.id || d!.status !== 'OPEN') {
@@ -158,43 +176,41 @@ export function DemandDetail() {
           Enviar proposta
         </Link>
       )}
-      <PageTitle title="Propostas recebidas" />
-      {proposals
-        .filter((p) => p.demandId === id)
-        .map((p) => (
-          <article className="panel" key={p.id}>
-            <h2>{p.freelancerName}</h2>
-            <p>
-              {money(p.price)} · {p.days} dias
-            </p>
-            <p>{p.message}</p>
-            <span className="badge">
-              {p.status === 'PENDING'
-                ? 'Aguardando decisão'
-                : p.status === 'ACCEPTED'
-                  ? 'Aceita'
-                  : 'Recusada'}
-            </span>
-            {user?.id === d.clientId && p.status === 'PENDING' && d.status === 'OPEN' && (
-              <div className="row">
-                <button className="button" onClick={() => accept(p.id)}>
-                  Aceitar proposta
-                </button>
-                <button
-                  className="button secondary"
-                  onClick={() =>
-                    setProposals((ps) =>
-                      ps.map((x) => (x.id === p.id ? { ...x, status: 'REJECTED' } : x)),
-                    )
-                  }
-                >
-                  Recusar
-                </button>
-              </div>
-            )}
-          </article>
-        ))}
-      {!proposals.some((p) => p.demandId === id) && (
+      <PageTitle title={isOwner ? 'Propostas recebidas' : 'Sua proposta'} />
+      {visibleProposals.map((p) => (
+        <article className="panel" key={p.id}>
+          <h2>{p.freelancerName}</h2>
+          <p>
+            {money(p.price)} · {p.days} dias
+          </p>
+          <p>{p.message}</p>
+          <span className="badge">
+            {p.status === 'PENDING'
+              ? 'Aguardando decisão'
+              : p.status === 'ACCEPTED'
+                ? 'Aceita'
+                : 'Recusada'}
+          </span>
+          {user?.id === d.clientId && p.status === 'PENDING' && d.status === 'OPEN' && (
+            <div className="row">
+              <button className="button" onClick={() => accept(p.id)}>
+                Aceitar proposta
+              </button>
+              <button
+                className="button secondary"
+                onClick={() =>
+                  setProposals((ps) =>
+                    ps.map((x) => (x.id === p.id ? { ...x, status: 'REJECTED' } : x)),
+                  )
+                }
+              >
+                Recusar
+              </button>
+            </div>
+          )}
+        </article>
+      ))}
+      {!visibleProposals.length && (
         <Empty title="Nenhuma proposta ainda">
           <p>A demanda está disponível para os profissionais da categoria.</p>
         </Empty>
@@ -219,6 +235,13 @@ export function ProposalForm() {
           Ver demanda
         </Link>
       </div>
+    )
+  if (d.status !== 'OPEN')
+    return (
+      <Empty title="Demanda encerrada">
+        <p>Esta demanda não recebe novas propostas.</p>
+        <Link to="/demandas">Ver demandas abertas</Link>
+      </Empty>
     )
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
