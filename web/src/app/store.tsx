@@ -1,5 +1,5 @@
 /* oxlint-disable react/only-export-components -- provider and its hook share the same context module */
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type {
   Category,
@@ -70,9 +70,11 @@ export function Provider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [toast, notify] = useState('')
+  // Only the first load replaces the page; later refreshes keep the current screen mounted.
+  const loaded = useRef(false)
   async function refresh() {
     setError('')
-    setLoading(true)
+    if (!loaded.current) setLoading(true)
     try {
       const [s, c, p] = await Promise.all([
         client.services(),
@@ -82,6 +84,7 @@ export function Provider({ children }: { children: ReactNode }) {
       setServices(s)
       setCategories(c)
       setProfessionals(p)
+      loaded.current = true
     } catch (e) {
       setError(
         e instanceof Error ? e.message : 'Falha ao carregar. Verifique a API e tente novamente.',

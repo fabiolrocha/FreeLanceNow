@@ -4,7 +4,7 @@ Registradas em 30/09/2026. Mudanças devem atualizar este documento e os contrat
 
 | ID | Decisão / motivo | Consequência |
 |---|---|---|
-| ADR01 | React web confirmado pelo líder | React Native/Expo fora do marco07/10 |
+| ADR01 | React web confirmado pelo líder | React Native/Expo fora do marco 07/10 |
 | ADR02 | Monorepo `web/`, `api/`, `docs/`; reutilizar Git existente | Um conjunto de PRs/CI; documentação original preservada |
 | ADR03 | Vite + TypeScript para SPA; React Router para navegação | Frontend simples de executar e entregar; Nginx precisa de fallback de rotas |
 | ADR04 | Uma aplicação React com admin mock | Não criar Vue ou aplicativo administrativo separado agora |

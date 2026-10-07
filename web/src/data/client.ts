@@ -16,6 +16,22 @@ if (!['mock', 'api'].includes(dataMode)) throw new Error('VITE_DATA_MODE deve se
 export const isMock = dataMode === 'mock'
 const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 let token = ''
+const fieldLabels: Record<string, string> = {
+  name: 'nome',
+  email: 'e-mail',
+  phone: 'telefone',
+  password: 'senha',
+  role: 'perfil',
+  acceptedTerms: 'termos',
+  city: 'cidade',
+  bio: 'descrição',
+  title: 'título',
+  description: 'descrição',
+  categoryId: 'categoria',
+  price: 'valor',
+  deliveryDays: 'prazo',
+  status: 'status',
+}
 export function setToken(value: string) {
   token = value
 }
@@ -31,7 +47,9 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   })
   if (!res.ok) {
     const problem = await res.json().catch(() => ({}))
-    throw new Error(problem.detail || `Não foi possível concluir (${res.status}).`)
+    const fields = Object.keys(problem.errors || {}).map((k) => fieldLabels[k] || k)
+    const detail = problem.detail || `Não foi possível concluir (${res.status}).`
+    throw new Error(fields.length ? `${detail} Campos: ${fields.join(', ')}.` : detail)
   }
   return res.json() as Promise<T>
 }
@@ -42,9 +60,20 @@ function read<T>(key: string, fallback: T): T {
     return structuredClone(fallback)
   }
 }
-let listings = read<Service[]>('fln-mock-services', services)
+// Public data never carries contact fields, mirroring UserDtos.PublicProfile in the API.
+const publicProfile = ({ id, name, role, city, bio }: Profile): Profile => ({
+  id,
+  name,
+  role,
+  city,
+  bio,
+})
+let listings = read<Service[]>('fln-mock-services', services).map((s) => ({
+  ...s,
+  freelancer: publicProfile(s.freelancer),
+}))
 let accounts = read<User[]>('fln-mock-users', demoUsers)
-let profiles = read<Profile[]>('fln-mock-profiles', professionals)
+let profiles = read<Profile[]>('fln-mock-profiles', professionals).map(publicProfile)
 // Digests only support the mock experience. Real authentication belongs to Spring Security.
 const hashes = read<Record<string, { salt: string; digest: string }>>('fln-mock-hashes', {})
 async function digest(value: string) {
@@ -95,7 +124,7 @@ export const client = {
     const salt = crypto.randomUUID()
     hashes[user.id] = { salt, digest: await digest(salt + r.password) }
     accounts.push(user)
-    if (user.role === 'FREELANCER') profiles.push(user)
+    if (user.role === 'FREELANCER') profiles.push(publicProfile(user))
     persist()
     return session(user)
   },
@@ -109,8 +138,10 @@ export const client = {
         body: JSON.stringify({ name: u.name, phone: u.phone, city: u.city, bio: u.bio }),
       })
     accounts = accounts.map((x) => (x.id === u.id ? u : x))
-    profiles = profiles.map((x) => (x.id === u.id ? u : x))
-    listings = listings.map((x) => (x.freelancer.id === u.id ? { ...x, freelancer: u } : x))
+    profiles = profiles.map((x) => (x.id === u.id ? publicProfile(u) : x))
+    listings = listings.map((x) =>
+      x.freelancer.id === u.id ? { ...x, freelancer: publicProfile(u) } : x,
+    )
     persist()
     return u
   },
@@ -142,6 +173,8 @@ export const client = {
         body: JSON.stringify(r),
       })
     if (u.role !== 'FREELANCER') throw new Error('Somente freelancers podem publicar serviços.')
+    if (id && listings.some((s) => s.id === id && s.freelancer.id !== u.id))
+      throw new Error('Este serviço pertence a outro profissional.')
     if (
       r.status === 'ACTIVE' &&
       listings.filter((s) => s.freelancer.id === u.id && s.status === 'ACTIVE' && s.id !== id)
@@ -150,7 +183,12 @@ export const client = {
       throw new Error('O limite é de 20 serviços ativos por freelancer.')
     const category = categories.find((c) => c.id === r.categoryId)
     if (!category) throw new Error('Selecione uma categoria.')
-    const service: Service = { ...r, id: id || crypto.randomUUID(), freelancer: u, category }
+    const service: Service = {
+      ...r,
+      id: id || crypto.randomUUID(),
+      freelancer: publicProfile(u),
+      category,
+    }
     listings = id ? listings.map((s) => (s.id === id ? service : s)) : [service, ...listings]
     persist()
     return service

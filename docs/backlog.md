@@ -14,9 +14,9 @@ Os cards G01–G04, A01–A03, B01–B03, W01–W06 e Q01–Q04 cobrem o **marco
 | A02 | P0 / Caio | Revisar perfil privado/público e conta inativa | A01 | Contatos só no privado; token de inativo recusado; campos validados | 2–3h |
 | A03 | P1 / Caio | Complementar testes e documentar sessão/limites | A01,A02 | Casos relevantes negativos cobertos; documentação igual à API | 2–3h |
 | B01 | P0 / Felipe | Revisar migrações PostgreSQL e seed | Base DB entregue | Banco vazio migra; reinício não duplica seed; DBteste isolado | 2–3h |
-| B02 | P0 / Felipe | Revisar anúncio, proprietário, status e limite20 | B01,A01 | Cliente não publica; outro freelancer não edita; 21º ativo409; drafts ocultos | 2–3h |
+| B02 | P0 / Felipe | Revisar anúncio, proprietário, status e limite 20 | B01,A01 | Cliente não publica; outro freelancer não edita; 21º ativo 409; drafts ocultos | 2–3h |
 | B03 | P1 / Felipe | Revisar busca/paginação e modelo futuro | B02 | Preço/categoria/texto/cidade e parâmetros inválidos testados; próximas entidades descritas | 2–3h |
-| W01 | P0 / Arthur Almirante | Consolidar catálogo, filtros e estados vazios | Base React entregue,B03 | Busca/detalhe/perfil navegáveis no desktop e390 px; erro da API tem retry | 2–3h |
+| W01 | P0 / Arthur Almirante | Consolidar catálogo, filtros e estados vazios | Base React entregue,B03 | Busca/detalhe/perfil navegáveis no desktop e 390 px; erro da API tem retry | 2–3h |
 | W02 | P0 / Arthur Almirante | Revisar formulário e gestão de anúncios | W01,B02 | Criar draft, publicar, editar e desativar nos dois modos | 2–3h |
 | W03 | P1 / Arthur Almirante | Refinar catálogo/design com imagens decididas | G02,W02 | Sem distorção/overflow; ícones continuam se imagens pendentes | 2–3h |
 | W04 | P0 / Arthur | Revisar cadastro/login/perfil e sessão | A01,A02 | Aceite obrigatório; erro compreensível; reload não estende token; logout limpa sessão | 2–3h |

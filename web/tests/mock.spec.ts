@@ -77,3 +77,113 @@ test('mobile, acesso restrito e sessão expirada', async ({ page }) => {
   await page.reload()
   await expect(page).toHaveURL(/\/login$/)
 })
+async function loginAs(page: import('@playwright/test').Page, role: string) {
+  await page.goto('/login')
+  await page.getByRole('button', { name: role, exact: true }).click()
+  await expect(page).toHaveURL(role === 'Admin' ? /\/admin\/usuarios$/ : /\/inicio$/)
+}
+async function logout(page: import('@playwright/test').Page) {
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+}
+test('demanda recebe proposta, aceite gera contratação e demanda encerrada recusa propostas', async ({
+  page,
+}) => {
+  const title = `Troca de tomadas ${Date.now()}`
+  await loginAs(page, 'Cliente')
+  await page.goto('/demandas/nova')
+  await page.getByLabel('Título da demanda').fill(title)
+  await page.getByLabel('Descrição').fill('Trocar seis tomadas antigas da sala e da cozinha.')
+  await page.getByLabel('Orçamento').fill('300')
+  await page.getByLabel('Prazo').fill('3')
+  await page.getByRole('button', { name: 'Publicar demanda' }).click()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  const demandUrl = page.url()
+  await logout(page)
+
+  await loginAs(page, 'Freelancer')
+  await page.goto(demandUrl)
+  await page.getByRole('link', { name: 'Enviar proposta' }).click()
+  await page.getByLabel('Valor da proposta').fill('280')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Levo as tomadas novas e testo cada ponto.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByRole('heading', { name: 'Proposta enviada' })).toBeVisible()
+  await page.goto(`${demandUrl}/proposta`)
+  await page.getByLabel('Valor da proposta').fill('250')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Segunda proposta não deve ser aceita.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
+  await logout(page)
+
+  await loginAs(page, 'Cliente')
+  await page.goto(demandUrl)
+  await page.getByRole('button', { name: 'Aceitar proposta' }).click()
+  await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
+  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  await logout(page)
+
+  await loginAs(page, 'Freelancer')
+  await page.goto(`${demandUrl}/proposta`)
+  await expect(page.getByRole('heading', { name: 'Demanda encerrada' })).toBeVisible()
+  await page.goto('/demandas')
+  await expect(page.getByRole('heading', { name: title })).toHaveCount(0)
+})
+test('cliente contesta conclusão e admin decide a disputa na moderação', async ({ page }) => {
+  await loginAs(page, 'Cliente')
+  await page.goto('/contratacoes/103/contestar')
+  await page
+    .getByLabel('Motivo da contestação')
+    .fill('O chuveiro continua sem aquecer depois da instalação.')
+  await page.getByRole('button', { name: 'Enviar contestação' }).click()
+  await expect(page.getByText('O chuveiro continua sem aquecer')).toBeVisible()
+  await expect(page.getByText('Em disputa', { exact: true }).first()).toBeVisible()
+  await page.goto('/contratacoes/103/confirmar')
+  await page.getByRole('button', { name: 'Confirmar recebimento' }).click()
+  await expect(
+    page.getByText('Esta mudança de status não é permitida para seu perfil.'),
+  ).toBeVisible()
+  await logout(page)
+
+  await loginAs(page, 'Admin')
+  await page.goto('/admin/moderacao')
+  const dispute = page.locator('article').filter({ hasText: 'O chuveiro continua sem aquecer' })
+  await dispute.getByRole('button', { name: 'Confirmar conclusão' }).click()
+  await expect(dispute).toHaveCount(0)
+  await logout(page)
+
+  await loginAs(page, 'Cliente')
+  await page.goto('/contratacoes/103')
+  await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('link', { name: 'Avaliar serviço' })).toBeVisible()
+})
+test('denúncia entra na fila do admin, recebe decisão e relatório exporta CSV', async ({
+  page,
+}) => {
+  await loginAs(page, 'Cliente')
+  await page.goto('/servicos/11')
+  await page.getByRole('link', { name: 'Denunciar anúncio' }).click()
+  await page.getByLabel('Motivo').selectOption('Anúncio incorreto')
+  await page
+    .getByLabel('O que aconteceu?')
+    .fill('O valor anunciado não corresponde ao que foi cobrado na visita técnica.')
+  await page.getByRole('button', { name: 'Enviar denúncia' }).click()
+  await expect(page.getByRole('heading', { name: 'Denúncia registrada' })).toBeVisible()
+  await logout(page)
+
+  await loginAs(page, 'Admin')
+  await page.goto('/admin/moderacao')
+  const report = page.locator('article').filter({ hasText: 'Anúncio incorreto' })
+  await expect(report.getByText('Pendente')).toBeVisible()
+  await report.getByRole('button', { name: 'Manter conteúdo' }).click()
+  await expect(report.getByText('Mantido')).toBeVisible()
+
+  await page.goto('/admin/relatorios')
+  const download = page.waitForEvent('download')
+  await page.getByRole('button', { name: 'Exportar CSV' }).click()
+  const file = await download
+  expect(file.suggestedFilename()).toBe('metricas-demo.csv')
+  const csv = await (await file.createReadStream()).toArray()
+  expect(Buffer.concat(csv).toString('utf8')).toContain('"Serviços ativos"')
+})

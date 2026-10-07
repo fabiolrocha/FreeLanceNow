@@ -39,8 +39,8 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | DB_URL | API | URL JDBC; Docker usa hostname `db` |
 | DB_USERNAME / DB_PASSWORD | API/banco | Acesso PostgreSQL |
 | JWT_SECRET | API | Chave HS256 com pelo menos 32 bytes |
-| PORT / API_PORT | API / Compose | Porta interna8081 / publicação |
-| DB_PORT / WEB_PORT | Compose | Portas host5435 /5173 |
+| PORT / API_PORT | API / Compose | Porta interna 8081 / publicação |
+| DB_PORT / WEB_PORT | Compose | Portas host 5435 / 5173 |
 | SPRING_PROFILES_ACTIVE / SEED_DEMO | API | Seed somente no perfil dev habilitado |
 | CORS_ORIGINS | API | Origens permitidas, separadas por vírgula |
 | VITE_DATA_MODE | Web build/dev | `mock` ou `api` |
@@ -64,7 +64,7 @@ Fluxo sugerido: atualizar a base, abrir branch por card (`codex/a01-auth`, por e
 | Web não mudou de modo | Reconstrua `web` no Docker ou reinicie Vite; variável é lida no build/dev |
 | API indisponível | `docker compose logs api db`; confira health, JWT_SECRET e DB_URL |
 | PostgreSQL rejeita senha após mudar `.env` | Volume existente conserva credenciais originais; alinhe a configuração ou crie outro ambiente/banco |
-| Token expirou | Faça login novamente; expiração15min e sem refresh |
+| Token expirou | Faça login novamente; expiração 15 min e sem refresh |
 | Fixtures ficaram alteradas | Limpe `sessionStorage` da aba para reiniciar somente os dados mock |
 | Java local não funciona | Use Compose; ou configure JDK21 e execute `./mvnw -v` |
 

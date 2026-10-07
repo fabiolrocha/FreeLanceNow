@@ -16,6 +16,9 @@ export function exportCsv(filename: string, rows: string[][]) {
   const a = document.createElement('a')
   a.href = url
   a.download = filename
+  document.body.append(a)
   a.click()
-  URL.revokeObjectURL(url)
+  a.remove()
+  // Revoking immediately can cancel the download in some browsers.
+  setTimeout(() => URL.revokeObjectURL(url), 1000)
 }

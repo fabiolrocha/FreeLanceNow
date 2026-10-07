@@ -124,7 +124,14 @@ export function OwnProfile() {
       <section className="panel">
         <h2>Sobre você</h2>
         <p>{user.bio || 'Complete seu perfil para contar um pouco sobre você.'}</p>
-        <p>Tipo de conta: {user.role === 'CLIENT' ? 'Cliente' : 'Freelancer'}</p>
+        <p>
+          Tipo de conta:{' '}
+          {user.role === 'CLIENT'
+            ? 'Cliente'
+            : user.role === 'FREELANCER'
+              ? 'Freelancer'
+              : 'Administrador'}
+        </p>
       </section>
     </>
   )
