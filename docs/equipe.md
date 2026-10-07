@@ -15,7 +15,7 @@ A base de código já foi criada. As tarefas desta semana são **revisar, ajusta
 | Felipe | Banco e API de catálogo: migrações, limites, propriedade, seed e busca; preparar modelo futuro | B01–B03 | `api/.../catalog/`, migrations, `config/DemoData.java`, `docs/dados.md` | Caio |
 | Enzo | QA e administração mock: roteiro, regressões mobile, CSV, denúncias, extras e evidências | Q01–Q04 | `web/tests/`, `web/src/features/admin/`, `extra/`, `docs/testes-e-demonstracao.md` | Líder |
 
-Estimativa inicial: líder6–8h, Caio6–9h, Arthur Almirante6–9h, Arthur8–12h, Felipe6–9h, Enzo8–12h, distribuídas ao longo da semana. São estimativas de revisão/complemento da base; recalibrar em 01/10 com a disponibilidade real. Se Arthur tiver sobrecarga, Enzo assume a revisão de demandas/propostas após concluir Q01.
+Estimativa inicial: líder 6–8h, Caio 6–9h, Arthur Almirante 6–9h, Arthur 8–12h, Felipe 6–9h, Enzo 8–12h, distribuídas ao longo da semana. São estimativas de revisão/complemento da base; recalibrar em 01/10 com a disponibilidade real. Se Arthur tiver sobrecarga, Enzo assume a revisão de demandas/propostas após concluir Q01.
 
 ## Integrações entre as pessoas
 

@@ -12,7 +12,7 @@ Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos d
 | GET | `/freelancers` | Público | Perfis públicos ativos |
 | GET | `/freelancers/{id}` | Público | Perfil público de freelancer |
 | GET | `/services` | Público | Página de anúncios ativos de usuários ativos |
-| GET | `/services/{id}` | Público | Anúncio ativo; draft/inativo retorna404 |
+| GET | `/services/{id}` | Público | Anúncio ativo; draft/inativo retorna 404 |
 | GET | `/freelancer/services` | Freelancer | Todos os anúncios do dono |
 | POST | `/services` | Freelancer | 201 + anúncio |
 | PUT | `/services/{id}` | Freelancer/dono | Atualização completa |
@@ -32,7 +32,7 @@ Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos d
 }
 ```
 
-Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam400. E-mail duplicado retorna409. Login recebe apenas `email` e `password`; falha usa mensagem genérica e401.
+Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam 400. E-mail duplicado retorna 409. Login recebe apenas `email` e `password`; falha usa mensagem genérica e 401.
 
 ```json
 {
@@ -70,17 +70,17 @@ Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não
 
 Resposta inclui `id`, campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
 
-Parâmetros de GET `/services`: `q` (texto, máx100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx100), `minPrice`, `maxPrice`, `page` (>=0), `size` (1–50, padrão12). Ordenação por criação decrescente. Faixa invertida retorna400. Pesquisa textual escapa caracteres especiais de LIKE.
+Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx 100), `minPrice`, `maxPrice`, `page` (>=0), `size` (1–50, padrão 12). Ordenação por criação decrescente. Faixa invertida retorna 400. Pesquisa textual escapa caracteres especiais de LIKE.
 
 ```json
-{ "items": [], "page": 0, "size": 12, "totalItems": 0, "totalPages": 0 }
+{ "items": [], "page": 0, "size": 12, "totalElements": 0, "totalPages": 0 }
 ```
 
 O React atual carrega páginas de 50 para compor o catálogo da entrega e filtra localmente; paginação server-side na interface é tarefa futura. Não há filtro por nota até avaliações persistentes serem implementadas.
 
 ## Erros e verificação manual
 
-Erros usam Problem Details (`status`, `title`, `detail`, `instance` quando aplicável). Validações de DTO acrescentam mapa `errors` com campos. Sem token ou token inválido:401; perfil/dono incorreto:403; recurso invisível/ausente:404; duplicidade ou limite20:409; payload/parâmetro inválido:400.
+Erros usam Problem Details (`status`, `title`, `detail`, `instance` quando aplicável). Validações de DTO acrescentam mapa `errors` com campos. Sem token ou token inválido: 401; perfil/dono incorreto: 403; recurso invisível/ausente: 404; duplicidade ou limite 20: 409; payload/parâmetro inválido: 400.
 
 ```sh
 curl http://localhost:8081/actuator/health

@@ -6,9 +6,9 @@
 |---|---|---|
 | Tipos/build React | `cd web && npm run build` | TypeScript e bundle de produção |
 | Lint | `cd web && npm run lint` | Regras React/TypeScript |
-| Regras unitárias | `cd web && npm test` | Permissões de transição, janela7 dias e senha72 bytes |
+| Regras unitárias | `cd web && npm test` | Permissões de transição, janela 7 dias e senha 72 bytes |
 | Browser mock | `cd web && npm run test:e2e` | Contratação completa, draft/publicação, mobile, role e sessão expirada |
-| API+PostgreSQL | `docker compose --profile test run --rm api-test` | Nove testes: contexto+migrações, cadastro/login, termos, duplicidade, admin, dono, limite20, perfil público e suspensão |
+| API+PostgreSQL | `docker compose --profile test run --rm api-test` | Nove testes: contexto+migrações, cadastro/login, termos, duplicidade, admin, dono, limite 20, perfil público e suspensão |
 | Browser API | `cd web && E2E_DATA_MODE=api npm run test:e2e` | Cadastro, perfil, anúncio persistente/reload, desativação, login e republicação |
 
 Os testes de navegador selecionam a suíte correspondente ao modo; o outro conjunto aparece como `skipped` de propósito. Não significa funcionalidade pulada dentro do fluxo testado. A suíte API usa banco `db-test` exclusivo e temporário. O teste browser API usa o banco de desenvolvimento e cria dados fictícios; não rodar contra um ambiente público.
@@ -45,4 +45,4 @@ Dados de contratação e denúncia são compartilhados entre contas **na mesma s
 - Registrar versão/commit, data, ambiente, comandos e falhas corrigidas no PR.
 - Ter as contas fictícias e o roteiro prontos antes da apresentação.
 
-Limitações conhecidas: sem OAuth/2FA/e-mail real, refresh token, uploads, administração real, contratação persistente, jobs48h/5 dias, chat remoto, gateway, teste de carga ou certificação de acessibilidade. As metas de SLA dos documentos ainda não foram medidas.
+Limitações conhecidas: sem OAuth/2FA/e-mail real, refresh token, uploads, administração real, contratação persistente, jobs 48h/5 dias, chat remoto, gateway, teste de carga ou certificação de acessibilidade. As metas de SLA dos documentos ainda não foram medidas.

@@ -23,7 +23,7 @@ React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `l
 | Denúncia | `/denunciar`, `/denunciar/enviada` | Autenticado | Mock; admin vê a fila na mesma sessão |
 | Administração | `/admin/usuarios`, `/admin/categorias`, `/admin/moderacao`, `/admin/relatorios`, `/admin/transacoes` | Admin demo | Mock; alterações de categorias/usuários restritas à tela |
 | Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Texto acadêmico provisório |
-| URL desconhecida | Qualquer rota não encontrada | Público | Tela404 com retorno ao início |
+| URL desconhecida | Qualquer rota não encontrada | Público | Tela 404 com retorno ao início |
 
 Os sufixos de ação na tabela se referem sempre ao prefixo completo da contratação. Guards protegem rotas por role; regras de participação e transição também são verificadas no estado mock. O backend verifica sua própria autorização para as funcionalidades reais.
 
@@ -32,7 +32,7 @@ Os sufixos de ação na tabela se referem sempre ao prefixo completo da contrata
 - `VITE_DATA_MODE=mock`: fixtures fictícias e persistência em `sessionStorage`; cadastro mock guarda digest com salt exclusivamente para simular login, sem pretensão de autenticação segura.
 - `VITE_DATA_MODE=api`: catálogo, profissionais, sessão, perfil e anúncios via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
 - Contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. Mensagens, leitura de avisos e alguns controles admin são estado de tela e podem reiniciar ao navegar/recarregar.
-- O token real dura15 minutos e sua expiração absoluta sobrevive ao reload. Novo login é necessário após expiração.
+- O token real dura 15 minutos e sua expiração absoluta sobrevive ao reload. Novo login é necessário após expiração.
 
 ## Direção visual e acessibilidade
 
@@ -49,6 +49,6 @@ Preservar o verde, Public Sans, cards e ícones de serviço do HTML original. He
 | Raios | 8 px controles, 12 px cards, 18 px hero |
 | Layout | Shell com sidebar desktop; menu expansível no celular |
 
-Inputs têm rótulo, formulários validação básica, feedback com `role=alert/status`, controles com foco visível, link para pular conteúdo, idioma `pt-BR` e respeito a movimento reduzido. Layouts usam grid adaptativo, tabelas com rolagem interna e breakpoint760 px. Não declarar conformidade WCAG completa sem auditoria própria.
+Inputs têm rótulo, formulários validação básica, feedback com `role=alert/status`, controles com foco visível, link para pular conteúdo, idioma `pt-BR` e respeito a movimento reduzido. Layouts usam grid adaptativo, tabelas com rolagem interna e breakpoint 760 px. Não declarar conformidade WCAG completa sem auditoria própria.
 
 Imagens ainda exigem decisão do grupo. O CSS principal usa componentes/classes consistentes; trocar ativos deve preservar dimensões, fallback e texto alternativo. Ver [imagens.md](imagens.md).
