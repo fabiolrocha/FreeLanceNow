@@ -25,7 +25,7 @@ Altere `VITE_DATA_MODE=api` no `.env` da raiz e reconstrua o frontend:
 docker compose up -d --build web
 ```
 
-No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias) e avaliações com nota média e resposta do profissional (`F01`, `F02`, `F03`)** passam pelo Spring Boot e persistem no PostgreSQL. As demais áreas continuam simuladas e exibem aviso. Não há fallback silencioso para mocks quando a API falha.
+No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias), avaliações com nota média e resposta do profissional e publicação de demandas com propostas e aceite gerando contratação (`F01`, `F02`, `F03`, `F08`)** passam pelo Spring Boot e persistem no PostgreSQL. As demais áreas continuam simuladas e exibem aviso. Não há fallback silencioso para mocks quando a API falha.
 
 Crie uma conta pela interface, ou entre com `marcos@demo.freelancenow.test` / `Demo12345` para explorar um freelancer fictício sem criar conta. O seed está restrito ao perfil `dev` com `SEED_DEMO=true`. **Admin existe somente no mock nesta etapa (`F04` pendente).** A API impede cadastro público de administradores.
 
@@ -86,6 +86,6 @@ Comece por estes documentos:
 - [Imagens a definir](docs/imagens.md), [telas e design](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
 - [Índice completo](docs/README.md) e [fluxo de contribuição](CONTRIBUTING.md).
 
-O repositório Git e o remoto `fabiolrocha/FreeLanceNow` já existiam no início da organização. O marco inicial (`marco-1`) foi integrado na `main`, seguido pelas entregas incrementais nas branches `fase-01` (`F01`/`F02`) e `fase-02` (`F03`). Os documentos originais foram realocados sem alterar seu conteúdo; hashes e caminhos estão no [inventário](docs/referencias/inventario.json).
+O repositório Git e o remoto `fabiolrocha/FreeLanceNow` já existiam no início da organização. O marco inicial (`marco-1`) foi integrado na `main`, seguido pelas entregas incrementais nas branches `fase-01` (`F01`/`F02`), `fase-02` (`F03`) e `fase-03` (`F08`). Os documentos originais foram realocados sem alterar seu conteúdo; hashes e caminhos estão no [inventário](docs/referencias/inventario.json).
 
 Para parar os serviços sem perder dados: `docker compose down`. O volume `postgres_data` guarda os cadastros. Este ambiente é local e acadêmico; o roadmap descreve o trabalho necessário antes de um lançamento público.

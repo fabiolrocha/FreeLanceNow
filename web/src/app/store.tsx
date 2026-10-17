@@ -6,6 +6,8 @@ import type {
   Contract,
   ContractStatus,
   CreateContract,
+  CreateDemand,
+  CreateProposal,
   Demand,
   Profile,
   Proposal,
@@ -19,7 +21,7 @@ import {
   proposals as initialProposals,
 } from '../data/fixtures'
 import { client, isMock, setToken } from '../data/client'
-import { canReview, canTransition, nowIso, today } from '../domain/rules'
+import { canReview, canTransition, futureDate, nowIso, today } from '../domain/rules'
 
 function saved<T>(key: string, fallback: T) {
   try {
@@ -45,6 +47,10 @@ interface Store {
   setDemands: (fn: (d: Demand[]) => Demand[]) => void
   setProposals: (fn: (p: Proposal[]) => Proposal[]) => void
   addContract: (c: Contract) => void
+  createDemand: (r: CreateDemand) => Promise<Demand>
+  createProposal: (demandId: string, r: CreateProposal) => Promise<Proposal>
+  acceptProposal: (proposalId: string) => Promise<Contract>
+  rejectProposal: (proposalId: string) => Promise<void>
   requestContract: (r: CreateContract) => Promise<Contract>
   transition: (id: string, status: ContractStatus, dispute?: string) => Promise<void>
   review: (id: string, rating: number, comment: string) => Promise<void>
@@ -75,9 +81,11 @@ export function Provider({ children }: { children: ReactNode }) {
   const [contracts, setContracts] = useState<Contract[]>(() =>
     isMock ? saved('fln-contracts', initialContracts) : saved('fln-api-contracts', []),
   )
-  const [demands, setDemands] = useState<Demand[]>(() => saved('fln-demands', initialDemands))
+  const [demands, setDemands] = useState<Demand[]>(() =>
+    isMock ? saved('fln-demands', initialDemands) : saved('fln-api-demands', []),
+  )
   const [proposals, setProposals] = useState<Proposal[]>(() =>
-    saved('fln-proposals', initialProposals),
+    isMock ? saved('fln-proposals', initialProposals) : saved('fln-api-proposals', []),
   )
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
@@ -89,16 +97,20 @@ export function Provider({ children }: { children: ReactNode }) {
     if (!loaded.current) setLoading(true)
     try {
       const hasToken = !isMock && !!saved<Session | null>('fln-session', null)?.accessToken
-      const [s, c, p, ct] = await Promise.all([
+      const [s, c, p, ct, dm, pr] = await Promise.all([
         client.services(),
         client.categories(),
         client.professionals(),
         hasToken ? client.contracts() : Promise.resolve(null),
+        hasToken ? client.demands() : Promise.resolve(null),
+        hasToken ? client.proposals() : Promise.resolve(null),
       ])
       setServices(s)
       setCategories(c)
       setProfessionals(p)
       if (ct) setContracts(ct)
+      if (dm) setDemands(dm)
+      if (pr) setProposals(pr)
       loaded.current = true
     } catch (e) {
       setError(
@@ -124,10 +136,13 @@ export function Provider({ children }: { children: ReactNode }) {
       }
     })
     if (!isMock) {
-      void client
-        .contracts()
-        .then((ct) => {
-          if (active) setContracts(ct)
+      void Promise.all([client.contracts(), client.demands(), client.proposals()])
+        .then(([ct, dm, pr]) => {
+          if (active) {
+            setContracts(ct)
+            setDemands(dm)
+            setProposals(pr)
+          }
         })
         .catch(() => {})
     }
@@ -149,10 +164,13 @@ export function Provider({ children }: { children: ReactNode }) {
     sessionStorage.setItem(isMock ? 'fln-contracts' : 'fln-api-contracts', JSON.stringify(contracts))
   }, [contracts])
   useEffect(() => {
-    sessionStorage.setItem('fln-demands', JSON.stringify(demands))
+    sessionStorage.setItem(isMock ? 'fln-demands' : 'fln-api-demands', JSON.stringify(demands))
   }, [demands])
   useEffect(() => {
-    sessionStorage.setItem('fln-proposals', JSON.stringify(proposals))
+    sessionStorage.setItem(
+      isMock ? 'fln-proposals' : 'fln-api-proposals',
+      JSON.stringify(proposals),
+    )
   }, [proposals])
   useEffect(() => {
     if (!toast) return
@@ -289,6 +307,128 @@ export function Provider({ children }: { children: ReactNode }) {
     )
     notify('Resposta publicada.')
   }
+  async function createDemand(r: CreateDemand): Promise<Demand> {
+    const u = session?.user
+    if (!u || u.role !== 'CLIENT') throw new Error('Somente clientes podem publicar demandas.')
+    if (!isMock) {
+      const created = await client.createDemand(r)
+      setDemands((ds) => [created, ...ds.filter((x) => x.id !== created.id)])
+      return created
+    }
+    const created: Demand = {
+      id: crypto.randomUUID(),
+      clientId: u.id,
+      title: r.title,
+      description: r.description,
+      categoryId: r.categoryId,
+      budget: r.budget,
+      days: r.days,
+      city: r.city,
+      status: 'OPEN',
+    }
+    setDemands((ds) => [created, ...ds])
+    return created
+  }
+  async function createProposal(demandId: string, r: CreateProposal): Promise<Proposal> {
+    const u = session?.user
+    if (!u || u.role !== 'FREELANCER')
+      throw new Error('Somente freelancers podem enviar propostas.')
+    if (!isMock) {
+      const created = await client.createProposal(demandId, r)
+      setProposals((ps) => [...ps.filter((x) => x.id !== created.id), created])
+      return created
+    }
+    const d = demands.find((x) => x.id === demandId)
+    if (!d || d.status !== 'OPEN') throw new Error('Esta demanda não recebe novas propostas.')
+    if (
+      proposals.some(
+        (p) => p.demandId === demandId && p.freelancerId === u.id && p.status === 'PENDING',
+      )
+    )
+      throw new Error('Você já enviou uma proposta para esta demanda.')
+    const created: Proposal = {
+      id: crypto.randomUUID(),
+      demandId,
+      freelancerId: u.id,
+      freelancerName: u.name,
+      price: r.price,
+      days: r.days,
+      message: r.message,
+      status: 'PENDING',
+    }
+    setProposals((ps) => [...ps, created])
+    return created
+  }
+  async function acceptProposal(proposalId: string): Promise<Contract> {
+    const u = session?.user
+    if (!u || u.role !== 'CLIENT') throw new Error('Esta proposta não pode ser aceita.')
+    if (!isMock) {
+      const accepted = await client.acceptProposal(proposalId)
+      setDemands((ds) => ds.map((x) => (x.id === accepted.demand.id ? accepted.demand : x)))
+      setProposals((ps) =>
+        ps.map((x) => {
+          if (x.id === accepted.proposal.id) return accepted.proposal
+          if (x.demandId === accepted.demand.id && x.status === 'PENDING')
+            return { ...x, status: 'REJECTED' }
+          return x
+        }),
+      )
+      setContracts((cs) => [
+        accepted.contract,
+        ...cs.filter((x) => x.id !== accepted.contract.id),
+      ])
+      notify('Proposta aceita e contratação criada.')
+      return accepted.contract
+    }
+    const p = proposals.find((x) => x.id === proposalId)
+    const d = p ? demands.find((x) => x.id === p.demandId) : undefined
+    if (!p || !d || d.clientId !== u.id || d.status !== 'OPEN' || p.status !== 'PENDING')
+      throw new Error('Esta proposta não pode ser aceita.')
+    const cid = crypto.randomUUID()
+    setProposals((ps) =>
+      ps.map((x) =>
+        x.demandId === d.id
+          ? {
+              ...x,
+              status:
+                x.id === proposalId ? 'ACCEPTED' : x.status === 'PENDING' ? 'REJECTED' : x.status,
+            }
+          : x,
+      ),
+    )
+    setDemands((ds) => ds.map((x) => (x.id === d.id ? { ...x, status: 'CLOSED' } : x)))
+    const contract: Contract = {
+      id: cid,
+      serviceId: 'proposal-' + p.id,
+      title: d.title,
+      freelancerId: p.freelancerId,
+      freelancerName: p.freelancerName,
+      clientId: u.id,
+      clientName: u.name,
+      price: p.price,
+      date: futureDate(),
+      description: d.description,
+      address: d.city,
+      status: 'ACEITO',
+      history: [{ status: 'ACEITO', at: nowIso() }],
+    }
+    setContracts((cs) => [contract, ...cs])
+    notify('Proposta aceita e contratação criada.')
+    return contract
+  }
+  async function rejectProposal(proposalId: string): Promise<void> {
+    const u = session?.user
+    if (!u || u.role !== 'CLIENT') throw new Error('Esta proposta não pode ser recusada.')
+    if (!isMock) {
+      const updated = await client.rejectProposal(proposalId)
+      setProposals((ps) => ps.map((x) => (x.id === updated.id ? updated : x)))
+      notify('Proposta recusada.')
+      return
+    }
+    setProposals((ps) =>
+      ps.map((x) => (x.id === proposalId ? { ...x, status: 'REJECTED' } : x)),
+    )
+  }
   const enrichedProfessionals = isMock
     ? professionals.map((p) => ({ ...p, ...mockRating(contracts, p.id) }))
     : professionals
@@ -317,7 +457,11 @@ export function Provider({ children }: { children: ReactNode }) {
           sessionStorage.removeItem('fln-session')
           if (!isMock) {
             setContracts([])
+            setDemands([])
+            setProposals([])
             sessionStorage.removeItem('fln-api-contracts')
+            sessionStorage.removeItem('fln-api-demands')
+            sessionStorage.removeItem('fln-api-proposals')
           }
         },
         refresh,
@@ -327,6 +471,10 @@ export function Provider({ children }: { children: ReactNode }) {
         setDemands,
         setProposals,
         addContract: (c) => setContracts((cs) => [c, ...cs]),
+        createDemand,
+        createProposal,
+        acceptProposal,
+        rejectProposal,
         requestContract,
         transition,
         review,

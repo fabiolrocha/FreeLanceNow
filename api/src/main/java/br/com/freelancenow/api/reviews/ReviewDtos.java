@@ -30,7 +30,7 @@ public final class ReviewDtos {
             return new ReviewView(
                     r.getId(),
                     r.getContract().getId(),
-                    r.getService().getId(),
+                    r.getService() == null ? null : r.getService().getId(),
                     r.getContract().getTitle(),
                     r.getFreelancer().getId(),
                     r.getClient().getId(),

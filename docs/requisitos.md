@@ -21,7 +21,7 @@ Referência principal: `originais/Documento Casos de Uso Final.docx`, v1.2. As r
 | RN15 / UC04 | Avaliação de 1 a 5, concluída, única, imutável, em até 7 dias; comentário até 500 | API e frontend persistentes (`review`), média com 1 decimal e resposta única do profissional até 200 caracteres | — |
 | RN16 / UC05 | Admin gerencia categorias/usuários; suspensão preserva histórico | Telas simuladas; API recusa login/token de usuário inativo | Endpoints administrativos e trilha de auditoria |
 | RN17 / UC05 | Denúncias, moderação e exportação CSV | Mock/CSV local com neutralização de fórmulas | API com fila, autorização e auditoria |
-| RN18 / protótipo | Demandas, propostas e aceite | Mock cria contratação fictícia | Especificar estados e implementar persistência |
+| RN18 / protótipo | Demandas, propostas e aceite | API e frontend persistentes (`demand` + `proposal`), unicidade de proposta pendente e aceite gerando `contract` em `ACEITO` (`F08`) | — |
 | RN19 / protótipo | Mensagens e notificações | Mock local; sem entrega para outras pessoas | Contrato, persistência e canal de envio |
 | RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Somente exploração visual com valores fictícios | Gateway, webhooks idempotentes, livro financeiro e conciliação |
 

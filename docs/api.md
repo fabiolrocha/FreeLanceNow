@@ -25,6 +25,14 @@ Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos d
 | POST | `/contracts/{id}/review/reply` | Freelancer (dono) | 200 + resposta única do profissional (até 200 chars) |
 | GET | `/freelancers/{id}/reviews` | Público | Lista avaliações públicas recebidas pelo profissional |
 | GET | `/services/{id}/reviews` | Público | Lista avaliações públicas vinculadas ao serviço |
+| GET | `/demands` | Autenticado | Demandas do cliente ou todas as demandas para freelancer/admin |
+| GET | `/demands/{id}` | Autorizado | Detalhe da demanda (cliente dono, admin ou freelancer) |
+| POST | `/demands` | Cliente | 201 + nova demanda aberta (`OPEN`) |
+| GET | `/proposals` | Autenticado | Propostas recebidas (cliente), enviadas (freelancer) ou todas (admin) |
+| GET | `/demands/{id}/proposals` | Autorizado | Propostas da demanda (todas para o dono/admin ou própria para freelancer) |
+| POST | `/demands/{id}/proposals` | Freelancer | 201 + proposta única `PENDING` por profissional/demanda |
+| POST | `/proposals/{id}/accept` | Cliente (dono da demanda) | 200 + encerra demanda, recusa demais propostas e cria contratação `ACEITO` |
+| POST | `/proposals/{id}/reject` | Cliente (dono da demanda) | 200 + marca proposta como `REJECTED` |
 | GET | `/actuator/health` (fora da base) | Público | Saúde sem detalhes privados |
 
 ## Cadastro e login
