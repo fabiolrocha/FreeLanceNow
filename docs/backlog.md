@@ -35,15 +35,15 @@ Uma tarefa termina quando satisfaz seu aceite, passa as verificações relevante
 
 | ID | Área | Resultado necessário | Período sugerido | Responsáveis propostos |
 |---|---|---|---|---|
-| F01 | Contratação | Persistir UC03/UC06, histórico, participantes e snapshots | 08–14/10 | Felipe + Arthur |
-| F02 | Prazos | Jobs idempotentes de 48h/5 dias com testes de relógio | 08–14/10 | Felipe + Enzo |
-| F03 | Avaliação | UC04 persistente, média/nota, janela/imutabilidade e resposta | 15–21/10 | Felipe + Arthur |
+| F01 | Contratação | **Concluído (`fase-01`)**: Persistir UC03/UC06, histórico, participantes e snapshots | 08–14/10 | Felipe + Arthur |
+| F02 | Prazos | **Concluído (`fase-01`)**: Jobs idempotentes de 48h/5 dias com testes de relógio | 08–14/10 | Felipe + Enzo |
+| F03 | Avaliação | **Concluído (`fase-02`)**: UC04 persistente, média com 1 decimal, janela/imutabilidade, resposta e filtro por nota | 15–21/10 | Felipe + Arthur |
 | F04 | Admin | Provisionar admin, gerenciar categorias/usuários e registrar auditoria | 15–21/10 | Caio + Arthur Almirante |
 | F05 | Moderação | Denúncias/disputas persistentes e autorização para decisão | 15–21/10 | Caio + Enzo |
 | F06 | Catálogo | Upload até 5 imagens/5 MB, storage e paginação real no web | 22–28/10 | Felipe + Arthur Almirante |
 | F07 | Comunicação | Recuperação de senha/verificação de e-mail, mensagens e notificações | 22–28/10 | Caio + Arthur |
 | F08 | Demandas | Refinar contrato e persistir demandas/propostas com unicidade | 15–21/10 | Felipe + Arthur |
-| F09 | Financeiro | Gateway de testes, comissão, webhooks/reembolsos/ledger e conciliação | Decisões em 08–09/10; implementação em 29/10–04/11 | Líder + Felipe + Caio + Arthur Almirante |
+| F09 | Financeiro | Gateway de testes (Stripe), comissão, webhooks/reembolsos/ledger e conciliação | Decisões concluídas; implementação em 29/10–04/11 | Líder + Felipe + Caio + Arthur Almirante |
 | F10 | Operação | Termos, retenção, backup, observabilidade, rate limit e teste de carga | 05–11/11 | Líder + Caio + Felipe + Enzo |
 
 Datas e responsáveis são exemplos de planejamento a validar com a disponibilidade do grupo. A entrega final em **18/11/2026** é o prazo informado pelo líder. Reservar **12–16/11** para regressão e correções, **17/11** para ensaio e **18/11** para entrega. Cada card F01–F10 inclui integração da respectiva tela React à API e testes de aceite; funcionalidade só mockada não encerra esses cards. O financeiro será demonstrado no sandbox do gateway escolhido.
