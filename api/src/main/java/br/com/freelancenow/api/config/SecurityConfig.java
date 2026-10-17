@@ -79,8 +79,10 @@ public class SecurityConfig {
                                                 "/api/v1/categories",
                                                 "/api/v1/services",
                                                 "/api/v1/services/*",
+                                                "/api/v1/services/*/reviews",
                                                 "/api/v1/freelancers",
-                                                "/api/v1/freelancers/*")
+                                                "/api/v1/freelancers/*",
+                                                "/api/v1/freelancers/*/reviews")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

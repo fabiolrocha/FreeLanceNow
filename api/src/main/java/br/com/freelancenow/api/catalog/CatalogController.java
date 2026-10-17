@@ -33,9 +33,10 @@ public class CatalogController {
             @RequestParam(required = false) @Size(max = 100) String city,
             @RequestParam(required = false) @DecimalMin("0") BigDecimal minPrice,
             @RequestParam(required = false) @DecimalMin("0") BigDecimal maxPrice,
+            @RequestParam(required = false) @DecimalMin("1") @DecimalMax("5") BigDecimal minRating,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "12") @Min(1) @Max(50) int size) {
-        return catalog.search(q, categoryId, city, minPrice, maxPrice, page, size);
+        return catalog.search(q, categoryId, city, minPrice, maxPrice, minRating, page, size);
     }
 
     @GetMapping("/services/{id}")

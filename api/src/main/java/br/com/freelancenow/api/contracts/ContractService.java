@@ -5,6 +5,8 @@ import br.com.freelancenow.api.catalog.ServiceListing;
 import br.com.freelancenow.api.catalog.ServiceRepository;
 import br.com.freelancenow.api.catalog.ServiceStatus;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.reviews.Review;
+import br.com.freelancenow.api.reviews.ReviewRepository;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
 import br.com.freelancenow.api.users.UserRepository;
@@ -24,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +55,7 @@ public class ContractService {
 
     private final ContractRepository contracts;
     private final ContractEventRepository events;
+    private final ReviewRepository reviews;
     private final ServiceRepository services;
     private final UserRepository users;
     private final CurrentUser current;
@@ -60,12 +64,14 @@ public class ContractService {
     public ContractService(
             ContractRepository contracts,
             ContractEventRepository events,
+            ReviewRepository reviews,
             ServiceRepository services,
             UserRepository users,
             CurrentUser current,
             Clock clock) {
         this.contracts = contracts;
         this.events = events;
+        this.reviews = reviews;
         this.services = services;
         this.users = users;
         this.current = current;
@@ -85,11 +91,18 @@ public class ContractService {
         var grouped =
                 events.findByContractIdInOrderByCreatedAtAsc(ids).stream()
                         .collect(Collectors.groupingBy(e -> e.getContract().getId()));
+        var reviewMap =
+                reviews.findByContractIdIn(ids).stream()
+                        .collect(
+                                Collectors.toMap(
+                                        r -> r.getContract().getId(), Function.identity()));
         return items.stream()
                 .map(
                         c ->
                                 ContractDtos.ContractView.from(
-                                        c, grouped.getOrDefault(c.getId(), List.of())))
+                                        c,
+                                        grouped.getOrDefault(c.getId(), List.of()),
+                                        reviewMap.get(c.getId())))
                 .toList();
     }
 
@@ -98,7 +111,9 @@ public class ContractService {
         var c = contracts.findWithDetailsById(id).orElseThrow(this::notFound);
         ensureParticipantOrAdmin(u, c);
         return ContractDtos.ContractView.from(
-                c, events.findByContractIdOrderByCreatedAtAsc(c.getId()));
+                c,
+                events.findByContractIdOrderByCreatedAtAsc(c.getId()),
+                reviews.findByContractId(c.getId()).orElse(null));
     }
 
     @Transactional
@@ -156,7 +171,9 @@ public class ContractService {
         c.transitionTo(r.status(), r.comment(), now);
         events.save(new ContractEvent(c, u, previous, r.status(), r.comment(), now));
         return ContractDtos.ContractView.from(
-                c, events.findByContractIdOrderByCreatedAtAsc(c.getId()));
+                c,
+                events.findByContractIdOrderByCreatedAtAsc(c.getId()),
+                reviews.findByContractId(c.getId()).orElse(null));
     }
 
     @Scheduled(fixedDelayString = "${app.contracts.deadline-check-ms:60000}")

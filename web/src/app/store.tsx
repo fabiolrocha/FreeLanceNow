@@ -47,9 +47,19 @@ interface Store {
   addContract: (c: Contract) => void
   requestContract: (r: CreateContract) => Promise<Contract>
   transition: (id: string, status: ContractStatus, dispute?: string) => Promise<void>
-  review: (id: string, rating: number, comment: string) => void
+  review: (id: string, rating: number, comment: string) => Promise<void>
+  replyReview: (id: string, reply: string) => Promise<void>
   toast: string
   notify: (s: string) => void
+}
+function mockRating(contracts: Contract[], freelancerId: string) {
+  const rated = contracts.filter((c) => c.freelancerId === freelancerId && typeof c.rating === 'number')
+  if (!rated.length) return { averageRating: null, reviewCount: 0 }
+  const sum = rated.reduce((acc, c) => acc + (c.rating || 0), 0)
+  return {
+    averageRating: Number((sum / rated.length).toFixed(1)),
+    reviewCount: rated.length,
+  }
 }
 const Context = createContext<Store | null>(null)
 export function Provider({ children }: { children: ReactNode }) {
@@ -224,24 +234,77 @@ export function Provider({ children }: { children: ReactNode }) {
     )
     notify(`Contratação: ${status.replaceAll('_', ' ').toLowerCase()}.`)
   }
-  function review(id: string, rating: number, comment: string) {
+  async function review(id: string, rating: number, comment: string) {
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5 || comment.length > 500)
+      throw new Error('Informe uma nota de 1 a 5 e um comentário de até 500 caracteres.')
+    if (!isMock) {
+      const savedReview = await client.reviewContract(id, rating, comment)
+      setContracts((cs) =>
+        cs.map((x) =>
+          x.id === id
+            ? {
+                ...x,
+                rating: savedReview.rating,
+                review: savedReview.comment,
+                reviewedAt: savedReview.createdAt,
+              }
+            : x,
+        ),
+      )
+      await refresh()
+      notify('Avaliação publicada.')
+      return
+    }
     const c = contracts.find((c) => c.id === id)
     if (!c || c.clientId !== session?.user.id || c.rating || !canReview(c.status, c.completedAt))
       throw new Error(
         'A avaliação exige uma contratação concluída nos últimos 7 dias e ainda não avaliada.',
       )
-    if (!Number.isInteger(rating) || rating < 1 || rating > 5 || comment.length > 500)
-      throw new Error('Informe uma nota de 1 a 5 e um comentário de até 500 caracteres.')
-    setContracts((cs) => cs.map((x) => (x.id === id ? { ...x, rating, review: comment } : x)))
+    setContracts((cs) =>
+      cs.map((x) =>
+        x.id === id ? { ...x, rating, review: comment, reviewedAt: nowIso() } : x,
+      ),
+    )
     notify('Avaliação publicada.')
   }
+  async function replyReview(id: string, reply: string) {
+    const trimmed = reply.trim()
+    if (!trimmed || trimmed.length > 200)
+      throw new Error('A resposta deve ter entre 1 e 200 caracteres.')
+    if (!isMock) {
+      const updated = await client.replyReview(id, trimmed)
+      setContracts((cs) =>
+        cs.map((x) =>
+          x.id === id ? { ...x, reviewReply: updated.reply || trimmed } : x,
+        ),
+      )
+      notify('Resposta publicada.')
+      return
+    }
+    const c = contracts.find((c) => c.id === id)
+    if (!c || c.freelancerId !== session?.user.id || !c.rating || c.reviewReply)
+      throw new Error('Não foi possível responder a esta avaliação.')
+    setContracts((cs) =>
+      cs.map((x) => (x.id === id ? { ...x, reviewReply: trimmed } : x)),
+    )
+    notify('Resposta publicada.')
+  }
+  const enrichedProfessionals = isMock
+    ? professionals.map((p) => ({ ...p, ...mockRating(contracts, p.id) }))
+    : professionals
+  const enrichedServices = isMock
+    ? services.map((s) => ({
+        ...s,
+        freelancer: { ...s.freelancer, ...mockRating(contracts, s.freelancer.id) },
+      }))
+    : services
   return (
     <Context.Provider
       value={{
         user: session?.user || null,
-        services,
+        services: enrichedServices,
         categories,
-        professionals,
+        professionals: enrichedProfessionals,
         loading,
         error,
         contracts,
@@ -267,6 +330,7 @@ export function Provider({ children }: { children: ReactNode }) {
         requestContract,
         transition,
         review,
+        replyReview,
         toast,
         notify,
       }}

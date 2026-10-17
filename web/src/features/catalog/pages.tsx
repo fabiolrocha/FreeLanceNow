@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Search, MapPin, Check, Wrench } from 'lucide-react'
 import { useApp } from '../../app/store'
+import { client, isMock } from '../../data/client'
+import type { Review } from '../../domain/types'
 import { Avatar, CategoryIcon, Empty, PageTitle, ServiceGrid } from '../../components/ui'
 import { money } from '../../domain/rules'
 
@@ -131,6 +133,7 @@ export function SearchServices() {
   const { services, categories } = useApp(),
     [params, setParams] = useSearchParams()
   const [maxPrice, setMaxPrice] = useState(''),
+    [minRating, setMinRating] = useState(''),
     [city, setCity] = useState(''),
     [sort, setSort] = useState('recent')
   const q = params.get('q') || '',
@@ -144,10 +147,17 @@ export function SearchServices() {
             .includes(q.toLocaleLowerCase('pt-BR'))) &&
         (!cat || s.category.id === cat) &&
         (!maxPrice || s.price <= Number(maxPrice)) &&
+        (!minRating || (s.freelancer.averageRating ?? 0) >= Number(minRating)) &&
         (!city ||
           s.freelancer.city.toLocaleLowerCase('pt-BR').includes(city.toLocaleLowerCase('pt-BR'))),
     )
-    .sort((a, b) => (sort === 'price' ? a.price - b.price : 0))
+    .sort((a, b) =>
+      sort === 'price'
+        ? a.price - b.price
+        : sort === 'rating'
+          ? (b.freelancer.averageRating ?? 0) - (a.freelancer.averageRating ?? 0)
+          : 0,
+    )
   function change(key: string, value: string) {
     const next = new URLSearchParams(params)
     if (value) next.set(key, value)
@@ -170,6 +180,7 @@ export function SearchServices() {
                 setParams({})
                 setCity('')
                 setMaxPrice('')
+                setMinRating('')
               }}
             >
               Limpar
@@ -195,6 +206,15 @@ export function SearchServices() {
               onChange={(e) => setMaxPrice(e.target.value)}
               placeholder="Sem limite"
             />
+          </label>
+          <label className="field">
+            <span>Nota mínima</span>
+            <select value={minRating} onChange={(e) => setMinRating(e.target.value)}>
+              <option value="">Qualquer nota</option>
+              <option value="4">4 estrelas ou mais</option>
+              <option value="4.5">4,5 estrelas ou mais</option>
+              <option value="5">5 estrelas</option>
+            </select>
           </label>
           <label className="field">
             <span>Localização</span>
@@ -226,6 +246,7 @@ export function SearchServices() {
             >
               <option value="recent">Mais recentes</option>
               <option value="price">Menor preço</option>
+              <option value="rating">Melhor avaliação</option>
             </select>
           </div>
           <p className="result-count">
@@ -243,6 +264,7 @@ export function SearchServices() {
                   setParams({})
                   setCity('')
                   setMaxPrice('')
+                  setMinRating('')
                 }}
               >
                 Limpar filtros
@@ -299,7 +321,11 @@ export function ServiceDetail() {
             <Avatar name={s.freelancer.name} />
             <div>
               <strong>{s.freelancer.name}</strong>
-              <p>{s.freelancer.city}</p>
+              <p>
+                {s.freelancer.city}
+                {typeof s.freelancer.averageRating === 'number' &&
+                  ` · ★ ${s.freelancer.averageRating.toFixed(1)} (${s.freelancer.reviewCount})`}
+              </p>
             </div>
           </div>
           <Link to={`/profissionais/${s.freelancer.id}`}>Ver perfil completo</Link>
@@ -340,6 +366,8 @@ export function Professionals() {
                 <p>{p.bio}</p>
                 <small>
                   <MapPin size={14} /> {p.city}
+                  {typeof p.averageRating === 'number' &&
+                    ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount})`}
                 </small>
               </div>
               <Link className="button secondary" to={`/profissionais/${p.id}`}>
@@ -354,9 +382,39 @@ export function Professionals() {
 export function ProfileDetail() {
   const { id } = useParams(),
     { professionals, services, contracts } = useApp(),
+    [apiReviews, setApiReviews] = useState<Review[]>([]),
     p = professionals.find((x) => x.id === id)
+  useEffect(() => {
+    if (isMock || !id) return
+    let active = true
+    void client
+      .freelancerReviews(id)
+      .then((items) => {
+        if (active) setApiReviews(items)
+      })
+      .catch(() => {})
+    return () => {
+      active = false
+    }
+  }, [id])
   if (!p) return <Empty title="Profissional não encontrado" />
-  const reviews = contracts.filter((c) => c.freelancerId === p.id && c.rating)
+  const reviews: Review[] = isMock
+    ? contracts
+        .filter((c) => c.freelancerId === p.id && c.rating)
+        .map((c) => ({
+          id: c.id,
+          contractId: c.id,
+          serviceId: c.serviceId,
+          serviceTitle: c.title,
+          freelancerId: c.freelancerId,
+          clientId: c.clientId,
+          clientName: c.clientName,
+          rating: c.rating!,
+          comment: c.review || '',
+          reply: c.reviewReply,
+          createdAt: c.reviewedAt || c.completedAt || '',
+        }))
+    : apiReviews
   return (
     <>
       <div className="panel profile-cover">
@@ -365,6 +423,8 @@ export function ProfileDetail() {
           <h1>{p.name}</h1>
           <p>
             <MapPin size={16} /> {p.city}
+            {typeof p.averageRating === 'number' &&
+              ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'})`}
           </p>
         </div>
         <Link className="button secondary" to="/mensagens">
@@ -380,13 +440,14 @@ export function ProfileDetail() {
       <section className="panel">
         <h2>Avaliações</h2>
         {reviews.length ? (
-          reviews.map((c) => (
-            <div className="review" key={c.id}>
+          reviews.map((r) => (
+            <div className="review" key={r.id}>
               <strong>
-                {c.rating} de 5 · {c.clientName}
+                {r.rating} de 5 · {r.clientName}
               </strong>
-              <p>{c.review || 'Sem comentário.'}</p>
-              <small>Contratação concluída na demonstração</small>
+              <p>{r.comment || 'Sem comentário.'}</p>
+              {r.reply && <p>Resposta do profissional: {r.reply}</p>}
+              <small>{r.serviceTitle}</small>
             </div>
           ))
         ) : (

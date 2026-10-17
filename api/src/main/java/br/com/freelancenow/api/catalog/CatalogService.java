@@ -2,6 +2,8 @@ package br.com.freelancenow.api.catalog;
 
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.reviews.Review;
+import br.com.freelancenow.api.reviews.ReviewService;
 import br.com.freelancenow.api.users.*;
 
 import jakarta.persistence.criteria.Predicate;
@@ -22,16 +24,19 @@ public class CatalogService {
     private final CategoryRepository categories;
     private final UserRepository users;
     private final CurrentUser current;
+    private final ReviewService reviews;
 
     public CatalogService(
             ServiceRepository services,
             CategoryRepository categories,
             UserRepository users,
-            CurrentUser current) {
+            CurrentUser current,
+            ReviewService reviews) {
         this.services = services;
         this.categories = categories;
         this.users = users;
         this.current = current;
+        this.reviews = reviews;
     }
 
     public List<CatalogDtos.CategoryView> categories() {
@@ -46,6 +51,7 @@ public class CatalogService {
             String city,
             BigDecimal minPrice,
             BigDecimal maxPrice,
+            BigDecimal minRating,
             int page,
             int size) {
         if (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)
@@ -84,14 +90,41 @@ public class CatalogService {
                                 filters.add(cb.greaterThanOrEqualTo(root.get("price"), minPrice));
                             if (maxPrice != null)
                                 filters.add(cb.lessThanOrEqualTo(root.get("price"), maxPrice));
+                            if (minRating != null && query != null) {
+                                var sub = query.subquery(Double.class);
+                                var reviewRoot = sub.from(Review.class);
+                                sub.select(cb.avg(reviewRoot.get("rating")))
+                                        .where(
+                                                cb.equal(
+                                                        reviewRoot.get("freelancer").get("id"),
+                                                        root.get("freelancer").get("id")));
+                                filters.add(
+                                        cb.greaterThanOrEqualTo(sub, minRating.doubleValue()));
+                            }
                             return cb.and(filters.toArray(Predicate[]::new));
                         },
                         PageRequest.of(
                                 page,
                                 size,
                                 Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by("id"))));
+        var stats =
+                reviews.ratingSummaries(
+                        result.stream()
+                                .map(s -> s.getFreelancer().getId())
+                                .distinct()
+                                .toList());
         return new CatalogDtos.PageView<>(
-                result.stream().map(CatalogDtos.ServiceView::from).toList(),
+                result.stream()
+                        .map(
+                                s -> {
+                                    var st =
+                                            stats.getOrDefault(
+                                                    s.getFreelancer().getId(),
+                                                    ReviewService.RatingSummary.EMPTY);
+                                    return CatalogDtos.ServiceView.from(
+                                            s, st.averageRating(), st.reviewCount());
+                                })
+                        .toList(),
                 page,
                 size,
                 result.getTotalElements(),
@@ -102,13 +135,15 @@ public class CatalogService {
         var s = find(id);
         if (s.getStatus() != ServiceStatus.ACTIVE || !s.getFreelancer().isActive())
             throw notFound();
-        return CatalogDtos.ServiceView.from(s);
+        var st = reviews.ratingSummary(s.getFreelancer().getId());
+        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
     }
 
     public List<CatalogDtos.ServiceView> mine(Jwt jwt) {
         var u = freelancer(jwt);
+        var st = reviews.ratingSummary(u.getId());
         return services.findByFreelancerIdOrderByCreatedAtDesc(u.getId()).stream()
-                .map(CatalogDtos.ServiceView::from)
+                .map(s -> CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount()))
                 .toList();
     }
 
@@ -116,8 +151,11 @@ public class CatalogService {
     public CatalogDtos.ServiceView create(Jwt jwt, CatalogDtos.SaveService r) {
         var u = lockedFreelancer(jwt);
         checkLimit(u, null, r.status());
+        var st = reviews.ratingSummary(u.getId());
         return CatalogDtos.ServiceView.from(
-                services.save(new ServiceListing(u, category(r.categoryId()), r)));
+                services.save(new ServiceListing(u, category(r.categoryId()), r)),
+                st.averageRating(),
+                st.reviewCount());
     }
 
     @Transactional
@@ -130,7 +168,8 @@ public class CatalogService {
                         ? s.getCategory()
                         : category(r.categoryId());
         s.update(cat, r);
-        return CatalogDtos.ServiceView.from(s);
+        var st = reviews.ratingSummary(u.getId());
+        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
     }
 
     @Transactional
@@ -139,7 +178,8 @@ public class CatalogService {
         var s = owned(u, id);
         checkLimit(u, s, status);
         s.setStatus(status);
-        return CatalogDtos.ServiceView.from(s);
+        var st = reviews.ratingSummary(u.getId());
+        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
     }
 
     private void checkLimit(User u, ServiceListing existing, ServiceStatus desired) {

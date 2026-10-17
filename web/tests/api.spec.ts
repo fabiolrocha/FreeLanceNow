@@ -113,4 +113,30 @@ test('ciclo completo de contratação entre duas contas persiste no PostgreSQL a
   await page.reload()
   await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
   await expect(page.getByText('Observações finais: Quadros e disjuntores revisados.')).toBeVisible()
+
+  await page.getByRole('link', { name: 'Avaliar serviço' }).click()
+  await page.getByRole('button', { name: '5 estrelas', exact: true }).click()
+  await page.getByLabel('Comentário').fill('Serviço impecável e dentro do prazo.')
+  await page.getByRole('button', { name: 'Enviar avaliação' }).click()
+  await expect(page.getByRole('heading', { name: 'Avaliação publicada' })).toBeVisible()
+  await page.getByRole('link', { name: 'Ver contratação' }).click()
+  await expect(
+    page.getByText('Avaliação registrada: 5 de 5. Serviço impecável e dentro do prazo.'),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(contractUrl)
+  await page
+    .getByLabel('Responder avaliação (até 200 caracteres)')
+    .fill('Agradeço a avaliação e fico à disposição!')
+  await page.getByRole('button', { name: 'Responder avaliação' }).click()
+  await page.reload()
+  await expect(
+    page.getByText('Resposta do profissional: Agradeço a avaliação e fico à disposição!'),
+  ).toBeVisible()
 })

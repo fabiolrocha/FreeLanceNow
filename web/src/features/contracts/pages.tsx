@@ -171,7 +171,7 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
 }
 export function ContractDetail() {
   const { id } = useParams(),
-    { contracts, user, transition } = useApp(),
+    { contracts, user, transition, replyReview } = useApp(),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false)
   const c = contracts.find(
@@ -185,6 +185,20 @@ export function ContractDetail() {
     setError('')
     try {
       await transition(c!.id, status)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  async function submitReply(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const d = new FormData(e.currentTarget),
+      reply = String(d.get('reply') || '')
+    setBusy(true)
+    setError('')
+    try {
+      await replyReview(c!.id, reply)
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -228,9 +242,27 @@ export function ContractDetail() {
             </div>
           )}
           {c.rating && (
-            <p className="success">
-              Avaliação registrada: {c.rating} de 5. {c.review}
-            </p>
+            <div className="notice">
+              <p className="success">
+                Avaliação registrada: {c.rating} de 5. {c.review}
+              </p>
+              {c.reviewReply ? (
+                <p>Resposta do profissional: {c.reviewReply}</p>
+              ) : (
+                user?.role === 'FREELANCER' &&
+                c.freelancerId === user.id && (
+                  <form onSubmit={submitReply}>
+                    <label className="field">
+                      <span>Responder avaliação (até 200 caracteres)</span>
+                      <textarea name="reply" required maxLength={200} rows={2} />
+                    </label>
+                    <button className="button secondary" disabled={busy}>
+                      Responder avaliação
+                    </button>
+                  </form>
+                )
+              )}
+            </div>
           )}
         </section>
         <aside className="panel booking-panel">
@@ -324,7 +356,7 @@ export function ContractAction() {
     setError('')
     try {
       if (kind === 'avaliar') {
-        review(c!.id, rating, String(d.get('comment')))
+        await review(c!.id, rating, String(d.get('comment') || ''))
         navigate(`/contratacoes/${c!.id}/avaliacao-publicada`)
       } else {
         await transition(
@@ -350,7 +382,7 @@ export function ContractAction() {
         title={titles[kind || ''] || 'Contratação'}
         description={`${c.title} · ${money(c.price)}`}
       />
-      {(kind === 'avaliar' || kind === 'disputa') && <SimulationNotice />}
+      {kind === 'disputa' && <SimulationNotice />}
       {kind === 'disputa' ? (
         <section className="panel">
           <span className="badge red">Em disputa</span>
@@ -390,7 +422,7 @@ export function ContractAction() {
               {kind === 'concluir'
                 ? 'O cliente terá 5 dias corridos para confirmar ou contestar a conclusão.'
                 : kind === 'contestar'
-                   ? 'Informe o problema para a mediação administrativa.'
+                  ? 'Informe o problema para a mediação administrativa.'
                   : 'Confirme somente se o serviço foi concluído conforme o combinado.'}
             </p>
           )}
@@ -443,8 +475,7 @@ export function ReviewPublished() {
       <CheckCircle2 size={52} />
       <h1>Avaliação publicada</h1>
       <p>
-        Seu comentário já aparece no histórico da contratação e no perfil do profissional da
-        demonstração.
+        Seu comentário já aparece no histórico da contratação e no perfil do profissional.
       </p>
       <Link className="button" to={`/contratacoes/${id}`}>
         Ver contratação

@@ -1,5 +1,7 @@
 package br.com.freelancenow.api.contracts;
 
+import br.com.freelancenow.api.reviews.Review;
+
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -41,9 +43,18 @@ public final class ContractDtos {
             ContractStatus status,
             List<HistoryItem> history,
             Instant completedAt,
+            Integer rating,
+            String review,
+            String reviewReply,
+            Instant reviewedAt,
             String dispute,
             String observations) {
         public static ContractView from(Contract c, List<ContractEvent> events) {
+            return from(c, events, null);
+        }
+
+        public static ContractView from(
+                Contract c, List<ContractEvent> events, Review r) {
             return new ContractView(
                     c.getId(),
                     c.getService().getId(),
@@ -59,6 +70,10 @@ public final class ContractDtos {
                     c.getStatus(),
                     events.stream().map(HistoryItem::from).toList(),
                     c.getCompletedAt(),
+                    r == null ? null : r.getRating(),
+                    r == null ? null : r.getComment(),
+                    r == null ? null : r.getReply(),
+                    r == null ? null : r.getCreatedAt(),
                     c.getDispute(),
                     c.getObservations());
         }
