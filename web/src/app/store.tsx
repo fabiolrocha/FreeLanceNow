@@ -5,6 +5,7 @@ import type {
   Category,
   Contract,
   ContractStatus,
+  CreateContract,
   Demand,
   Profile,
   Proposal,
@@ -18,7 +19,7 @@ import {
   proposals as initialProposals,
 } from '../data/fixtures'
 import { client, isMock, setToken } from '../data/client'
-import { canReview, canTransition } from '../domain/rules'
+import { canReview, canTransition, nowIso, today } from '../domain/rules'
 
 function saved<T>(key: string, fallback: T) {
   try {
@@ -44,7 +45,8 @@ interface Store {
   setDemands: (fn: (d: Demand[]) => Demand[]) => void
   setProposals: (fn: (p: Proposal[]) => Proposal[]) => void
   addContract: (c: Contract) => void
-  transition: (id: string, status: ContractStatus, dispute?: string) => void
+  requestContract: (r: CreateContract) => Promise<Contract>
+  transition: (id: string, status: ContractStatus, dispute?: string) => Promise<void>
   review: (id: string, rating: number, comment: string) => void
   toast: string
   notify: (s: string) => void
@@ -61,7 +63,7 @@ export function Provider({ children }: { children: ReactNode }) {
     [categories, setCategories] = useState<Category[]>([]),
     [professionals, setProfessionals] = useState<Profile[]>([])
   const [contracts, setContracts] = useState<Contract[]>(() =>
-    saved('fln-contracts', initialContracts),
+    isMock ? saved('fln-contracts', initialContracts) : saved('fln-api-contracts', []),
   )
   const [demands, setDemands] = useState<Demand[]>(() => saved('fln-demands', initialDemands))
   const [proposals, setProposals] = useState<Proposal[]>(() =>
@@ -76,14 +78,17 @@ export function Provider({ children }: { children: ReactNode }) {
     setError('')
     if (!loaded.current) setLoading(true)
     try {
-      const [s, c, p] = await Promise.all([
+      const hasToken = !isMock && !!saved<Session | null>('fln-session', null)?.accessToken
+      const [s, c, p, ct] = await Promise.all([
         client.services(),
         client.categories(),
         client.professionals(),
+        hasToken ? client.contracts() : Promise.resolve(null),
       ])
       setServices(s)
       setCategories(c)
       setProfessionals(p)
+      if (ct) setContracts(ct)
       loaded.current = true
     } catch (e) {
       setError(
@@ -108,6 +113,14 @@ export function Provider({ children }: { children: ReactNode }) {
         sessionStorage.removeItem('fln-session')
       }
     })
+    if (!isMock) {
+      void client
+        .contracts()
+        .then((ct) => {
+          if (active) setContracts(ct)
+        })
+        .catch(() => {})
+    }
     const timer = setTimeout(
       () => {
         setSession(null)
@@ -123,7 +136,7 @@ export function Provider({ children }: { children: ReactNode }) {
     }
   }, [session])
   useEffect(() => {
-    sessionStorage.setItem('fln-contracts', JSON.stringify(contracts))
+    sessionStorage.setItem(isMock ? 'fln-contracts' : 'fln-api-contracts', JSON.stringify(contracts))
   }, [contracts])
   useEffect(() => {
     sessionStorage.setItem('fln-demands', JSON.stringify(demands))
@@ -142,12 +155,53 @@ export function Provider({ children }: { children: ReactNode }) {
     setSession(timed)
     sessionStorage.setItem('fln-session', JSON.stringify(timed))
   }
-  function transition(id: string, status: ContractStatus, dispute?: string) {
+  async function requestContract(r: CreateContract): Promise<Contract> {
+    const u = session?.user
+    if (!u) throw new Error('Entre na sua conta para solicitar um serviço.')
+    if (!isMock) {
+      const created = await client.createContract(r)
+      setContracts((cs) => [created, ...cs.filter((x) => x.id !== created.id)])
+      return created
+    }
+    const s = services.find((x) => x.id === r.serviceId)
+    if (!s) throw new Error('Serviço não encontrado.')
+    if (r.date <= today()) throw new Error('Selecione uma data futura.')
+    if (
+      contracts.some(
+        (c) => c.clientId === u.id && c.serviceId === r.serviceId && c.status === 'PENDENTE',
+      )
+    )
+      throw new Error('Você já tem uma solicitação pendente para este serviço.')
+    const c: Contract = {
+      id: crypto.randomUUID(),
+      serviceId: s.id,
+      title: s.title,
+      freelancerId: s.freelancer.id,
+      freelancerName: s.freelancer.name,
+      clientId: u.id,
+      clientName: u.name,
+      price: s.price,
+      date: r.date,
+      description: r.description,
+      address: r.address,
+      status: 'PENDENTE',
+      history: [{ status: 'PENDENTE', at: nowIso() }],
+    }
+    setContracts((cs) => [c, ...cs])
+    return c
+  }
+  async function transition(id: string, status: ContractStatus, dispute?: string) {
     const c = contracts.find((c) => c.id === id),
       u = session?.user
+    if (!u) throw new Error('Esta mudança de status não é permitida para seu perfil.')
+    if (!isMock) {
+      const updated = await client.transitionContract(id, status, dispute)
+      setContracts((cs) => cs.map((x) => (x.id === id ? { ...x, ...updated } : x)))
+      notify(`Contratação: ${status.replaceAll('_', ' ').toLowerCase()}.`)
+      return
+    }
     if (
       !c ||
-      !u ||
       !canTransition(c.status, status, u.role) ||
       (u.role === 'CLIENT' && c.clientId !== u.id) ||
       (u.role === 'FREELANCER' && c.freelancerId !== u.id)
@@ -198,6 +252,10 @@ export function Provider({ children }: { children: ReactNode }) {
           setSession(null)
           setToken('')
           sessionStorage.removeItem('fln-session')
+          if (!isMock) {
+            setContracts([])
+            sessionStorage.removeItem('fln-api-contracts')
+          }
         },
         refresh,
         updateUser: (u) => {
@@ -206,6 +264,7 @@ export function Provider({ children }: { children: ReactNode }) {
         setDemands,
         setProposals,
         addContract: (c) => setContracts((cs) => [c, ...cs]),
+        requestContract,
         transition,
         review,
         toast,

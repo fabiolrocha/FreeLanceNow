@@ -11,7 +11,6 @@ import {
   Field,
   PageTitle,
   ServiceGrid,
-  SimulationNotice,
 } from '../../components/ui'
 import { money, statusLabel } from '../../domain/rules'
 import type { Service } from '../../domain/types'
@@ -194,7 +193,6 @@ export function Dashboard() {
           <small>prazo de até 48 horas</small>
         </div>
       </div>
-      <SimulationNotice />
       <div className="dashboard-grid">
         <section className="panel">
           <div className="row between">

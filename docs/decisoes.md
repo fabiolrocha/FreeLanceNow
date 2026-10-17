@@ -13,7 +13,10 @@ Registradas em 30/09/2026. Mudanças devem atualizar este documento e os contrat
 | ADR07 | JWT HS25615min, bcrypt, perfis públicos sem contato | Autenticação local funcional; sem refresh, 2FA ou login social |
 | ADR08 | Modo mock explícito e adapter HTTP no mesmo frontend | Grupo desenvolve telas sem backend; falha de API não vira mock silencioso |
 | ADR09 | Financeiro/comunicação/contratação simulados no primeiro marco | Priorizar auth, banco e catálogo; demais integrações entram no backlog |
-| ADR10 | Ícones/iniciais até decisão de imagens | Fotos do carômetro não reaproveitadas como usuários do produto |
+| ADR10 | Logo vetorial oficial SVG (`web/public/images/logo.svg`), ícones por categoria e avatares por iniciais | Identidade visual fechada sem depender de fotos do carômetro |
+| ADR11 | Stripe em modo sandbox como gateway de pagamentos (taxa de 10%) | Custódia, webhooks idempotentes e reembolso padronizados |
+| ADR12 | Neon Serverless PostgreSQL para ambiente remoto, mantendo PostgreSQL 15 no Compose local | Mesmas migrações Flyway (`V1`–`V3`) em dev local e nuvem |
+| ADR13 | Resend como provedor transacional de e-mail | Recuperação de senha, verificação de conta e avisos |
 
 ## Proveniência do scaffold
 

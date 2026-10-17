@@ -1,11 +1,14 @@
 # Modelo de dados
 
-Esquema implementado na migração `V1__initial_schema.sql`; categorias iniciais em `V2__categories.sql`.
+Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql` e `V3__contracts.sql`.
 
 ```mermaid
 erDiagram
   APP_USER ||--o{ SERVICE_LISTING : publica
   CATEGORY ||--o{ SERVICE_LISTING : classifica
+  APP_USER ||--o{ CONTRACT : solicita_ou_executa
+  SERVICE_LISTING ||--o{ CONTRACT : origina
+  CONTRACT ||--o{ CONTRACT_EVENT : registra
   APP_USER {
     uuid id PK
     varchar email UK
@@ -29,6 +32,24 @@ erDiagram
     int delivery_days
     varchar status
   }
+  CONTRACT {
+    uuid id PK
+    uuid service_id FK
+    uuid client_id FK
+    uuid freelancer_id FK
+    varchar title
+    numeric price
+    date scheduled_date
+    varchar status
+  }
+  CONTRACT_EVENT {
+    uuid id PK
+    uuid contract_id FK
+    uuid actor_id FK
+    varchar previous_status
+    varchar status
+    timestamptz created_at
+  }
 ```
 
 | Tabela | Campos e limites principais | Regras |
@@ -36,8 +57,10 @@ erDiagram
 | `app_user` | UUID; nome 100; e-mail 254 único; hash; telefone 20; role; ativo; cidade 100; bio 600; termos/aceite; criação | E-mail em minúsculas; `CLIENT`, `FREELANCER`, `ADMIN`; hash bcrypt |
 | `category` | UUID; nome; slug único; ativo | Migração cria Elétrica, Encanamento, Limpeza, TI e Pintura |
 | `service_listing` | UUID; dono/categoria FK; título 80; descrição 500; preço `numeric(12,2)`; dias; status; criação | Preço >0; dias 1–365; `DRAFT`, `ACTIVE`, `INACTIVE`; dono validado pelo serviço |
+| `contract` | UUID; serviço/cliente/freelancer FK; snapshot de título 80 e preço `numeric(12,2)`; data futura; descrição 300; endereço 200; status; observações 500; disputa 300; timestamps | Índice parcial único `(client_id, service_id) WHERE status = 'PENDENTE'`; jobs automáticos de 48h e 5 dias |
+| `contract_event` | UUID; contratação FK; ator opcional FK; estado anterior/novo; nota 500; criação | Histórico imutável de transições manuais e automáticas |
 
-Índices apoiam consulta por proprietário/status e categoria/preço em anúncios ativos. Integridade referencial mantém vínculos; desativação não elimina histórico. O limite de 20 ativos é regra transacional, não um simples `CHECK` de linha.
+Índices apoiam consulta por proprietário/status, categoria/preço em anúncios ativos e verificação de prazos em contratações. Integridade referencial mantém vínculos; desativação não elimina histórico. O limite de 20 ativos é regra transacional, não um simples `CHECK` de linha.
 
 Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o banco não usa ponto flutuante para preço. No mock, o JavaScript representa valores ilustrativos; isso não é base de contabilização financeira.
 
@@ -47,8 +70,6 @@ Não criar todas as tabelas agora sem validar o contrato da respectiva feature. 
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
-| `contract` | Cliente, freelancer, serviço; snapshot de título/escopo/preço; data futura; estado; uma pendência por cliente/serviço |
-| `contract_event` | Contratação, ator, estado anterior/novo e timestamp; histórico imutável |
 | `review` | Contratação única e concluída; nota 1–5; autor; texto 500; resposta 200; janela de 7 dias |
 | `demand` / `proposal` | Cliente/categoria e freelancer; orçamento, prazo, estado; uma proposta pendente por profissional/demanda |
 | `report` / `dispute` / `audit_event` | Alvo, autor, evidência, decisão e administrador; preservar rastreabilidade |

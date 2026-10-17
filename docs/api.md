@@ -17,6 +17,10 @@ Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos d
 | POST | `/services` | Freelancer | 201 + anúncio |
 | PUT | `/services/{id}` | Freelancer/dono | Atualização completa |
 | PATCH | `/services/{id}/status` | Freelancer/dono | Ativa, desativa ou põe em rascunho |
+| GET | `/contracts` | Autenticado | Lista contratações do participante (ou todas para admin) |
+| GET | `/contracts/{id}` | Participante/Admin | Detalhe e histórico de eventos da contratação |
+| POST | `/contracts` | Cliente | 201 + solicitação `PENDENTE` com snapshot do serviço |
+| PATCH | `/contracts/{id}/status` | Participante/Admin | Transição de estado e registro em `contract_event` |
 | GET | `/actuator/health` (fora da base) | Público | Saúde sem detalhes privados |
 
 ## Cadastro e login

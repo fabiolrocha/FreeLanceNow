@@ -78,6 +78,12 @@ export interface Contract {
   dispute?: string
   observations?: string
 }
+export interface CreateContract {
+  serviceId: string
+  date: string
+  description: string
+  address: string
+}
 export interface Demand {
   id: string
   clientId: string

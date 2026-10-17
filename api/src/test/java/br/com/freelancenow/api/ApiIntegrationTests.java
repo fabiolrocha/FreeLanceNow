@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import br.com.freelancenow.api.catalog.*;
 import br.com.freelancenow.api.config.DemoData;
+import br.com.freelancenow.api.contracts.ContractService;
 import br.com.freelancenow.api.users.UserRepository;
 
 import org.junit.jupiter.api.*;
@@ -14,6 +15,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.*;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -27,6 +32,7 @@ class ApiIntegrationTests {
     @Autowired UserRepository users;
     @Autowired CategoryRepository categories;
     @Autowired ServiceRepository services;
+    @Autowired ContractService contractService;
     @Autowired PasswordEncoder passwords;
     private final String prefix = UUID.randomUUID().toString();
     private String freelancerToken, clientToken, otherToken, serviceId;
@@ -499,11 +505,287 @@ class ApiIntegrationTests {
                 http().get().uri("/api/v1/freelancers").retrieve().body(String.class).contains(id));
     }
 
+    private String contractFreelaToken, contractServiceId;
+
+    @Test
+    @Order(12)
+    @SuppressWarnings("unchecked")
+    void clientRequestsContractAndFreelancerCompletesCycleWithPersistentHistory() {
+        contractFreelaToken =
+                post("/api/v1/auth/register", registration("contractfreela", "FREELANCER"), null)
+                        .get("accessToken")
+                        .toString();
+        contractServiceId =
+                post("/api/v1/services", listing("Chuveiro", "ACTIVE"), contractFreelaToken)
+                        .get("id")
+                        .toString();
+        var futureDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(5).toString();
+        var todayDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).toString();
+
+        // Freelancer cannot request service
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Tentativa de freelancer",
+                                        "address", "Asa Sul"),
+                                contractFreelaToken));
+
+        // Past/today date is rejected
+        expect(
+                400,
+                () ->
+                        post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", todayDate,
+                                        "description", "Data de hoje inválida",
+                                        "address", "Asa Sul"),
+                                clientToken));
+
+        var created =
+                post(
+                        "/api/v1/contracts",
+                        Map.of(
+                                "serviceId", contractServiceId,
+                                "date", futureDate,
+                                "description", "Troca de disjuntor e revisão de tomada.",
+                                "address", "QNA 12, Taguatinga"),
+                        clientToken);
+        var contractId = created.get("id").toString();
+        assertEquals("PENDENTE", created.get("status"));
+        assertEquals("Chuveiro", created.get("title"));
+        assertEquals(0, new java.math.BigDecimal("180").compareTo(new java.math.BigDecimal(created.get("price").toString())));
+
+        // Duplicate pending request by same client for same service returns 409
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Duplicada",
+                                        "address", ""),
+                                clientToken));
+
+        // Non-participant cannot read or transition contract
+        expect(
+                403,
+                () ->
+                        http().get()
+                                .uri("/api/v1/contracts/" + contractId)
+                                .headers(h -> h.setBearerAuth(otherToken))
+                                .retrieve()
+                                .toBodilessEntity());
+        expect(
+                403,
+                () ->
+                        send(
+                                HttpMethod.PATCH,
+                                "/api/v1/contracts/" + contractId + "/status",
+                                Map.of("status", "ACEITO"),
+                                otherToken));
+
+        // Client cannot accept own request (invalid role transition)
+        expect(
+                409,
+                () ->
+                        send(
+                                HttpMethod.PATCH,
+                                "/api/v1/contracts/" + contractId + "/status",
+                                Map.of("status", "ACEITO"),
+                                clientToken));
+
+        // Changing service title/price afterwards preserves contract snapshot
+        send(
+                HttpMethod.PUT,
+                "/api/v1/services/" + contractServiceId,
+                Map.of(
+                        "title", "Chuveiro Editado",
+                        "description", "Descrição atualizada",
+                        "categoryId", CATEGORY,
+                        "price", 350,
+                        "deliveryDays", 2,
+                        "status", "ACTIVE"),
+                contractFreelaToken);
+
+        var accepted =
+                send(
+                        HttpMethod.PATCH,
+                        "/api/v1/contracts/" + contractId + "/status",
+                        Map.of("status", "ACEITO"),
+                        contractFreelaToken);
+        assertEquals("ACEITO", accepted.get("status"));
+        assertEquals("Chuveiro", accepted.get("title"));
+        assertEquals(0, new java.math.BigDecimal("180").compareTo(new java.math.BigDecimal(accepted.get("price").toString())));
+
+        var inProgress =
+                send(
+                        HttpMethod.PATCH,
+                        "/api/v1/contracts/" + contractId + "/status",
+                        Map.of("status", "EM_ANDAMENTO"),
+                        contractFreelaToken);
+        assertEquals("EM_ANDAMENTO", inProgress.get("status"));
+
+        var awaiting =
+                send(
+                        HttpMethod.PATCH,
+                        "/api/v1/contracts/" + contractId + "/status",
+                        Map.of(
+                                "status",
+                                "AGUARDANDO_CONFIRMACAO",
+                                "comment",
+                                "Instalação concluída e testada."),
+                        contractFreelaToken);
+        assertEquals("AGUARDANDO_CONFIRMACAO", awaiting.get("status"));
+        assertEquals("Instalação concluída e testada.", awaiting.get("observations"));
+
+        var completed =
+                send(
+                        HttpMethod.PATCH,
+                        "/api/v1/contracts/" + contractId + "/status",
+                        Map.of("status", "CONCLUIDO"),
+                        clientToken);
+        assertEquals("CONCLUIDO", completed.get("status"));
+        assertNotNull(completed.get("completedAt"));
+        var history = (List<Map<String, Object>>) completed.get("history");
+        assertEquals(5, history.size());
+        assertEquals("PENDENTE", history.get(0).get("status"));
+        assertEquals("CONCLUIDO", history.get(4).get("status"));
+    }
+
+    @Test
+    @Order(13)
+    void clientContestsCompletionAndDisputeRequiresReason() {
+        var futureDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(6).toString();
+        var contractId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Serviço para teste de contestação.",
+                                        "address", "Águas Claras"),
+                                clientToken)
+                        .get("id")
+                        .toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + contractId + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + contractId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + contractId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO"),
+                contractFreelaToken);
+
+        expect(
+                400,
+                () ->
+                        send(
+                                HttpMethod.PATCH,
+                                "/api/v1/contracts/" + contractId + "/status",
+                                Map.of("status", "EM_DISPUTA", "comment", "   "),
+                                clientToken));
+
+        var disputed =
+                send(
+                        HttpMethod.PATCH,
+                        "/api/v1/contracts/" + contractId + "/status",
+                        Map.of(
+                                "status",
+                                "EM_DISPUTA",
+                                "comment",
+                                "Equipamento apresentou mau contato após saída."),
+                        clientToken);
+        assertEquals("EM_DISPUTA", disputed.get("status"));
+        assertEquals("Equipamento apresentou mau contato após saída.", disputed.get("dispute"));
+    }
+
+    @Test
+    @Order(14)
+    void deadlineJobsCancelPendingAfter48hAndConfirmAfter5DaysIdempotently() {
+        var futureDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(8).toString();
+        var pendingId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Solicitação para expirar em 48h.",
+                                        "address", ""),
+                                clientToken)
+                        .get("id")
+                        .toString();
+
+        // Before 48h: nothing expires
+        assertEquals(0, contractService.processExpiredDeadlines(Instant.now().plus(Duration.ofHours(47))));
+        assertEquals(
+                "PENDENTE",
+                getJson("/api/v1/contracts/" + pendingId, clientToken).get("status"));
+
+        // After 48h: pending contract is automatically cancelled, and second run is idempotent
+        var after48h = Instant.now().plus(Duration.ofHours(49));
+        assertTrue(contractService.processExpiredDeadlines(after48h) >= 1);
+        assertEquals(0, contractService.processExpiredDeadlines(after48h));
+        assertEquals(
+                "CANCELADO",
+                getJson("/api/v1/contracts/" + pendingId, clientToken).get("status"));
+
+        // Create another contract and move to AGUARDANDO_CONFIRMACAO to test 5-day auto-confirmation
+        var awaitingId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Solicitação para confirmar em 5 dias.",
+                                        "address", ""),
+                                clientToken)
+                        .get("id")
+                        .toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + awaitingId + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + awaitingId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + awaitingId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO"),
+                contractFreelaToken);
+
+        var after5Days = Instant.now().plus(Duration.ofDays(5).plusHours(1));
+        assertTrue(contractService.processExpiredDeadlines(after5Days) >= 1);
+        assertEquals(0, contractService.processExpiredDeadlines(after5Days));
+        var autoConfirmed = getJson("/api/v1/contracts/" + awaitingId, clientToken);
+        assertEquals("CONCLUIDO", autoConfirmed.get("status"));
+        assertNotNull(autoConfirmed.get("completedAt"));
+    }
+
     @Test
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                2,
+                3,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var seed = new DemoData(users, categories, services, passwords);

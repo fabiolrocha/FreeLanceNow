@@ -4,17 +4,18 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle2, Star } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { Empty, ErrorMessage, Field, PageTitle, SimulationNotice } from '../../components/ui'
-import { canReview, futureDate, money, statusLabel, today, nowIso } from '../../domain/rules'
+import { canReview, futureDate, money, statusLabel, today } from '../../domain/rules'
 import type { Contract } from '../../domain/types'
 
 export function RequestService() {
   const { id } = useParams(),
-    { services, contracts, user, addContract } = useApp(),
+    { services, user, requestContract } = useApp(),
     navigate = useNavigate(),
-    [error, setError] = useState('')
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
   const s = services.find((s) => s.id === id)
   if (!s || !user) return <Empty title="Serviço não encontrado" />
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!s || !user) return
     const d = new FormData(e.currentTarget),
@@ -23,29 +24,21 @@ export function RequestService() {
       setError('Selecione uma data futura.')
       return
     }
-    if (
-      contracts.some((c) => c.clientId === user.id && c.serviceId === id && c.status === 'PENDENTE')
-    ) {
-      setError('Você já tem uma solicitação pendente para este serviço.')
-      return
+    setBusy(true)
+    setError('')
+    try {
+      const c = await requestContract({
+        serviceId: s.id,
+        date,
+        description: String(d.get('description')),
+        address: String(d.get('address') || ''),
+      })
+      navigate(`/contratacoes/${c.id}/enviada`)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
     }
-    const c: Contract = {
-      id: crypto.randomUUID(),
-      serviceId: s.id,
-      title: s.title,
-      freelancerId: s.freelancer.id,
-      freelancerName: s.freelancer.name,
-      clientId: user.id,
-      clientName: user.name,
-      price: s.price,
-      date,
-      description: String(d.get('description')),
-      address: String(d.get('address')),
-      status: 'PENDENTE',
-      history: [{ status: 'PENDENTE', at: nowIso() }],
-    }
-    addContract(c)
-    navigate(`/contratacoes/${c.id}/enviada`)
   }
   return (
     <>
@@ -53,7 +46,6 @@ export function RequestService() {
         title="Solicitar serviço"
         description={`${s.title} · ${s.freelancer.name} · ${money(s.price)}`}
       />
-      <SimulationNotice />
       <form className="form-panel" onSubmit={submit}>
         <Field
           label="Data desejada"
@@ -88,7 +80,9 @@ export function RequestService() {
           <Link to={`/servicos/${s.id}`} className="button secondary">
             Cancelar
           </Link>
-          <button className="button">Confirmar solicitação</button>
+          <button className="button" disabled={busy}>
+            {busy ? 'Enviando…' : 'Confirmar solicitação'}
+          </button>
         </div>
       </form>
     </>
@@ -101,8 +95,8 @@ export function RequestSent() {
       <CheckCircle2 size={52} />
       <h1>Solicitação enviada</h1>
       <p>
-        A solicitação foi registrada na demonstração. O profissional poderá aceitar ou recusar em
-        sua conta.
+        A solicitação foi registrada. O profissional poderá aceitar ou recusar em sua conta em até
+        48 horas.
       </p>
       <Link to={`/contratacoes/${id}`} className="button">
         Acompanhar contratação
@@ -129,7 +123,6 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
             : 'Acompanhe cada etapa do serviço, do pedido à avaliação.'
         }
       />
-      <SimulationNotice />
       <div className="tabs" role="group" aria-label="Filtrar contratações">
         {[
           ['all', 'Todas'],
@@ -179,18 +172,23 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
 export function ContractDetail() {
   const { id } = useParams(),
     { contracts, user, transition } = useApp(),
-    [error, setError] = useState('')
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
   const c = contracts.find(
     (c) =>
       c.id === id &&
       (user?.role === 'ADMIN' || c.clientId === user?.id || c.freelancerId === user?.id),
   )
   if (!c) return <Empty title="Contratação não encontrada" />
-  function action(status: Contract['status']) {
+  async function action(status: Contract['status']) {
+    setBusy(true)
+    setError('')
     try {
-      transition(c!.id, status)
+      await transition(c!.id, status)
     } catch (e) {
       setError((e as Error).message)
+    } finally {
+      setBusy(false)
     }
   }
   return (
@@ -199,7 +197,6 @@ export function ContractDetail() {
         title={c.title}
         description={`Contratação #${c.id.slice(0, 8)} · ${user?.role === 'CLIENT' ? c.freelancerName : c.clientName}`}
       />
-      <SimulationNotice />
       <ErrorMessage message={error} />
       <div className="detail-grid">
         <section className="panel">
@@ -240,21 +237,33 @@ export function ContractDetail() {
           <h2>Próximo passo</h2>
           {user?.role === 'FREELANCER' && c.status === 'PENDENTE' && (
             <>
-              <button className="button full" onClick={() => action('ACEITO')}>
+              <button className="button full" disabled={busy} onClick={() => void action('ACEITO')}>
                 Aceitar solicitação
               </button>
-              <button className="button secondary full" onClick={() => action('RECUSADO')}>
+              <button
+                className="button secondary full"
+                disabled={busy}
+                onClick={() => void action('RECUSADO')}
+              >
                 Recusar solicitação
               </button>
             </>
           )}
           {user?.role === 'CLIENT' && c.status === 'PENDENTE' && (
-            <button className="button secondary full" onClick={() => action('CANCELADO')}>
+            <button
+              className="button secondary full"
+              disabled={busy}
+              onClick={() => void action('CANCELADO')}
+            >
               Cancelar solicitação
             </button>
           )}
           {user?.role === 'FREELANCER' && c.status === 'ACEITO' && (
-            <button className="button full" onClick={() => action('EM_ANDAMENTO')}>
+            <button
+              className="button full"
+              disabled={busy}
+              onClick={() => void action('EM_ANDAMENTO')}
+            >
               Iniciar serviço
             </button>
           )}
@@ -277,8 +286,8 @@ export function ContractDetail() {
             <Link to={`/contratacoes/${c.id}/disputa`}>Acompanhar disputa</Link>
           )}
           <p>
-            Na demonstração, o início depende do aceite. Pagamentos reais serão integrados em uma
-            etapa futura.
+            O início depende do aceite do profissional. Pagamentos em sandbox serão integrados na
+            etapa financeira.
           </p>
           <Link className="subtle-link" to={`/denunciar?alvo=${encodeURIComponent(c.title)}`}>
             Denunciar contratação
@@ -294,6 +303,7 @@ export function ContractAction() {
     { contracts, user, transition, review } = useApp(),
     navigate = useNavigate()
   const [error, setError] = useState(''),
+    [busy, setBusy] = useState(false),
     [rating, setRating] = useState(5)
   const c = contracts.find(
       (c) => c.id === id && (c.clientId === user?.id || c.freelancerId === user?.id),
@@ -307,15 +317,17 @@ export function ContractAction() {
     disputa: 'Acompanhar disputa',
     avaliar: 'Como foi o serviço?',
   }
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const d = new FormData(e.currentTarget)
+    setBusy(true)
+    setError('')
     try {
       if (kind === 'avaliar') {
         review(c!.id, rating, String(d.get('comment')))
         navigate(`/contratacoes/${c!.id}/avaliacao-publicada`)
       } else {
-        transition(
+        await transition(
           c!.id,
           kind === 'concluir'
             ? 'AGUARDANDO_CONFIRMACAO'
@@ -328,6 +340,8 @@ export function ContractAction() {
       }
     } catch (e) {
       setError((e as Error).message)
+    } finally {
+      setBusy(false)
     }
   }
   return (
@@ -336,7 +350,7 @@ export function ContractAction() {
         title={titles[kind || ''] || 'Contratação'}
         description={`${c.title} · ${money(c.price)}`}
       />
-      <SimulationNotice />
+      {(kind === 'avaliar' || kind === 'disputa') && <SimulationNotice />}
       {kind === 'disputa' ? (
         <section className="panel">
           <span className="badge red">Em disputa</span>
@@ -376,7 +390,7 @@ export function ContractAction() {
               {kind === 'concluir'
                 ? 'O cliente terá 5 dias corridos para confirmar ou contestar a conclusão.'
                 : kind === 'contestar'
-                  ? 'Informe o problema para a mediação administrativa.'
+                   ? 'Informe o problema para a mediação administrativa.'
                   : 'Confirme somente se o serviço foi concluído conforme o combinado.'}
             </p>
           )}
@@ -402,7 +416,7 @@ export function ContractAction() {
             <Link className="button secondary" to={`/contratacoes/${c.id}`}>
               Cancelar
             </Link>
-            <button className="button">
+            <button className="button" disabled={busy}>
               {kind === 'avaliar'
                 ? 'Enviar avaliação'
                 : kind === 'concluir'

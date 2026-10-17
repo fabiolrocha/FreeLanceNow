@@ -1,5 +1,8 @@
 import type {
   Category,
+  Contract,
+  ContractStatus,
+  CreateContract,
   Profile,
   Register,
   SaveService,
@@ -31,6 +34,10 @@ const fieldLabels: Record<string, string> = {
   price: 'valor',
   deliveryDays: 'prazo',
   status: 'status',
+  serviceId: 'serviço',
+  date: 'data',
+  address: 'endereço',
+  comment: 'comentário',
 }
 export function setToken(value: string) {
   token = value
@@ -200,5 +207,24 @@ export const client = {
         body: JSON.stringify({ status }),
       })
     return this.saveService(u, { ...service, categoryId: service.category.id, status }, service.id)
+  },
+  async contracts(): Promise<Contract[]> {
+    return request('/contracts')
+  },
+  async createContract(r: CreateContract): Promise<Contract> {
+    return request('/contracts', {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async transitionContract(
+    id: string,
+    status: ContractStatus,
+    comment?: string,
+  ): Promise<Contract> {
+    return request(`/contracts/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, comment }),
+    })
   },
 }

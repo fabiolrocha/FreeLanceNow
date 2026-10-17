@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.util.Arrays;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -24,6 +25,11 @@ import javax.crypto.spec.SecretKeySpec;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+    @Bean
+    Clock clock() {
+        return Clock.systemUTC();
+    }
+
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
