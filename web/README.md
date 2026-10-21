@@ -9,4 +9,4 @@ Scripts: `build`, `lint`, `format`, `format:check`, `test` e `test:e2e`. Playwri
 - [Colaboração sem papéis fixos](../docs/equipe.md) e [tarefas](../docs/backlog.md).
 - [Marca, ícones e upload planejado](../docs/imagens.md).
 
-No modo API, auth, perfis, catálogo, contratações, avaliações e demandas/propostas são persistentes. Recuperação de senha, mensagens, notificações, financeiro e administração ainda têm telas visuais/simuladas. Consulte a matriz de frontend antes de apresentar um fluxo como integrado.
+No modo API, auth, perfis, catálogo, contratações, avaliações e demandas/propostas são persistentes. F04/F05 integram usuários/categorias, denúncias de anúncios/avaliações, moderação, métricas/CSV e auditoria; ADMIN real exige bootstrap explícito. Recuperação de senha, mensagens, notificações e financeiro continuam visuais/simulados. Consulte a matriz de frontend antes de apresentar um fluxo como integrado.

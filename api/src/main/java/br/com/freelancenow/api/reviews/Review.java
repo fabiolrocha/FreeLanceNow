@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
+@org.hibernate.annotations.DynamicUpdate
 @Table(name = "review")
 public class Review {
     @Id private UUID id;
@@ -44,6 +45,17 @@ public class Review {
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
+
+    @Column(nullable = false)
+    private boolean hidden;
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public void hide() {
+        hidden = true;
+    }
 
     protected Review() {}
 

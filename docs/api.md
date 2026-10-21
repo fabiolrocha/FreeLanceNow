@@ -1,6 +1,6 @@
 # Contrato da API
 
-Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha, mensagens/notificações, upload, gestão administrativa, denúncias e financeiro ainda não possuem endpoints completos; suas telas continuam visuais/simuladas. A interface de moderação já chama as transições reais de disputa com sessão ADMIN, mas não há provisionamento público ou seed dessa conta.
+Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha, mensagens/notificações, upload e financeiro permanecem pendentes. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
@@ -33,6 +33,16 @@ Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/demands/{id}/proposals` | Freelancer | 201 + proposta única `PENDING` por profissional/demanda |
 | POST | `/proposals/{id}/accept` | Cliente (dono da demanda) | 200 + encerra demanda, recusa demais propostas e cria contratação `ACEITO` |
 | POST | `/proposals/{id}/reject` | Cliente (dono da demanda) | 200 + marca proposta como `REJECTED` |
+| GET | `/admin/users` | Admin ativo | Contas, contatos privados, status e data de cadastro; sem senha/hash |
+| PATCH | `/admin/users/{id}/status` | Admin ativo | Suspende/reativa conta não-admin, com motivo e auditoria |
+| GET | `/admin/categories` | Admin ativo | Categorias ativas/inativas |
+| POST | `/admin/categories` | Admin ativo | 201 + categoria criada e auditada |
+| PUT | `/admin/categories/{id}` | Admin ativo | Renomeia/ativa/desativa, preservando slug e vínculos |
+| GET | `/admin/metrics` | Admin ativo | Totais reais por período de criação |
+| GET | `/admin/audit` | Admin ativo | Até 200 ações mais recentes, ordem decrescente |
+| POST | `/reports` | Autenticado ativo | 201 + denúncia de serviço/avaliação visível |
+| GET | `/admin/reports` | Admin ativo | Fila e decisões, com relato e cópia do conteúdo |
+| PATCH | `/admin/reports/{id}` | Admin ativo | Manter/remover com justificativa; remoção lógica e auditoria |
 | GET | `/actuator/health` (fora da base) | Público | Saúde sem detalhes privados |
 
 ## Cadastro e login
@@ -84,7 +94,7 @@ Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não
 }
 ```
 
-Resposta inclui `id`, campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio,averageRating,reviewCount}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
+Resposta inclui `id`, `moderated` (booleano), campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio,averageRating,reviewCount}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
 
 Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx 100), `minPrice`, `maxPrice`, `minRating` (1–5), `page` (>=0), `size` (1–50, padrão 12). Ordenação por criação decrescente. Faixa invertida retorna 400. Pesquisa textual escapa caracteres especiais de LIKE.
 
@@ -124,7 +134,7 @@ Contestação exige motivo não vazio de até 300 caracteres em `comment`. Parti
 
 O job cancela `PENDENTE` após 48 horas sem resposta e confirma `AGUARDANDO_CONFIRMACAO` após 5 dias corridos. A checagem periódica usa `CONTRACT_DEADLINE_CHECK_MS`, padrão 60000 ms, e registra eventos idempotentes. Não depende do navegador aberto, mas exige API em execução. Não dispara pagamentos ou e-mails.
 
-`ContractView` inclui IDs dos participantes, nomes, `serviceId` (pode ser nulo em contratação por proposta), título/preço, `date`, descrição/endereço, `status`, `history: [{status,at}]`, `completedAt`, `rating`, `review`, `reviewReply`, `reviewedAt`, `dispute` e `observations`. Campos opcionais podem ser nulos. Ator, estado anterior e nota dos eventos ficam no banco, mas não são expostos em `history`.
+`ContractView` inclui IDs dos participantes, nomes, `serviceId` (pode ser nulo em contratação por proposta), título/preço, `date`, descrição/endereço, `status`, `history: [{status,at}]`, `completedAt`, `rating`, `review`, `reviewReply`, `reviewedAt`, `dispute` e `observations`. Campos opcionais podem ser nulos. Ator, estado anterior e nota dos eventos ficam no banco, mas não são expostos em `history`. Decisões de disputa por ADMIN também são registradas em `audit_event`; a interface solicita justificativa.
 
 ## Avaliações e resposta (F03)
 
@@ -158,6 +168,34 @@ As listas são arrays sem paginação nesta base. O cliente lista suas demandas/
 O cliente dono decide uma proposta pendente com POST `/proposals/{id}/accept` ou `/reject`, sem payload obrigatório. O aceite retorna `{demand,proposal,contract}`, fecha a demanda, aceita a proposta escolhida, recusa as demais pendentes e cria contratação `ACEITO`, em transação. A data da contratação é o dia do aceite em São Paulo acrescido do prazo da proposta. O título/valor acordado e os vínculos são preservados no banco; `demandId`/`proposalId` ainda não fazem parte de `ContractView`.
 
 A recusa retorna a proposta `REJECTED` e mantém a demanda aberta. Demanda fechada ou proposta já decidida retorna 409; decisão por quem não é cliente dono retorna 403. A interface atual oferece ações de aceite e recusa no detalhe da demanda para o cliente dono.
+
+## Administração e denúncias (F04/F05)
+
+O backend verifica perfil e conta ativa em toda operação administrativa. Cliente/freelancer recebe 403; a suspensão também bloqueia tokens já emitidos. Não há endpoint de promoção pública nem exclusão definitiva de usuários.
+
+- PATCH `/admin/users/{id}/status`: `{"active":false,"reason":"Suspensão após análise"}`. Motivo obrigatório, até 1000 caracteres. Alterar status de ADMIN retorna 409. Repetir o estado atual não cria evento duplicado.
+- POST `/admin/categories`: `{"name":"Jardinagem"}`. Nome obrigatório, até 80 caracteres; nome/slug duplicado retorna 409. PUT `/admin/categories/{id}`: `{"name":"Jardim e paisagismo","active":false}`. Renomear conserva slug; desativar impede novos anúncios nessa categoria sem apagar os existentes.
+- GET `/admin/metrics`: filtros opcionais `from`/`to` no formato `YYYY-MM-DD`, inclusivos, por data de criação no fuso São Paulo. Período invertido retorna 400. Retorna `users`, `services`, `contracts`, `reviews`, `reports`, `pendingReports`, `disputes`. Totais incluem registros preservados após suspensão/remoção lógica; pendências refletem o estado atual dos registros criados no período.
+- GET `/admin/audit`: lista com `id`, `actorId`, `actorName`, `action`, `targetType`, `targetId`, `beforeValue`, `afterValue`, `reason`, `createdAt`. Sem endpoint de edição/exclusão. Criação de admin, mudanças em usuários/categorias, decisão de denúncia e decisão de disputa geram eventos na mesma transação.
+
+POST `/reports` recebe:
+
+```json
+{
+  "targetType": "SERVICE",
+  "targetId": "UUID válido do anúncio",
+  "reason": "Anúncio incorreto",
+  "comment": "Relato detalhado com pelo menos quarenta caracteres para análise."
+}
+```
+
+`targetType` aceita `SERVICE` ou `REVIEW`; motivo obrigatório até 80 caracteres e relato de 40–1000 caracteres úteis após trim. O serviço precisa estar ativo e não moderado, com profissional ativo; a avaliação precisa estar visível e vinculada a profissional ativo. Alvo inexistente/invisível retorna 404. Só pode existir uma denúncia pendente do mesmo autor para o mesmo alvo (409 na duplicidade).
+
+A resposta/fila inclui autor, tipo/ID do alvo, `targetTitle`, `targetContent` (cópia textual), motivo/relato, estado, justificativa, administrador e datas. GET `/admin/reports` é exclusivo de ADMIN; não há listagem pública de denúncias. O relato e a cópia do conteúdo são a evidência persistida nesta fase, sem upload de anexos.
+
+PATCH `/admin/reports/{id}` recebe `{"status":"REMOVED","note":"Motivo fundamentado da decisão"}` ou estado `KEPT`. A justificativa é obrigatória, até 1000 caracteres. `PENDING` como decisão retorna 400; segunda decisão retorna 409. A remoção mantém registros e vínculos: anúncio fica `INACTIVE`/`moderated=true` e seu dono não pode editar/republicar; avaliação fica `hidden=true`, saindo de listas públicas, médias e busca por nota. O histórico privado da contratação e a unicidade da avaliação permanecem preservados.
+
+Decisões são transacionais e usam locks para serializar alterações concorrentes no alvo. Não há operação de desfazer remoção nesta entrega. E-mail dos envolvidos pertence a F07; arquivos de evidência dependem de F06.
 
 ## Erros e verificação manual
 

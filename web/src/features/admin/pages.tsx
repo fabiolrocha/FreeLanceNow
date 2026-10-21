@@ -1,11 +1,13 @@
 import { useState } from 'react'
+import { isMock } from '../../data/client'
+import { ApiAdminUsers, ApiAdminCategories, ApiAdminModeration, ApiAdminReports } from './api-pages'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../app/store'
 import { demoUsers, professionals } from '../../data/fixtures'
 import { Avatar, Field, PageTitle, Empty } from '../../components/ui'
 import { exportCsv } from '../../data/exportCsv'
 
-export function AdminUsers() {
+function MockAdminUsers() {
   const [users, setUsers] = useState(
       [
         ...demoUsers,
@@ -91,7 +93,7 @@ export function AdminUsers() {
     </>
   )
 }
-export function AdminCategories() {
+function MockAdminCategories() {
   const { categories } = useApp(),
     [items, setItems] = useState(categories.map((c) => ({ ...c, active: true }))),
     [name, setName] = useState('')
@@ -164,7 +166,7 @@ interface ReportRecord {
   comment: string
   status: string
 }
-export function AdminModeration() {
+function MockAdminModeration() {
   const { contracts, transition } = useApp(),
     [reports, setReports] = useState<ReportRecord[]>(() => {
       try {
@@ -228,7 +230,7 @@ export function AdminModeration() {
     </>
   )
 }
-export function AdminReports() {
+function MockAdminReports() {
   const { services, contracts, professionals } = useApp()
   return (
     <>
@@ -303,4 +305,20 @@ export function AdminTransactions() {
       </section>
     </>
   )
+}
+
+export function AdminUsers() {
+  return isMock ? <MockAdminUsers /> : <ApiAdminUsers />
+}
+
+export function AdminCategories() {
+  return isMock ? <MockAdminCategories /> : <ApiAdminCategories />
+}
+
+export function AdminModeration() {
+  return isMock ? <MockAdminModeration /> : <ApiAdminModeration />
+}
+
+export function AdminReports() {
+  return isMock ? <MockAdminReports /> : <ApiAdminReports />
 }

@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
+@org.hibernate.annotations.DynamicUpdate
 @Table(name = "app_user")
 public class User {
     @Id private UUID id;
@@ -87,6 +88,14 @@ public class User {
 
     public Role getRole() {
         return role;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
     public boolean isActive() {

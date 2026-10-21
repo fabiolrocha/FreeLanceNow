@@ -38,7 +38,7 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
                    avg(r.rating) as averageRating,
                    count(r.id) as reviewCount
             from Review r
-            where r.freelancer.id in :freelancerIds
+            where r.hidden = false and r.freelancer.id in :freelancerIds
             group by r.freelancer.id
             """)
     List<RatingStats> statsByFreelancerIds(Collection<UUID> freelancerIds);

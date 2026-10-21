@@ -1,6 +1,6 @@
 # Arquitetura dos sistemas
 
-Revisado em **21/10/2026**. Monorepositório com dois aplicativos e um banco. A aplicação web é uma SPA React; o backend é um monólito Spring Boot modularizado por domínio. Uma única API atende clientes e freelancers. A interface de moderação já usa contratos e transições reais de disputa no modo API quando há sessão ADMIN. Provisionamento dessa conta, gestão, denúncias persistentes e auditoria completa permanecem em F04/F05.
+Revisado em **21/10/2026**. Monorepositório com dois aplicativos e um banco. A aplicação web é uma SPA React; o backend é um monólito Spring Boot modularizado por domínio. Uma única API atende clientes e freelancers. F04/F05 acrescentam os módulos `admin` e `moderation`, com provisionamento explícito de ADMIN, gestão persistente, denúncias e auditoria transacional.
 
 ```mermaid
 flowchart LR
@@ -9,10 +9,10 @@ flowchart LR
   Web -->|modo api: HTTP JSON| Proxy[Vite em dev / Nginx no Docker]
   Proxy --> API[Spring Boot 4.1.1 / Java 21]
   API --> Security[Spring Security / JWT / bcrypt]
-  API --> Modulos[auth / users / catalog / contracts / reviews / demands]
+  API --> Modulos[auth / users / catalog / contracts / reviews / demands / admin / moderation]
   Modulos --> JPA[JPA / transações]
   JPA --> DB[(PostgreSQL 15 local)]
-  Flyway[Flyway V1 a V5] --> DB
+  Flyway[Flyway V1 a V7] --> DB
 ```
 
 | Camada | Local | Responsabilidade |
@@ -21,11 +21,11 @@ flowchart LR
 | Features | `web/src/features/` | Formulários e fluxos por área |
 | Dados web | `web/src/data/client.ts` | Seleção explícita mock/API e chamadas HTTP |
 | Domínio web | `web/src/domain/` | Tipos e regras testáveis do fluxo simulado |
-| Controllers/DTOs | `api/.../{auth,users,catalog,contracts,reviews,demands}` | HTTP, validação, representação pública/privada |
+| Controllers/DTOs | `api/.../{auth,users,catalog,contracts,reviews,demands,admin,moderation}` | HTTP, validação, representação pública/privada |
 | Services | Mesmos módulos | Regras de negócio, prazos agendados (`@Scheduled`) e fronteiras transacionais |
 | Repositories/entidades | Mesmos módulos | Persistência, busca, locks pessimistas e vínculos |
 | Config/common | `api/.../{config,common}` | Segurança, `Clock` injetável, CORS, seed e Problem Details |
-| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V5`) |
+| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V7`) |
 
 JWT HS256 é emitido pelo próprio backend com issuer validado, expiração de 900s e segredo configurado por ambiente com pelo menos 32 bytes. Os endpoints de perfil privado, gestão de anúncios, contratações, avaliações e demandas/propostas verificam também que a conta existe e está ativa. O frontend guarda a sessão em `sessionStorage`, conserva a expiração absoluta após reload e elimina a sessão ao expirar. Uma fase futura deve avaliar cookies HttpOnly/CSRF ou outra política de sessão adequada à implantação pública.
 
@@ -49,8 +49,8 @@ Compose publica as portas em `127.0.0.1`. Não é uma infraestrutura de produç�
 
 | Sistema | Estado atual | Provedor / Próximo passo |
 |---|---|---|
-| Contratação/reputação (`F01`/`F02`/`F03`) | Implementado na API e no React (`contract`, `contract_event`, `review`, jobs 48h/5d) | Validar a moderação integrada após provisionar admin (`F04`/`F05`) |
-| Administração/auditoria (`F04`/`F05`) | Parcial: disputa ligada à API na interface; gestão e denúncias locais | Provisionar admin real, persistir gestão/denúncias e completar evidências/auditoria |
+| Contratação/reputação (`F01`/`F02`/`F03`) | Implementado na API e no React (`contract`, `contract_event`, `review`, jobs 48h/5d) | Moderação e auditoria integradas nesta entrega F04/F05 |
+| Administração/auditoria (`F04`/`F05`) | Implementadas: bootstrap opt-in, usuários/categorias, denúncias, remoção lógica, métricas e auditoria | E-mail em F07 e anexos em F06; manter verificação de autorização e regressão |
 | Demandas/propostas (`F08`) | Implementado na API e no React (`demand`, `proposal`, aceite gerando `contract` em `ACEITO`) | — |
 | Mensagens/notificações e e-mail (`F07`) | Provedor definido (**Resend**) | Implementar envio transacional e persistência de mensagens/avisos |
 | Arquivos e catálogo (`F06`) | Upload ausente; busca da API paginada; marca SVG estática disponível | Definir storage, validar até 5 imagens/5 MB e paginar busca no React |

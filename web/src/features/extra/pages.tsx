@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { isMock } from '../../data/client'
+import { ApiReport } from './report-api'
 import { exportCsv } from '../../data/exportCsv'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
@@ -315,7 +317,7 @@ export function Withdraw() {
     </>
   )
 }
-export function Report() {
+function MockReport() {
   const [params] = useSearchParams(),
     { pathname } = useLocation(),
     navigate = useNavigate()
@@ -450,4 +452,8 @@ export function Help({ kind = 'help' }: { kind?: string }) {
       <ErrorMessage message="" />
     </article>
   )
+}
+
+export function Report() {
+  return isMock ? <MockReport /> : <ApiReport />
 }

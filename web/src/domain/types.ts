@@ -32,6 +32,7 @@ export interface Service {
   price: number
   deliveryDays: number
   status: ServiceStatus
+  moderated?: boolean
   category: Category
   freelancer: Profile
 }

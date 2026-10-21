@@ -62,15 +62,17 @@ export function MyServices() {
                   {s.category.name} · {money(s.price)} · {s.deliveryDays} dias
                 </p>
                 <span className={`badge ${s.status === 'ACTIVE' ? 'green' : ''}`}>
-                  {labels[s.status]}
+                  {s.moderated ? 'Removido pela moderação' : labels[s.status]}
                 </span>
               </div>
               <div className="row">
-                <Link className="button secondary" to={`/meus-servicos/${s.id}/editar`}>
-                  Editar
-                </Link>
+                {!s.moderated && (
+                  <Link className="button secondary" to={`/meus-servicos/${s.id}/editar`}>
+                    Editar
+                  </Link>
+                )}
                 <button
-                  disabled={busy === s.id}
+                  disabled={busy === s.id || s.moderated}
                   className="text-button"
                   onClick={() => void status(s)}
                 >
@@ -162,6 +164,11 @@ export function ServiceForm() {
             <span>Categoria *</span>
             <select name="categoryId" required defaultValue={existing?.category.id || ''}>
               <option value="">Selecione uma categoria</option>
+              {existing && !categories.some((c) => c.id === existing.category.id) && (
+                <option value={existing.category.id}>
+                  {existing.category.name} (categoria atual desativada)
+                </option>
+              )}
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.name}
