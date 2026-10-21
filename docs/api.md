@@ -17,6 +17,22 @@ Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos d
 | POST | `/services` | Freelancer | 201 + anúncio |
 | PUT | `/services/{id}` | Freelancer/dono | Atualização completa |
 | PATCH | `/services/{id}/status` | Freelancer/dono | Ativa, desativa ou põe em rascunho |
+| GET | `/contracts` | Autenticado | Lista contratações do participante (ou todas para admin) |
+| GET | `/contracts/{id}` | Participante/Admin | Detalhe, histórico de eventos e avaliação da contratação |
+| POST | `/contracts` | Cliente | 201 + solicitação `PENDENTE` com snapshot do serviço |
+| PATCH | `/contracts/{id}/status` | Participante/Admin | Transição de estado e registro em `contract_event` |
+| POST | `/contracts/{id}/review` | Cliente (autor) | 201 + avaliação única (1–5, até 500 chars, janela de 7 dias) |
+| POST | `/contracts/{id}/review/reply` | Freelancer (dono) | 200 + resposta única do profissional (até 200 chars) |
+| GET | `/freelancers/{id}/reviews` | Público | Lista avaliações públicas recebidas pelo profissional |
+| GET | `/services/{id}/reviews` | Público | Lista avaliações públicas vinculadas ao serviço |
+| GET | `/demands` | Autenticado | Demandas do cliente ou todas as demandas para freelancer/admin |
+| GET | `/demands/{id}` | Autorizado | Detalhe da demanda (cliente dono, admin ou freelancer) |
+| POST | `/demands` | Cliente | 201 + nova demanda aberta (`OPEN`) |
+| GET | `/proposals` | Autenticado | Propostas recebidas (cliente), enviadas (freelancer) ou todas (admin) |
+| GET | `/demands/{id}/proposals` | Autorizado | Propostas da demanda (todas para o dono/admin ou própria para freelancer) |
+| POST | `/demands/{id}/proposals` | Freelancer | 201 + proposta única `PENDING` por profissional/demanda |
+| POST | `/proposals/{id}/accept` | Cliente (dono da demanda) | 200 + encerra demanda, recusa demais propostas e cria contratação `ACEITO` |
+| POST | `/proposals/{id}/reject` | Cliente (dono da demanda) | 200 + marca proposta como `REJECTED` |
 | GET | `/actuator/health` (fora da base) | Público | Saúde sem detalhes privados |
 
 ## Cadastro e login
@@ -53,7 +69,7 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 
 `expiresAt` é calculado pelo frontend e não pertence à resposta HTTP. Logout apaga a sessão local; não existe refresh/revogação individual. Conta desativada não consegue login e perde acesso ao perfil privado e à gestão de serviços mesmo com token ainda válido.
 
-Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não são alteráveis por esse endpoint. Perfil público retorna `id`, `name`, `role`, `city`, `bio`, sem dados de contato.
+Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não são alteráveis por esse endpoint. Perfil público retorna `id`, `name`, `role`, `city`, `bio`, `averageRating` (média com 1 casa decimal) e `reviewCount`, sem dados de contato.
 
 ## Anúncios e busca
 
@@ -68,15 +84,15 @@ Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não
 }
 ```
 
-Resposta inclui `id`, campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
+Resposta inclui `id`, campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio,averageRating,reviewCount}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
 
-Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx 100), `minPrice`, `maxPrice`, `page` (>=0), `size` (1–50, padrão 12). Ordenação por criação decrescente. Faixa invertida retorna 400. Pesquisa textual escapa caracteres especiais de LIKE.
+Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx 100), `minPrice`, `maxPrice`, `minRating` (1–5), `page` (>=0), `size` (1–50, padrão 12). Ordenação por criação decrescente. Faixa invertida retorna 400. Pesquisa textual escapa caracteres especiais de LIKE.
 
 ```json
 { "items": [], "page": 0, "size": 12, "totalElements": 0, "totalPages": 0 }
 ```
 
-O React atual carrega páginas de 50 para compor o catálogo da entrega e filtra localmente; paginação server-side na interface é tarefa futura. Não há filtro por nota até avaliações persistentes serem implementadas.
+O React atual carrega páginas de 50 para compor o catálogo da entrega e filtra localmente (incluindo nota mínima e ordenação por melhor avaliação); paginação server-side na interface é tarefa futura (`F06`).
 
 ## Erros e verificação manual
 

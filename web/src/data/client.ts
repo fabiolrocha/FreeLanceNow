@@ -1,7 +1,16 @@
 import type {
   Category,
+  Contract,
+  ContractStatus,
+  CreateContract,
+  CreateDemand,
+  CreateProposal,
+  Demand,
   Profile,
+  Proposal,
+  ProposalAcceptance,
   Register,
+  Review,
   SaveService,
   Service,
   ServiceStatus,
@@ -29,8 +38,17 @@ const fieldLabels: Record<string, string> = {
   description: 'descrição',
   categoryId: 'categoria',
   price: 'valor',
+  budget: 'orçamento',
+  days: 'prazo',
   deliveryDays: 'prazo',
+  message: 'mensagem',
   status: 'status',
+  serviceId: 'serviço',
+  date: 'data',
+  address: 'endereço',
+  comment: 'comentário',
+  rating: 'nota',
+  reply: 'resposta',
 }
 export function setToken(value: string) {
   token = value
@@ -61,12 +79,22 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 // Public data never carries contact fields, mirroring UserDtos.PublicProfile in the API.
-const publicProfile = ({ id, name, role, city, bio }: Profile): Profile => ({
+const publicProfile = ({
   id,
   name,
   role,
   city,
   bio,
+  averageRating,
+  reviewCount,
+}: Profile): Profile => ({
+  id,
+  name,
+  role,
+  city,
+  bio,
+  averageRating,
+  reviewCount,
 })
 let listings = read<Service[]>('fln-mock-services', services).map((s) => ({
   ...s,
@@ -200,5 +228,70 @@ export const client = {
         body: JSON.stringify({ status }),
       })
     return this.saveService(u, { ...service, categoryId: service.category.id, status }, service.id)
+  },
+  async contracts(): Promise<Contract[]> {
+    return request('/contracts')
+  },
+  async createContract(r: CreateContract): Promise<Contract> {
+    return request('/contracts', {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async transitionContract(
+    id: string,
+    status: ContractStatus,
+    comment?: string,
+  ): Promise<Contract> {
+    return request(`/contracts/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, comment }),
+    })
+  },
+  async reviewContract(id: string, rating: number, comment: string): Promise<Review> {
+    return request(`/contracts/${id}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ rating, comment }),
+    })
+  },
+  async replyReview(id: string, reply: string): Promise<Review> {
+    return request(`/contracts/${id}/review/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ reply }),
+    })
+  },
+  async freelancerReviews(freelancerId: string): Promise<Review[]> {
+    return request(`/freelancers/${freelancerId}/reviews`)
+  },
+  async serviceReviews(serviceId: string): Promise<Review[]> {
+    return request(`/services/${serviceId}/reviews`)
+  },
+  async demands(): Promise<Demand[]> {
+    return request('/demands')
+  },
+  async createDemand(r: CreateDemand): Promise<Demand> {
+    return request('/demands', {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async proposals(): Promise<Proposal[]> {
+    return request('/proposals')
+  },
+  async createProposal(demandId: string, r: CreateProposal): Promise<Proposal> {
+    return request(`/demands/${demandId}/proposals`, {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async acceptProposal(proposalId: string): Promise<ProposalAcceptance> {
+    return request(`/proposals/${proposalId}/accept`, {
+      method: 'POST',
+    })
+  },
+  async rejectProposal(proposalId: string): Promise<Proposal> {
+    return request(`/proposals/${proposalId}/reject`, {
+      method: 'POST',
+    })
   },
 }

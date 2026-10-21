@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#16854c"/><path d="M22 16h27l-2 9H30l-2 9h15l-2 8H26l-3 12H12z" fill="white"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="fln-bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#16854c" />
+      <stop offset="100%" stop-color="#174b35" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#fln-bg)" />
+  <path
+    d="M18 16h26l-2.5 8.5H26.5l-1.8 7.5h13.8l-2.3 8H22.4L19.5 50H11L18 16Z"
+    fill="#ffffff"
+  />
+  <path
+    d="M44.5 22L35 36.5h7.2L39.5 49 52 33h-7.4L44.5 22Z"
+    fill="#70b793"
+  />
+</svg>

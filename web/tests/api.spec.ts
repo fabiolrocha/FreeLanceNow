@@ -40,3 +40,180 @@ test('cadastro, perfil e anúncio persistem no PostgreSQL e sobrevivem ao reload
   await page.goto(`/servicos?q=${encodeURIComponent(title)}`)
   await expect(page.getByRole('heading', { name: title })).toBeVisible()
 })
+
+test('ciclo completo de contratação entre duas contas persiste no PostgreSQL após reload', async ({
+  page,
+}) => {
+  const freelancerEmail = `freela-${crypto.randomUUID()}@example.test`,
+    clientEmail = `client-${crypto.randomUUID()}@example.test`,
+    title = `Contratação real ${Date.now()}`
+
+  await page.goto('/cadastro?tipo=freelancer')
+  await page.getByLabel('Nome completo').fill('Freelancer Contrato')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel('Telefone').fill('61999990001')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto('/meus-servicos/novo')
+  await page.getByLabel('Título do serviço').fill(title)
+  await page.getByLabel('Categoria').selectOption({ label: 'Elétrica' })
+  await page.getByLabel('Descrição detalhada').fill('Serviço para validar contratação real.')
+  await page.getByLabel('Valor estimado').fill('210.00')
+  await page.getByRole('button', { name: 'Publicar serviço', exact: true }).click()
+  await expect(page).toHaveURL(/\/meus-servicos$/)
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/cadastro')
+  await page.getByRole('button', { name: /Quero contratar/ }).click()
+  await page.getByLabel('Nome completo').fill('Cliente Contrato')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel('Telefone').fill('61999990002')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto(`/servicos?q=${encodeURIComponent(title)}`)
+  await page.getByRole('link', { name: title, exact: true }).click()
+  await page.getByRole('link', { name: 'Solicitar serviço' }).click()
+  await page.getByLabel('Descrição da demanda').fill('Instalação completa com revisão do quadro.')
+  await page.getByLabel('Endereço').fill('Asa Norte, Brasília')
+  await page.getByRole('button', { name: 'Confirmar solicitação' }).click()
+  await expect(page.getByRole('heading', { name: 'Solicitação enviada' })).toBeVisible()
+  await page.getByRole('link', { name: 'Acompanhar contratação' }).click()
+  const contractUrl = page.url()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(contractUrl)
+  await page.getByRole('button', { name: 'Aceitar solicitação' }).click()
+  await page.getByRole('button', { name: 'Iniciar serviço' }).click()
+  await page.getByRole('link', { name: 'Marcar como concluído' }).click()
+  await page.getByLabel('Observações finais').fill('Quadros e disjuntores revisados.')
+  await page.getByRole('button', { name: 'Confirmar conclusão' }).click()
+  await expect(page.getByText('Aguardando confirmação', { exact: true }).first()).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(contractUrl)
+  await page.getByRole('link', { name: 'Confirmar ou contestar' }).click()
+  await page.getByRole('button', { name: 'Confirmar recebimento' }).click()
+  await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Observações finais: Quadros e disjuntores revisados.')).toBeVisible()
+
+  await page.getByRole('link', { name: 'Avaliar serviço' }).click()
+  await page.getByRole('button', { name: '5 estrelas', exact: true }).click()
+  await page.getByLabel('Comentário').fill('Serviço impecável e dentro do prazo.')
+  await page.getByRole('button', { name: 'Enviar avaliação' }).click()
+  await expect(page.getByRole('heading', { name: 'Avaliação publicada' })).toBeVisible()
+  await page.getByRole('link', { name: 'Ver contratação' }).click()
+  await expect(
+    page.getByText('Avaliação registrada: 5 de 5. Serviço impecável e dentro do prazo.'),
+  ).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(contractUrl)
+  await page
+    .getByLabel('Responder avaliação (até 200 caracteres)')
+    .fill('Agradeço a avaliação e fico à disposição!')
+  await page.getByRole('button', { name: 'Responder avaliação' }).click()
+  await page.reload()
+  await expect(
+    page.getByText('Resposta do profissional: Agradeço a avaliação e fico à disposição!'),
+  ).toBeVisible()
+})
+
+test('demanda publicada recebe proposta, aceite gera contratação no PostgreSQL e demanda encerrada recusa propostas', async ({
+  page,
+}) => {
+  const clientEmail = `dem-client-${crypto.randomUUID()}@example.test`,
+    freelancerEmail = `dem-freela-${crypto.randomUUID()}@example.test`,
+    title = `Demanda real ${Date.now()}`
+
+  await page.goto('/cadastro')
+  await page.getByRole('button', { name: /Quero contratar/ }).click()
+  await page.getByLabel('Nome completo').fill('Cliente Demanda')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel('Telefone').fill('61999990011')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto('/demandas/nova')
+  await page.getByLabel('Título da demanda').fill(title)
+  await page.getByLabel('Descrição').fill('Substituir seis tomadas e revisar disjuntor da cozinha.')
+  await page.getByLabel('Orçamento').fill('320')
+  await page.getByLabel('Prazo').fill('3')
+  await page.getByLabel('Cidade e UF').fill('Taguatinga, DF')
+  await page.getByRole('button', { name: 'Publicar demanda' }).click()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  const demandUrl = page.url()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/cadastro?tipo=freelancer')
+  await page.getByLabel('Nome completo').fill('Freelancer Proposta')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel('Telefone').fill('61999990012')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto(demandUrl)
+  await page.getByRole('link', { name: 'Enviar proposta' }).click()
+  await page.getByLabel('Valor da proposta').fill('290')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Faço o serviço completo com teste de carga.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByRole('heading', { name: 'Proposta enviada' })).toBeVisible()
+
+  await page.goto(`${demandUrl}/proposta`)
+  await page.getByLabel('Valor da proposta').fill('260')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Segunda proposta duplicada.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(demandUrl)
+  await page.getByRole('button', { name: 'Aceitar proposta' }).click()
+  await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
+  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(`${demandUrl}/proposta`)
+  await expect(page.getByRole('heading', { name: 'Demanda encerrada' })).toBeVisible()
+})
+

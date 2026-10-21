@@ -1,6 +1,7 @@
 package br.com.freelancenow.api.config;
 
 import br.com.freelancenow.api.catalog.*;
+import br.com.freelancenow.api.demands.*;
 import br.com.freelancenow.api.users.*;
 
 import org.springframework.boot.CommandLineRunner;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
@@ -20,16 +22,22 @@ public class DemoData implements CommandLineRunner {
     private final UserRepository users;
     private final CategoryRepository categories;
     private final ServiceRepository services;
+    private final DemandRepository demands;
+    private final ProposalRepository proposals;
     private final PasswordEncoder passwords;
 
     public DemoData(
             UserRepository users,
             CategoryRepository categories,
             ServiceRepository services,
+            DemandRepository demands,
+            ProposalRepository proposals,
             PasswordEncoder passwords) {
         this.users = users;
         this.categories = categories;
         this.services = services;
+        this.demands = demands;
+        this.proposals = proposals;
         this.passwords = passwords;
     }
 
@@ -71,6 +79,38 @@ public class DemoData implements CommandLineRunner {
                 "Asa Norte, DF",
                 "Suporte de TI e redes para pequenos escritórios.",
                 "4");
+        seedDemand();
+    }
+
+    private void seedDemand() {
+        if (demands.count() > 0) return;
+        var ana = users.findByEmail("ana@demo.freelancenow.test").orElse(null);
+        var marcos = users.findByEmail("marcos@demo.freelancenow.test").orElse(null);
+        var eletrica =
+                categories
+                        .findById(UUID.fromString("10000000-0000-0000-0000-000000000001"))
+                        .orElse(null);
+        if (ana == null || marcos == null || eletrica == null) return;
+        var now = Instant.now();
+        var demand =
+                demands.saveAndFlush(
+                        new Demand(
+                                ana,
+                                eletrica,
+                                "Quadro de distribuição vive desarmando",
+                                "Preciso de avaliação do quadro e troca dos disjuntores se necessário.",
+                                new BigDecimal("800.00"),
+                                2,
+                                "Taguatinga, DF",
+                                now));
+        proposals.save(
+                new Proposal(
+                        demand,
+                        marcos,
+                        new BigDecimal("720.00"),
+                        2,
+                        "Avalio o quadro na mesma visita. Material será orçado separadamente.",
+                        now));
     }
 
     private void seed(String name, String email, Role role, String city, String bio, String cat) {

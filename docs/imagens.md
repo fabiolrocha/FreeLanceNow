@@ -1,6 +1,6 @@
 # Imagens e identidade visual
 
-**Decisão pendente do líder:** quais imagens realmente serão usadas no produto. Foi solicitada a escolha entre ícones/iniciais, fotografias reais autorizadas e ilustrações de serviço. Enquanto a resposta não chega, a base usa **ícones por categoria e avatares com iniciais**, sem bloquear a entrega.
+**Decisão registrada (Passo 0):** o produto utiliza a **logo oficial em SVG** (`web/public/images/logo.svg` e `web/public/favicon.svg`), **ícones vetoriais Lucide por categoria** nos cards do catálogo e **avatares com iniciais** para os perfis até a etapa de upload de imagens (`F06`).
 
 | Material existente | O que contém | Uso atual |
 |---|---|---|
@@ -9,16 +9,16 @@
 | FreeLanceNOW DOCX/PDF | Fotos/carômetro de integrantes e apresentação acadêmica | Apenas original; não representar clientes/freelancers |
 | PPTX | Ícones e figuras de apresentação/documentação | Referência, sem selecionar como assets definitivos |
 | HTML original | Placeholders e ícones; não contém catálogo fotográfico pronto | Referência visual |
-| React atual | Lucide, Public Sans e marca tipográfica provisória “F” | Interface de demonstração |
+| `web/public/images/logo.svg` e `favicon.svg` | Símbolo vetorial autoral "F + centelha" nas cores `#16854c` / `#174b35` / `#70b793` | Marca oficial no cabeçalho, rodapé e aba do navegador |
 
-## Decisões a registrar
+## Decisões registradas
 
-| ID | Decisão | Responsável | Prazo sugerido |
-|---|---|---|---|
-| IMG01 | Manter marca tipográfica ou fornecer logo final | Líder | 01/10 |
-| IMG02 | Fotos reais de serviços ou ilustrações? Quais categorias? | Líder + Arthur Almirante | 01/10 |
-| IMG03 | Avatares reais ou iniciais na apresentação? | Líder | 01/10 |
-| IMG04 | Origem/licença/autorização dos arquivos escolhidos | Quem fornecer + líder | Antes do commit do asset |
+| ID | Decisão | Status |
+|---|---|---|
+| IMG01 | Logo oficial criada em SVG (`web/public/images/logo.svg` e `web/public/favicon.svg`) | Concluído |
+| IMG02 | Ícones vetoriais Lucide por categoria no catálogo padrão; fotos reais via upload em `F06` | Concluído |
+| IMG03 | Avatares com iniciais por padrão na demonstração | Concluído |
+| IMG04 | Assets autorais do próprio repositório sob mesma licença acadêmica do projeto | Concluído |
 
 A escolha deve identificar arquivo, finalidade, autor/origem e licença/autorização. Fotos de colegas, clientes ou profissionais não entram automaticamente na interface. Não foi gerada nem baixada imagem de terceiros para preencher essa lacuna.
 

@@ -6,6 +6,8 @@ export interface Profile {
   role: Role
   city: string
   bio: string
+  averageRating?: number | null
+  reviewCount?: number
 }
 export interface User extends Profile {
   email: string
@@ -60,7 +62,7 @@ export type ContractStatus =
   | 'CANCELADO'
 export interface Contract {
   id: string
-  serviceId: string
+  serviceId?: string | null
   title: string
   freelancerId: string
   clientId: string
@@ -75,8 +77,30 @@ export interface Contract {
   completedAt?: string
   rating?: number
   review?: string
+  reviewReply?: string
+  reviewedAt?: string
   dispute?: string
   observations?: string
+}
+export interface Review {
+  id: string
+  contractId: string
+  serviceId?: string | null
+  serviceTitle: string
+  freelancerId: string
+  clientId: string
+  clientName: string
+  rating: number
+  comment: string
+  reply?: string | null
+  repliedAt?: string | null
+  createdAt: string
+}
+export interface CreateContract {
+  serviceId: string
+  date: string
+  description: string
+  address: string
 }
 export interface Demand {
   id: string
@@ -89,6 +113,14 @@ export interface Demand {
   city: string
   status: 'OPEN' | 'CLOSED'
 }
+export interface CreateDemand {
+  title: string
+  description: string
+  categoryId: string
+  budget: number
+  days: number
+  city: string
+}
 export interface Proposal {
   id: string
   demandId: string
@@ -98,4 +130,14 @@ export interface Proposal {
   days: number
   message: string
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
+}
+export interface CreateProposal {
+  price: number
+  days: number
+  message: string
+}
+export interface ProposalAcceptance {
+  demand: Demand
+  proposal: Proposal
+  contract: Contract
 }

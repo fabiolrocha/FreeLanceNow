@@ -23,7 +23,14 @@ import { Avatar } from '../components/ui'
 export function Brand() {
   return (
     <Link to="/" className="brand">
-      <span className="brand-icon">F</span>
+      <img
+        src="/images/logo.svg"
+        alt=""
+        aria-hidden="true"
+        className="brand-logo"
+        width={36}
+        height={36}
+      />
       <span>
         FreeLance<span className="brand-accent">Now</span>
       </span>
@@ -73,7 +80,7 @@ export function Layout() {
       <div className="demo-banner">
         {isMock
           ? 'Demonstração acadêmica · dados fictícios · nenhum pagamento real'
-          : 'Ambiente acadêmico · cadastro, login, perfis e serviços conectados à API'}
+          : 'Ambiente acadêmico · cadastro, login, perfis, serviços e contratações conectados à API'}
       </div>
       <header className="topbar">
         <Brand />

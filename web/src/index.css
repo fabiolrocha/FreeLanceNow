@@ -182,6 +182,13 @@ hr {
 .brand-accent {
   color: var(--green);
 }
+.brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  display: block;
+}
 .brand-icon {
   background: var(--green);
   color: white;
