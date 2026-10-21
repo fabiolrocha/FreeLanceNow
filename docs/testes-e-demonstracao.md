@@ -36,12 +36,12 @@ Verificação executada em 30/09/2026 na máquina de origem: **9 testes Java**, 
 ## Ensaio mock (6–8 minutos)
 
 1. Abra o modo mock e mostre o aviso acadêmico. Explore início, busca, categoria, detalhe e perfil.
-2. Entre como **Cliente** no login. Solicite outro anúncio ainda sem pendência, por exemplo o serviço de troca de tomada; data futura e descrição.
-3. Saia e entre como **Freelancer**, na mesma aba. Abra a contratação, aceite, inicie e marque como concluída.
+2. Entre como **Cliente** (`ana@demo.freelancenow.test` / `Demo12345`) com e-mail e senha. Solicite outro anúncio ainda sem pendência, por exemplo o serviço de troca de tomada; data futura e descrição.
+3. Saia e entre como **Freelancer** (`marcos@demo.freelancenow.test`), na mesma aba. Abra a contratação, aceite, inicie e marque como concluída.
 4. Saia e entre como **Cliente**; confirme e avalie. Mostre que a avaliação não permite novo envio. Demonstre também uma disputa preexistente sem alterar este fluxo.
 5. Entre como freelancer: crie rascunho, comprove que não aparece na busca, publique e desative.
 6. Mostre demanda e proposta; mensagens e notificações como simulação. Não apresentar entrega externa ou troca real entre navegadores.
-7. Entre como **Admin** mock, mostre usuários/categorias/relatórios/moderação; decida a disputa fictícia e exporte um CSV.
+7. Entre como **Admin** mock (`admin@demo.freelancenow.test`), mostre usuários/categorias/relatórios/moderação; decida a disputa fictícia e exporte um CSV.
 8. Abra uma tela financeira e explique os valores fictícios e o trabalho futuro. Finalize mostrando mobile e roadmap.
 
 Dados de contratação e denúncia no modo mock são compartilhados entre contas **na mesma sessão da aba** para facilitar o ensaio. No modo API, contratações, avaliações, demandas e propostas ficam salvas no PostgreSQL.

@@ -796,20 +796,6 @@ hr {
   text-align: center;
   margin-top: 1.5rem;
 }
-.demo-accounts {
-  border-top: 1px solid var(--border);
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  font-size: 0.8rem;
-}
-.demo-accounts .button {
-  font-size: 0.75rem;
-  padding: 0.5rem 0.8rem;
-}
-.demo-accounts small {
-  display: block;
-  margin-top: 0.7rem;
-}
 .auth-single {
   max-width: 600px;
   margin: 1rem auto;

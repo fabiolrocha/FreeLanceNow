@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { loginAs } from './login'
 test.skip(process.env.E2E_DATA_MODE === 'api', 'Suíte exclusiva do modo mock')
 test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e avalia', async ({
   page,
 }) => {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Cliente', exact: true }).click()
+  await loginAs(page, 'ana')
   await page.goto('/servicos/12/solicitar')
   await page
     .getByLabel('Descrição da demanda')
@@ -15,7 +16,7 @@ test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e
   const contractUrl = page.url()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await page.goto(contractUrl)
   await page.getByRole('button', { name: 'Aceitar solicitação' }).click()
   await page.getByRole('button', { name: 'Iniciar serviço' }).click()
@@ -23,7 +24,7 @@ test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e
   await page.getByRole('button', { name: 'Confirmar conclusão' }).click()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Cliente', exact: true }).click()
+  await loginAs(page, 'ana')
   await page.goto(contractUrl)
   await page.getByRole('link', { name: 'Confirmar ou contestar' }).click()
   await page.getByRole('button', { name: 'Confirmar recebimento' }).click()
@@ -35,7 +36,7 @@ test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e
 })
 test('rascunho não aparece na busca e publicação o torna disponível', async ({ page }) => {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await page.goto('/meus-servicos/novo')
   await page.getByLabel('Título do serviço').fill('Pintura de teste da equipe')
   await page.getByLabel('Categoria', { exact: false }).selectOption({ label: 'Pintura' })
@@ -64,7 +65,7 @@ test('mobile, acesso restrito e sessão expirada', async ({ page }) => {
     true,
   )
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Cliente', exact: true }).click()
+  await loginAs(page, 'ana')
   await page.goto('/meus-servicos')
   await expect(page.getByRole('heading', { name: 'Acesso restrito' })).toBeVisible()
   await page.getByRole('button', { name: 'Abrir menu' }).click()
@@ -77,11 +78,6 @@ test('mobile, acesso restrito e sessão expirada', async ({ page }) => {
   await page.reload()
   await expect(page).toHaveURL(/\/login$/)
 })
-async function loginAs(page: import('@playwright/test').Page, role: string) {
-  await page.goto('/login')
-  await page.getByRole('button', { name: role, exact: true }).click()
-  await expect(page).toHaveURL(role === 'Admin' ? /\/admin\/usuarios$/ : /\/inicio$/)
-}
 async function logout(page: import('@playwright/test').Page) {
   await page.getByRole('button', { name: 'Sair da conta' }).click()
 }
@@ -89,7 +85,7 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   page,
 }) => {
   const title = `Troca de tomadas ${Date.now()}`
-  await loginAs(page, 'Cliente')
+  await loginAs(page, 'ana')
   await page.goto('/demandas/nova')
   await page.getByLabel('Título da demanda').fill(title)
   await page.getByLabel('Descrição').fill('Trocar seis tomadas antigas da sala e da cozinha.')
@@ -100,7 +96,7 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   const demandUrl = page.url()
   await logout(page)
 
-  await loginAs(page, 'Freelancer')
+  await loginAs(page, 'marcos')
   await page.goto(demandUrl)
   await page.getByRole('link', { name: 'Enviar proposta' }).click()
   await page.getByLabel('Valor da proposta').fill('280')
@@ -116,7 +112,7 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
   await logout(page)
 
-  await loginAs(page, 'Cliente')
+  await loginAs(page, 'ana')
   await page.goto(demandUrl)
   await page.getByRole('button', { name: 'Aceitar proposta' }).click()
   await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
@@ -124,14 +120,14 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   await expect(page.getByRole('heading', { name: title })).toBeVisible()
   await logout(page)
 
-  await loginAs(page, 'Freelancer')
+  await loginAs(page, 'marcos')
   await page.goto(`${demandUrl}/proposta`)
   await expect(page.getByRole('heading', { name: 'Demanda encerrada' })).toBeVisible()
   await page.goto('/demandas')
   await expect(page.getByRole('heading', { name: title })).toHaveCount(0)
 })
 test('cliente contesta conclusão e admin decide a disputa na moderação', async ({ page }) => {
-  await loginAs(page, 'Cliente')
+  await loginAs(page, 'ana')
   await page.goto('/contratacoes/103/contestar')
   await page
     .getByLabel('Motivo da contestação')
@@ -146,14 +142,14 @@ test('cliente contesta conclusão e admin decide a disputa na moderação', asyn
   ).toBeVisible()
   await logout(page)
 
-  await loginAs(page, 'Admin')
+  await loginAs(page, 'admin')
   await page.goto('/admin/moderacao')
   const dispute = page.locator('article').filter({ hasText: 'O chuveiro continua sem aquecer' })
   await dispute.getByRole('button', { name: 'Confirmar conclusão' }).click()
   await expect(dispute).toHaveCount(0)
   await logout(page)
 
-  await loginAs(page, 'Cliente')
+  await loginAs(page, 'ana')
   await page.goto('/contratacoes/103')
   await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Avaliar serviço' })).toBeVisible()
@@ -161,7 +157,7 @@ test('cliente contesta conclusão e admin decide a disputa na moderação', asyn
 test('denúncia entra na fila do admin, recebe decisão e relatório exporta CSV', async ({
   page,
 }) => {
-  await loginAs(page, 'Cliente')
+  await loginAs(page, 'ana')
   await page.goto('/servicos/11')
   await page.getByRole('link', { name: 'Denunciar anúncio' }).click()
   await page.getByLabel('Motivo').selectOption('Anúncio incorreto')
@@ -172,7 +168,7 @@ test('denúncia entra na fila do admin, recebe decisão e relatório exporta CSV
   await expect(page.getByRole('heading', { name: 'Denúncia registrada' })).toBeVisible()
   await logout(page)
 
-  await loginAs(page, 'Admin')
+  await loginAs(page, 'admin')
   await page.goto('/admin/moderacao')
   const report = page.locator('article').filter({ hasText: 'Anúncio incorreto' })
   await expect(report.getByText('Pendente')).toBeVisible()

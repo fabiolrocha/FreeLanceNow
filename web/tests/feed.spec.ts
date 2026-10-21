@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test'
+import { loginAs } from './login'
 test.skip(process.env.E2E_DATA_MODE === 'api', 'Feed mock; integração real em feed-api.spec.ts')
 test('feed publica entre contas, filtra oportunidades e permite retirar apenas o próprio texto', async ({
   page,
 }) => {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await expect(page.getByRole('heading', { name: 'Feed de trabalho' })).toBeVisible()
   await page
     .getByLabel('Compartilhe seu trabalho')
@@ -16,7 +17,7 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Cliente', exact: true }).click()
+  await loginAs(page, 'ana')
   await expect(card).toBeVisible()
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Serviços', exact: true }).click()
@@ -29,7 +30,7 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
   await page.goto('/inicio')
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await card.getByRole('button', { name: 'Retirar publicação' }).click()
   await expect(card).toHaveCount(0)
   await page.reload()
@@ -38,7 +39,7 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
 test('feed no celular preserva navegação e acesso ao formulário de serviço', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await expect(page.getByLabel('Compartilhe seu trabalho')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
   await page.getByRole('link', { name: 'Oferecer serviço', exact: true }).click()
@@ -51,13 +52,13 @@ test('feed no celular preserva navegação e acesso ao formulário de serviço',
 test('denúncia de publicação permite ao admin retirar o texto do feed mock', async ({ page }) => {
   const text = 'Publicação de teste para análise da moderação.'
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await page.getByLabel('Compartilhe seu trabalho').fill(text)
   await page.getByRole('button', { name: 'Publicar atualização', exact: true }).click()
   await expect(page.locator('article.feed-card').filter({ hasText: text })).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Cliente', exact: true }).click()
+  await loginAs(page, 'ana')
   await page
     .locator('article.feed-card')
     .filter({ hasText: text })
@@ -69,19 +70,19 @@ test('denúncia de publicação permite ao admin retirar o texto do feed mock', 
   await page.getByRole('button', { name: 'Enviar denúncia' }).click()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Admin', exact: true }).click()
+  await loginAs(page, 'admin')
   await page.goto('/admin/moderacao')
   await page.getByRole('button', { name: 'Simular remoção' }).click()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await expect(page.locator('article.feed-card').filter({ hasText: text })).toHaveCount(0)
 })
 test('retirar o último item da última página retorna aos resultados restantes', async ({
   page,
 }) => {
   await page.goto('/login')
-  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await loginAs(page, 'marcos')
   await page.evaluate(() => {
     const { user } = JSON.parse(sessionStorage.getItem('fln-session')!)
     const author = { id: user.id, name: user.name, role: user.role, city: user.city }

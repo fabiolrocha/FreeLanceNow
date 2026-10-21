@@ -4,7 +4,6 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ShieldCheck, ArrowLeft, CheckCircle2 } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client, isMock } from '../../data/client'
-import { demoUsers } from '../../data/fixtures'
 import { validPassword } from '../../domain/rules'
 import { ErrorMessage, Field } from '../../components/ui'
 
@@ -60,28 +59,6 @@ export function Login() {
             {busy ? 'Entrando…' : 'Entrar'}
           </button>
         </form>
-        {isMock && (
-          <div className="demo-accounts">
-            <p>Explorar com uma conta de demonstração</p>
-            <div className="row">
-              {demoUsers.map((u) => (
-                <button
-                  key={u.id}
-                  className="button secondary"
-                  disabled={busy}
-                  onClick={() => void enter(u.email, 'Demo12345')}
-                >
-                  {u.role === 'CLIENT'
-                    ? 'Cliente'
-                    : u.role === 'FREELANCER'
-                      ? 'Freelancer'
-                      : 'Admin'}
-                </button>
-              ))}
-            </div>
-            <small>Senha das contas fictícias: Demo12345</small>
-          </div>
-        )}
         <p className="auth-switch">
           Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
         </p>

@@ -21,7 +21,7 @@ Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --buil
 
 Abra **http://localhost:5173**. A API responde em **http://localhost:8081/actuator/health**. O PostgreSQL local usa a porta **5435**. Essas portas evitam conflitos com outros projetos presentes na máquina de origem.
 
-Por padrão, a aplicação roda em **modo mock**, sem depender da API para navegar. Na tela de login, os botões **Cliente**, **Freelancer** e **Admin** abrem contas fictícias. Todas usam a senha `Demo12345`. Dados simulados ficam na sessão do navegador; fechar a aba ou limpar `sessionStorage` reinicia a experiência. Ações financeiras nunca movimentam dinheiro.
+Por padrão, a aplicação roda em **modo mock**, sem depender da API para navegar. O login aceita somente e-mail e senha. Contas fictícias do mock: `ana@demo.freelancenow.test` (cliente), `marcos@demo.freelancenow.test` (freelancer) e `admin@demo.freelancenow.test` (admin), todas com a senha `Demo12345`. Dados simulados ficam na sessão do navegador; fechar a aba ou limpar `sessionStorage` reinicia a experiência. Ações financeiras nunca movimentam dinheiro.
 
 ### Usar a API real
 

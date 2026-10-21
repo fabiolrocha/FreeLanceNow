@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { loginAs } from './login'
 test.skip(process.env.E2E_DATA_MODE === 'api', 'Navegação de todas as áreas simuladas')
 test('telas por perfil renderizam em celular sem erros de execução', async ({ page }) => {
   test.setTimeout(60000)
@@ -47,7 +48,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
   ]
   const roles = [
     {
-      name: 'Cliente',
+      user: 'ana' as const,
       paths: [
         ...shared,
         '/servicos/12/solicitar',
@@ -61,7 +62,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
       ],
     },
     {
-      name: 'Freelancer',
+      user: 'marcos' as const,
       paths: [
         '/painel',
         '/meus-servicos',
@@ -76,7 +77,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
       ],
     },
     {
-      name: 'Admin',
+      user: 'admin' as const,
       paths: [
         '/admin/usuarios',
         '/admin/categorias',
@@ -87,8 +88,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
     },
   ]
   for (const role of roles) {
-    await page.goto('/login')
-    await page.getByRole('button', { name: role.name, exact: true }).click()
+    await loginAs(page, role.user)
     for (const path of role.paths) await visit(path)
     await page.getByRole('button', { name: 'Abrir menu' }).click()
     await page.getByRole('button', { name: 'Sair da conta' }).click()
