@@ -140,3 +140,80 @@ test('ciclo completo de contratação entre duas contas persiste no PostgreSQL a
     page.getByText('Resposta do profissional: Agradeço a avaliação e fico à disposição!'),
   ).toBeVisible()
 })
+
+test('demanda publicada recebe proposta, aceite gera contratação no PostgreSQL e demanda encerrada recusa propostas', async ({
+  page,
+}) => {
+  const clientEmail = `dem-client-${crypto.randomUUID()}@example.test`,
+    freelancerEmail = `dem-freela-${crypto.randomUUID()}@example.test`,
+    title = `Demanda real ${Date.now()}`
+
+  await page.goto('/cadastro')
+  await page.getByRole('button', { name: /Quero contratar/ }).click()
+  await page.getByLabel('Nome completo').fill('Cliente Demanda')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel('Telefone').fill('61999990011')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto('/demandas/nova')
+  await page.getByLabel('Título da demanda').fill(title)
+  await page.getByLabel('Descrição').fill('Substituir seis tomadas e revisar disjuntor da cozinha.')
+  await page.getByLabel('Orçamento').fill('320')
+  await page.getByLabel('Prazo').fill('3')
+  await page.getByLabel('Cidade e UF').fill('Taguatinga, DF')
+  await page.getByRole('button', { name: 'Publicar demanda' }).click()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  const demandUrl = page.url()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/cadastro?tipo=freelancer')
+  await page.getByLabel('Nome completo').fill('Freelancer Proposta')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel('Telefone').fill('61999990012')
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('checkbox').check()
+  await page.getByRole('button', { name: 'Criar conta', exact: true }).click()
+  await expect(page).toHaveURL(/\/perfil\/completar$/)
+
+  await page.goto(demandUrl)
+  await page.getByRole('link', { name: 'Enviar proposta' }).click()
+  await page.getByLabel('Valor da proposta').fill('290')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Faço o serviço completo com teste de carga.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByRole('heading', { name: 'Proposta enviada' })).toBeVisible()
+
+  await page.goto(`${demandUrl}/proposta`)
+  await page.getByLabel('Valor da proposta').fill('260')
+  await page.getByLabel('Prazo de execução').fill('2')
+  await page.getByLabel('Mensagem ao cliente').fill('Segunda proposta duplicada.')
+  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(clientEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(demandUrl)
+  await page.getByRole('button', { name: 'Aceitar proposta' }).click()
+  await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
+  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: title })).toBeVisible()
+  await page.reload()
+  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await page.getByRole('button', { name: 'Sair da conta' }).click()
+
+  await page.goto('/login')
+  await page.getByLabel(/^E-mail/).fill(freelancerEmail)
+  await page.getByLabel(/^Senha/).fill('Strong12345')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/\/inicio$/)
+  await page.goto(`${demandUrl}/proposta`)
+  await expect(page.getByRole('heading', { name: 'Demanda encerrada' })).toBeVisible()
+})
+

@@ -10,7 +10,7 @@ O marco de **07/10** continua sendo a primeira entrega: React web completo em mo
 |---|---|---|---|
 | 30/09–07/10 | Base do projeto, documentação, React mock e API inicial | Todos; líder coordena | Frontend navegável; cadastro, login, perfil e anúncio persistidos; CI verde |
 | 08–14/10 | Contratações reais, histórico e rotinas de prazo — F01/F02 (**Concluído na `fase-01`**) | Felipe + Arthur; Enzo testa | Cliente solicita; freelancer aceita/inicia/sinaliza; cliente confirma/contesta; estados salvos no banco |
-| 15–21/10 | Avaliações (**F03 concluído na `fase-02`**), administração, moderação e demandas/propostas — F03/F04/F05/F08 | Caio + Felipe no backend; Arthur + Arthur Almirante no web; Enzo revisa | Nota/avaliação persistente; admin autorizado; denúncia/disputa e proposta com fluxo integrado |
+| 15–21/10 | Avaliações (**F03 concluído na `fase-02`**), demandas/propostas (**F08 concluído na `fase-03`**), administração e moderação — F03/F04/F05/F08 | Caio + Felipe no backend; Arthur + Arthur Almirante no web; Enzo revisa | Nota/avaliação persistente; admin autorizado; denúncia/disputa e proposta com fluxo integrado |
 | 22–28/10 | Imagens, busca paginada, mensagens, notificações e e-mail — F06/F07 | Caio + Felipe no backend; Arthur + Arthur Almirante no web; Enzo testa | Upload validado; busca usa paginação da API; comunicação persistente entre contas; recuperação de acesso funciona |
 | 29/10–04/11 | Financeiro integrado em sandbox — F09 | Felipe + Caio; Arthur Almirante integra telas; líder fecha regras | Pagamento de teste, custódia/repasse representados no sistema, webhook idempotente, reembolso e conciliação testados |
 | 05–11/11 | Integração completa, ambiente de demonstração e operação — F10 | Todos; líder + Enzo coordenam | Fluxos completos sem dependência de fixtures, ambiente reproduzível, backup/restauração e testes de acesso/carga executados |
@@ -38,7 +38,7 @@ Os pares propostos seguem as áreas da [equipe](equipe.md) e devem ser confirmad
 |---|---|---|
 | 09/10 | Definir gateway de testes, comissão, regras financeiras, storage/e-mail e ambiente de demonstração (**Concluído no Passo 0: Stripe Sandbox, Neon PostgreSQL e Resend**) | Permite preparar integrações externas sem esperar a semana financeira |
 | 14/10 | Demonstrar ciclo de contratação com duas contas e persistência após reload (**Concluído na `fase-01`**) | Base para avaliações, disputas e financeiro |
-| 21/10 | Demonstrar nota (**F03 concluído na `fase-02`**), proposta aceita e decisão administrativa com autorização | Fecha regras de reputação, administração e demanda |
+| 21/10 | Demonstrar nota (**F03 concluído na `fase-02`**), proposta aceita (**F08 concluído na `fase-03`**) e decisão administrativa com autorização | Fecha regras de reputação, administração e demanda |
 | 28/10 | Demonstrar upload, comunicação entre contas e recuperação de senha | Fecha catálogo/comunicação; prepara regressão completa |
 | 04/11 | Demonstrar pagamento e reembolso de teste com eventos repetidos | Confere financeiro e idempotência antes do fechamento |
 | 11/11 | Concluir funcionalidades e conferir integração em ambiente de demonstração | Abre a reserva final de correções |

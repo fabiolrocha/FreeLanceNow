@@ -2,8 +2,8 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../../app/store'
-import { Empty, ErrorMessage, Field, PageTitle, SimulationNotice } from '../../components/ui'
-import { futureDate, money, nowIso } from '../../domain/rules'
+import { Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
+import { money } from '../../domain/rules'
 
 export function Demands() {
   const { demands, user, proposals } = useApp()
@@ -23,7 +23,6 @@ export function Demands() {
           )
         }
       />
-      <SimulationNotice />
       <div className="stack">
         {visible.map((d) => (
           <article className="panel" key={d.id}>
@@ -50,28 +49,31 @@ export function Demands() {
   )
 }
 export function DemandForm() {
-  const { user, categories, setDemands } = useApp(),
-    navigate = useNavigate()
-  function submit(e: FormEvent<HTMLFormElement>) {
+  const { user, categories, createDemand } = useApp(),
+    navigate = useNavigate(),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!user) return
-    const d = new FormData(e.currentTarget),
-      id = crypto.randomUUID()
-    setDemands((ds) => [
-      {
-        id,
-        clientId: user.id,
+    const d = new FormData(e.currentTarget)
+    setBusy(true)
+    setError('')
+    try {
+      const created = await createDemand({
         title: String(d.get('title')),
         description: String(d.get('description')),
         categoryId: String(d.get('categoryId')),
         budget: Number(d.get('budget')),
         days: Number(d.get('days')),
         city: String(d.get('city')),
-        status: 'OPEN',
-      },
-      ...ds,
-    ])
-    navigate(`/demandas/${id}`)
+      })
+      navigate(`/demandas/${created.id}`)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
   }
   return (
     <>
@@ -79,7 +81,6 @@ export function DemandForm() {
         title="Conte o que você precisa"
         description="Os profissionais da categoria poderão enviar propostas."
       />
-      <SimulationNotice />
       <form className="form-panel" onSubmit={submit}>
         <Field label="Título da demanda" name="title" required maxLength={80} />
         <label className="field">
@@ -101,11 +102,14 @@ export function DemandForm() {
           <Field label="Prazo (dias)" name="days" type="number" required min="1" max="365" />
         </div>
         <Field label="Cidade e UF" name="city" required maxLength={100} defaultValue={user?.city} />
+        <ErrorMessage message={error} />
         <div className="row">
           <Link className="button secondary" to="/demandas">
             Cancelar
           </Link>
-          <button className="button">Publicar demanda</button>
+          <button className="button" disabled={busy}>
+            Publicar demanda
+          </button>
         </div>
       </form>
     </>
@@ -113,9 +117,10 @@ export function DemandForm() {
 }
 export function DemandDetail() {
   const { id } = useParams(),
-    { user, demands, proposals, setProposals, setDemands, addContract, notify } = useApp(),
+    { user, demands, proposals, acceptProposal, rejectProposal } = useApp(),
     navigate = useNavigate()
-  const [error, setError] = useState('')
+  const [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
   // Clients see only their own demands; freelancers see open ones or those they already answered.
   const d = demands.find(
     (d) =>
@@ -131,41 +136,32 @@ export function DemandDetail() {
   const visibleProposals = proposals.filter(
     (p) => p.demandId === id && (isOwner || p.freelancerId === user?.id),
   )
-  function accept(pid: string) {
-    const p = proposals.find((p) => p.id === pid)
-    if (!p || !user || d!.clientId !== user.id || d!.status !== 'OPEN') {
-      setError('Esta proposta não pode ser aceita.')
-      return
+  async function accept(pid: string) {
+    setBusy(true)
+    setError('')
+    try {
+      const contract = await acceptProposal(pid)
+      navigate(`/contratacoes/${contract.id}`)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
     }
-    const cid = crypto.randomUUID()
-    setProposals((ps) =>
-      ps.map((x) =>
-        x.demandId === id ? { ...x, status: x.id === pid ? 'ACCEPTED' : 'REJECTED' } : x,
-      ),
-    )
-    setDemands((ds) => ds.map((x) => (x.id === id ? { ...x, status: 'CLOSED' } : x)))
-    addContract({
-      id: cid,
-      serviceId: 'proposal-' + p.id,
-      title: d!.title,
-      freelancerId: p.freelancerId,
-      freelancerName: p.freelancerName,
-      clientId: user.id,
-      clientName: user.name,
-      price: p.price,
-      date: futureDate(),
-      description: d!.description,
-      address: d!.city,
-      status: 'ACEITO',
-      history: [{ status: 'ACEITO', at: nowIso() }],
-    })
-    notify('Proposta aceita e contratação criada.')
-    navigate(`/contratacoes/${cid}`)
+  }
+  async function reject(pid: string) {
+    setBusy(true)
+    setError('')
+    try {
+      await rejectProposal(pid)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
   }
   return (
     <>
       <PageTitle title={d.title} description={`${money(d.budget)} · ${d.days} dias · ${d.city}`} />
-      <SimulationNotice />
       <section className="panel">
         <p>{d.description}</p>
         <span className="badge">{d.status === 'OPEN' ? 'Aberta' : 'Encerrada'}</span>
@@ -193,16 +189,13 @@ export function DemandDetail() {
           </span>
           {user?.id === d.clientId && p.status === 'PENDING' && d.status === 'OPEN' && (
             <div className="row">
-              <button className="button" onClick={() => accept(p.id)}>
+              <button className="button" disabled={busy} onClick={() => void accept(p.id)}>
                 Aceitar proposta
               </button>
               <button
                 className="button secondary"
-                onClick={() =>
-                  setProposals((ps) =>
-                    ps.map((x) => (x.id === p.id ? { ...x, status: 'REJECTED' } : x)),
-                  )
-                }
+                disabled={busy}
+                onClick={() => void reject(p.id)}
               >
                 Recusar
               </button>
@@ -220,10 +213,11 @@ export function DemandDetail() {
 }
 export function ProposalForm() {
   const { id } = useParams(),
-    { user, demands, proposals, setProposals } = useApp(),
+    { user, demands, createProposal } = useApp(),
     navigate = useNavigate(),
     { pathname } = useLocation(),
-    [error, setError] = useState('')
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
   const d = demands.find((d) => d.id === id)
   if (!d || !user) return <Empty title="Demanda não encontrada" />
   if (pathname.endsWith('/enviada'))
@@ -243,36 +237,27 @@ export function ProposalForm() {
         <Link to="/demandas">Ver demandas abertas</Link>
       </Empty>
     )
-  function submit(e: FormEvent<HTMLFormElement>) {
+  async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (
-      proposals.some(
-        (p) => p.demandId === id && p.freelancerId === user!.id && p.status === 'PENDING',
-      )
-    ) {
-      setError('Você já enviou uma proposta para esta demanda.')
-      return
-    }
     const f = new FormData(e.currentTarget)
-    setProposals((ps) => [
-      ...ps,
-      {
-        id: crypto.randomUUID(),
-        demandId: id!,
-        freelancerId: user!.id,
-        freelancerName: user!.name,
+    setBusy(true)
+    setError('')
+    try {
+      await createProposal(id!, {
         price: Number(f.get('price')),
         days: Number(f.get('days')),
         message: String(f.get('message')),
-        status: 'PENDING',
-      },
-    ])
-    navigate(`/demandas/${id}/proposta/enviada`)
+      })
+      navigate(`/demandas/${id}/proposta/enviada`)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
   }
   return (
     <>
       <PageTitle title="Enviar proposta" description={d.title} />
-      <SimulationNotice />
       <form className="form-panel" onSubmit={submit}>
         <Field
           label="Valor da proposta (R$)"
@@ -295,7 +280,9 @@ export function ProposalForm() {
           <textarea name="message" required maxLength={600} rows={5} />
         </label>
         <ErrorMessage message={error} />
-        <button className="button">Enviar proposta</button>
+        <button className="button" disabled={busy}>
+          Enviar proposta
+        </button>
       </form>
     </>
   )

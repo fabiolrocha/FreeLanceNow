@@ -3,7 +3,12 @@ import type {
   Contract,
   ContractStatus,
   CreateContract,
+  CreateDemand,
+  CreateProposal,
+  Demand,
   Profile,
+  Proposal,
+  ProposalAcceptance,
   Register,
   Review,
   SaveService,
@@ -33,7 +38,10 @@ const fieldLabels: Record<string, string> = {
   description: 'descrição',
   categoryId: 'categoria',
   price: 'valor',
+  budget: 'orçamento',
+  days: 'prazo',
   deliveryDays: 'prazo',
+  message: 'mensagem',
   status: 'status',
   serviceId: 'serviço',
   date: 'data',
@@ -257,5 +265,33 @@ export const client = {
   },
   async serviceReviews(serviceId: string): Promise<Review[]> {
     return request(`/services/${serviceId}/reviews`)
+  },
+  async demands(): Promise<Demand[]> {
+    return request('/demands')
+  },
+  async createDemand(r: CreateDemand): Promise<Demand> {
+    return request('/demands', {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async proposals(): Promise<Proposal[]> {
+    return request('/proposals')
+  },
+  async createProposal(demandId: string, r: CreateProposal): Promise<Proposal> {
+    return request(`/demands/${demandId}/proposals`, {
+      method: 'POST',
+      body: JSON.stringify(r),
+    })
+  },
+  async acceptProposal(proposalId: string): Promise<ProposalAcceptance> {
+    return request(`/proposals/${proposalId}/accept`, {
+      method: 'POST',
+    })
+  },
+  async rejectProposal(proposalId: string): Promise<Proposal> {
+    return request(`/proposals/${proposalId}/reject`, {
+      method: 'POST',
+    })
   },
 }
