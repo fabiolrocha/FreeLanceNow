@@ -12,7 +12,8 @@ import java.util.UUID;
 public class ContentReport {
     public enum Target {
         SERVICE,
-        REVIEW
+        REVIEW,
+        POST
     }
 
     public enum Status {
