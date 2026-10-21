@@ -1,6 +1,6 @@
 # Testes e roteiro de apresentação
 
-Revisado em **21/10/2026**. Os comandos abaixo descrevem a cobertura existente. Resultados de execuções anteriores são evidências históricas, não confirmação de testes repetidos nesta revisão documental.
+Revisado em **21/10/2026**. Os comandos abaixo descrevem a cobertura existente. A seção de F04/F05 registra a execução atual; resultados de entregas anteriores permanecem identificados como históricos.
 
 ## Verificações da base
 
@@ -12,10 +12,10 @@ Revisado em **21/10/2026**. Os comandos abaixo descrevem a cobertura existente. 
 | Lint | `cd web && npm run lint` | Regras React/TypeScript |
 | Regras unitárias | `cd web && npm test` | Permissões de transição, janela 7 dias e senha 72 bytes |
 | Browser mock | `cd web && npm run test:e2e` | Contratação completa, contestação com decisão do admin, demanda/proposta/aceite, denúncia na fila com CSV, draft/publicação, mobile, role e sessão expirada |
-| API+PostgreSQL | `docker compose --profile test run --rm api-test` | Vinte e dois testes: contexto+migrações (`V1`–`V5`), cadastro/login, termos, duplicidade com e-mail normalizado, admin, edição e perfil público sem contato, dono do anúncio, limite 20, filtros/paginação da busca (`minRating`), drafts/inativos ocultos, suspensão, ciclo de contratação (`UC03`/`UC06`), snapshots, jobs de 48h/5 dias, avaliações (`UC04`), média com 1 decimal, janela de 7 dias, resposta do profissional, demandas/propostas (`F08`, unicidade pendente e aceite gerando contratação) e seed idempotente |
-| Browser API | `cd web && E2E_DATA_MODE=api npm run test:e2e` | Três fluxos completos: (1) cadastro, perfil, anúncio persistente/reload, desativação e republicação; (2) ciclo completo de contratação entre duas contas, confirmação, avaliação 5 estrelas, resposta do profissional e persistência após reload; (3) demanda publicada, proposta única, aceite gerando contratação `ACEITO` no PostgreSQL e bloqueio de novas propostas em demanda encerrada |
+| API+PostgreSQL | `docker compose --profile test run --rm api-test` | 31 testes: contexto+migrações (`V1`–`V7`), bootstrap administrativo, permissões, suspensão/reativação, categorias/auditoria, denúncias e remoção lógica/reputação, métricas por período e concorrência de perfil/resposta; também cadastro/login, termos, duplicidade com e-mail normalizado, admin, edição e perfil público sem contato, dono do anúncio, limite 20, filtros/paginação da busca (`minRating`), drafts/inativos ocultos, suspensão, ciclo de contratação (`UC03`/`UC06`), snapshots, jobs de 48h/5 dias, avaliações (`UC04`), média com 1 decimal, janela de 7 dias, resposta do profissional, demandas/propostas (`F08`, unicidade pendente e aceite gerando contratação) e seed idempotente |
+| Browser API | `cd web && E2E_DATA_MODE=api npm run test:e2e` | Quatro fluxos completos quando `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` são fornecidos: (1) cadastro, perfil, anúncio persistente/reload, desativação e republicação; (2) ciclo completo de contratação entre duas contas, confirmação, avaliação 5 estrelas, resposta do profissional e persistência após reload; (3) demanda publicada, proposta única, aceite gerando contratação `ACEITO` no PostgreSQL e bloqueio de novas propostas em demanda encerrada; (4) admin gerencia categoria/usuário e decide denúncia com auditoria após reload |
 
-Os testes de navegador selecionam a suíte correspondente ao modo; o outro conjunto aparece como `skipped` de propósito. Não significa funcionalidade pulada dentro do fluxo testado. A suíte API usa banco `db-test` exclusivo e temporário. O teste browser API usa o banco de desenvolvimento e cria dados fictícios; não rodar contra um ambiente público.
+Os testes de navegador selecionam a suíte correspondente ao modo; o outro conjunto aparece como `skipped` de propósito. O cenário administrativo em API também exige credenciais explícitas `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`; sem elas, somente esse teste é skipped com motivo. Não significa funcionalidade pulada dentro do fluxo testado. A suíte API usa banco `db-test` exclusivo e temporário. O teste browser API usa o banco de desenvolvimento e cria dados fictícios; não rodar contra um ambiente público.
 
 ## Revisão documental de 21/10/2026
 
@@ -67,4 +67,19 @@ Dados de contratação e denúncia no modo mock são compartilhados entre contas
 
 A validação e a revisão podem ser feitas por qualquer integrante disponível, sem nome ou par fixo. Em mudanças apenas documentais, conferir links locais, consistência com código/configuração, preservação das fontes e higiene do diff; não relatar execução das suítes da aplicação sem rodá-las.
 
-Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, uploads (`F06`), provisionamento de admin, gestão e denúncias persistentes (`F04`/`F05`), gateway (`F09`) e teste de carga (`F10`). A seção de disputas da interface de moderação já usa contratos/transições reais com sessão ADMIN; faltam provisionamento da conta, evidências/auditoria completa e validação ponta a ponta desse acesso. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.
+Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, upload/anexos (`F06`), gateway (`F09`) e teste de carga (`F10`). F04/F05 preservam relato/cópia textual, removem conteúdo de forma lógica e auditam decisões. Não há exclusão definitiva de usuários, operação de desfazer remoção ou credenciais ADMIN padrão. A auditoria é transacional no banco, sem endpoint de alteração/exclusão; controles operacionais/retenção de produção pertencem a F10. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.
+
+## Ensaio administrativo em modo API
+
+1. Provisionar uma conta ADMIN de teste conforme o guia de desenvolvimento; desabilitar o bootstrap após a criação.
+2. Entrar pelo login comum; criar/renomear/desativar uma categoria e recarregar para mostrar persistência.
+3. Filtrar um usuário fictício, informar motivo, suspender e conferir o bloqueio de seu token; reativar preservando seus registros.
+4. Como cliente, denunciar um anúncio ou avaliação com relato de 40–1000 caracteres. Como ADMIN, conferir o relato e a cópia do conteúdo, registrar justificativa e manter/remover.
+5. Recarregar, conferir o resultado público e a auditoria. Para avaliação removida, conferir que sai das listas/notas sem permitir nova avaliação da mesma contratação.
+6. Mediar uma disputa e consultar o evento correspondente na auditoria; mostrar métricas por período e exportar CSV de dados reais.
+
+## Verificação F04/F05 — 21/10/2026
+
+Branch `codex/fase-04-05-administracao-moderacao`, baseada em `717ee99`. Passaram 31 testes Java/PostgreSQL, 3 unitários web, 7 cenários browser mock e 4 cenários browser API (incluindo credenciais explícitas de admin). Build, lint e formatação foram conferidos. Os testes novos observaram falha antes da implementação; as regressões de concorrência confirmaram que editar perfil/responder avaliação não desfaz suspensão/remoção administrativa. A edição de anúncio preserva sua categoria atual mesmo desativada.
+
+Os 26 originais mantêm tamanho e SHA-256; o contrato documenta 39 endpoints de negócio. Esta execução é local; resultados da CI do PR devem ser consultados separadamente.

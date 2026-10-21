@@ -329,7 +329,10 @@ export function ServiceDetail() {
             </div>
           </div>
           <Link to={`/profissionais/${s.freelancer.id}`}>Ver perfil completo</Link>
-          <Link className="subtle-link" to={`/denunciar?alvo=${encodeURIComponent(s.title)}`}>
+          <Link
+            className="subtle-link"
+            to={`/denunciar?type=SERVICE&id=${s.id}&alvo=${encodeURIComponent(s.title)}`}
+          >
             Denunciar anúncio
           </Link>
         </aside>
@@ -448,6 +451,12 @@ export function ProfileDetail() {
               <p>{r.comment || 'Sem comentário.'}</p>
               {r.reply && <p>Resposta do profissional: {r.reply}</p>}
               <small>{r.serviceTitle}</small>
+              <Link
+                className="subtle-link"
+                to={`/denunciar?type=REVIEW&id=${r.id}&alvo=${encodeURIComponent(r.serviceTitle)}`}
+              >
+                Denunciar avaliação
+              </Link>
             </div>
           ))
         ) : (

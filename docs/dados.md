@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **21/10/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql` e `V5__demands_and_proposals.sql`.
+Revisado em **21/10/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql` e `V7__content_reports.sql`.
 
 ```mermaid
 erDiagram
@@ -108,15 +108,26 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V5, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; uma entidade própria de disputa/auditoria ainda é proposta de evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V7, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
-| `report` / `dispute` / `audit_event` | Alvo, autor, evidência, decisão e administrador; preservar rastreabilidade |
+| `dispute` / anexos de evidência | Evoluir o motivo atualmente em `contract`; vincular storage de F06 sem apagar histórico |
 | `message` / `notification` | Participantes autorizados e eventos; status de leitura/entrega |
 | `service_image` | Dono, storage key, tipo/tamanho, ordem e metadados; máximo 5 |
 | `payment` / `ledger_entry` | Referência gateway única, contratação, eventos idempotentes, valores e conciliação |
 
 Contratações originadas por proposta podem ter `service_id` nulo, inclusive na avaliação. O aceite guarda os vínculos de demanda/proposta e o preço acordado; a API pública da contratação ainda não expõe `demandId`/`proposalId`.
 
-O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não há seed financeiro nem admin real. Testes de API geram identificadores/e-mails novos, sem assumir IDs dos usuários do seed.
+O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não há seed financeiro nem credenciais ADMIN padrão. O bootstrap administrativo é separado, opt-in e idempotente. Testes de API geram identificadores/e-mails novos, sem assumir IDs dos usuários do seed.
+
+## Administração e moderação (V6/V7)
+
+| Tabela/campo | Persistência e invariantes |
+|---|---|
+| `audit_event` | Ator, ação, tipo/ID do alvo, valores anterior/novo, justificativa e data; sem API de alteração/exclusão. Gravado na mesma transação da ação administrativa |
+| `content_report` | Autor, tipo `SERVICE`/`REVIEW`, ID do alvo, cópia de título/conteúdo, motivo/relato, `PENDING`/`KEPT`/`REMOVED`, administrador, justificativa e datas |
+| `service_listing.moderated` | Remoção lógica acompanhada de `INACTIVE`; o proprietário não pode editar/republicar anúncio moderado |
+| `review.hidden` | Oculta avaliação das listas públicas, médias e filtro por nota; preserva vínculo único e histórico privado da contratação |
+
+Índice parcial impede duas denúncias pendentes do mesmo autor/alvo. Decisões usam locks e não podem ser repetidas. Os alvos polimórficos são validados no serviço; as FKs preservam autores e administradores. V6 acrescenta unicidade de nome de categoria sem distinguir maiúsculas. Renomear preserva o slug e os vínculos dos anúncios existentes.

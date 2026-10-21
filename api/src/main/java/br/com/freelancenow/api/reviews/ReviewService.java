@@ -55,26 +55,20 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDtos.ReviewView create(
-            Jwt jwt, UUID contractId, ReviewDtos.CreateReview request) {
+    public ReviewDtos.ReviewView create(Jwt jwt, UUID contractId, ReviewDtos.CreateReview request) {
         var u = current.require(jwt);
         var c = contracts.lockById(contractId).orElseThrow(this::contractNotFound);
         if (u.getRole() != Role.CLIENT || !c.getClient().getId().equals(u.getId()))
             throw new ApiException(
-                    HttpStatus.FORBIDDEN,
-                    "Somente o cliente desta contratação pode avaliá-la.");
+                    HttpStatus.FORBIDDEN, "Somente o cliente desta contratação pode avaliá-la.");
         if (c.getStatus() != ContractStatus.CONCLUIDO || c.getCompletedAt() == null)
             throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "A avaliação exige uma contratação concluída.");
+                    HttpStatus.CONFLICT, "A avaliação exige uma contratação concluída.");
         if (reviews.existsByContractId(c.getId()))
-            throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "Esta contratação já foi avaliada.");
+            throw new ApiException(HttpStatus.CONFLICT, "Esta contratação já foi avaliada.");
         var now = Instant.now(clock);
         if (now.isBefore(c.getCompletedAt()))
-            throw new ApiException(
-                    HttpStatus.CONFLICT, "A contratação ainda não foi concluída.");
+            throw new ApiException(HttpStatus.CONFLICT, "A contratação ainda não foi concluída.");
         if (now.isAfter(c.getCompletedAt().plus(Duration.ofDays(7))))
             throw new ApiException(
                     HttpStatus.CONFLICT,
@@ -84,8 +78,7 @@ public class ReviewService {
     }
 
     @Transactional
-    public ReviewDtos.ReviewView reply(
-            Jwt jwt, UUID contractId, ReviewDtos.ReplyReview request) {
+    public ReviewDtos.ReviewView reply(Jwt jwt, UUID contractId, ReviewDtos.ReplyReview request) {
         var u = current.require(jwt);
         var c = contracts.lockById(contractId).orElseThrow(this::contractNotFound);
         if (u.getRole() != Role.FREELANCER || !c.getFreelancer().getId().equals(u.getId()))
@@ -97,11 +90,9 @@ public class ReviewService {
                         .orElseThrow(
                                 () ->
                                         new ApiException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Avaliação não encontrada."));
+                                                HttpStatus.NOT_FOUND, "Avaliação não encontrada."));
         if (review.getReply() != null)
-            throw new ApiException(
-                    HttpStatus.CONFLICT, "Esta avaliação já foi respondida.");
+            throw new ApiException(HttpStatus.CONFLICT, "Esta avaliação já foi respondida.");
         review.registerReply(request.reply(), Instant.now(clock));
         return ReviewDtos.ReviewView.from(review);
     }
@@ -114,6 +105,7 @@ public class ReviewService {
                                 new ApiException(
                                         HttpStatus.NOT_FOUND, "Profissional não encontrado."));
         return reviews.findByFreelancerIdOrderByCreatedAtDesc(freelancerId).stream()
+                .filter(r -> !r.isHidden())
                 .map(ReviewDtos.ReviewView::from)
                 .toList();
     }
@@ -122,10 +114,9 @@ public class ReviewService {
         services.findById(serviceId)
                 .filter(s -> s.getStatus() == ServiceStatus.ACTIVE && s.getFreelancer().isActive())
                 .orElseThrow(
-                        () ->
-                                new ApiException(
-                                        HttpStatus.NOT_FOUND, "Serviço não encontrado."));
+                        () -> new ApiException(HttpStatus.NOT_FOUND, "Serviço não encontrado."));
         return reviews.findByServiceIdOrderByCreatedAtDesc(serviceId).stream()
+                .filter(r -> !r.isHidden())
                 .map(ReviewDtos.ReviewView::from)
                 .toList();
     }

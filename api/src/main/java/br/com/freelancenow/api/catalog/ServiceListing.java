@@ -40,6 +40,18 @@ public class ServiceListing {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private boolean moderated;
+
+    public boolean isModerated() {
+        return moderated;
+    }
+
+    public void moderate() {
+        moderated = true;
+        status = ServiceStatus.INACTIVE;
+    }
+
     protected ServiceListing() {}
 
     public ServiceListing(User freelancer, Category category, CatalogDtos.SaveService r) {

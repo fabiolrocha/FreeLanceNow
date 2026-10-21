@@ -20,6 +20,18 @@ public class Category {
 
     protected Category() {}
 
+    public Category(String name, String slug) {
+        id = UUID.randomUUID();
+        this.name = name;
+        this.slug = slug;
+        active = true;
+    }
+
+    public void update(String name, boolean active) {
+        this.name = name;
+        this.active = active;
+    }
+
     public UUID getId() {
         return id;
     }

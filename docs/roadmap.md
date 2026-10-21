@@ -10,15 +10,15 @@ Revisado em **21/10/2026**. Prazo final: **18/11/2026, quarta-feira**, horário 
 | Contratações e prazos (`fase-01`, F01/F02) | Integrados: histórico, participantes, snapshots e jobs de 48h/5 dias |
 | Avaliações (`fase-02`, F03) | Integradas: nota, média, janela de avaliação e resposta do profissional |
 | Demandas/propostas (`fase-03`, F08) | Integradas: proposta pendente única e aceite gerando contratação |
-| Administração/moderação (F04/F05) | Pendentes/parciais: contestação e decisão de disputa ligadas à API na interface, condicionadas à conta ADMIN; gestão e denúncias permanecem locais |
+| Administração/moderação (F04/F05) | Implementadas na branch `codex/fase-04-05-administracao-moderacao`: bootstrap ADMIN, gestão, denúncias/evidência textual, remoção lógica, métricas e auditoria |
 
-As entregas de F04/F05 estavam na janela de 15–21/10 e precisam de replanejamento. Seu estado permanece explícito no [backlog](backlog.md). Os registros de testes anteriores estão em [testes e demonstração](testes-e-demonstracao.md); esta revisão documental não constitui nova execução das suítes da aplicação.
+F04/F05 têm implementação nesta branch e verificações descritas em [testes e demonstração](testes-e-demonstracao.md). O PR #39 integrou a revisão documental à `main`; o estado da nova entrega fica no [backlog](backlog.md). E-mail e anexos são dependências futuras de F07/F06, respectivamente.
 
 ## Próximas janelas sugeridas
 
 | Período | Entrega | Critério para encerrar |
 |---|---|---|
-| A partir de 21/10 | Replanejar e integrar administração/moderação — F04/F05 | Admin provisionado de forma controlada, gestão e fila persistentes, decisão autorizada e auditável |
+| 21/10 | Publicar F04/F05 para revisão e integração | Bootstrap, gestão, denúncias, remoção lógica e auditoria testados; PR com evidências |
 | 22–28/10 | Upload, paginação no web, mensagens, notificações e e-mail — F06/F07 | Upload validado; busca paginada; comunicação entre contas e recuperação de senha verificadas |
 | 29/10–04/11 | Financeiro em Stripe Sandbox — F09 | Pagamento/reembolso de teste, comissão, eventos repetidos e conciliação testados |
 | 05–11/11 | Integração e operação — F10 | Ambiente de demonstração reproduzível, fluxos persistentes, backup/restauração e verificações de acesso/carga |
@@ -26,7 +26,7 @@ As entregas de F04/F05 estavam na janela de 15–21/10 e precisam de replanejame
 | 17/11 | Ensaio e conferência dos materiais | Roteiro executado do início ao fim; versão e instruções conferidas |
 | **18/11** | **Entrega final** | **Código, sistema web, documentação, evidências e apresentação entregues** |
 
-As próximas janelas precisam acomodar F04/F05. Ao revisar capacidade e dependências, atualizar calendário e backlog juntos; não assumir que a passagem de uma data conclui a etapa. Não há previsão de trabalho obrigatório em fins de semana.
+As próximas janelas concentram F06/F07 e depois F09/F10. Atualizar calendário e backlog conforme a integração dos PRs e as evidências de cada entrega; a passagem de uma data não conclui a etapa. Não há previsão de trabalho obrigatório em fins de semana.
 
 ## Provedores e dependências
 
@@ -53,7 +53,7 @@ A cada entrega, conferir dependências, demonstrar frontend e backend juntos e a
 
 | Risco | Ação |
 |---|---|
-| Pendências de administração acumularem com as próximas fases | Replanejar F04/F05 primeiro e conferir a capacidade para F06/F07 |
+| Integrações de upload/comunicação excederem a próxima janela | Conferir capacidade para F06/F07 e demonstrar seus fluxos completos |
 | Conflitos em store, tipos, adapter, rotas e CSS | Combinar edições e integrar PRs pequenos |
 | Provedor escolhido ser tratado como integração concluída | Exigir execução e evidência do fluxo real ou sandbox |
 | Mock ser confundido com funcionalidade persistente | Usar a matriz de frontend e fechar os cards apenas pelo aceite |

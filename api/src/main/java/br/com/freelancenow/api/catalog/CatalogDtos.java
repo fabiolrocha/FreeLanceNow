@@ -33,14 +33,14 @@ public final class CatalogDtos {
             BigDecimal price,
             int deliveryDays,
             ServiceStatus status,
+            boolean moderated,
             CategoryView category,
             UserDtos.PublicProfile freelancer) {
         public static ServiceView from(ServiceListing s) {
             return from(s, null, 0L);
         }
 
-        public static ServiceView from(
-                ServiceListing s, Double averageRating, long reviewCount) {
+        public static ServiceView from(ServiceListing s, Double averageRating, long reviewCount) {
             return new ServiceView(
                     s.getId(),
                     s.getTitle(),
@@ -48,9 +48,9 @@ public final class CatalogDtos {
                     s.getPrice(),
                     s.getDeliveryDays(),
                     s.getStatus(),
+                    s.isModerated(),
                     CategoryView.from(s.getCategory()),
-                    UserDtos.PublicProfile.from(
-                            s.getFreelancer(), averageRating, reviewCount));
+                    UserDtos.PublicProfile.from(s.getFreelancer(), averageRating, reviewCount));
         }
     }
 

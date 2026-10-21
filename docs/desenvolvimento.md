@@ -11,7 +11,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial e F01/F02/F03/F08. Branches antigas de fase não são a base padrão de novas contribuições.
+Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial e F01/F02/F03/F08. A branch de F04/F05 inclui as integrações administrativas descritas nesta revisão. Branches antigas de fase não são a base padrão de novas contribuições.
 
 ## Java fora do Docker
 
@@ -41,6 +41,9 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | PORT / API_PORT | API / Compose | Porta interna 8081 / publicação |
 | DB_PORT / WEB_PORT | Compose | Portas host 5435 / 5173 |
 | SPRING_PROFILES_ACTIVE / SEED_DEMO | API | Seed somente no perfil dev habilitado |
+| ADMIN_BOOTSTRAP_ENABLED | API/Compose | Opt-in de criação inicial do ADMIN; padrão `false` |
+| ADMIN_BOOTSTRAP_EMAIL / ADMIN_BOOTSTRAP_PASSWORD / ADMIN_BOOTSTRAP_NAME | API/Compose | Credenciais privadas de criação inicial; nome padrão `Administrador`, sem e-mail/senha padrão |
+| E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD | Testes web | Credenciais explícitas para incluir o fluxo browser administrativo em modo API |
 | CORS_ORIGINS | API | Origens permitidas, separadas por vírgula |
 | CONTRACT_DEADLINE_CHECK_MS | API | Intervalo do job de prazos, lido em `app.contracts.deadline-check-ms` (padrão `60000` ms) |
 | STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API (reservadas) | Propriedades declaradas; checkout/webhooks ainda não implementados (`F09`) |
@@ -54,6 +57,14 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e as credenciais Stripe/Resend, CORS e intervalo do job não são repassadas por ele atualmente. Uma futura implantação precisa configurar esse repasse e validar as integrações.
 
 As credenciais de exemplo são públicas e locais. `.env`/`.env.local` são ignorados por Git. Não usar `VITE_*` para segredos.
+
+## Provisionar o primeiro ADMIN
+
+Configure `ADMIN_BOOTSTRAP_ENABLED=true`, `ADMIN_BOOTSTRAP_EMAIL` e `ADMIN_BOOTSTRAP_PASSWORD` no `.env` local ignorado e execute `docker compose up -d --build api`. A senha segue a política do cadastro (8 caracteres, letras/números, até 72 bytes). Entre pelo login comum; o perfil ADMIN abre o painel.
+
+Depois da criação, defina `ADMIN_BOOTSTRAP_ENABLED=false`, retire a senha de bootstrap da configuração e recrie a API. O processo nunca redefine senha, reativa conta nem promove um cliente/freelancer existente. Credenciais inválidas ou colisão com conta comum interrompem a inicialização. Não há credenciais administrativas padrão; não publique o `.env`.
+
+Para incluir o teste browser administrativo, exporte `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` com uma conta de teste provisionada e execute `E2E_DATA_MODE=api npm run test:e2e` em `web/`. Sem essas variáveis, somente esse cenário aparece como skipped, com motivo explícito. Os demais cenários API continuam executando.
 
 ## Git
 

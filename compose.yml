@@ -25,6 +25,10 @@ services:
       JWT_SECRET: ${JWT_SECRET:-freelancenow-local-development-key-change-before-deploy-2026}
       PORT: 8081
       SEED_DEMO: "true"
+      ADMIN_BOOTSTRAP_ENABLED: ${ADMIN_BOOTSTRAP_ENABLED:-false}
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-}
+      ADMIN_BOOTSTRAP_PASSWORD: ${ADMIN_BOOTSTRAP_PASSWORD:-}
+      ADMIN_BOOTSTRAP_NAME: ${ADMIN_BOOTSTRAP_NAME:-Administrador}
     ports:
       - "127.0.0.1:${API_PORT:-8081}:8081"
     depends_on:

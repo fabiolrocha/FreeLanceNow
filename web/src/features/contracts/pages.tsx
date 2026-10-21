@@ -341,9 +341,14 @@ export function ContractDetail() {
             O início depende do aceite do profissional. Pagamentos em sandbox serão integrados na
             etapa financeira.
           </p>
-          <Link className="subtle-link" to={`/denunciar?alvo=${encodeURIComponent(c.title)}`}>
-            Denunciar contratação
-          </Link>
+          {(isMock || c.serviceId) && (
+            <Link
+              className="subtle-link"
+              to={`/denunciar?type=SERVICE&id=${c.serviceId || ''}&alvo=${encodeURIComponent(c.title)}`}
+            >
+              Denunciar anúncio
+            </Link>
+          )}
         </aside>
       </div>
     </>

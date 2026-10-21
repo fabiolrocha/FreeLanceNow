@@ -62,6 +62,7 @@ public class CatalogService {
                         (root, query, cb) -> {
                             var filters = new ArrayList<Predicate>();
                             filters.add(cb.equal(root.get("status"), ServiceStatus.ACTIVE));
+                            filters.add(cb.isFalse(root.get("moderated")));
                             filters.add(cb.isTrue(root.get("freelancer").get("active")));
                             if (q != null && !q.isBlank()) {
                                 var term =
@@ -97,9 +98,9 @@ public class CatalogService {
                                         .where(
                                                 cb.equal(
                                                         reviewRoot.get("freelancer").get("id"),
-                                                        root.get("freelancer").get("id")));
-                                filters.add(
-                                        cb.greaterThanOrEqualTo(sub, minRating.doubleValue()));
+                                                        root.get("freelancer").get("id")),
+                                                cb.isFalse(reviewRoot.get("hidden")));
+                                filters.add(cb.greaterThanOrEqualTo(sub, minRating.doubleValue()));
                             }
                             return cb.and(filters.toArray(Predicate[]::new));
                         },
@@ -109,10 +110,7 @@ public class CatalogService {
                                 Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by("id"))));
         var stats =
                 reviews.ratingSummaries(
-                        result.stream()
-                                .map(s -> s.getFreelancer().getId())
-                                .distinct()
-                                .toList());
+                        result.stream().map(s -> s.getFreelancer().getId()).distinct().toList());
         return new CatalogDtos.PageView<>(
                 result.stream()
                         .map(
@@ -133,8 +131,9 @@ public class CatalogService {
 
     public CatalogDtos.ServiceView detail(UUID id) {
         var s = find(id);
-        if (s.getStatus() != ServiceStatus.ACTIVE || !s.getFreelancer().isActive())
-            throw notFound();
+        if (s.isModerated()
+                || s.getStatus() != ServiceStatus.ACTIVE
+                || !s.getFreelancer().isActive()) throw notFound();
         var st = reviews.ratingSummary(s.getFreelancer().getId());
         return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
     }
@@ -204,10 +203,13 @@ public class CatalogService {
     }
 
     private ServiceListing owned(User u, UUID id) {
-        var s = find(id);
+        var s = services.lockById(id).orElseThrow(this::notFound);
         if (!s.getFreelancer().getId().equals(u.getId()))
             throw new ApiException(
                     HttpStatus.FORBIDDEN, "Este serviço pertence a outro profissional.");
+        if (s.isModerated())
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "Este anúncio foi removido pela moderação.");
         return s;
     }
 

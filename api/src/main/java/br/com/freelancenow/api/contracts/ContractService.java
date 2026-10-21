@@ -1,11 +1,11 @@
 package br.com.freelancenow.api.contracts;
 
+import br.com.freelancenow.api.admin.AuditService;
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.catalog.ServiceListing;
 import br.com.freelancenow.api.catalog.ServiceRepository;
 import br.com.freelancenow.api.catalog.ServiceStatus;
 import br.com.freelancenow.api.common.ApiException;
-import br.com.freelancenow.api.reviews.Review;
 import br.com.freelancenow.api.reviews.ReviewRepository;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
@@ -39,7 +39,8 @@ public class ContractService {
                     ContractStatus.PENDENTE,
                     Map.of(
                             Role.CLIENT, Set.of(ContractStatus.CANCELADO),
-                            Role.FREELANCER, Set.of(ContractStatus.ACEITO, ContractStatus.RECUSADO)),
+                            Role.FREELANCER,
+                                    Set.of(ContractStatus.ACEITO, ContractStatus.RECUSADO)),
                     ContractStatus.ACEITO,
                     Map.of(Role.FREELANCER, Set.of(ContractStatus.EM_ANDAMENTO)),
                     ContractStatus.EM_ANDAMENTO,
@@ -60,6 +61,7 @@ public class ContractService {
     private final UserRepository users;
     private final CurrentUser current;
     private final Clock clock;
+    private final AuditService audit;
 
     public ContractService(
             ContractRepository contracts,
@@ -68,7 +70,8 @@ public class ContractService {
             ServiceRepository services,
             UserRepository users,
             CurrentUser current,
-            Clock clock) {
+            Clock clock,
+            AuditService audit) {
         this.contracts = contracts;
         this.events = events;
         this.reviews = reviews;
@@ -76,6 +79,7 @@ public class ContractService {
         this.users = users;
         this.current = current;
         this.clock = clock;
+        this.audit = audit;
     }
 
     public List<ContractDtos.ContractView> list(Jwt jwt) {
@@ -130,13 +134,11 @@ public class ContractService {
         if (contracts.existsByClientIdAndServiceIdAndStatus(
                 client.getId(), service.getId(), ContractStatus.PENDENTE))
             throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "Você já tem uma solicitação pendente para este serviço.");
+                    HttpStatus.CONFLICT, "Você já tem uma solicitação pendente para este serviço.");
         var now = Instant.now(clock);
         var contract =
                 contracts.save(
-                        new Contract(
-                                service, client, r.date(), r.description(), r.address(), now));
+                        new Contract(service, client, r.date(), r.description(), r.address(), now));
         var initialEvent =
                 events.save(
                         new ContractEvent(
@@ -157,8 +159,7 @@ public class ContractService {
         ensureParticipantOrAdmin(u, c);
         if (!canTransition(c.getStatus(), r.status(), u.getRole()))
             throw new ApiException(
-                    HttpStatus.CONFLICT,
-                    "Esta mudança de status não é permitida para seu perfil.");
+                    HttpStatus.CONFLICT, "Esta mudança de status não é permitida para seu perfil.");
         if (r.status() == ContractStatus.EM_DISPUTA
                 && (r.comment() == null
                         || r.comment().isBlank()
@@ -169,6 +170,15 @@ public class ContractService {
         var previous = c.getStatus();
         var now = Instant.now(clock);
         c.transitionTo(r.status(), r.comment(), now);
+        if (u.getRole() == Role.ADMIN)
+            audit.record(
+                    u,
+                    "DISPUTE_DECIDED",
+                    "CONTRACT",
+                    id,
+                    previous.name(),
+                    r.status().name(),
+                    r.comment());
         events.save(new ContractEvent(c, u, previous, r.status(), r.comment(), now));
         return ContractDtos.ContractView.from(
                 c,
@@ -185,8 +195,7 @@ public class ContractService {
     @Transactional
     public int processExpiredDeadlines(Instant now) {
         var pendingCutoff = now.minus(Duration.ofHours(48));
-        var expiredPending =
-                contracts.findExpiredForUpdate(ContractStatus.PENDENTE, pendingCutoff);
+        var expiredPending = contracts.findExpiredForUpdate(ContractStatus.PENDENTE, pendingCutoff);
         for (var c : expiredPending) {
             c.transitionTo(ContractStatus.CANCELADO, null, now);
             events.save(
@@ -218,10 +227,7 @@ public class ContractService {
     }
 
     public static boolean canTransition(ContractStatus from, ContractStatus to, Role role) {
-        return TRANSITIONS
-                .getOrDefault(from, Map.of())
-                .getOrDefault(role, Set.of())
-                .contains(to);
+        return TRANSITIONS.getOrDefault(from, Map.of()).getOrDefault(role, Set.of()).contains(to);
     }
 
     private void ensureParticipantOrAdmin(User u, Contract c) {
@@ -232,17 +238,14 @@ public class ContractService {
                     case FREELANCER -> c.getFreelancer().getId().equals(u.getId());
                 };
         if (!allowed)
-            throw new ApiException(
-                    HttpStatus.FORBIDDEN, "Você não participa desta contratação.");
+            throw new ApiException(HttpStatus.FORBIDDEN, "Você não participa desta contratação.");
     }
 
     private ServiceListing activeService(UUID id) {
         return services.findById(id)
                 .filter(s -> s.getStatus() == ServiceStatus.ACTIVE && s.getFreelancer().isActive())
                 .orElseThrow(
-                        () ->
-                                new ApiException(
-                                        HttpStatus.NOT_FOUND, "Serviço não encontrado."));
+                        () -> new ApiException(HttpStatus.NOT_FOUND, "Serviço não encontrado."));
     }
 
     private ApiException notFound() {

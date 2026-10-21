@@ -25,7 +25,7 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 | Divergência | Decisão atual | Origem da decisão |
 |---|---|---|
 | React Native mencionado, seguido de React somente web | React web; nenhuma aplicação Expo/Native nesta entrega | Resposta explícita do líder |
-| Vue/admin separado em roadmap antigo | Uma aplicação React com área administrativa simulada e acesso por perfil | Escopo atual e prazo curto; evita um terceiro frontend |
+| Vue/admin separado em roadmap antigo | Uma aplicação React com administração mock/API por perfil; F04/F05 persistentes nesta branch | Escopo atual; evita um terceiro frontend |
 | Distribuição nominal proposta na organização inicial | Sem pessoas específicas por caso, área, arquivo ou revisão; antiga página de delegação substituída por guia de colaboração | Orientação do grupo em 21/10; ver `equipe.md` |
 | Usuário informou não haver repositório | Já existiam `.git`, `main` e remoto `fabiolrocha/FreeLanceNow` | Inspeção do workspace; histórico preservado |
 | Financeiro aparece como central no pitch/HTML e futuro em especificações | Telas financeiras simuladas agora; gateway, custódia e conciliação depois | Corte explícito da primeira entrega |
@@ -40,7 +40,7 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 - Categorias finais e política comercial: comissão planejada de 10% para Stripe Sandbox, ainda sem fluxo financeiro implementado.
 - Fonte e data dos números de mercado do pitch; não os apresentar como medição do projeto.
 - Termos, retenção/exclusão de dados e suporte para uma versão pública; os textos atuais são acadêmicos.
-- Implementação de upload, administração/moderação completa, comunicação e financeiro; requisitos detalhados nos cards F04–F07/F09/F10. OAuth/2FA permanecem como evolução futura, sem entrega confirmada.
+- Implementação de upload/anexos, comunicação e financeiro; F04/F05 agora persistem gestão, denúncias/evidência textual e auditoria. Restante detalhado em F06/F07/F09/F10. OAuth/2FA permanecem como evolução futura, sem entrega confirmada.
 - Neon, Stripe e Resend são escolhas de provedores, não evidência de implantação nem de fluxos externos funcionando.
 
 O [inventário](referencias/inventario.json) permite provar que a realocação não alterou nenhum dos 26 arquivos relevantes. Os artefatos de sistema, como `.DS_Store`, não fazem parte da documentação funcional.

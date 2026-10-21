@@ -1,6 +1,6 @@
 # Documentação do FreeLanceNow
 
-Revisada em **21/10/2026**, a partir da `main` em `7a6e769`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
+Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 estão na branch `codex/fase-04-05-administracao-moderacao`, criada de `717ee99`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
 
 ## Onde consultar
 
@@ -9,7 +9,7 @@ Revisada em **21/10/2026**, a partir da `main` em `7a6e769`. Os Markdown desta p
 | [Escopo](escopo.md) | Produto, integrações disponíveis e entrega final |
 | [Requisitos](requisitos.md) | Regras dos casos de uso, estado e rastreabilidade |
 | [Arquitetura](arquitetura.md) | Camadas, módulos, ambientes e integrações |
-| [Dados](dados.md) | Migrações V1–V5, tabelas e evolução planejada |
+| [Dados](dados.md) | Migrações V1–V7, tabelas e evolução planejada |
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |
