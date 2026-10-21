@@ -12,7 +12,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabe
 | ADR06 | PostgreSQL 15 acompanha especificação existente | Flyway e teste real de banco; futuras atualizações precisam de validação |
 | ADR07 | JWT HS256 com validade de 15 min, bcrypt, perfis públicos sem contato | Autenticação local funcional; sem refresh, 2FA ou login social |
 | ADR08 | Modo mock explícito e adapter HTTP no mesmo frontend | Grupo desenvolve telas sem backend; falha de API não vira mock silencioso |
-| ADR09 | Mock explícito no marco inicial; contratações/prazos, avaliações e demandas/propostas integrados nas fases seguintes | F01/F02/F03/F08 implementados; F04/F05 integram administração/moderação nesta branch; financeiro e comunicação continuam pendentes |
+| ADR09 | Mock explícito no marco inicial; contratações/prazos, avaliações e demandas/propostas integrados nas fases seguintes | F01/F02/F03/F08 implementados; F04/F05 integram administração/moderação no PR #40; financeiro e comunicação continuam pendentes |
 | ADR10 | Logo vetorial oficial SVG (`web/public/images/logo.svg`), ícones por categoria e avatares por iniciais | Identidade visual fechada sem depender de fotos do carômetro |
 | ADR11 | Stripe Sandbox escolhido, com comissão planejada de 10% | Checkout, registros financeiros, webhooks, reembolso e conciliação ainda serão implementados em F09 |
 | ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V7; implantação e compatibilidade remota precisam de validação |
@@ -22,6 +22,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabe
 | ADR16 | Bootstrap administrativo opt-in, sem senha padrão e sem promoção automática de conta existente | Cadastro público continua sem ADMIN; reinício não altera credenciais nem reativa conta |
 | ADR17 | Denúncia guarda relato/cópia textual; remoção de serviço/avaliação é lógica e auditada | Preserva histórico, bloqueia republicação e retira nota removida da reputação; anexos ficam em F06, avisos em F07 |
 | ADR18 | Auditoria transacional no mesmo banco, sem API de alteração/exclusão | Consulta limitada aos 200 eventos recentes; retenção/controles operacionais de produção ficam em F10 |
+| ADR19 | Feed como entrada principal, com publicações profissionais e oportunidades, retomando o HTML (mudança de escopo 21/10) | F11 ganha prioridade; `/inicio` precisa deixar de duplicar o Dashboard; composição/visibilidade estão na proposta em revisão |
 
 ## Proveniência do scaffold
 

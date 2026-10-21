@@ -2,6 +2,12 @@
 
 Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 estão na branch `codex/fase-04-05-administracao-moderacao`, criada de `717ee99`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
 
+## Mudança de escopo: feed inicial
+
+A página inicial do aplicativo deve ser um feed de publicações e oportunidades, retomando o HTML de referência. O Dashboard atual ainda precisa ser substituído em `/inicio`; o feed não está implementado. A [proposta de implementação do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra o layout, publicação, fluxos e confirmações pendentes.
+
+F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A mudança de feed fica na branch separada `codex/feed-inicial` e passa a ser a próxima prioridade (F11).
+
 ## Onde consultar
 
 | Documento | Uso atual |

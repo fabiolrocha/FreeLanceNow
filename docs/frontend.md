@@ -2,6 +2,14 @@
 
 Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos módulos de dados. React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
 
+## Correção de direção: início como feed
+
+O HTML fornecido contém feeds de cliente/freelancer, publicação no topo, conteúdo em coluna central e apoio lateral de perfil, oportunidades e contratações. A implementação atual perdeu essa hierarquia ao usar o mesmo Dashboard em `/inicio` e `/painel`.
+
+F11 deverá transformar `/inicio` no feed de publicações/oportunidades e conservar `/painel` para gestão. O layout retoma o HTML e se adapta a uma coluna no celular; evitar somar a sidebar atual às três colunas do feed. Os fluxos de serviço, demanda e contratação continuam ligados às ações de cada publicação.
+
+A [proposta detalhada](superpowers/specs/2026-10-21-feed-inicial-design.md) está em revisão. A matriz abaixo descreve o código atual, não o feed já implementado. Na sequência, revisar publicação, detalhe de serviço, perfil profissional e demandas/propostas para manter continuidade visual com o HTML.
+
 ## Matriz de telas e acesso
 
 | Fluxo atual | Rotas registradas | Perfil/participação | Dados |
@@ -11,7 +19,7 @@ Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos m�
 | Entrada/cadastro | `/login`, `/cadastro` | Público | Auth mock/API |
 | Recuperação de acesso | `/recuperar-senha` | Público | Apenas visual; sem envio de e-mail (`F07`) |
 | Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API |
-| Dashboard | `/inicio`, `/painel` (freelancer) | Autenticado | Mock ou API (catálogo e métricas de contratação reais) |
+| Dashboard atual; separar em F11 | `/inicio`, `/painel` (freelancer) | Autenticado | Mock ou API (catálogo e métricas de contratação reais) |
 | Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API |
 | Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
 | Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
@@ -39,7 +47,7 @@ Recuperação de senha, avisos/chat e financeiro continuam visuais/simulados, vi
 
 | Rotas/estados | Reutilização atual |
 |---|---|
-| `/inicio` e `/painel` | Mesmo `Dashboard`; `/painel` exige freelancer |
+| `/inicio` e `/painel` | Hoje usam o mesmo `Dashboard`; F11 deve separar feed e gestão; `/painel` exige freelancer |
 | `/perfil/editar` e `/perfil/completar` | Mesmo `EditProfile`, com título contextual |
 | `/contratacoes` e `/solicitacoes` | `ContractList` com contexto de solicitações para freelancer |
 | Ações de contratação e `/contratacoes/:id/disputa` | `ContractAction` varia conforme URL e estado |

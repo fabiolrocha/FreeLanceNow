@@ -4,6 +4,12 @@ Revisado em **21/10/2026**, com F04/F05 na branch `codex/fase-04-05-administraca
 
 “Implementado” indica código integrado e cobertura existente; os registros de execução estão em [testes e demonstração](testes-e-demonstracao.md). Uma tela mock não encerra uma integração real. As janelas futuras do [roadmap](roadmap.md) são sugestões; o prazo final é **18/11/2026**.
 
+## Próxima prioridade: F11 — feed e publicações
+
+Mudança de escopo informada em 21/10: o início deve funcionar como feed, onde pessoas publicam sobre o trabalho e descobrem serviços/demandas. O painel de métricas atual não satisfaz essa experiência. F11 entra antes de avançar nas próximas integrações; as janelas de F06/F07 precisam ser revistas em conjunto com esse trabalho.
+
+F04/F05 estão publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), ainda aberto. A [proposta de F11](superpowers/specs/2026-10-21-feed-inicial-design.md) está em revisão de escopo; não registrar o feed como entregue nem ampliar funcionalidades sociais implicitamente.
+
 ## Funcionalidades e critérios de aceite
 
 | ID | Área | Estado em 21/10 | Dependências | Critério de aceite |
@@ -11,15 +17,16 @@ Revisado em **21/10/2026**, com F04/F05 na branch `codex/fase-04-05-administraca
 | F01 | Contratação | Implementado (`fase-01`) | Auth e catálogo | Solicitar, aceitar/recusar, iniciar, sinalizar conclusão, confirmar/contestar; participantes autorizados, histórico e snapshots persistentes |
 | F02 | Prazos | Implementado (`fase-01`) | F01 | Cancelar pendência após 48h e confirmar conclusão após 5 dias; jobs idempotentes e testes de relógio |
 | F03 | Avaliação | Implementado (`fase-02`) | F01 | Nota 1–5 única e imutável em até 7 dias; média com 1 decimal, resposta única e filtro por nota |
-| F04 | Administração | Implementado nesta branch | Auth e catálogo | Bootstrap opt-in de ADMIN; gestão de usuários/categorias, suspensão/reativação, filtros, métricas por período, CSV e auditoria persistentes |
-| F05 | Moderação | Implementado nesta branch; evidência textual | F01, F04 | Denúncias de serviços/avaliações, cópia do conteúdo/relato, decisão fundamentada e remoção lógica persistentes; disputa e demais ações administrativas auditadas |
+| F04 | Administração | Implementado; PR #40 aberto, CI aprovada | Auth e catálogo | Bootstrap opt-in de ADMIN; gestão de usuários/categorias, suspensão/reativação, filtros, métricas por período, CSV e auditoria persistentes |
+| F05 | Moderação | Implementado; PR #40 aberto; evidência textual | F01, F04 | Denúncias de serviços/avaliações, cópia do conteúdo/relato, decisão fundamentada e remoção lógica persistentes; disputa e demais ações administrativas auditadas |
 | F06 | Catálogo e imagens | Pendente; API já pagina busca | Catálogo | Até 5 JPG/PNG de até 5 MB por anúncio, storage/autorização e paginação da API na interface; validar filtros e limites |
 | F07 | Comunicação e acesso | Pendente; telas locais/visuais | Auth, F01, F08 | Recuperação/verificação por e-mail, mensagens e notificações persistentes entre contas; Resend configurado e falhas tratadas |
 | F08 | Demandas/propostas | Implementado (`fase-03`) | Auth, catálogo, F01 | Publicar demanda, enviar proposta pendente única por profissional, aceitar/recusar; aceite fecha demanda, rejeita demais pendentes e gera contratação `ACEITO` |
 | F09 | Financeiro | Pendente; telas simuladas | F01, F02, regras de disputa | Stripe Sandbox, comissão planejada de 10%, eventos idempotentes, reembolso, registros financeiros e conciliação testados |
 | F10 | Operação | Pendente | Integrações anteriores | Termos revisados, retenção, backup/restauração, observabilidade, rate limit e teste de carga com evidências |
+| F11 | Feed e publicações | P0 imediato; proposta em revisão | Auth, catálogo, F08, F04/F05 | Início como feed, publicação persistente, descoberta de oportunidades com ações reais, moderação e adaptação desktop/celular; confirmar composição e acesso antes de implementar |
 
-F04/F05 foram implementados juntos nesta branch. A evidência é o relato e a cópia textual do conteúdo denunciado; arquivos anexos dependem de F06, e avisos por e-mail dependem de F07. Contas são suspensas/reativadas; não há exclusão definitiva. As ações administrativas são auditadas sem apagar histórico. Os provedores Stripe, Neon e Resend foram escolhidos; isso não comprova implantação nem integração executada.
+F04/F05 foram implementados juntos na branch `codex/fase-04-05-administracao-moderacao` (PR #40). A evidência é o relato e a cópia textual do conteúdo denunciado; arquivos anexos dependem de F06, e avisos por e-mail dependem de F07. Contas são suspensas/reativadas; não há exclusão definitiva. As ações administrativas são auditadas sem apagar histórico. Os provedores Stripe, Neon e Resend foram escolhidos; isso não comprova implantação nem integração executada.
 
 ## Revisão transversal
 

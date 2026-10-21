@@ -25,6 +25,15 @@ Revisado em **21/10/2026**, conforme a base integrada. Referência principal: `o
 | RN19 / protótipo | Mensagens e notificações | Mock local; sem entrega para outras pessoas | Contrato, persistência e canal de envio |
 | RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Somente exploração visual com valores fictícios | Gateway, webhooks idempotentes, livro financeiro e conciliação |
 
+## Mudança de escopo — feed (F11)
+
+| ID | Regra | Estado atual | Continuação |
+|---|---|---|---|
+| RN21 / mudança de escopo 21/10 | O início do aplicativo é um feed de publicações e oportunidades, com textos sobre trabalhos e ações para conectar pessoas/necessidades | Não implementado; `/inicio` ainda mostra Dashboard | F11: publicar, listar, descobrir e moderar; confirmar composição e visibilidade do feed |
+| RN22 / HTML e mudança de escopo | Manter continuidade visual do HTML entre feed, publicação, serviço, perfil e demandas | Rotas existem, mas a hierarquia inicial diverge da referência | Reorganizar essas páginas de forma incremental, com validação desktop/celular |
+
+A [proposta do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) não transforma curtidas, comentários, seguidores ou fotos em funcionalidades já entregues. Regras existentes de proposta privada e contratação continuam válidas.
+
 Os IDs RN/UC identificam regras e casos de uso; não atribuem pessoas. A implementação e a revisão são combinadas pela equipe conforme [colaboração](equipe.md). Para rotas demonstrativas e componentes reutilizados, consulte [frontend](frontend.md).
 
 Os requisitos não funcionais dos documentos (páginas/busca P95 até 3s, solicitação até 5s, notificação até 10s, disponibilidade 99% e 200 acessos simultâneos) são **metas futuras ainda não medidas**. A verificação atual cobre funcionalidade e layout de 390 px/desktop; não certifica SLA ou capacidade de produção.

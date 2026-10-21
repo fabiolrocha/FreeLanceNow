@@ -4,6 +4,12 @@ Revisado em **21/10/2026**. O FreeLanceNow conecta clientes que precisam de serv
 
 **Entrega final: 18/11/2026, quarta-feira, horário de Brasília.** O marco de 07/10 e as fases F01/F02/F03/F08 já compõem a base atual. O [roadmap](roadmap.md) distingue entregas integradas e trabalho restante. A colaboração é por entrega, sem pessoas designadas de forma fixa para cada caso.
 
+## Mudança de experiência principal
+
+A descoberta deve acontecer em um **feed inicial**, inspirado na dinâmica de Instagram/LinkedIn e na composição do HTML fornecido. Pessoas devem publicar textos/informações sobre seu trabalho e encontrar oportunidades para abrir serviços, perfis ou demandas. O feed será a entrada principal para conectar pessoas e necessidades.
+
+O código atual ainda abre um Dashboard em `/inicio`; essa é uma divergência a corrigir em F11. O painel de gestão permanece como apoio. A [proposta do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) separa requisitos confirmados e decisões pendentes, incluindo composição e visibilidade antes do login. F04/F05 seguem em seu PR próprio, sem misturar a mudança visual à entrega administrativa.
+
 ## Estado da aplicação
 
 | Área | Disponível agora | Trabalho restante |
@@ -21,6 +27,6 @@ A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas d
 
 ## Entrega planejada
 
-Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 estão implementados nesta branch. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md).
+Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 estão implementados no PR #40, ainda aberto. F11 (feed/publicações) passa a ser a próxima prioridade. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
 
 Stripe Sandbox, Neon e Resend são escolhas de provedores; não constituem integrações entregues. Não há movimentação financeira real. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.
