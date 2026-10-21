@@ -40,9 +40,12 @@ Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integ
 | PUT | `/admin/categories/{id}` | Admin ativo | Renomeia/ativa/desativa, preservando slug e vínculos |
 | GET | `/admin/metrics` | Admin ativo | Totais reais por período de criação |
 | GET | `/admin/audit` | Admin ativo | Até 200 ações mais recentes, ordem decrescente |
-| POST | `/reports` | Autenticado ativo | 201 + denúncia de serviço/avaliação visível |
+| POST | `/reports` | Autenticado ativo | 201 + denúncia de serviço/avaliação/publicação visível |
 | GET | `/admin/reports` | Admin ativo | Fila e decisões, com relato e cópia do conteúdo |
 | PATCH | `/admin/reports/{id}` | Admin ativo | Manter/remover com justificativa; remoção lógica e auditoria |
+| GET | `/feed` | Autenticado ativo | Página cronológica mista de publicações, serviços e demandas autorizadas |
+| POST | `/feed/posts` | Cliente/freelancer ativo | 200 + publicação profissional persistente |
+| PATCH | `/feed/posts/{id}/hide` | Autor ativo | 200 + `{hidden:true}`; retirada lógica própria |
 | GET | `/actuator/health` (fora da base) | Público | Saúde sem detalhes privados |
 
 ## Cadastro e login
@@ -189,7 +192,7 @@ POST `/reports` recebe:
 }
 ```
 
-`targetType` aceita `SERVICE` ou `REVIEW`; motivo obrigatório até 80 caracteres e relato de 40–1000 caracteres úteis após trim. O serviço precisa estar ativo e não moderado, com profissional ativo; a avaliação precisa estar visível e vinculada a profissional ativo. Alvo inexistente/invisível retorna 404. Só pode existir uma denúncia pendente do mesmo autor para o mesmo alvo (409 na duplicidade).
+`targetType` aceita `SERVICE`, `REVIEW` ou `POST`; motivo obrigatório até 80 caracteres e relato de 40–1000 caracteres úteis após trim. O serviço precisa estar ativo e não moderado, com profissional ativo; a avaliação precisa estar visível e vinculada a profissional ativo. Alvo inexistente/invisível retorna 404. Só pode existir uma denúncia pendente do mesmo autor para o mesmo alvo (409 na duplicidade).
 
 A resposta/fila inclui autor, tipo/ID do alvo, `targetTitle`, `targetContent` (cópia textual), motivo/relato, estado, justificativa, administrador e datas. GET `/admin/reports` é exclusivo de ADMIN; não há listagem pública de denúncias. O relato e a cópia do conteúdo são a evidência persistida nesta fase, sem upload de anexos.
 
@@ -211,3 +214,13 @@ curl -X POST http://localhost:8081/api/v1/auth/login \
 ```
 
 Use a suíte de integração para os cenários de autorização; não compartilhe tokens reais em issues. OpenAPI/Swagger ainda não foi incluído; este contrato Markdown e os testes são a referência mantida do contrato atual.
+
+## Feed e publicações (F11)
+
+GET `/feed`: `page` padrão 0, `size` padrão 20 (1–100), `type` opcional `UPDATE`/`SERVICE`/`DEMAND`, `categoryId` opcional UUID. Ordenação por criação e ID decrescentes, tipo como desempate. A resposta usa `{items,page,size,totalElements,totalPages}`; filtros de visibilidade são aplicados no banco antes da paginação.
+
+Cada item retorna `id`, `type`, `author: {id,name,role,city}`, `title`, `text`, `createdAt`, `category: {id,name}` ou nulo, `serviceId`, `price`, `days`, `city`. Campos sem aplicação são nulos. Não inclui contatos, endereço de contratação ou mensagens de proposta. Serviços inativos/moderados e autores suspensos não aparecem. Demandas devem estar abertas e ter autor ativo: cliente vê as próprias; freelancer/admin vê oportunidades abertas. O detalhe e a negociação mantêm suas regras existentes.
+
+POST `/feed/posts` recebe `{"text":"Meu trabalho da semana", "categoryId":"UUID opcional", "serviceId":"UUID opcional"}`. Texto obrigatório de 1–500 caracteres (espaços isolados não são válidos); categoria deve estar ativa. Vincular serviço exige autoria, status ativo e ausência de moderação; a categoria é inferida do serviço, e outra categoria explícita é rejeitada. Administradores não publicam por essa operação. O retorno é o item `UPDATE`; a publicação aparece para outras contas autenticadas. Se o serviço vinculado ficar invisível, a publicação vinculada também sai do feed.
+
+PATCH `/feed/posts/{id}/hide` não exige corpo; somente o autor pode agir. A retirada é lógica e não permite restaurar conteúdo moderado. Denunciar usa POST `/reports` com `targetType: "POST"`; relato, cópia do texto, decisão fundamentada e auditoria reaproveitam F05. Visitantes não têm acesso ao feed. Fotos, comentários, curtidas, seguidores e ranking personalizado permanecem fora de F11.

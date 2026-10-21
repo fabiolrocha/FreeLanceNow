@@ -13,7 +13,8 @@ export function ApiReport() {
   const [target, setTarget] = useState(params.get('id') || ''),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false)
-  const type = params.get('type') === 'REVIEW' ? 'REVIEW' : 'SERVICE'
+  const type =
+    params.get('type') === 'POST' ? 'POST' : params.get('type') === 'REVIEW' ? 'REVIEW' : 'SERVICE'
   const sent = pathname.endsWith('enviada')
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -55,7 +56,11 @@ export function ApiReport() {
               <p>
                 Conteúdo:{' '}
                 {params.get('alvo') ||
-                  (type === 'REVIEW' ? 'Avaliação selecionada' : 'Anúncio selecionado')}
+                  (type === 'POST'
+                    ? 'Publicação selecionada'
+                    : type === 'REVIEW'
+                      ? 'Avaliação selecionada'
+                      : 'Anúncio selecionado')}
               </p>
             ) : (
               <label className="field">

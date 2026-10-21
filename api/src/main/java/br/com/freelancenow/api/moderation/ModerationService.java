@@ -4,6 +4,7 @@ import br.com.freelancenow.api.admin.*;
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.catalog.*;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.feed.FeedPost;
 import br.com.freelancenow.api.reviews.*;
 
 import jakarta.persistence.*;
@@ -65,6 +66,11 @@ public class ModerationService {
                             .orElseThrow(this::missing);
             title = s.getTitle();
             content = s.getDescription();
+        } else if (r.targetType() == ContentReport.Target.POST) {
+            var post = em.find(FeedPost.class, r.targetId());
+            if (post == null || !post.isVisible()) throw missing();
+            title = "Publicação profissional";
+            content = post.getText();
         } else {
             var v =
                     reviews.findById(r.targetId())
@@ -102,6 +108,14 @@ public class ModerationService {
                                 LockModeType.PESSIMISTIC_WRITE);
                 if (s == null) throw missing();
                 s.moderate();
+            } else if (report.getTargetType() == ContentReport.Target.POST) {
+                var post =
+                        em.find(
+                                FeedPost.class,
+                                report.getTargetId(),
+                                LockModeType.PESSIMISTIC_WRITE);
+                if (post == null) throw missing();
+                post.hide();
             } else {
                 var review =
                         em.find(Review.class, report.getTargetId(), LockModeType.PESSIMISTIC_WRITE);

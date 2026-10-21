@@ -2,6 +2,12 @@
 
 Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 estão na branch `codex/fase-04-05-administracao-moderacao`, criada de `717ee99`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
 
+## Mudança de escopo: feed inicial
+
+A página inicial do aplicativo deve ser um feed de publicações e oportunidades, retomando o HTML de referência. `/inicio` agora abre o feed misto autenticado; `/painel` conserva a gestão do freelancer. A [especificação aprovada do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra layout, publicação e fluxos implementados.
+
+F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A mudança de feed fica na branch separada `codex/feed-inicial` com a implementação de F11, dependente de F04/F05.
+
 ## Onde consultar
 
 | Documento | Uso atual |
@@ -9,7 +15,7 @@ Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo P
 | [Escopo](escopo.md) | Produto, integrações disponíveis e entrega final |
 | [Requisitos](requisitos.md) | Regras dos casos de uso, estado e rastreabilidade |
 | [Arquitetura](arquitetura.md) | Camadas, módulos, ambientes e integrações |
-| [Dados](dados.md) | Migrações V1–V7, tabelas e evolução planejada |
+| [Dados](dados.md) | Migrações V1–V8, tabelas e evolução planejada |
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |

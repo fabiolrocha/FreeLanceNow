@@ -9,23 +9,25 @@ flowchart LR
   Web -->|modo api: HTTP JSON| Proxy[Vite em dev / Nginx no Docker]
   Proxy --> API[Spring Boot 4.1.1 / Java 21]
   API --> Security[Spring Security / JWT / bcrypt]
-  API --> Modulos[auth / users / catalog / contracts / reviews / demands / admin / moderation]
+  API --> Modulos[auth / users / catalog / contracts / reviews / demands / admin / moderation / feed]
   Modulos --> JPA[JPA / transações]
+  Modulos --> JDBC[JDBC / feed paginado]
+  JDBC --> DB
   JPA --> DB[(PostgreSQL 15 local)]
-  Flyway[Flyway V1 a V7] --> DB
+  Flyway[Flyway V1 a V8] --> DB
 ```
 
 | Camada | Local | Responsabilidade |
 |---|---|---|
 | Rotas e shell | `web/src/App.tsx`, `web/src/app/` | Layout, sessão, navegação e guards |
 | Features | `web/src/features/` | Formulários e fluxos por área |
-| Dados web | `web/src/data/client.ts` | Seleção explícita mock/API e chamadas HTTP |
+| Dados web | `web/src/data/{client,admin,feed}.ts` | Seleção explícita mock/API e chamadas HTTP |
 | Domínio web | `web/src/domain/` | Tipos e regras testáveis do fluxo simulado |
-| Controllers/DTOs | `api/.../{auth,users,catalog,contracts,reviews,demands,admin,moderation}` | HTTP, validação, representação pública/privada |
+| Controllers/DTOs | `api/.../{auth,users,catalog,contracts,reviews,demands,admin,moderation,feed}` | HTTP, validação, representação pública/privada |
 | Services | Mesmos módulos | Regras de negócio, prazos agendados (`@Scheduled`) e fronteiras transacionais |
 | Repositories/entidades | Mesmos módulos | Persistência, busca, locks pessimistas e vínculos |
 | Config/common | `api/.../{config,common}` | Segurança, `Clock` injetável, CORS, seed e Problem Details |
-| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V7`) |
+| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V8`) |
 
 JWT HS256 é emitido pelo próprio backend com issuer validado, expiração de 900s e segredo configurado por ambiente com pelo menos 32 bytes. Os endpoints de perfil privado, gestão de anúncios, contratações, avaliações e demandas/propostas verificam também que a conta existe e está ativa. O frontend guarda a sessão em `sessionStorage`, conserva a expiração absoluta após reload e elimina a sessão ao expirar. Uma fase futura deve avaliar cookies HttpOnly/CSRF ou outra política de sessão adequada à implantação pública.
 

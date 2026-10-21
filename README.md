@@ -4,6 +4,8 @@ Marketplace acadêmico de serviços gerais: clientes encontram profissionais e f
 
 **Documentação revisada em 21/10/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). F04/F05 acrescentam administração e moderação persistentes. Comunicação, upload e financeiro continuam pendentes. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
 
+**F11 — feed inicial e publicações** está implementada na branch `codex/feed-inicial`: após login, publicações profissionais, serviços e demandas aparecem em um feed cronológico com filtros e paginação. A [especificação aprovada](docs/superpowers/specs/2026-10-21-feed-inicial-design.md) registra o escopo, retomando o HTML de referência. F04/F05 estão publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada.
+
 ## Começar
 
 Pré-requisitos: Git e Docker com Compose. Para desenvolver o React fora do Docker: Node **22.12+** e npm. Para desenvolver a API fora do Docker: **JDK 21**; o Maven Wrapper está incluído.

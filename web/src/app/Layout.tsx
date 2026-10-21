@@ -19,10 +19,12 @@ import {
 import { useApp } from './store'
 import { isMock } from '../data/client'
 import { Avatar } from '../components/ui'
+import '../features/feed/feed.css'
 
 export function Brand() {
+  const { user } = useApp()
   return (
-    <Link to="/" className="brand">
+    <Link to={user ? (user.role === 'ADMIN' ? '/admin' : '/inicio') : '/'} className="brand">
       <img
         src="/images/logo.svg"
         alt=""
@@ -41,6 +43,12 @@ export function Layout() {
   const { user, signOut, loading, error, refresh } = useApp(),
     navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const social = !!user && user.role !== 'ADMIN'
+  function logout() {
+    signOut()
+    setOpen(false)
+    navigate('/')
+  }
   const links =
     user?.role === 'ADMIN'
       ? ([
@@ -82,9 +90,17 @@ export function Layout() {
           ? 'Demonstração acadêmica · dados fictícios · nenhum pagamento real'
           : 'Ambiente acadêmico · cadastro, login, perfis, serviços e contratações conectados à API'}
       </div>
-      <header className="topbar">
+      <header className={`topbar ${social ? 'social-header' : ''}`}>
         <Brand />
         <nav className="public-links" aria-label="Menu principal">
+          {social && (
+            <>
+              <NavLink to="/inicio">Feed</NavLink>
+              <NavLink to="/servicos">Serviços</NavLink>
+              <NavLink to="/profissionais">Profissionais</NavLink>
+              <NavLink to="/demandas">Demandas</NavLink>
+            </>
+          )}
           {!user && (
             <>
               <Link to="/servicos">Encontrar serviços</Link>
@@ -111,6 +127,11 @@ export function Layout() {
                   </small>
                 </span>
               </span>
+              {social && !open && (
+                <button className="text-button desktop-signout" onClick={logout}>
+                  Sair da conta
+                </button>
+              )}
               <button
                 className="menu-button"
                 aria-label={open ? 'Fechar menu' : 'Abrir menu'}
@@ -129,7 +150,7 @@ export function Layout() {
           )}
         </div>
       </header>
-      <div className={user ? 'app-shell' : 'public-shell'}>
+      <div className={social ? 'social-shell' : user ? 'app-shell' : 'public-shell'}>
         {user && (
           <aside className={`sidebar ${open ? 'open' : ''}`}>
             <nav aria-label="Navegação da conta">
@@ -142,14 +163,7 @@ export function Layout() {
             </nav>
             <div className="sidebar-bottom">
               <p>Seu trabalho, em um só lugar.</p>
-              <button
-                className="text-button"
-                onClick={() => {
-                  signOut()
-                  setOpen(false)
-                  navigate('/')
-                }}
-              >
+              <button className="text-button" onClick={logout}>
                 <LogOut size={18} />
                 Sair da conta
               </button>

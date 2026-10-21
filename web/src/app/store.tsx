@@ -324,6 +324,7 @@ export function Provider({ children }: { children: ReactNode }) {
       return created
     }
     const created: Demand = {
+      createdAt: new Date().toISOString(),
       id: crypto.randomUUID(),
       clientId: u.id,
       title: r.title,

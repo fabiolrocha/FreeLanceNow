@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Search, MapPin, Check, Wrench } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client, isMock } from '../../data/client'
@@ -8,7 +8,8 @@ import { Avatar, CategoryIcon, Empty, PageTitle, ServiceGrid } from '../../compo
 import { money } from '../../domain/rules'
 
 export function Landing() {
-  const { categories, services } = useApp()
+  const { categories, services, user } = useApp()
+  if (user) return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/inicio'} replace />
   return (
     <>
       <section className="hero">
