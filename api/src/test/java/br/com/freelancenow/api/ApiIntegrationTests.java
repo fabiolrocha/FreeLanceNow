@@ -782,10 +782,265 @@ class ApiIntegrationTests {
     }
 
     @Test
+    @Order(15)
+    void reviewRequiresCompletedContractValidatesRatingUniquenessAndFreelancerReply() {
+        var futureDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(9).toString();
+        var pendingId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Contrato para validar avaliação.",
+                                        "address", "Asa Sul"),
+                                clientToken)
+                        .get("id")
+                        .toString();
+
+        // Cannot review before completion
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 5, "comment", "Antes de concluir"),
+                                clientToken));
+
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + pendingId + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + pendingId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + pendingId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + pendingId + "/status",
+                Map.of("status", "CONCLUIDO"),
+                clientToken);
+
+        // Non-client (freelancer or other user) cannot review
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 5, "comment", "Autoavaliação"),
+                                contractFreelaToken));
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 5, "comment", "Outro usuário"),
+                                otherToken));
+
+        // Invalid rating (0 or 6) or comment > 500 chars -> 400
+        expect(
+                400,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 0, "comment", "Nota inválida"),
+                                clientToken));
+        expect(
+                400,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 6, "comment", "Nota inválida"),
+                                clientToken));
+        expect(
+                400,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 5, "comment", "x".repeat(501)),
+                                clientToken));
+
+        // Valid review -> 201
+        var created =
+                post(
+                        "/api/v1/contracts/" + pendingId + "/review",
+                        Map.of("rating", 5, "comment", "Excelente atendimento e pontualidade."),
+                        clientToken);
+        assertEquals(5, ((Number) created.get("rating")).intValue());
+        assertEquals("Excelente atendimento e pontualidade.", created.get("comment"));
+
+        // Duplicate review on same contract -> 409
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review",
+                                Map.of("rating", 4, "comment", "Segunda tentativa"),
+                                clientToken));
+
+        // Client cannot reply; reply > 200 chars -> 400
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review/reply",
+                                Map.of("reply", "Cliente tentando responder"),
+                                clientToken));
+        expect(
+                400,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review/reply",
+                                Map.of("reply", "r".repeat(201)),
+                                contractFreelaToken));
+
+        var replied =
+                post(
+                        "/api/v1/contracts/" + pendingId + "/review/reply",
+                        Map.of("reply", "Muito obrigado pela confiança!"),
+                        contractFreelaToken);
+        assertEquals("Muito obrigado pela confiança!", replied.get("reply"));
+        assertNotNull(replied.get("repliedAt"));
+
+        // Duplicate reply -> 409
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + pendingId + "/review/reply",
+                                Map.of("reply", "Outra resposta"),
+                                contractFreelaToken));
+
+        // Contract detail reflects rating, review and reviewReply
+        var contractDetail = getJson("/api/v1/contracts/" + pendingId, clientToken);
+        assertEquals(5, ((Number) contractDetail.get("rating")).intValue());
+        assertEquals("Excelente atendimento e pontualidade.", contractDetail.get("review"));
+        assertEquals("Muito obrigado pela confiança!", contractDetail.get("reviewReply"));
+    }
+
+    @Test
+    @Order(16)
+    @SuppressWarnings("unchecked")
+    void reviewSevenDayWindowAndOneDecimalAverageRatingAndMinRatingFilter() {
+        var futureDate = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(10).toString();
+        var secondContractId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Segundo contrato para média 4.5.",
+                                        "address", "Guará"),
+                                clientToken)
+                        .get("id")
+                        .toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + secondContractId + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + secondContractId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + secondContractId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + secondContractId + "/status",
+                Map.of("status", "CONCLUIDO"),
+                clientToken);
+        post(
+                "/api/v1/contracts/" + secondContractId + "/review",
+                Map.of("rating", 4, "comment", "Bom serviço."),
+                clientToken);
+
+        var freelaId = userId(contractFreelaToken);
+        var profile = getJson("/api/v1/freelancers/" + freelaId, null);
+        assertEquals(4.5, ((Number) profile.get("averageRating")).doubleValue(), 0.001);
+        assertEquals(2, ((Number) profile.get("reviewCount")).intValue());
+
+        var freelaReviews =
+                http().get()
+                        .uri("/api/v1/freelancers/" + freelaId + "/reviews")
+                        .retrieve()
+                        .body(List.class);
+        assertEquals(2, freelaReviews.size());
+
+        var serviceReviews =
+                http().get()
+                        .uri("/api/v1/services/" + contractServiceId + "/reviews")
+                        .retrieve()
+                        .body(List.class);
+        assertEquals(2, serviceReviews.size());
+
+        var matchingMinRating =
+                getJson("/api/v1/services?size=50&minRating=4.5", null);
+        assertTrue(ids(matchingMinRating).contains(contractServiceId));
+
+        var higherMinRating =
+                getJson("/api/v1/services?size=50&minRating=4.6", null);
+        assertFalse(ids(higherMinRating).contains(contractServiceId));
+
+        // Expired 7-day window test
+        var expiredContractId =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", futureDate,
+                                        "description", "Contrato concluído há mais de 7 dias.",
+                                        "address", "Sudoeste"),
+                                clientToken)
+                        .get("id")
+                        .toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + expiredContractId + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + expiredContractId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + expiredContractId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + expiredContractId + "/status",
+                Map.of("status", "CONCLUIDO"),
+                clientToken);
+        db.update(
+                "update contract set completed_at = now() - interval '8 days' where id = ?::uuid",
+                expiredContractId);
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/contracts/" + expiredContractId + "/review",
+                                Map.of("rating", 5, "comment", "Fora da janela de 7 dias"),
+                                clientToken));
+    }
+
+    @Test
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                3,
+                4,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var seed = new DemoData(users, categories, services, passwords);

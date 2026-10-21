@@ -1,12 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle2, Star } from 'lucide-react'
 import { useApp } from '../../app/store'
+import { isMock } from '../../data/client'
 import { Empty, ErrorMessage, Field, PageTitle, SimulationNotice } from '../../components/ui'
 import { canReview, futureDate, money, statusLabel, today } from '../../domain/rules'
 import type { Contract } from '../../domain/types'
 
+// In API mode, refetch on open so new requests and direct links appear without a manual reload.
+function useFreshContracts() {
+  // Kept in a ref so the effect runs once per page open; the provider recreates the function.
+  const reload = useRef(useApp().reloadContracts),
+    [syncing, setSyncing] = useState(!isMock)
+  useEffect(() => {
+    let active = true
+    void reload.current().finally(() => {
+      if (active) setSyncing(false)
+    })
+    return () => {
+      active = false
+    }
+  }, [])
+  return syncing
+}
 export function RequestService() {
   const { id } = useParams(),
     { services, user, requestContract } = useApp(),
@@ -107,6 +124,7 @@ export function RequestSent() {
 export function ContractList({ requests = false }: { requests?: boolean }) {
   const { contracts, user } = useApp(),
     [filter, setFilter] = useState('all')
+  useFreshContracts()
   const own = contracts.filter(
     (c) =>
       (user?.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user?.id) &&
@@ -171,20 +189,36 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
 }
 export function ContractDetail() {
   const { id } = useParams(),
-    { contracts, user, transition } = useApp(),
+    { contracts, user, transition, replyReview } = useApp(),
     [error, setError] = useState(''),
-    [busy, setBusy] = useState(false)
+    [busy, setBusy] = useState(false),
+    syncing = useFreshContracts()
   const c = contracts.find(
     (c) =>
       c.id === id &&
       (user?.role === 'ADMIN' || c.clientId === user?.id || c.freelancerId === user?.id),
   )
-  if (!c) return <Empty title="Contratação não encontrada" />
+  if (!c)
+    return <Empty title={syncing ? 'Carregando contratação…' : 'Contratação não encontrada'} />
   async function action(status: Contract['status']) {
     setBusy(true)
     setError('')
     try {
       await transition(c!.id, status)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  async function submitReply(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const d = new FormData(e.currentTarget),
+      reply = String(d.get('reply') || '')
+    setBusy(true)
+    setError('')
+    try {
+      await replyReview(c!.id, reply)
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -228,9 +262,27 @@ export function ContractDetail() {
             </div>
           )}
           {c.rating && (
-            <p className="success">
-              Avaliação registrada: {c.rating} de 5. {c.review}
-            </p>
+            <div className="notice">
+              <p className="success">
+                Avaliação registrada: {c.rating} de 5. {c.review}
+              </p>
+              {c.reviewReply ? (
+                <p>Resposta do profissional: {c.reviewReply}</p>
+              ) : (
+                user?.role === 'FREELANCER' &&
+                c.freelancerId === user.id && (
+                  <form onSubmit={submitReply}>
+                    <label className="field">
+                      <span>Responder avaliação (até 200 caracteres)</span>
+                      <textarea name="reply" required maxLength={200} rows={2} />
+                    </label>
+                    <button className="button secondary" disabled={busy}>
+                      Responder avaliação
+                    </button>
+                  </form>
+                )
+              )}
+            </div>
           )}
         </section>
         <aside className="panel booking-panel">
@@ -304,12 +356,14 @@ export function ContractAction() {
     navigate = useNavigate()
   const [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
-    [rating, setRating] = useState(5)
+    [rating, setRating] = useState(5),
+    syncing = useFreshContracts()
   const c = contracts.find(
       (c) => c.id === id && (c.clientId === user?.id || c.freelancerId === user?.id),
     ),
     kind = pathname.split('/').at(-1)
-  if (!c) return <Empty title="Contratação não encontrada" />
+  if (!c)
+    return <Empty title={syncing ? 'Carregando contratação…' : 'Contratação não encontrada'} />
   const titles: Record<string, string> = {
     concluir: 'Marcar como concluído',
     confirmar: 'Confirmar recebimento',
@@ -324,7 +378,7 @@ export function ContractAction() {
     setError('')
     try {
       if (kind === 'avaliar') {
-        review(c!.id, rating, String(d.get('comment')))
+        await review(c!.id, rating, String(d.get('comment') || ''))
         navigate(`/contratacoes/${c!.id}/avaliacao-publicada`)
       } else {
         await transition(
@@ -350,7 +404,7 @@ export function ContractAction() {
         title={titles[kind || ''] || 'Contratação'}
         description={`${c.title} · ${money(c.price)}`}
       />
-      {(kind === 'avaliar' || kind === 'disputa') && <SimulationNotice />}
+      {kind === 'disputa' && <SimulationNotice />}
       {kind === 'disputa' ? (
         <section className="panel">
           <span className="badge red">Em disputa</span>
@@ -390,7 +444,7 @@ export function ContractAction() {
               {kind === 'concluir'
                 ? 'O cliente terá 5 dias corridos para confirmar ou contestar a conclusão.'
                 : kind === 'contestar'
-                   ? 'Informe o problema para a mediação administrativa.'
+                  ? 'Informe o problema para a mediação administrativa.'
                   : 'Confirme somente se o serviço foi concluído conforme o combinado.'}
             </p>
           )}
@@ -442,10 +496,7 @@ export function ReviewPublished() {
     <div className="form-panel confirmation">
       <CheckCircle2 size={52} />
       <h1>Avaliação publicada</h1>
-      <p>
-        Seu comentário já aparece no histórico da contratação e no perfil do profissional da
-        demonstração.
-      </p>
+      <p>Seu comentário já aparece no histórico da contratação e no perfil do profissional.</p>
       <Link className="button" to={`/contratacoes/${id}`}>
         Ver contratação
       </Link>

@@ -5,6 +5,7 @@ import type {
   CreateContract,
   Profile,
   Register,
+  Review,
   SaveService,
   Service,
   ServiceStatus,
@@ -38,6 +39,8 @@ const fieldLabels: Record<string, string> = {
   date: 'data',
   address: 'endereço',
   comment: 'comentário',
+  rating: 'nota',
+  reply: 'resposta',
 }
 export function setToken(value: string) {
   token = value
@@ -68,12 +71,22 @@ function read<T>(key: string, fallback: T): T {
   }
 }
 // Public data never carries contact fields, mirroring UserDtos.PublicProfile in the API.
-const publicProfile = ({ id, name, role, city, bio }: Profile): Profile => ({
+const publicProfile = ({
   id,
   name,
   role,
   city,
   bio,
+  averageRating,
+  reviewCount,
+}: Profile): Profile => ({
+  id,
+  name,
+  role,
+  city,
+  bio,
+  averageRating,
+  reviewCount,
 })
 let listings = read<Service[]>('fln-mock-services', services).map((s) => ({
   ...s,
@@ -226,5 +239,23 @@ export const client = {
       method: 'PATCH',
       body: JSON.stringify({ status, comment }),
     })
+  },
+  async reviewContract(id: string, rating: number, comment: string): Promise<Review> {
+    return request(`/contracts/${id}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ rating, comment }),
+    })
+  },
+  async replyReview(id: string, reply: string): Promise<Review> {
+    return request(`/contracts/${id}/review/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ reply }),
+    })
+  },
+  async freelancerReviews(freelancerId: string): Promise<Review[]> {
+    return request(`/freelancers/${freelancerId}/reviews`)
+  },
+  async serviceReviews(serviceId: string): Promise<Review[]> {
+    return request(`/services/${serviceId}/reviews`)
   },
 }

@@ -107,7 +107,11 @@ export function ServiceCard({ service: s }: { service: Service }) {
         <div className="person">
           <Avatar name={s.freelancer.name} />
           <div>
-            <span>{s.freelancer.name}</span>
+            <span>
+              {s.freelancer.name}
+              {typeof s.freelancer.averageRating === 'number' &&
+                ` · ★ ${s.freelancer.averageRating.toFixed(1)}`}
+            </span>
             <small>
               <MapPin size={12} />
               {s.freelancer.city || 'Localização não informada'}

@@ -6,6 +6,8 @@ export interface Profile {
   role: Role
   city: string
   bio: string
+  averageRating?: number | null
+  reviewCount?: number
 }
 export interface User extends Profile {
   email: string
@@ -75,8 +77,24 @@ export interface Contract {
   completedAt?: string
   rating?: number
   review?: string
+  reviewReply?: string
+  reviewedAt?: string
   dispute?: string
   observations?: string
+}
+export interface Review {
+  id: string
+  contractId: string
+  serviceId: string
+  serviceTitle: string
+  freelancerId: string
+  clientId: string
+  clientName: string
+  rating: number
+  comment: string
+  reply?: string | null
+  repliedAt?: string | null
+  createdAt: string
 }
 export interface CreateContract {
   serviceId: string

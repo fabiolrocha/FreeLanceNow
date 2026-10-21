@@ -1,6 +1,6 @@
 # Documentação do FreeLanceNow
 
-Atualizada em **30/09/2026**. Esta pasta concentra a especificação e o planejamento atual. Os arquivos originais são evidência histórica; as decisões atuais estão nos Markdown abaixo.
+Atualizada em **17/10/2026**. Esta pasta concentra a especificação e o planejamento atual. Os arquivos originais são evidência histórica; as decisões atuais estão nos Markdown abaixo.
 
 | Documento | Uso |
 |---|---|
@@ -11,7 +11,7 @@ Atualizada em **30/09/2026**. Esta pasta concentra a especificação e o planeja
 | [Dados](dados.md) | Banco atual e entidades futuras |
 | [API](api.md) | Endpoints, payloads, erros e autenticação |
 | [Frontend](frontend.md) | Rotas, componentes, design e modos de dados |
-| [Imagens](imagens.md) | Inventário visual e decisões pendentes |
+| [Imagens](imagens.md) | Inventário visual, logo oficial e decisões de mídia |
 | [Roadmap](roadmap.md) | Datas sugeridas por etapa e entrega final em 18/11/2026 |
 | [Equipe](equipe.md) | Responsáveis, fronteiras de arquivos e revisores |
 | [Backlog](backlog.md) | Tarefas, dependências e critérios de aceite |

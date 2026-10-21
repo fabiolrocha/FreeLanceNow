@@ -2,6 +2,7 @@ package br.com.freelancenow.api.users;
 
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.reviews.ReviewService;
 
 import jakarta.validation.Valid;
 
@@ -18,10 +19,12 @@ import java.util.*;
 public class UserController {
     private final CurrentUser current;
     private final UserRepository users;
+    private final ReviewService reviews;
 
-    public UserController(CurrentUser current, UserRepository users) {
+    public UserController(CurrentUser current, UserRepository users, ReviewService reviews) {
         this.current = current;
         this.users = users;
+        this.reviews = reviews;
     }
 
     @GetMapping("/users/me")
@@ -40,8 +43,17 @@ public class UserController {
 
     @GetMapping("/freelancers")
     public List<UserDtos.PublicProfile> freelancers() {
-        return users.findByRoleAndActiveTrue(Role.FREELANCER).stream()
-                .map(UserDtos.PublicProfile::from)
+        var items = users.findByRoleAndActiveTrue(Role.FREELANCER);
+        var stats = reviews.ratingSummaries(items.stream().map(User::getId).toList());
+        return items.stream()
+                .map(
+                        u -> {
+                            var s =
+                                    stats.getOrDefault(
+                                            u.getId(), ReviewService.RatingSummary.EMPTY);
+                            return UserDtos.PublicProfile.from(
+                                    u, s.averageRating(), s.reviewCount());
+                        })
                 .toList();
     }
 
@@ -55,6 +67,7 @@ public class UserController {
                                         new ApiException(
                                                 HttpStatus.NOT_FOUND,
                                                 "Profissional não encontrado."));
-        return UserDtos.PublicProfile.from(u);
+        var s = reviews.ratingSummary(u.getId());
+        return UserDtos.PublicProfile.from(u, s.averageRating(), s.reviewCount());
     }
 }

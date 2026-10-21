@@ -21,9 +21,27 @@ public final class UserDtos {
         }
     }
 
-    public record PublicProfile(UUID id, String name, Role role, String city, String bio) {
+    public record PublicProfile(
+            UUID id,
+            String name,
+            Role role,
+            String city,
+            String bio,
+            Double averageRating,
+            long reviewCount) {
         public static PublicProfile from(User u) {
-            return new PublicProfile(u.getId(), u.getName(), u.getRole(), u.getCity(), u.getBio());
+            return from(u, null, 0L);
+        }
+
+        public static PublicProfile from(User u, Double averageRating, long reviewCount) {
+            return new PublicProfile(
+                    u.getId(),
+                    u.getName(),
+                    u.getRole(),
+                    u.getCity(),
+                    u.getBio(),
+                    averageRating,
+                    reviewCount);
         }
     }
 

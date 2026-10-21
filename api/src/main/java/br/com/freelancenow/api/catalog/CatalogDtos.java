@@ -36,6 +36,11 @@ public final class CatalogDtos {
             CategoryView category,
             UserDtos.PublicProfile freelancer) {
         public static ServiceView from(ServiceListing s) {
+            return from(s, null, 0L);
+        }
+
+        public static ServiceView from(
+                ServiceListing s, Double averageRating, long reviewCount) {
             return new ServiceView(
                     s.getId(),
                     s.getTitle(),
@@ -44,7 +49,8 @@ public final class CatalogDtos {
                     s.getDeliveryDays(),
                     s.getStatus(),
                     CategoryView.from(s.getCategory()),
-                    UserDtos.PublicProfile.from(s.getFreelancer()));
+                    UserDtos.PublicProfile.from(
+                            s.getFreelancer(), averageRating, reviewCount));
         }
     }
 

@@ -12,13 +12,13 @@ Referência principal: `originais/Documento Casos de Uso Final.docx`, v1.2. As r
 | RN06 / UC02 | Até 20 anúncios ativos por freelancer | API com bloqueio do usuário na transação; mock valida limite | Teste de concorrência e carga |
 | RN07 / UC02 | Rascunho, ativo e inativo; edição pelo dono | API preserva registros e restringe proprietário; público vê ativos | Histórico/auditoria de alterações |
 | RN08 / UC02 | Até 5 imagens JPG/PNG, cada uma até 5 MB | Ícones provisórios | Storage, validação real de conteúdo, tamanho e autorização |
-| RN09 / UC03 | Buscar por texto, categoria, localização, preço, avaliação | API: texto, categoria, cidade exata, faixa de preço e paginação; frontend filtra catálogo carregado | Filtro por nota após avaliações reais; paginação server-side no React |
+| RN09 / UC03 | Buscar por texto, categoria, localização, preço, avaliação | API: texto, categoria, cidade exata, faixa de preço, nota mínima (`minRating`) e paginação; frontend filtra catálogo carregado | Paginação server-side no React (`F06`) |
 | RN10 / UC03 | Data futura, descrição até 300, endereço opcional, uma solicitação pendente por cliente/serviço | API e frontend com lock transacional e índice único parcial | Notificações externas por e-mail (`F07`) |
 | RN11 / UC03 | Freelancer responde em até 48 horas; cancela automaticamente após prazo | Job idempotente na API com `Clock` injetável e testes de relógio | Notificação de cancelamento (`F07`) |
 | RN12 / UC06 | `PENDENTE → ACEITO → EM_ANDAMENTO → AGUARDANDO_CONFIRMACAO → CONCLUIDO` | API transacional (`contract` + `contract_event`), snapshots de título/preço e React integrado | — |
 | RN13 / UC06 | Freelancer sinaliza; cliente confirma ou contesta; disputa administrada | API persiste conclusão e abertura de disputa com motivo; admin resolve transição | Fila administrativa dedicada e anexos (`F05`) |
 | RN14 / UC06 | Confirmação automática após 5 dias | Job idempotente na API (`AGUARDANDO_CONFIRMACAO → CONCLUIDO`) com testes de relógio | Repasse automático no gateway (`F09`) |
-| RN15 / UC04 | Avaliação de 1 a 5, concluída, única, imutável, em até 7 dias; comentário até 500 | Mock valida nota, prazo e unicidade | API, média com 1 decimal; resposta do profissional até 200 |
+| RN15 / UC04 | Avaliação de 1 a 5, concluída, única, imutável, em até 7 dias; comentário até 500 | API e frontend persistentes (`review`), média com 1 decimal e resposta única do profissional até 200 caracteres | — |
 | RN16 / UC05 | Admin gerencia categorias/usuários; suspensão preserva histórico | Telas simuladas; API recusa login/token de usuário inativo | Endpoints administrativos e trilha de auditoria |
 | RN17 / UC05 | Denúncias, moderação e exportação CSV | Mock/CSV local com neutralização de fórmulas | API com fila, autorização e auditoria |
 | RN18 / protótipo | Demandas, propostas e aceite | Mock cria contratação fictícia | Especificar estados e implementar persistência |

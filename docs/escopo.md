@@ -7,13 +7,13 @@ O FreeLanceNow conecta clientes que precisam de serviços gerais a profissionais
 | Área | Base disponível | Critério da primeira entrega |
 |---|---|---|
 | Navegação pública | Início, busca, profissionais, detalhe, cadastro, login e ajuda | Rotas sem tela quebrada, acesso por URL e layout em celular |
-| Cliente | Perfil, demandas/propostas, solicitações, acompanhamento, confirmação, contestação e avaliação simulados | Um fluxo completo demonstrável em uma sessão |
-| Freelancer | Perfil, anúncios e solicitações; propostas e acompanhamento simulados | Criar rascunho, publicar, desativar e percorrer execução |
+| Cliente | Perfil, solicitações, acompanhamento, confirmação, contestação e avaliação integrados à API; demandas/propostas simuladas | Um fluxo completo demonstrável em uma sessão |
+| Freelancer | Perfil, anúncios, solicitações, execução e resposta a avaliações integrados à API; propostas simuladas | Criar rascunho, publicar, desativar e percorrer execução |
 | Administração | Usuários, categorias, moderação, relatórios e financeiro simulados | Acesso mock por perfil, fila de denúncia/disputa e CSV |
-| API e banco | Cadastro, login JWT, perfil privado/público, categorias e catálogo persistente | Migrações, validações, autorização e testes com PostgreSQL |
+| API e banco | Cadastro, login JWT, perfil privado/público, categorias, catálogo, contratações (com prazos de 48h/5d) e avaliações | Migrações `V1`–`V4`, validações, autorização e testes com PostgreSQL |
 | Organização | Documentação, CI e fluxo Git | Cada integrante encontra sua tarefa, dependências e aceite |
 
-**Persistência real:** usuário, categoria e anúncio. **Simulação:** contratação, avaliação, demanda, proposta, mensagem, notificação, denúncia, administração e financeiro. Mudar para `VITE_DATA_MODE=api` integra apenas o primeiro grupo; o segundo continua com aviso explícito.
+**Persistência real:** usuário, categoria, anúncio, contratação (`contract` + `contract_event`) e avaliação (`review`). **Simulação:** demanda, proposta, mensagem, notificação, denúncia, administração e financeiro. Mudar para `VITE_DATA_MODE=api` integra todo o primeiro grupo ao PostgreSQL; o segundo continua com aviso explícito até suas respectivas fases (`F04`–`F09`).
 
 Para o marco de 07/10, prioridade P0 é estabilidade dos dois caminhos de demonstração (mock e API). P1 é melhorar estados vazios, validações e experiência visual já existente. Integrações de pagamento e comunicação entram nas etapas seguintes, antes da entrega final.
 

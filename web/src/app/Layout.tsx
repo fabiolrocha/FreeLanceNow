@@ -23,7 +23,14 @@ import { Avatar } from '../components/ui'
 export function Brand() {
   return (
     <Link to="/" className="brand">
-      <img src="/images/logo.svg" alt="" aria-hidden="true" className="brand-logo" width={36} height={36} />
+      <img
+        src="/images/logo.svg"
+        alt=""
+        aria-hidden="true"
+        className="brand-logo"
+        width={36}
+        height={36}
+      />
       <span>
         FreeLance<span className="brand-accent">Now</span>
       </span>
