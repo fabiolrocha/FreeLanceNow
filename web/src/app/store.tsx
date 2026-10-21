@@ -381,10 +381,7 @@ export function Provider({ children }: { children: ReactNode }) {
           return x
         }),
       )
-      setContracts((cs) => [
-        accepted.contract,
-        ...cs.filter((x) => x.id !== accepted.contract.id),
-      ])
+      setContracts((cs) => [accepted.contract, ...cs.filter((x) => x.id !== accepted.contract.id)])
       notify('Proposta aceita e contratação criada.')
       return accepted.contract
     }
@@ -433,9 +430,7 @@ export function Provider({ children }: { children: ReactNode }) {
       notify('Proposta recusada.')
       return
     }
-    setProposals((ps) =>
-      ps.map((x) => (x.id === proposalId ? { ...x, status: 'REJECTED' } : x)),
-    )
+    setProposals((ps) => ps.map((x) => (x.id === proposalId ? { ...x, status: 'REJECTED' } : x)))
   }
   const enrichedProfessionals = isMock
     ? professionals.map((p) => ({ ...p, ...mockRating(contracts, p.id) }))
