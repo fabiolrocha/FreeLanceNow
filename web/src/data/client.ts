@@ -213,6 +213,7 @@ export const client = {
     if (!category) throw new Error('Selecione uma categoria.')
     const service: Service = {
       ...r,
+      createdAt: listings.find((s) => s.id === id)?.createdAt || new Date().toISOString(),
       id: id || crypto.randomUUID(),
       freelancer: publicProfile(u),
       category,

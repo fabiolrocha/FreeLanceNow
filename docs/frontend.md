@@ -2,6 +2,14 @@
 
 Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos módulos de dados. React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
 
+## Correção de direção: início como feed
+
+O HTML fornecido contém feeds de cliente/freelancer, publicação no topo, conteúdo em coluna central e apoio lateral de perfil, oportunidades e contratações. F11 recupera essa hierarquia e separa o feed inicial do Dashboard de gestão.
+
+F11 transforma `/inicio` no feed de publicações/oportunidades e conserva `/painel` para gestão. O layout retoma o HTML e se adapta a uma coluna no celular; o cabeçalho e o menu da conta substituem a sidebar fixa nas áreas de cliente/freelancer, evitando uma quarta coluna. Os fluxos de serviço, demanda e contratação continuam ligados às ações de cada publicação.
+
+A [especificação detalhada](superpowers/specs/2026-10-21-feed-inicial-design.md) foi aprovada. O feed possui campo de publicação (1–500 caracteres, categoria e serviço próprio opcionais), filtros tipo/categoria e páginas de 20 itens. Os formulários de serviço/demanda e as páginas de detalhe/perfil reutilizam o shell de descoberta e os fluxos existentes. O modo API trata erros sem fallback silencioso; o mock preserva publicações nesta sessão.
+
 ## Matriz de telas e acesso
 
 | Fluxo atual | Rotas registradas | Perfil/participação | Dados |
@@ -11,7 +19,8 @@ Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos m�
 | Entrada/cadastro | `/login`, `/cadastro` | Público | Auth mock/API |
 | Recuperação de acesso | `/recuperar-senha` | Público | Apenas visual; sem envio de e-mail (`F07`) |
 | Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API |
-| Dashboard | `/inicio`, `/painel` (freelancer) | Autenticado | Mock ou API (catálogo e métricas de contratação reais) |
+| Feed | `/inicio` | Autenticado | Mock ou API: publicações, serviços e demandas autorizadas, filtros e paginação |
+| Dashboard de gestão | `/painel` | Freelancer | Mock ou API: catálogo e métricas de contratação reais |
 | Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API |
 | Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
 | Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
@@ -24,7 +33,7 @@ Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos m�
 | Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
 | Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Simulação financeira (`F09` pendente) |
 | Saque | `/saque`, `/saque/enviado` | Freelancer | Simulação financeira (`F09` pendente) |
-| Denúncia | `/denunciar`, `/denunciar/enviada` | Autenticado ativo | Mock ou API: anúncios/avaliações com relato e cópia textual (`F05`) |
+| Denúncia | `/denunciar`, `/denunciar/enviada` | Autenticado ativo | Mock ou API: anúncios/avaliações/publicações com relato e cópia textual (`F05`) |
 | Gestão e relatórios | `/admin/usuarios`, `/admin/categorias`, `/admin/relatorios` | Admin | Mock ou API: usuários/categorias, filtros, métricas por período, CSV e auditoria (`F04`) |
 | Transações administrativas | `/admin/transacoes` | Admin | Financeiro ainda simulado (`F09`) |
 | Moderação | `/admin/moderacao` | Admin ativo | Mock ou API: denúncias/decisões persistentes, remoção lógica e disputas auditadas (`F05`) |
@@ -39,7 +48,7 @@ Recuperação de senha, avisos/chat e financeiro continuam visuais/simulados, vi
 
 | Rotas/estados | Reutilização atual |
 |---|---|
-| `/inicio` e `/painel` | Mesmo `Dashboard`; `/painel` exige freelancer |
+| `/inicio` e `/painel` | `Feed` e `Dashboard` separados; `/painel` exige freelancer |
 | `/perfil/editar` e `/perfil/completar` | Mesmo `EditProfile`, com título contextual |
 | `/contratacoes` e `/solicitacoes` | `ContractList` com contexto de solicitações para freelancer |
 | Ações de contratação e `/contratacoes/:id/disputa` | `ContractAction` varia conforme URL e estado |
@@ -51,8 +60,8 @@ Esses endereços não equivalem a implementações independentes. A remoção de
 ## Modos e estado
 
 - `VITE_DATA_MODE=mock`: fixtures fictícias e persistência em `sessionStorage`; cadastro mock guarda digest com salt exclusivamente para simular login, sem pretensão de autenticação segura.
-- `VITE_DATA_MODE=api`: catálogo, profissionais, sessão, perfil, anúncios, contratações, avaliações, demandas e propostas via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
-- No modo mock, contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações, avaliações, demandas e propostas são sincronizadas com o PostgreSQL. Denúncias e ações administrativas usam `web/src/data/admin.ts` no modo API; o estado local fica restrito ao mock, às mensagens/leitura de avisos e ao financeiro ainda simulado. As telas administrativas tratam carregamento, falhas e nova tentativa.
+- `VITE_DATA_MODE=api`: feed/publicações, catálogo, profissionais, sessão, perfil, anúncios, contratações, avaliações, demandas e propostas via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
+- No modo mock, publicações/contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações, avaliações, demandas e propostas são sincronizadas com o PostgreSQL. Denúncias e ações administrativas usam `web/src/data/admin.ts` no modo API; o estado local fica restrito ao mock, às mensagens/leitura de avisos e ao financeiro ainda simulado. As telas administrativas tratam carregamento, falhas e nova tentativa.
 - O token real dura 15 minutos e sua expiração absoluta sobrevive ao reload. Novo login é necessário após expiração.
 
 ## Direção visual e acessibilidade

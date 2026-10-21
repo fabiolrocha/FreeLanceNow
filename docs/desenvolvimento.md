@@ -2,6 +2,8 @@
 
 Revisado em **21/10/2026**. O [README](../README.md) cobre o início rápido. O Compose fornece Java/Maven em container; o desenvolvimento fora dele requer JDK 21 e, para o web, Node 22.12+ e npm. Use as versões resolvidas nos arquivos de dependências do repositório.
 
+Para entrar no aplicativo durante o desenvolvimento, consulte as [contas locais por perfil](contas-desenvolvimento.md).
+
 ## Clone e primeira execução
 
 ```sh
@@ -11,7 +13,9 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial e F01/F02/F03/F08. A branch de F04/F05 inclui as integrações administrativas descritas nesta revisão. Branches antigas de fase não são a base padrão de novas contribuições.
+Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial, F01/F02/F03/F08, F04/F05 (PR #40) e o feed de F11.
+
+Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --build` para reconstruir `api` e `web` juntos. `docker compose up -d` sem `--build` reaproveita imagens antigas; `--build api` ou `--build web` atualizam só um serviço. Branches antigas de fase não são a base padrão de novas contribuições.
 
 ## Java fora do Docker
 
@@ -76,6 +80,7 @@ O repositório já tem histórico e remoto. Atualize `main` com `git pull --ff-o
 |---|---|
 | Porta ocupada | `docker compose ps`; ajuste `WEB_PORT`, `API_PORT`, `DB_PORT` no `.env` e os destinos correspondentes |
 | Web não mudou de modo | Reconstrua `web` no Docker ou reinicie Vite; variável é lida no build/dev |
+| `/inicio` abre o painel antigo em vez do feed | Imagem `web` anterior a F11 ou checkout desatualizado. Atualize a `main` com `git pull --ff-only origin main`, execute `docker compose up -d --build` e recarregue a página. O Nginx envia `Cache-Control: no-cache` no `index.html`; páginas guardadas de imagens anteriores a essa configuração podem exigir uma recarga forçada uma única vez |
 | API indisponível | `docker compose logs api db`; confira health, JWT_SECRET e DB_URL |
 | PostgreSQL rejeita senha após mudar `.env` | Volume existente conserva credenciais originais; alinhe a configuração ou crie outro ambiente/banco |
 | Token expirou | Faça login novamente; expiração 15 min e sem refresh |

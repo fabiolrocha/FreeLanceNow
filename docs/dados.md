@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **21/10/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql` e `V7__content_reports.sql`.
+Revisado em **21/10/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql` e `V8__feed.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V7, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V8, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -126,8 +126,15 @@ O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não 
 | Tabela/campo | Persistência e invariantes |
 |---|---|
 | `audit_event` | Ator, ação, tipo/ID do alvo, valores anterior/novo, justificativa e data; sem API de alteração/exclusão. Gravado na mesma transação da ação administrativa |
-| `content_report` | Autor, tipo `SERVICE`/`REVIEW`, ID do alvo, cópia de título/conteúdo, motivo/relato, `PENDING`/`KEPT`/`REMOVED`, administrador, justificativa e datas |
+| `content_report` | Autor, tipo `SERVICE`/`REVIEW`/`POST`, ID do alvo, cópia de título/conteúdo, motivo/relato, `PENDING`/`KEPT`/`REMOVED`, administrador, justificativa e datas |
 | `service_listing.moderated` | Remoção lógica acompanhada de `INACTIVE`; o proprietário não pode editar/republicar anúncio moderado |
 | `review.hidden` | Oculta avaliação das listas públicas, médias e filtro por nota; preserva vínculo único e histórico privado da contratação |
 
 Índice parcial impede duas denúncias pendentes do mesmo autor/alvo. Decisões usam locks e não podem ser repetidas. Os alvos polimórficos são validados no serviço; as FKs preservam autores e administradores. V6 acrescenta unicidade de nome de categoria sem distinguir maiúsculas. Renomear preserva o slug e os vínculos dos anúncios existentes.
+
+
+## Publicações e feed (V8)
+
+`feed_post` guarda UUID, `author_id` com FK, texto de até 500 caracteres não vazio, `category_id` e `service_id` opcionais, `created_at` e `hidden`. Serviço vinculado deve pertencer ao autor e estar visível; retirada própria e remoção administrativa usam o mesmo sinal lógico, preservando a linha para histórico. O tipo `POST` amplia a restrição de alvos de `content_report` sem alterar V7 já aplicada.
+
+O feed não duplica serviços ou demandas: uma consulta `UNION ALL` combina as três fontes e filtra autores ativos, conteúdo visível, tipo/categoria e acesso às demandas antes de contar/paginar. Índices de criação/ID apoiam a listagem de oportunidades. Ordenação é cronológica e determinística; não existe algoritmo de relevância. A consulta retorna DTO seguro e não serializa entidades/contatos privados.

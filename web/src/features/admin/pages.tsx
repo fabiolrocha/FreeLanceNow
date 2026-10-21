@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { isMock } from '../../data/client'
+import { moderateMockPost } from '../../data/feed'
 import { ApiAdminUsers, ApiAdminCategories, ApiAdminModeration, ApiAdminReports } from './api-pages'
 import { Link } from 'react-router-dom'
 import { useApp } from '../../app/store'
@@ -160,6 +161,8 @@ function MockAdminCategories() {
   )
 }
 interface ReportRecord {
+  targetType?: string
+  targetId?: string
   id: string
   target: string
   reason: string
@@ -177,6 +180,9 @@ function MockAdminModeration() {
     })
   const disputes = contracts.filter((c) => c.status === 'EM_DISPUTA')
   function decide(id: string, status: string) {
+    const report = reports.find((r) => r.id === id)
+    if (status === 'Remoção simulada' && report?.targetType === 'POST' && report.targetId)
+      moderateMockPost(report.targetId)
     const next = reports.map((r) => (r.id === id ? { ...r, status } : r))
     setReports(next)
     sessionStorage.setItem('fln-reports', JSON.stringify(next))

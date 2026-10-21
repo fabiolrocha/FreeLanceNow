@@ -31,6 +31,7 @@ const Landing = feature(catalog, 'Landing'),
   Detail = feature(catalog, 'ServiceDetail'),
   Professionals = feature(catalog, 'Professionals'),
   Profile = feature(catalog, 'ProfileDetail')
+const Feed = feature(() => import('./features/feed/pages'), 'Feed')
 const Dashboard = feature(account, 'Dashboard'),
   OwnProfile = feature(account, 'OwnProfile'),
   EditProfile = feature(account, 'EditProfile')
@@ -106,7 +107,7 @@ export default function App() {
               <Route path="termos" element={<Help kind="terms" />} />
               <Route path="privacidade" element={<Help kind="privacy" />} />
               <Route element={<Guard />}>
-                <Route path="inicio" element={<Dashboard />} />
+                <Route path="inicio" element={<Feed />} />
                 <Route path="perfil" element={<OwnProfile />} />
                 <Route path="perfil/editar" element={<EditProfile />} />
                 <Route path="perfil/completar" element={<EditProfile />} />

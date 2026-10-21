@@ -4,6 +4,10 @@ Marketplace acadêmico de serviços gerais: clientes encontram profissionais e f
 
 **Documentação revisada em 21/10/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). F04/F05 acrescentam administração e moderação persistentes. Comunicação, upload e financeiro continuam pendentes. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
 
+**F11 — feed inicial e publicações** está integrada à `main`: após login, publicações profissionais, serviços e demandas aparecem em um feed cronológico com filtros e paginação. A [especificação aprovada](docs/superpowers/specs/2026-10-21-feed-inicial-design.md) registra o escopo, retomando o HTML de referência. F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40).
+
+Acessos locais de cliente, freelancer e administrador: [contas de desenvolvimento](docs/contas-desenvolvimento.md).
+
 ## Começar
 
 Pré-requisitos: Git e Docker com Compose. Para desenvolver o React fora do Docker: Node **22.12+** e npm. Para desenvolver a API fora do Docker: **JDK 21**; o Maven Wrapper está incluído.
@@ -12,6 +16,8 @@ Pré-requisitos: Git e Docker com Compose. Para desenvolver o React fora do Dock
 cp .env.example .env
 docker compose up -d --build
 ```
+
+Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --build`: `--build api` ou `--build web` reconstroem só aquele serviço e deixam o outro com a imagem anterior.
 
 Abra **http://localhost:5173**. A API responde em **http://localhost:8081/actuator/health**. O PostgreSQL local usa a porta **5435**. Essas portas evitam conflitos com outros projetos presentes na máquina de origem.
 
