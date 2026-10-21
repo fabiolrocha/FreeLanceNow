@@ -216,4 +216,3 @@ test('demanda publicada recebe proposta, aceite gera contratação no PostgreSQL
   await page.goto(`${demandUrl}/proposta`)
   await expect(page.getByRole('heading', { name: 'Demanda encerrada' })).toBeVisible()
 })
-

@@ -1,6 +1,6 @@
 # Desenvolvimento e colaboração
 
-O [README](../README.md) cobre o início rápido. O Compose fornece Java/Maven em container, evitando necessidade de instalar JDK no host. Na máquina de origem não havia JDK configurado; a compilação e os testes Java foram feitos pelo Docker.
+Revisado em **21/10/2026**. O [README](../README.md) cobre o início rápido. O Compose fornece Java/Maven em container; o desenvolvimento fora dele requer JDK 21 e, para o web, Node 22.12+ e npm. Use as versões resolvidas nos arquivos de dependências do repositório.
 
 ## Clone e primeira execução
 
@@ -11,7 +11,7 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-Com o marco inicial (`marco-1`) integrado à `main`, novos integrantes usam `main` (ou a branch da fase em andamento, como `fase-01` e `fase-02`) como ponto de partida.
+Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial e F01/F02/F03/F08. Branches antigas de fase não são a base padrão de novas contribuições.
 
 ## Java fora do Docker
 
@@ -35,30 +35,29 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 
 | Variável | Aplicação | Finalidade |
 |---|---|---|
-| DB_URL | API | URL JDBC; Docker usa hostname `db`, demonstração remota usa **Neon** |
+| DB_URL | API fora do Compose | URL JDBC; Compose fixa `jdbc:postgresql://db:5432/freelancenow`; Neon é opção remota planejada |
 | DB_USERNAME / DB_PASSWORD | API/banco | Acesso PostgreSQL |
 | JWT_SECRET | API | Chave HS256 com pelo menos 32 bytes |
 | PORT / API_PORT | API / Compose | Porta interna 8081 / publicação |
 | DB_PORT / WEB_PORT | Compose | Portas host 5435 / 5173 |
 | SPRING_PROFILES_ACTIVE / SEED_DEMO | API | Seed somente no perfil dev habilitado |
 | CORS_ORIGINS | API | Origens permitidas, separadas por vírgula |
-| APP_CONTRACT_DEADLINE_CHECK_MS | API | Intervalo do job de expiração de contratações (padrão `60000` ms) |
-| STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API | Chaves do **Stripe Sandbox** para pagamentos e webhooks (`F09`) |
-| VITE_STRIPE_PUBLIC_KEY | Web build/dev | Chave pública de teste do Stripe (`pk_test_...`) |
-| APP_PLATFORM_FEE_PERCENT | API | Percentual de comissão da plataforma em sandbox (padrão `10`) |
-| RESEND_API_KEY / MAIL_FROM | API | Envio de e-mails transacionais via **Resend** (`F07`) |
+| CONTRACT_DEADLINE_CHECK_MS | API | Intervalo do job de prazos, lido em `app.contracts.deadline-check-ms` (padrão `60000` ms) |
+| STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API (reservadas) | Propriedades declaradas; checkout/webhooks ainda não implementados (`F09`) |
+| PLATFORM_FEE_PERCENT | API (reservada) | Propriedade de comissão planejada, padrão `10`; não aplicada a pagamentos atuais |
+| RESEND_API_KEY / RESEND_FROM_EMAIL | API (reservadas) | Propriedades declaradas; envio ainda não implementado (`F07`) |
 | VITE_DATA_MODE | Web build/dev | `mock` ou `api` |
 | VITE_API_BASE_URL | Web build/dev | Padrão `/api/v1`; somente valor público |
 | API_PROXY_TARGET | Vite | Destino de `/api` e `/actuator` em dev |
 | E2E_DATA_MODE | Testes web | `api` seleciona teste com backend real |
 
+A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e as credenciais Stripe/Resend, CORS e intervalo do job não são repassadas por ele atualmente. Uma futura implantação precisa configurar esse repasse e validar as integrações.
+
 As credenciais de exemplo são públicas e locais. `.env`/`.env.local` são ignorados por Git. Não usar `VITE_*` para segredos.
 
 ## Git
 
-O repositório já tinha histórico e remoto. O marco inicial (`marco-1`) foi integrado na `main`, e as entregas de outubro/novembro seguem em branches por fase (`fase-01`, `fase-02`, etc.). Consulte [CONTRIBUTING](../CONTRIBUTING.md) para branches, revisões e arquivos compartilhados.
-
-Fluxo sugerido: atualizar a base, abrir branch por card (`codex/a01-auth`, por exemplo), fazer commits pequenos, rodar testes relevantes, abrir PR com ID/aceite/evidência e pedir revisão ao par. O líder integra PRs aprovados. Não há branch protection configurada automaticamente.
+O repositório já tem histórico e remoto. Atualize `main` com `git pull --ff-only origin main`, abra uma branch descritiva (`codex/f04-administracao`, por exemplo), faça commits pequenos e abra PR com aceite, evidência e limitações. A revisão é combinada com outro integrante disponível, sem pares ou áreas exclusivos. Consulte [CONTRIBUTING](../CONTRIBUTING.md) e [colaboração](equipe.md). Não há branch protection configurada automaticamente.
 
 ## Problemas comuns
 
