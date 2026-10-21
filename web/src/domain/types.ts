@@ -26,6 +26,7 @@ export interface Category {
   slug: string
 }
 export interface Service {
+  createdAt?: string
   id: string
   title: string
   description: string
@@ -104,6 +105,7 @@ export interface CreateContract {
   address: string
 }
 export interface Demand {
+  createdAt?: string
   id: string
   clientId: string
   title: string

@@ -338,6 +338,8 @@ function MockReport() {
         {
           id: crypto.randomUUID(),
           target: params.get('alvo') || 'Conteúdo da demonstração',
+          targetType: params.get('type'),
+          targetId: params.get('id'),
           reason: String(d.get('reason')),
           comment: String(d.get('comment')),
           status: 'PENDING',

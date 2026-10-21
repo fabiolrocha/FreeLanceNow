@@ -328,7 +328,12 @@ function ReportCard({
       <span className="badge">{reportLabels[r.status]}</span>
       <h2>{r.targetTitle}</h2>
       <p>
-        {r.targetType === 'SERVICE' ? 'Anúncio' : 'Avaliação'} · Reportado por {r.reporterName}
+        {r.targetType === 'SERVICE'
+          ? 'Anúncio'
+          : r.targetType === 'POST'
+            ? 'Publicação'
+            : 'Avaliação'}{' '}
+        · Reportado por {r.reporterName}
       </p>
       <h3>{r.reason}</h3>
       <p>{r.comment}</p>

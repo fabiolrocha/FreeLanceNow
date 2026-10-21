@@ -21,7 +21,7 @@ export interface AuditEvent {
 export interface ContentReport {
   id: string
   reporterName: string
-  targetType: 'SERVICE' | 'REVIEW'
+  targetType: 'SERVICE' | 'REVIEW' | 'POST'
   targetId: string
   targetTitle: string
   targetContent: string
@@ -33,7 +33,7 @@ export interface ContentReport {
   createdAt: string
 }
 export interface CreateReport {
-  targetType: 'SERVICE' | 'REVIEW'
+  targetType: 'SERVICE' | 'REVIEW' | 'POST'
   targetId: string
   reason: string
   comment: string
