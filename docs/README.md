@@ -4,9 +4,9 @@ Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo P
 
 ## Mudança de escopo: feed inicial
 
-A página inicial do aplicativo deve ser um feed de publicações e oportunidades, retomando o HTML de referência. O Dashboard atual ainda precisa ser substituído em `/inicio`; o feed não está implementado. A [proposta de implementação do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra o layout, publicação, fluxos e confirmações pendentes.
+A página inicial do aplicativo deve ser um feed de publicações e oportunidades, retomando o HTML de referência. `/inicio` agora abre o feed misto autenticado; `/painel` conserva a gestão do freelancer. A [especificação aprovada do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra layout, publicação e fluxos implementados.
 
-F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A mudança de feed fica na branch separada `codex/feed-inicial` e passa a ser a próxima prioridade (F11).
+F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A mudança de feed fica na branch separada `codex/feed-inicial` com a implementação de F11, dependente de F04/F05.
 
 ## Onde consultar
 
@@ -15,7 +15,7 @@ F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanc
 | [Escopo](escopo.md) | Produto, integrações disponíveis e entrega final |
 | [Requisitos](requisitos.md) | Regras dos casos de uso, estado e rastreabilidade |
 | [Arquitetura](arquitetura.md) | Camadas, módulos, ambientes e integrações |
-| [Dados](dados.md) | Migrações V1–V7, tabelas e evolução planejada |
+| [Dados](dados.md) | Migrações V1–V8, tabelas e evolução planejada |
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |

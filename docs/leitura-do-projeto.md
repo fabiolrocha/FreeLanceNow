@@ -18,7 +18,7 @@ Na análise inicial, foram examinados o documento de visão `.doc`, os DOCX comp
 | Protótipo HTML + support.js | Navegação de cliente/freelancer, catálogo, demandas, propostas, pagamentos, mensagens, notificações e cinco áreas administrativas | Convertido em rotas React com estado de demonstração; runtime gerado não foi reutilizado |
 | Roadmap HTML antigo | 18 etapas (0–17), React, backend, banco, aplicação administrativa separada e integrações | Referência de longo prazo, replanejada para o prazo atual |
 
-A revisão de escopo em 21/10 identificou que o HTML já contém feeds de cliente/freelancer e um campo de publicação. A aplicação React atual ainda usa um Dashboard no início; F11 deve corrigir essa divergência, conforme a [proposta do feed](superpowers/specs/2026-10-21-feed-inicial-design.md).
+A revisão de escopo em 21/10 identificou que o HTML já contém feeds de cliente/freelancer e um campo de publicação. F11 substitui o Dashboard inicial pelo feed misto autenticado e recupera a composição em três colunas, conforme a [especificação do feed](superpowers/specs/2026-10-21-feed-inicial-design.md).
 
 O HTML anuncia “42 telas”, mas contém variações e estados adicionais (confirmações, abas e formulários). A matriz atual em [frontend.md](frontend.md) usa **rotas e fluxos verificáveis**, sem tratar a contagem editorial como requisito. O HTML original tem largura mínima de desktop; a versão React acrescenta adaptação para celular.
 

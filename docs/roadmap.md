@@ -18,7 +18,7 @@ F04/F05 têm implementação no PR #40 e verificações descritas em [testes e d
 
 O início do aplicativo deve ser o feed previsto no HTML de base, com publicação de conteúdo e descoberta de oportunidades. Essa mudança inclui experiência, persistência, autorização, moderação e testes; não se limita a trocar o título do Dashboard.
 
-F04/F05 estão publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A próxima frente é F11, em branch separada. Conferir a [proposta do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) e confirmar os pontos de produto pendentes antes de fechar o plano técnico.
+F04/F05 estão publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. F11 está implementada na branch separada `codex/feed-inicial`, conforme a [especificação aprovada](superpowers/specs/2026-10-21-feed-inicial-design.md). Revisão e integração do feed precedem o avanço das próximas fases.
 
 As janelas de F06/F07 abaixo precisam ser replanejadas para acomodar F11. Não há nova data intermediária confirmada; o prazo final de 18/11 permanece como referência do grupo.
 
@@ -27,7 +27,7 @@ As janelas de F06/F07 abaixo precisam ser replanejadas para acomodar F11. Não h
 | Período | Entrega | Critério para encerrar |
 |---|---|---|
 | 21/10 | F04/F05 publicadas — PR #40 aberto | Bootstrap, gestão, denúncias, remoção lógica e auditoria testados; CI aprovada |
-| Próxima entrega, antes de F06/F07 | F11 — feed e publicações | Início como feed, publicação persistente, descoberta, moderação e continuidade visual com o HTML |
+| 21/10 — implementação em branch, revisão/integração pendentes | F11 — feed e publicações | Feed misto após login, texto persistente, oportunidades autorizadas, moderação, desktop/celular |
 | 22–28/10 | Upload, paginação no web, mensagens, notificações e e-mail — F06/F07 | Upload validado; busca paginada; comunicação entre contas e recuperação de senha verificadas |
 | 29/10–04/11 | Financeiro em Stripe Sandbox — F09 | Pagamento/reembolso de teste, comissão, eventos repetidos e conciliação testados |
 | 05–11/11 | Integração e operação — F10 | Ambiente de demonstração reproduzível, fluxos persistentes, backup/restauração e verificações de acesso/carga |

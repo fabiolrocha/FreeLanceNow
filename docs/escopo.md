@@ -6,9 +6,9 @@ Revisado em **21/10/2026**. O FreeLanceNow conecta clientes que precisam de serv
 
 ## Mudança de experiência principal
 
-A descoberta deve acontecer em um **feed inicial**, inspirado na dinâmica de Instagram/LinkedIn e na composição do HTML fornecido. Pessoas devem publicar textos/informações sobre seu trabalho e encontrar oportunidades para abrir serviços, perfis ou demandas. O feed será a entrada principal para conectar pessoas e necessidades.
+A descoberta deve acontecer em um **feed inicial**, inspirado na dinâmica de Instagram/LinkedIn e na composição do HTML fornecido. Pessoas devem publicar textos/informações sobre seu trabalho e encontrar oportunidades para abrir serviços, perfis ou demandas. O feed é a entrada principal para conectar pessoas e necessidades.
 
-O código atual ainda abre um Dashboard em `/inicio`; essa é uma divergência a corrigir em F11. O painel de gestão permanece como apoio. A [proposta do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) separa requisitos confirmados e decisões pendentes, incluindo composição e visibilidade antes do login. F04/F05 seguem em seu PR próprio, sem misturar a mudança visual à entrega administrativa.
+F11 implementa o feed misto autenticado em `/inicio`, com publicação de texto, filtros, paginação e ações reais. O painel de gestão permanece como apoio. A [especificação do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra o escopo aprovado: após login, com publicações, serviços e demandas autorizadas; a apresentação pública permanece em `/`. F04/F05 seguem em seu PR próprio, sem misturar a mudança visual à entrega administrativa.
 
 ## Estado da aplicação
 
@@ -18,7 +18,7 @@ O código atual ainda abre um Dashboard em `/inicio`; essa é uma divergência a
 | Cliente | Perfil, solicitações, acompanhamento, confirmação, contestação, avaliação e demandas/propostas integrados à API | Comunicação, anexos e financeiro |
 | Freelancer | Perfil, anúncios, execução, resposta a avaliações e propostas integrados à API | Upload, comunicação e financeiro |
 | Administração | Bootstrap ADMIN, usuários/categorias, moderação de serviços/avaliações/disputas, métricas e auditoria integrados | Notificações externas (F07), anexos (F06) e financeiro (F09) |
-| API e banco | Auth JWT, perfis, catálogo, contratações, prazos de 48h/5 dias, avaliações, demandas/propostas; migrações V1–V7, denúncias e auditoria | Integrações dos cards F06/F07/F09/F10 |
+| API e banco | Auth JWT, perfis, catálogo, contratações, prazos de 48h/5 dias, avaliações, demandas/propostas; migrações V1–V8, feed/publicações, denúncias e auditoria | Integrações dos cards F06/F07/F09/F10 |
 | Organização | Documentação, CI e fluxo de branches/PRs | Manter critérios de aceite e evidências por entrega |
 
 **Persistência real:** usuário, categoria, anúncio, contratação e histórico, avaliação, demanda e proposta. **Persistência administrativa:** denúncias e auditoria. **Simulação:** mensagens, notificações e financeiro. Em `VITE_DATA_MODE=api`, o primeiro grupo usa PostgreSQL; telas do segundo grupo continuam demonstrativas. O ADMIN real é provisionado por configuração explícita; não há conta/senha padrão. Denúncias preservam relato e cópia textual do alvo, com decisões e atores auditados; upload de anexos permanece em F06.
@@ -27,6 +27,6 @@ A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas d
 
 ## Entrega planejada
 
-Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 estão implementados no PR #40, ainda aberto. F11 (feed/publicações) passa a ser a próxima prioridade. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
+Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 estão implementados no PR #40, ainda aberto. F11 (feed/publicações) está implementada na branch `codex/feed-inicial`, aguardando revisão/integração. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
 
 Stripe Sandbox, Neon e Resend são escolhas de provedores; não constituem integrações entregues. Não há movimentação financeira real. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.

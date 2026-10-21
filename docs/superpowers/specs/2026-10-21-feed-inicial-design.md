@@ -1,6 +1,6 @@
 # Feed inicial e alinhamento ao HTML de referência
 
-Status: proposta de implementação para a mudança de escopo de 21/10/2026. O feed ainda não está implementado. Branch: `codex/feed-inicial`, baseada em F04/F05 (`7054060`).
+Status: escopo aprovado em 21/10/2026 pelo usuário ("Pode seguir"): feed misto após login. Implementado nesta branch; validação/revisão registradas no plano. Branch: `codex/feed-inicial`, baseada em F04/F05 (`7054060`).
 
 ## Intenção confirmada
 
@@ -42,7 +42,7 @@ ou meus serviços       Serviço ou demanda com ação        Orientações úte
 - A ação principal leva a um fluxo existente: ver serviço, solicitar, enviar proposta ou visitar perfil profissional.
 - Indicadores de contratação ficam em apoio lateral ou no painel de gestão, sem abrir a página com cards de métricas.
 
-## Conteúdo e publicação — primeira entrega proposta
+## Conteúdo e publicação — primeira entrega aprovada
 
 | Conteúdo | Quem publica | Resultado |
 |---|---|---|
@@ -70,7 +70,7 @@ Fotos de trabalho entram com F06. Curtidas, comentários, salvamentos, seguir pe
 | Demandas e propostas | Preservar autorização e geração de contratação; integrar a entrada pelo feed |
 | Área administrativa | Preservar F04/F05 e incorporar moderação das novas publicações |
 
-Decisão proposta pelo implementador: começar pelo feed autenticado, como no HTML. A página pública `/` e a abertura do feed a visitantes precisam de confirmação antes de alterar acesso a conteúdo. Essa escolha não foi informada pelo usuário.
+Decisão aprovada: começar pelo feed misto autenticado, como no HTML. A página pública `/` permanece como apresentação; o feed não expõe conteúdo a visitantes.
 
 ## Dados e autorização
 
@@ -103,7 +103,6 @@ Adicionar F11 — Feed e publicações — como prioridade imediata após F04/F0
 
 A revisão das demais páginas começa pelas que participam de descoberta/publicação/contratação. Não substituir todas as telas de uma vez nem alterar pagamentos para preencher a aparência do HTML.
 
-## Confirmações de produto pendentes
+## Aprovação
 
-- Mistura de publicações, serviços e demandas no feed versus somente publicações profissionais (pergunta já apresentada ao usuário).
-- Visibilidade antes do login: somente feed autenticado nesta primeira entrega ou também uma versão pública.
+Em 21/10/2026, o usuário aprovou seguir com a proposta de publicações, serviços e demandas juntos, após login. Implementação inline nesta sessão, na branch solicitada; sem worktree adicional.

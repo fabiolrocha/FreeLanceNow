@@ -15,14 +15,14 @@ Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabe
 | ADR09 | Mock explícito no marco inicial; contratações/prazos, avaliações e demandas/propostas integrados nas fases seguintes | F01/F02/F03/F08 implementados; F04/F05 integram administração/moderação no PR #40; financeiro e comunicação continuam pendentes |
 | ADR10 | Logo vetorial oficial SVG (`web/public/images/logo.svg`), ícones por categoria e avatares por iniciais | Identidade visual fechada sem depender de fotos do carômetro |
 | ADR11 | Stripe Sandbox escolhido, com comissão planejada de 10% | Checkout, registros financeiros, webhooks, reembolso e conciliação ainda serão implementados em F09 |
-| ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V7; implantação e compatibilidade remota precisam de validação |
+| ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V8; implantação e compatibilidade remota precisam de validação |
 | ADR13 | Resend escolhido como provedor transacional de e-mail | Recuperação, verificação e avisos previstos em F07; parâmetros declarados, sem envio implementado |
 | ADR14 | Organização por entrega, sem designação fixa de pessoas por caso, área, arquivo ou revisão (21/10) | Tabela de delegação retirada; backlog/roadmap sem nomes; revisão combinada por disponibilidade |
 | ADR15 | Markdown atual como referência; originais/protótipo/roadmap HTML preservados como histórico | `equipe.md` passa a guia de colaboração; evitar apagar outras páginas sem confirmar uso e conferir referências |
 | ADR16 | Bootstrap administrativo opt-in, sem senha padrão e sem promoção automática de conta existente | Cadastro público continua sem ADMIN; reinício não altera credenciais nem reativa conta |
 | ADR17 | Denúncia guarda relato/cópia textual; remoção de serviço/avaliação é lógica e auditada | Preserva histórico, bloqueia republicação e retira nota removida da reputação; anexos ficam em F06, avisos em F07 |
 | ADR18 | Auditoria transacional no mesmo banco, sem API de alteração/exclusão | Consulta limitada aos 200 eventos recentes; retenção/controles operacionais de produção ficam em F10 |
-| ADR19 | Feed como entrada principal, com publicações profissionais e oportunidades, retomando o HTML (mudança de escopo 21/10) | F11 ganha prioridade; `/inicio` precisa deixar de duplicar o Dashboard; composição/visibilidade estão na proposta em revisão |
+| ADR19 | Feed como entrada principal, com publicações profissionais e oportunidades, retomando o HTML (mudança de escopo 21/10) | F11 implementa feed misto após login em `/inicio`; `/painel` mantém gestão; composição e visibilidade aprovadas em 21/10 |
 
 ## Proveniência do scaffold
 
