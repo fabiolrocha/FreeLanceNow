@@ -7,17 +7,31 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
   await page.goto('/login')
   await loginAs(page, 'marcos')
   await expect(page.getByRole('heading', { name: 'Feed de trabalho' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Demandas abertas', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(page.getByRole('heading', { name: 'Solicitações pendentes' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Conheça profissionais' })).toHaveCount(0)
   await page
     .getByLabel('Compartilhe seu trabalho')
     .fill('Hoje concluí a instalação de um quadro elétrico.')
   await page.getByRole('button', { name: 'Publicar atualização', exact: true }).click()
   await page.reload()
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   const card = page.locator('article.feed-card').filter({ hasText: 'Hoje concluí a instalação' })
   await expect(card).toBeVisible()
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
   await loginAs(page, 'ana')
+  await expect(page.getByRole('button', { name: 'Serviços', exact: true })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(page.getByRole('heading', { name: 'Conheça profissionais' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Solicitações pendentes' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await expect(card).toBeVisible()
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Serviços', exact: true }).click()
@@ -31,9 +45,11 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
   await loginAs(page, 'marcos')
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await card.getByRole('button', { name: 'Retirar publicação' }).click()
   await expect(card).toHaveCount(0)
   await page.reload()
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await expect(card).toHaveCount(0)
 })
 test('feed no celular preserva navegação e acesso ao formulário de serviço', async ({ page }) => {
@@ -59,6 +75,7 @@ test('denúncia de publicação permite ao admin retirar o texto do feed mock', 
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
   await loginAs(page, 'ana')
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await page
     .locator('article.feed-card')
     .filter({ hasText: text })

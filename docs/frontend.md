@@ -10,6 +10,16 @@ F11 transforma `/inicio` no feed de publicações/oportunidades e conserva `/pai
 
 A [especificação detalhada](superpowers/specs/2026-10-21-feed-inicial-design.md) foi aprovada. O feed possui campo de publicação (1–500 caracteres, categoria e serviço próprio opcionais), filtros tipo/categoria e páginas de 20 itens. Os formulários de serviço/demanda e as páginas de detalhe/perfil reutilizam o shell de descoberta e os fluxos existentes. O modo API trata erros sem fallback silencioso; o mock preserva publicações nesta sessão.
 
+O feed e o cabeçalho variam por perfil:
+
+| Perfil | Filtro inicial e abas | Cabeçalho | Coluna lateral |
+|---|---|---|---|
+| Cliente | Serviços; também Publicações, Minhas demandas e Tudo | Feed, Serviços, Profissionais, Minhas demandas | Contratações em andamento e Conheça profissionais |
+| Freelancer | Demandas abertas; também Publicações e Tudo (anúncios de outros freelancers só em Tudo) | Feed, Demandas abertas, Meus serviços, Solicitações | Solicitações pendentes, contratações em andamento e Meus serviços |
+| Admin | Tudo; também Publicações, Serviços e Demandas | Sem links do feed; menu administrativo | Contratações em andamento e profissionais |
+
+A separação é de apresentação: a visibilidade dos itens continua aplicada pela API (`GET /feed`).
+
 ## Matriz de telas e acesso
 
 | Fluxo atual | Rotas registradas | Perfil/participação | Dados |

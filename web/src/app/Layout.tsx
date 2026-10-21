@@ -96,9 +96,19 @@ export function Layout() {
           {social && (
             <>
               <NavLink to="/inicio">Feed</NavLink>
-              <NavLink to="/servicos">Serviços</NavLink>
-              <NavLink to="/profissionais">Profissionais</NavLink>
-              <NavLink to="/demandas">Demandas</NavLink>
+              {user.role === 'FREELANCER' ? (
+                <>
+                  <NavLink to="/demandas">Demandas abertas</NavLink>
+                  <NavLink to="/meus-servicos">Meus serviços</NavLink>
+                  <NavLink to="/solicitacoes">Solicitações</NavLink>
+                </>
+              ) : (
+                <>
+                  <NavLink to="/servicos">Serviços</NavLink>
+                  <NavLink to="/profissionais">Profissionais</NavLink>
+                  <NavLink to="/demandas">Minhas demandas</NavLink>
+                </>
+              )}
             </>
           )}
           {!user && (

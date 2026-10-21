@@ -28,10 +28,43 @@ const dates = new Intl.DateTimeFormat('pt-BR', {
   minute: '2-digit',
   timeZone: 'America/Sao_Paulo',
 })
+// Each role opens on what it acts on: clients look for services, freelancers for open demands.
+const views = {
+  CLIENT: {
+    tabs: [
+      ['SERVICE', 'Serviços'],
+      ['UPDATE', 'Publicações'],
+      ['DEMAND', 'Minhas demandas'],
+      ['', 'Tudo'],
+    ],
+    subtitle: 'Encontre profissionais e acompanhe o que você precisa resolver.',
+    placeholder: 'Conte o que você precisa ou como foi um serviço…',
+  },
+  FREELANCER: {
+    tabs: [
+      ['DEMAND', 'Demandas abertas'],
+      ['UPDATE', 'Publicações'],
+      ['', 'Tudo'],
+    ],
+    subtitle: 'Encontre demandas abertas e mostre o que você faz.',
+    placeholder: 'No que você está trabalhando?',
+  },
+  ADMIN: {
+    tabs: [
+      ['', 'Tudo'],
+      ['UPDATE', 'Publicações'],
+      ['SERVICE', 'Serviços'],
+      ['DEMAND', 'Demandas'],
+    ],
+    subtitle: 'Acompanhe publicações, serviços e demandas da plataforma.',
+    placeholder: '',
+  },
+}
 export function Feed() {
   const { user, services, demands, categories, contracts, professionals, notify } = useApp()
+  const view = views[user?.role ?? 'CLIENT']
   const [data, setData] = useState<FeedPage | null>(null),
-    [type, setType] = useState(''),
+    [type, setType] = useState(view.tabs[0][0]),
     [categoryId, setCategoryId] = useState(''),
     [page, setPage] = useState(0),
     [revision, setRevision] = useState(0)
@@ -75,10 +108,14 @@ export function Feed() {
   const ownServices = services.filter(
     (s) => s.freelancer.id === user.id && s.status === 'ACTIVE' && !s.moderated,
   )
-  const pending = contracts.filter(
-    (c) =>
-      (c.clientId === user.id || c.freelancerId === user.id) &&
-      ['PENDENTE', 'ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO'].includes(c.status),
+  const freelancer = user.role === 'FREELANCER'
+  const mine = contracts.filter((c) => c.clientId === user.id || c.freelancerId === user.id)
+  const requests = mine.filter((c) => c.freelancerId === user.id && c.status === 'PENDENTE')
+  const pending = mine.filter((c) =>
+    (freelancer
+      ? ['ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
+      : ['PENDENTE', 'ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
+    ).includes(c.status),
   )
   function reload() {
     setRevision((r) => r + 1)
@@ -186,7 +223,7 @@ export function Feed() {
         <div className="feed-heading">
           <span>CONEXÕES QUE VIRAM TRABALHO</span>
           <h1>Feed de trabalho</h1>
-          <p>Compartilhe o que você faz. Encontre o próximo projeto.</p>
+          <p>{view.subtitle}</p>
         </div>
         {user.role !== 'ADMIN' && (
           <section className="feed-surface feed-composer">
@@ -198,7 +235,7 @@ export function Feed() {
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
-                    placeholder="No que você está trabalhando?"
+                    placeholder={view.placeholder}
                     required
                     maxLength={500}
                     rows={3}
@@ -262,12 +299,7 @@ export function Feed() {
         <ErrorMessage message={actionError} />
         <div className="feed-filter-bar">
           <div role="group" aria-label="Tipo de conteúdo">
-            {[
-              ['', 'Tudo'],
-              ['UPDATE', 'Publicações'],
-              ['SERVICE', 'Serviços'],
-              ['DEMAND', 'Demandas'],
-            ].map(([value, label]) => (
+            {view.tabs.map(([value, label]) => (
               <button
                 key={value}
                 aria-pressed={type === value}
@@ -437,6 +469,29 @@ export function Feed() {
         )}
       </section>
       <aside className="feed-right" aria-label="Acompanhamento e profissionais">
+        {freelancer && (
+          <section className="feed-surface">
+            <div className="feed-section-title">
+              <BriefcaseBusiness size={18} />
+              <h2>Solicitações pendentes</h2>
+            </div>
+            {requests.length ? (
+              requests.slice(0, 3).map((c) => (
+                <Link key={c.id} className="feed-contract" to={`/contratacoes/${c.id}`}>
+                  <strong>{c.title}</strong>
+                  <small>
+                    Responder em até 48 horas <ArrowRight size={13} />
+                  </small>
+                </Link>
+              ))
+            ) : (
+              <p className="feed-help-text">Nenhuma solicitação aguardando sua resposta.</p>
+            )}
+            <Link className="feed-all-link" to="/solicitacoes">
+              Ver solicitações <ArrowRight size={14} />
+            </Link>
+          </section>
+        )}
         <section className="feed-surface">
           <div className="feed-section-title">
             <ClipboardList size={18} />
@@ -459,24 +514,40 @@ export function Feed() {
             Ver contratações <ArrowRight size={14} />
           </Link>
         </section>
-        <section className="feed-surface">
-          <h2>Conheça profissionais</h2>
-          {professionals
-            .filter((p) => p.id !== user.id)
-            .slice(0, 3)
-            .map((p) => (
-              <Link className="feed-professional" key={p.id} to={`/profissionais/${p.id}`}>
-                <Avatar name={p.name} />
-                <span>
-                  <strong>{p.name}</strong>
-                  <small>{p.city || 'Ver perfil profissional'}</small>
-                </span>
-              </Link>
-            ))}
-          <Link className="feed-all-link" to="/profissionais">
-            Explorar profissionais <ArrowRight size={14} />
-          </Link>
-        </section>
+        {freelancer ? (
+          <section className="feed-surface">
+            <h2>Meus serviços</h2>
+            <p className="feed-help-text">
+              {ownServices.length} {ownServices.length === 1 ? 'anúncio ativo' : 'anúncios ativos'}{' '}
+              de até 20.
+            </p>
+            <Link className="feed-all-link" to="/meus-servicos/novo">
+              Novo serviço <ArrowRight size={14} />
+            </Link>
+            <Link className="feed-all-link" to="/meus-servicos">
+              Gerenciar serviços <ArrowRight size={14} />
+            </Link>
+          </section>
+        ) : (
+          <section className="feed-surface">
+            <h2>Conheça profissionais</h2>
+            {professionals
+              .filter((p) => p.id !== user.id)
+              .slice(0, 3)
+              .map((p) => (
+                <Link className="feed-professional" key={p.id} to={`/profissionais/${p.id}`}>
+                  <Avatar name={p.name} />
+                  <span>
+                    <strong>{p.name}</strong>
+                    <small>{p.city || 'Ver perfil profissional'}</small>
+                  </span>
+                </Link>
+              ))}
+            <Link className="feed-all-link" to="/profissionais">
+              Explorar profissionais <ArrowRight size={14} />
+            </Link>
+          </section>
+        )}
         <div className="feed-trust">
           <ShieldCheck size={24} />
           <strong>Boas conexões começam com clareza.</strong>

@@ -69,9 +69,11 @@ test('publicação real persiste entre contas, falha mantém texto e moderação
     `/servicos/${service.id}`,
   )
   await page.reload()
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await expect(card).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await login(client.email)
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await expect(card).toBeVisible()
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toHaveCount(0)
   await card.getByRole('link', { name: 'Denunciar', exact: true }).click()
