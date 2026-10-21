@@ -1,12 +1,12 @@
 # Documentação do FreeLanceNow
 
-Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 estão na branch `codex/fase-04-05-administracao-moderacao`, criada de `717ee99`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
+Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 (PR #40) e F11 (revisada no PR #41) também estão na `main`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
 
 ## Mudança de escopo: feed inicial
 
 A página inicial do aplicativo deve ser um feed de publicações e oportunidades, retomando o HTML de referência. `/inicio` agora abre o feed misto autenticado; `/painel` conserva a gestão do freelancer. A [especificação aprovada do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) registra layout, publicação e fluxos implementados.
 
-F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40), aberto com CI aprovada. A mudança de feed fica na branch separada `codex/feed-inicial` com a implementação de F11, dependente de F04/F05.
+F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40). A implementação de F11, dependente de F04/F05, também foi integrada à `main`.
 
 ## Onde consultar
 
@@ -19,6 +19,7 @@ F04/F05 já foram publicadas no [PR #40](https://github.com/fabiolrocha/FreeLanc
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |
+| [Contas de desenvolvimento](contas-desenvolvimento.md) | Login local de cliente, freelancer e administrador; diferenças API/mock |
 | [Testes e demonstração](testes-e-demonstracao.md) | Comandos, roteiro, evidências históricas e limites |
 | [Backlog](backlog.md) | Entregas por funcionalidade, dependências e aceite |
 | [Roadmap](roadmap.md) | Estado das fases, janelas sugeridas e prazo de 18/11/2026 |

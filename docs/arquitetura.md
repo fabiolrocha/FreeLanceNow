@@ -39,7 +39,7 @@ Flyway controla o esquema e JPA executa `validate`; não usar `ddl-auto=update`.
 
 | Serviço | Porta no host | Porta interna | Observação |
 |---|---|---|---|
-| Web | 5173 | 80 no Nginx | SPA fallback e proxy `/api` |
+| Web | 5173 | 80 no Nginx | SPA fallback, `index.html` sem cache e proxy `/api` |
 | API | 8081 | 8081 | Health em `/actuator/health` |
 | PostgreSQL | 5435 | 5432 | Volume nomeado `postgres_data` |
 | Banco de teste | Não publicado | 5432 | Isolado, armazenamento temporário |

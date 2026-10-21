@@ -27,6 +27,6 @@ A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas d
 
 ## Entrega planejada
 
-Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 estão implementados no PR #40, ainda aberto. F11 (feed/publicações) está implementada na branch `codex/feed-inicial`, aguardando revisão/integração. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
+Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 foram integrados à `main` pelo PR #40. F11 (feed/publicações) foi revisada no PR #41 e integrada à `main`. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
 
 Stripe Sandbox, Neon e Resend são escolhas de provedores; não constituem integrações entregues. Não há movimentação financeira real. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.

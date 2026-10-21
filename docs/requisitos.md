@@ -29,7 +29,7 @@ Revisado em **21/10/2026**, conforme a base integrada. Referência principal: `o
 
 | ID | Regra | Estado atual | Continuação |
 |---|---|---|---|
-| RN21 / mudança de escopo 21/10 | O início do aplicativo é um feed de publicações e oportunidades, com textos sobre trabalhos e ações para conectar pessoas/necessidades | Implementado em `codex/feed-inicial`; feed misto após login | F11: texto persistente, serviço/demanda, filtros/paginação, retirada própria e moderação auditada |
+| RN21 / mudança de escopo 21/10 | O início do aplicativo é um feed de publicações e oportunidades, com textos sobre trabalhos e ações para conectar pessoas/necessidades | Implementado na `main`; feed misto após login | F11: texto persistente, serviço/demanda, filtros/paginação, retirada própria e moderação auditada |
 | RN22 / HTML e mudança de escopo | Manter continuidade visual do HTML entre feed, publicação, serviço, perfil e demandas | Feed em três colunas desktop/uma no celular; cabeçalho/menu compartilhados com publicação, detalhe e perfil | Continuar refinamentos específicos conforme validação do grupo |
 
 A [especificação aprovada do feed](superpowers/specs/2026-10-21-feed-inicial-design.md) não transforma curtidas, comentários, seguidores ou fotos em funcionalidades já entregues. Regras existentes de proposta privada e contratação continuam válidas.
