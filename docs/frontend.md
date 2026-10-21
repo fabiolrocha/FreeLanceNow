@@ -17,7 +17,7 @@ React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `l
 | Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/confirmar`, `/contestar` (prefixo da contratação) | Ator da etapa | Mock ou API (`F01`) |
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/avaliacao-publicada` e resposta no detalhe | Cliente / Freelancer | Mock ou API (`F03`) |
 | Disputa | `/contratacoes/:id/disputa` | Participantes | Abertura via API (`F01`); mediação admin simulada (`F05`) |
-| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock (`F08` pendente) |
+| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`) |
 | Avisos/chat | `/notificacoes`, `/mensagens` | Autenticado | Mock; chat nesta tela/sessão sem entrega externa (`F07`) |
 | Carteira/pagamento | `/carteira`, `/pagamento`, `/pagamento/confirmado`, `/transacao` | Perfil apropriado | Simulação financeira (`F09` pendente) |
 | Saque | `/saque`, `/saque/enviado` | Freelancer | Simulação financeira (`F09` pendente) |
@@ -31,8 +31,8 @@ Os sufixos de ação na tabela se referem sempre ao prefixo completo da contrata
 ## Modos e estado
 
 - `VITE_DATA_MODE=mock`: fixtures fictícias e persistência em `sessionStorage`; cadastro mock guarda digest com salt exclusivamente para simular login, sem pretensão de autenticação segura.
-- `VITE_DATA_MODE=api`: catálogo, profissionais, sessão, perfil, anúncios, contratações e avaliações via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
-- No modo mock, contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações e avaliações são sincronizadas com o PostgreSQL. Mensagens, leitura de avisos e alguns controles admin permanecem em estado local até as fases `F04`–`F07`.
+- `VITE_DATA_MODE=api`: catálogo, profissionais, sessão, perfil, anúncios, contratações, avaliações, demandas e propostas via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
+- No modo mock, contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações, avaliações, demandas e propostas são sincronizadas com o PostgreSQL. Mensagens, leitura de avisos e alguns controles admin permanecem em estado local até as fases `F04`–`F07`.
 - O token real dura 15 minutos e sua expiração absoluta sobrevive ao reload. Novo login é necessário após expiração.
 
 ## Direção visual e acessibilidade

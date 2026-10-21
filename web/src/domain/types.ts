@@ -62,7 +62,7 @@ export type ContractStatus =
   | 'CANCELADO'
 export interface Contract {
   id: string
-  serviceId: string
+  serviceId?: string | null
   title: string
   freelancerId: string
   clientId: string
@@ -85,7 +85,7 @@ export interface Contract {
 export interface Review {
   id: string
   contractId: string
-  serviceId: string
+  serviceId?: string | null
   serviceTitle: string
   freelancerId: string
   clientId: string
@@ -113,6 +113,14 @@ export interface Demand {
   city: string
   status: 'OPEN' | 'CLOSED'
 }
+export interface CreateDemand {
+  title: string
+  description: string
+  categoryId: string
+  budget: number
+  days: number
+  city: string
+}
 export interface Proposal {
   id: string
   demandId: string
@@ -122,4 +130,14 @@ export interface Proposal {
   days: number
   message: string
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
+}
+export interface CreateProposal {
+  price: number
+  days: number
+  message: string
+}
+export interface ProposalAcceptance {
+  demand: Demand
+  proposal: Proposal
+  contract: Contract
 }

@@ -57,7 +57,7 @@ public final class ContractDtos {
                 Contract c, List<ContractEvent> events, Review r) {
             return new ContractView(
                     c.getId(),
-                    c.getService().getId(),
+                    c.getService() == null ? null : c.getService().getId(),
                     c.getTitle(),
                     c.getFreelancer().getId(),
                     c.getClient().getId(),

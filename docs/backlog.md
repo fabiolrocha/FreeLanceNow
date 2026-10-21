@@ -42,7 +42,7 @@ Uma tarefa termina quando satisfaz seu aceite, passa as verificações relevante
 | F05 | Moderação | Denúncias/disputas persistentes e autorização para decisão | 15–21/10 | Caio + Enzo |
 | F06 | Catálogo | Upload até 5 imagens/5 MB, storage e paginação real no web | 22–28/10 | Felipe + Arthur Almirante |
 | F07 | Comunicação | Recuperação de senha/verificação de e-mail, mensagens e notificações | 22–28/10 | Caio + Arthur |
-| F08 | Demandas | Refinar contrato e persistir demandas/propostas com unicidade | 15–21/10 | Felipe + Arthur |
+| F08 | Demandas | **Concluído (`fase-03`)**: Refinar contrato e persistir demandas/propostas com unicidade e geração de contratação | 15–21/10 | Felipe + Arthur |
 | F09 | Financeiro | Gateway de testes (Stripe), comissão, webhooks/reembolsos/ledger e conciliação | Decisões concluídas; implementação em 29/10–04/11 | Líder + Felipe + Caio + Arthur Almirante |
 | F10 | Operação | Termos, retenção, backup, observabilidade, rate limit e teste de carga | 05–11/11 | Líder + Caio + Felipe + Enzo |
 

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import br.com.freelancenow.api.catalog.*;
 import br.com.freelancenow.api.config.DemoData;
 import br.com.freelancenow.api.contracts.ContractService;
+import br.com.freelancenow.api.demands.DemandRepository;
+import br.com.freelancenow.api.demands.ProposalRepository;
 import br.com.freelancenow.api.users.UserRepository;
 
 import org.junit.jupiter.api.*;
@@ -32,6 +34,8 @@ class ApiIntegrationTests {
     @Autowired UserRepository users;
     @Autowired CategoryRepository categories;
     @Autowired ServiceRepository services;
+    @Autowired DemandRepository demands;
+    @Autowired ProposalRepository proposals;
     @Autowired ContractService contractService;
     @Autowired PasswordEncoder passwords;
     private final String prefix = UUID.randomUUID().toString();
@@ -1037,13 +1041,161 @@ class ApiIntegrationTests {
     }
 
     @Test
+    @Order(17)
+    @SuppressWarnings("unchecked")
+    void demandsAndProposalsLifecycleUniquenessAndGeneratedContract() {
+        // Freelancer cannot publish a demand
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/demands",
+                                Map.of(
+                                        "title", "Demanda de freelancer",
+                                        "description", "Não permitida",
+                                        "categoryId", CATEGORY,
+                                        "budget", 400,
+                                        "days", 3,
+                                        "city", "Brasília, DF"),
+                                contractFreelaToken));
+
+        var demand =
+                post(
+                        "/api/v1/demands",
+                        Map.of(
+                                "title", "Revisão elétrica do escritório",
+                                "description", "Troca de 8 tomadas e revisão do quadro geral.",
+                                "categoryId", CATEGORY,
+                                "budget", 450,
+                                "days", 3,
+                                "city", "Asa Norte, DF"),
+                        clientToken);
+        var demandId = demand.get("id").toString();
+        assertEquals("OPEN", demand.get("status"));
+        assertEquals("Revisão elétrica do escritório", demand.get("title"));
+
+        // Client cannot send proposal
+        expect(
+                403,
+                () ->
+                        post(
+                                "/api/v1/demands/" + demandId + "/proposals",
+                                Map.of("price", 400, "days", 2, "message", "Proposta inválida"),
+                                clientToken));
+
+        // First freelancer sends proposal
+        var proposal1 =
+                post(
+                        "/api/v1/demands/" + demandId + "/proposals",
+                        Map.of(
+                                "price", 420,
+                                "days", 2,
+                                "message", "Atendo com emissão de laudo técnico."),
+                        contractFreelaToken);
+        var proposal1Id = proposal1.get("id").toString();
+        assertEquals("PENDING", proposal1.get("status"));
+
+        // Duplicate pending proposal from same freelancer -> 409
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/demands/" + demandId + "/proposals",
+                                Map.of(
+                                        "price", 390,
+                                        "days", 2,
+                                        "message", "Segunda proposta pendente duplicada."),
+                                contractFreelaToken));
+
+        // Second freelancer sends competing proposal
+        var proposal2 =
+                post(
+                        "/api/v1/demands/" + demandId + "/proposals",
+                        Map.of(
+                                "price", 440,
+                                "days", 3,
+                                "message", "Disponível para início imediato."),
+                        otherToken);
+        var proposal2Id = proposal2.get("id").toString();
+        assertEquals("PENDING", proposal2.get("status"));
+
+        // Non-owner cannot accept proposal
+        expect(
+                403,
+                () -> post("/api/v1/proposals/" + proposal1Id + "/accept", Map.of(), contractFreelaToken));
+
+        // Client accepts proposal1 -> closes demand, rejects proposal2, creates contract in ACEITO
+        var acceptance = post("/api/v1/proposals/" + proposal1Id + "/accept", Map.of(), clientToken);
+        var closedDemand = (Map<String, Object>) acceptance.get("demand");
+        var acceptedProposal = (Map<String, Object>) acceptance.get("proposal");
+        var generatedContract = (Map<String, Object>) acceptance.get("contract");
+        assertEquals("CLOSED", closedDemand.get("status"));
+        assertEquals("ACCEPTED", acceptedProposal.get("status"));
+        assertEquals("ACEITO", generatedContract.get("status"));
+        assertEquals("Revisão elétrica do escritório", generatedContract.get("title"));
+        assertEquals(
+                0,
+                new java.math.BigDecimal("420")
+                        .compareTo(new java.math.BigDecimal(generatedContract.get("price").toString())));
+
+        // Competing proposal2 was automatically rejected
+        var demandProposals =
+                http().get()
+                        .uri("/api/v1/demands/" + demandId + "/proposals")
+                        .headers(h -> h.setBearerAuth(clientToken))
+                        .retrieve()
+                        .body(List.class);
+        assertEquals(2, demandProposals.size());
+        var p2After =
+                ((List<Map<String, Object>>) demandProposals)
+                        .stream()
+                        .filter(p -> proposal2Id.equals(p.get("id").toString()))
+                        .findFirst()
+                        .orElseThrow();
+        assertEquals("REJECTED", p2After.get("status"));
+
+        // Closed demand refuses new proposals -> 409
+        expect(
+                409,
+                () ->
+                        post(
+                                "/api/v1/demands/" + demandId + "/proposals",
+                                Map.of("price", 380, "days", 1, "message", "Tarde demais"),
+                                otherToken));
+
+        // Generated contract can progress to completion and be reviewed
+        var generatedContractId = generatedContract.get("id").toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + generatedContractId + "/status",
+                Map.of("status", "EM_ANDAMENTO"),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + generatedContractId + "/status",
+                Map.of("status", "AGUARDANDO_CONFIRMACAO", "comment", "Serviço finalizado."),
+                contractFreelaToken);
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + generatedContractId + "/status",
+                Map.of("status", "CONCLUIDO"),
+                clientToken);
+        var demandReview =
+                post(
+                        "/api/v1/contracts/" + generatedContractId + "/review",
+                        Map.of("rating", 5, "comment", "Demanda atendida com perfeição."),
+                        clientToken);
+        assertEquals(5, ((Number) demandReview.get("rating")).intValue());
+    }
+
+    @Test
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                4,
+                5,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
-        var seed = new DemoData(users, categories, services, passwords);
+        var seed = new DemoData(users, categories, services, demands, proposals, passwords);
         seed.run();
         seed.run();
         assertEquals(

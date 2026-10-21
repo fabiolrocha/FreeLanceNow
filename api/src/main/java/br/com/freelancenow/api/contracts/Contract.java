@@ -1,6 +1,8 @@
 package br.com.freelancenow.api.contracts;
 
 import br.com.freelancenow.api.catalog.ServiceListing;
+import br.com.freelancenow.api.demands.Demand;
+import br.com.freelancenow.api.demands.Proposal;
 import br.com.freelancenow.api.users.User;
 
 import jakarta.persistence.*;
@@ -15,9 +17,17 @@ import java.util.UUID;
 public class Contract {
     @Id private UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_id")
     private ServiceListing service;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "demand_id")
+    private Demand demand;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proposal_id")
+    private Proposal proposal;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "client_id")
@@ -80,6 +90,27 @@ public class Contract {
         this.description = description.trim();
         this.address = address == null ? "" : address.trim();
         this.status = ContractStatus.PENDENTE;
+        this.createdAt = now;
+        this.statusUpdatedAt = now;
+    }
+
+    public Contract(
+            Demand demand,
+            Proposal proposal,
+            LocalDate scheduledDate,
+            Instant now) {
+        this.id = UUID.randomUUID();
+        this.demand = demand;
+        this.proposal = proposal;
+        this.client = demand.getClient();
+        this.freelancer = proposal.getFreelancer();
+        this.title = demand.getTitle();
+        this.price = proposal.getPrice();
+        this.scheduledDate = scheduledDate;
+        String desc = demand.getDescription().trim();
+        this.description = desc.length() > 300 ? desc.substring(0, 300) : desc;
+        this.address = demand.getCity().trim();
+        this.status = ContractStatus.ACEITO;
         this.createdAt = now;
         this.statusUpdatedAt = now;
     }
