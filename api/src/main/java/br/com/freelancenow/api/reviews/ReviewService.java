@@ -72,8 +72,10 @@ public class ReviewService {
                     HttpStatus.CONFLICT,
                     "Esta contratação já foi avaliada.");
         var now = Instant.now(clock);
-        if (now.isBefore(c.getCompletedAt())
-                || now.isAfter(c.getCompletedAt().plus(Duration.ofDays(7))))
+        if (now.isBefore(c.getCompletedAt()))
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "A contratação ainda não foi concluída.");
+        if (now.isAfter(c.getCompletedAt().plus(Duration.ofDays(7))))
             throw new ApiException(
                     HttpStatus.CONFLICT,
                     "O prazo de 7 dias para avaliar esta contratação expirou.");

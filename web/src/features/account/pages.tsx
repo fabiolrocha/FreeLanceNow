@@ -4,14 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Plus, ArrowRight } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client } from '../../data/client'
-import {
-  Avatar,
-  Empty,
-  ErrorMessage,
-  Field,
-  PageTitle,
-  ServiceGrid,
-} from '../../components/ui'
+import { Avatar, Empty, ErrorMessage, Field, PageTitle, ServiceGrid } from '../../components/ui'
 import { money, statusLabel } from '../../domain/rules'
 import type { Service } from '../../domain/types'
 

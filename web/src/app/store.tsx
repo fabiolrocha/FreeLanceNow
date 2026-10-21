@@ -49,11 +49,14 @@ interface Store {
   transition: (id: string, status: ContractStatus, dispute?: string) => Promise<void>
   review: (id: string, rating: number, comment: string) => Promise<void>
   replyReview: (id: string, reply: string) => Promise<void>
+  reloadContracts: () => Promise<void>
   toast: string
   notify: (s: string) => void
 }
 function mockRating(contracts: Contract[], freelancerId: string) {
-  const rated = contracts.filter((c) => c.freelancerId === freelancerId && typeof c.rating === 'number')
+  const rated = contracts.filter(
+    (c) => c.freelancerId === freelancerId && typeof c.rating === 'number',
+  )
   if (!rated.length) return { averageRating: null, reviewCount: 0 }
   const sum = rated.reduce((acc, c) => acc + (c.rating || 0), 0)
   return {
@@ -146,7 +149,10 @@ export function Provider({ children }: { children: ReactNode }) {
     }
   }, [session])
   useEffect(() => {
-    sessionStorage.setItem(isMock ? 'fln-contracts' : 'fln-api-contracts', JSON.stringify(contracts))
+    sessionStorage.setItem(
+      isMock ? 'fln-contracts' : 'fln-api-contracts',
+      JSON.stringify(contracts),
+    )
   }, [contracts])
   useEffect(() => {
     sessionStorage.setItem('fln-demands', JSON.stringify(demands))
@@ -164,6 +170,14 @@ export function Provider({ children }: { children: ReactNode }) {
     setToken(timed.accessToken)
     setSession(timed)
     sessionStorage.setItem('fln-session', JSON.stringify(timed))
+  }
+  async function reloadContracts() {
+    if (isMock || !session) return
+    try {
+      setContracts(await client.contracts())
+    } catch {
+      // Keep the list already on screen; the next action reports API errors.
+    }
   }
   async function requestContract(r: CreateContract): Promise<Contract> {
     const u = session?.user
@@ -261,9 +275,7 @@ export function Provider({ children }: { children: ReactNode }) {
         'A avaliação exige uma contratação concluída nos últimos 7 dias e ainda não avaliada.',
       )
     setContracts((cs) =>
-      cs.map((x) =>
-        x.id === id ? { ...x, rating, review: comment, reviewedAt: nowIso() } : x,
-      ),
+      cs.map((x) => (x.id === id ? { ...x, rating, review: comment, reviewedAt: nowIso() } : x)),
     )
     notify('Avaliação publicada.')
   }
@@ -274,9 +286,7 @@ export function Provider({ children }: { children: ReactNode }) {
     if (!isMock) {
       const updated = await client.replyReview(id, trimmed)
       setContracts((cs) =>
-        cs.map((x) =>
-          x.id === id ? { ...x, reviewReply: updated.reply || trimmed } : x,
-        ),
+        cs.map((x) => (x.id === id ? { ...x, reviewReply: updated.reply || trimmed } : x)),
       )
       notify('Resposta publicada.')
       return
@@ -284,9 +294,7 @@ export function Provider({ children }: { children: ReactNode }) {
     const c = contracts.find((c) => c.id === id)
     if (!c || c.freelancerId !== session?.user.id || !c.rating || c.reviewReply)
       throw new Error('Não foi possível responder a esta avaliação.')
-    setContracts((cs) =>
-      cs.map((x) => (x.id === id ? { ...x, reviewReply: trimmed } : x)),
-    )
+    setContracts((cs) => cs.map((x) => (x.id === id ? { ...x, reviewReply: trimmed } : x)))
     notify('Resposta publicada.')
   }
   const enrichedProfessionals = isMock
@@ -331,6 +339,7 @@ export function Provider({ children }: { children: ReactNode }) {
         transition,
         review,
         replyReview,
+        reloadContracts,
         toast,
         notify,
       }}
