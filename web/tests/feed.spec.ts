@@ -77,3 +77,38 @@ test('denúncia de publicação permite ao admin retirar o texto do feed mock', 
   await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
   await expect(page.locator('article.feed-card').filter({ hasText: text })).toHaveCount(0)
 })
+test('retirar o último item da última página retorna aos resultados restantes', async ({
+  page,
+}) => {
+  await page.goto('/login')
+  await page.getByRole('button', { name: 'Freelancer', exact: true }).click()
+  await page.evaluate(() => {
+    const { user } = JSON.parse(sessionStorage.getItem('fln-session')!)
+    const author = { id: user.id, name: user.name, role: user.role, city: user.city }
+    sessionStorage.setItem(
+      'fln-feed-posts',
+      JSON.stringify(
+        Array.from({ length: 21 }, (_, i) => ({
+          id: crypto.randomUUID(),
+          type: 'UPDATE',
+          author,
+          title: 'Publicação profissional',
+          text: `Publicação número ${i}`,
+          createdAt: `2026-10-21T10:00:${String(i).padStart(2, '0')}Z`,
+          category: null,
+          serviceId: null,
+          price: null,
+          days: null,
+          city: null,
+        })),
+      ),
+    )
+  })
+  await page.reload()
+  await page.getByRole('button', { name: 'Publicações', exact: true }).click()
+  await page.getByRole('button', { name: 'Próxima', exact: true }).click()
+  await expect(page.locator('article.feed-card')).toHaveCount(1)
+  await page.getByRole('button', { name: 'Retirar publicação', exact: true }).click()
+  await expect(page.getByText('Página 1 de 1', { exact: true })).toBeVisible()
+  await expect(page.locator('article.feed-card')).toHaveCount(20)
+})

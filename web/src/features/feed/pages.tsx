@@ -55,7 +55,11 @@ export function Feed() {
     void feedApi
       .list(source, page, type, categoryId)
       .then((result) => {
-        if (active) setData(result)
+        if (active) {
+          const lastPage = Math.max(0, result.totalPages - 1)
+          if (page > lastPage) setPage(lastPage)
+          else setData(result)
+        }
       })
       .catch((e) => {
         if (active) setError((e as Error).message)
