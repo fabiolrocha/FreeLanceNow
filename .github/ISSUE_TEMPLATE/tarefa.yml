@@ -1,19 +1,12 @@
 name: Tarefa da equipe
-description: Trabalho com responsável, dependências e critérios de aceite
+description: Entrega com dependências e critérios de aceite, sem papéis fixos
 title: '[ID] — '
 body:
-  - type: input
-    id: responsavel
-    attributes:
-      label: Responsável
-      placeholder: Nome do integrante e revisor
-    validations:
-      required: true
   - type: textarea
     id: resultado
     attributes:
       label: Resultado esperado
-      description: Referencie docs/backlog.md e descreva o comportamento.
+      description: Referencie docs/backlog.md e descreva o comportamento. Combine contribuições e revisão conforme disponibilidade.
     validations:
       required: true
   - type: textarea

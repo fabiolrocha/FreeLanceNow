@@ -1,10 +1,12 @@
-# Leitura integral dos materiais
+# Leitura dos materiais e decisões atuais
 
-Foram examinados o documento de visão `.doc`, os DOCX completos incluindo tabelas, os PDFs em todas as páginas, os textos dos slides e suas imagens, o BMC, o conteúdo visual do protótipo HTML, seu script de navegação, o runtime `support.js` e o roadmap HTML. Os diagramas e as imagens embutidas foram inspecionados junto às extrações textuais. Arquivos duplicados em `uploads/` foram comparados por SHA-256; cópias idênticas foram preservadas como parte da exportação.
+Revisado em **21/10/2026**. Este documento resume a análise inicial das fontes e atualiza as divergências resolvidas. Não substitui a especificação atual nem constitui uma nova inspeção integral dos arquivos binários.
+
+Na análise inicial, foram examinados o documento de visão `.doc`, os DOCX completos incluindo tabelas, os PDFs em todas as páginas, os textos dos slides e suas imagens, o BMC, o conteúdo visual do protótipo HTML, seu script de navegação, o runtime `support.js` e o roadmap HTML. Os diagramas e as imagens embutidas foram inspecionados junto às extrações textuais. Arquivos duplicados em `uploads/` foram comparados por SHA-256; cópias idênticas foram preservadas como parte da exportação.
 
 ## O que cada fonte acrescenta
 
-| Fonte | Conteúdo encontrado | Efeito sobre o início |
+| Fonte | Conteúdo encontrado | Uso como referência |
 |---|---|---|
 | Documento de Visão Final, v1.1 | Marketplace responsivo, clientes, freelancers e administrador; futuras integrações e aplicativo móvel; campos de template ainda vazios | Define o produto, mas não é uma especificação final para lançamento |
 | Documento Casos de Uso Final, v1.2 | UC01–UC06, validações, limites, prazos, permissões, disputas e auditoria | Fonte principal das regras funcionais |
@@ -24,20 +26,21 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 |---|---|---|
 | React Native mencionado, seguido de React somente web | React web; nenhuma aplicação Expo/Native nesta entrega | Resposta explícita do líder |
 | Vue/admin separado em roadmap antigo | Uma aplicação React com área administrativa simulada e acesso por perfil | Escopo atual e prazo curto; evita um terceiro frontend |
-| Documento menciona pessoas diferentes/quantidades anteriores | Seis: líder, Caio, Arthur Almirante, Arthur, Felipe e Enzo | Lista atual fornecida pelo líder |
+| Distribuição nominal proposta na organização inicial | Sem pessoas específicas por caso, área, arquivo ou revisão; antiga página de delegação substituída por guia de colaboração | Orientação do grupo em 21/10; ver `equipe.md` |
 | Usuário informou não haver repositório | Já existiam `.git`, `main` e remoto `fabiolrocha/FreeLanceNow` | Inspeção do workspace; histórico preservado |
 | Financeiro aparece como central no pitch/HTML e futuro em especificações | Telas financeiras simuladas agora; gateway, custódia e conciliação depois | Corte explícito da primeira entrega |
-| Java 21 / Boot 3 em planejamento antigo | Java 21 / Spring Boot 4.1.1 na base gerada hoje | Spring Initializr atual; decisão registrada em `decisoes.md` |
-| Prazos de 48h, 5 dias, 7 dias | Fluxo mock respeita sequência e janela de avaliação; jobs de prazo futuro | UC03, UC04, UC06; nenhuma promessa de automação já pronta |
-| Fotos de pessoas nos materiais | Carômetro não vira imagem de usuários; produto usa iniciais e ícones | Imagens do produto ainda pendentes de decisão do grupo |
+| Java 21 / Boot 3 em planejamento antigo | Java 21 / Spring Boot 4.1.1 na base do repositório | `pom.xml` e decisão registrada em `decisoes.md` |
+| Prazos de 48h, 5 dias, 7 dias | API implementa jobs de 48h/5 dias e janela de avaliação de 7 dias | F01/F02/F03 e testes existentes; mock não equivale ao job agendado |
+| Fotos de pessoas nos materiais | Carômetro não vira imagem de usuários; marca SVG, iniciais e ícones disponíveis | Decisões de `imagens.md`; upload ainda pendente |
 
 ## Lacunas para o grupo resolver
 
-- Especialidades e disponibilidade dos cinco colegas: a distribuição inicial é uma proposta revisável.
-- Seleção de fotos de serviço, avatares e logo final: ver [imagens.md](imagens.md).
-- Categorias finais, taxa de comissão e política comercial: os valores atuais são ilustrativos.
+- Uso de outras páginas/telas: apenas a função de delegação nominal foi confirmada como descontinuada. As demais rotas existem; revisar o uso com o grupo antes de remover.
+- Storage e upload de fotos de serviço; marca SVG e avatares por iniciais já estão definidos em [imagens.md](imagens.md).
+- Categorias finais e política comercial: comissão planejada de 10% para Stripe Sandbox, ainda sem fluxo financeiro implementado.
 - Fonte e data dos números de mercado do pitch; não os apresentar como medição do projeto.
 - Termos, retenção/exclusão de dados e suporte para uma versão pública; os textos atuais são acadêmicos.
-- Requisitos de upload, moderação real, 2FA/OAuth, notificações e rotinas automáticas de prazos.
+- Implementação de upload, administração/moderação completa, comunicação e financeiro; requisitos detalhados nos cards F04–F07/F09/F10. OAuth/2FA permanecem como evolução futura, sem entrega confirmada.
+- Neon, Stripe e Resend são escolhas de provedores, não evidência de implantação nem de fluxos externos funcionando.
 
 O [inventário](referencias/inventario.json) permite provar que a realocação não alterou nenhum dos 26 arquivos relevantes. Os artefatos de sistema, como `.DS_Store`, não fazem parte da documentação funcional.

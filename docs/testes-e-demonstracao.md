@@ -1,9 +1,13 @@
 # Testes e roteiro de apresentação
 
+Revisado em **21/10/2026**. Os comandos abaixo descrevem a cobertura existente. Resultados de execuções anteriores são evidências históricas, não confirmação de testes repetidos nesta revisão documental.
+
 ## Verificações da base
 
 | Verificação | Comando | Cobertura |
 |---|---|---|
+| Preservação das fontes | `node scripts/verify-documents.mjs` (raiz) | Tamanho e SHA-256 dos 26 arquivos inventariados; não valida conteúdo dos Markdown |
+| Higiene do diff | `git diff --check` (raiz) | Erros de whitespace e marcadores de conflito introduzidos no diff |
 | Tipos/build React | `cd web && npm run build` | TypeScript e bundle de produção |
 | Lint | `cd web && npm run lint` | Regras React/TypeScript |
 | Regras unitárias | `cd web && npm test` | Permissões de transição, janela 7 dias e senha 72 bytes |
@@ -13,13 +17,23 @@
 
 Os testes de navegador selecionam a suíte correspondente ao modo; o outro conjunto aparece como `skipped` de propósito. Não significa funcionalidade pulada dentro do fluxo testado. A suíte API usa banco `db-test` exclusivo e temporário. O teste browser API usa o banco de desenvolvimento e cria dados fictícios; não rodar contra um ambiente público.
 
-## Ensaio mock (6–8 minutos)
+## Revisão documental de 21/10/2026
+
+Base: `main` em `7a6e769`; revisão na branch `codex/atualizar-documentacao`. Conferidos os links locais dos Markdown, as 50 rotas da matriz de frontend contra `App.tsx` (além do redirecionamento `/admin`) e os 29 endpoints de negócio contra os controllers. A revisão independente de leitura conferiu colaboração, fases, telas, moderação, variáveis e fontes históricas; a descrição da integração parcial de disputas foi corrigida conforme o código.
+
+`node scripts/verify-documents.mjs` confirmou tamanho e SHA-256 dos 26 arquivos preservados. `git diff --check` passou. Estas verificações são documentais; as suítes Java, React e Playwright não foram executadas novamente nesta mudança.
+
+## Evidências históricas de execução
+
+Os parágrafos seguintes preservam os resultados registrados nas entregas anteriores. Nesta revisão de 21/10, o estado funcional foi conferido pela leitura do código, sem repetir essas suítes.
 
 Verificação das fases **01, 02 e 03** em **17/10/2026** (branches `fase-01`, `fase-02` e `fase-03`): **22 testes Java**, **3 testes unitários web**, **7 testes de navegador mock** e **3 testes de navegador integrados à API** passaram. Build, lint (`oxlint` 0 avisos/erros) e os 26 hashes originais também passaram.
 
 Verificação do marco de **07/10/2026** (branch `marco-1`): **16 testes Java**, **3 testes unitários web**, **7 testes de navegador mock** e **1 teste de navegador integrado à API** passaram. Build, lint, formatação e os 26 hashes também passaram. Um clone limpo subiu com `docker compose up -d --build` (web 200, `/actuator/health` UP), e o seed demo manteve 5 usuários e 8 anúncios após reiniciar a API. A navegação por perfil em 390 px seguiu sem erros de execução ou overflow horizontal.
 
 Verificação executada em 30/09/2026 na máquina de origem: **9 testes Java**, **3 testes unitários web**, **4 testes de navegador mock** e **1 teste de navegador integrado à API** passaram. Build, lint sem avisos, formatação e verificação dos 26 hashes também passaram. A navegação por perfil foi percorrida em 390 px, sem erros de execução ou overflow horizontal. Essas evidências locais não substituem a revisão e o ensaio do grupo em outro computador.
+
+## Ensaio mock (6–8 minutos)
 
 1. Abra o modo mock e mostre o aviso acadêmico. Explore início, busca, categoria, detalhe e perfil.
 2. Entre como **Cliente** no login. Solicite outro anúncio ainda sem pendência, por exemplo o serviço de troca de tomada; data futura e descrição.
@@ -42,13 +56,15 @@ Dados de contratação e denúncia no modo mock são compartilhados entre contas
 6. Entre como o cliente, confirme o recebimento, publique uma avaliação de 1 a 5 estrelas e mostre a nota média com 1 decimal no perfil do profissional. Entre como freelancer e responda à avaliação.
 7. Publique uma demanda aberta como cliente, envie uma proposta como freelancer e aceite a proposta como cliente, demonstrando a geração imediata da contratação em estado `ACEITO`.
 
-## Checklist do gestor/QA
+## Checklist de validação da equipe
 
 - Executar todos os comandos aplicáveis em clone limpo e conferir CI.
-- Percorrer cada grupo de rotas da matriz em `frontend.md` com ator apropriado.
+- Percorrer cada grupo de rotas da matriz em [frontend](frontend.md) com o perfil apropriado, distinguindo API, simulação e texto estático.
 - Inspecionar console, erros HTTP, estados vazios e tentativas de acesso indevido.
 - Conferir layout de 390 px e desktop, teclado/foco, menu e validações.
 - Registrar versão/commit, data, ambiente, comandos e falhas corrigidas no PR.
 - Ter as contas fictícias e o roteiro prontos antes da apresentação.
 
-Limitações conhecidas: sem OAuth/2FA/e-mail real (`F07`), refresh token, uploads (`F06`), administração/moderação real (`F04`/`F05`), chat remoto (`F07`), gateway integrado (`F09`), teste de carga ou certificação de acessibilidade (`F10`). As metas de SLA dos documentos ainda não foram medidas.
+A validação e a revisão podem ser feitas por qualquer integrante disponível, sem nome ou par fixo. Em mudanças apenas documentais, conferir links locais, consistência com código/configuração, preservação das fontes e higiene do diff; não relatar execução das suítes da aplicação sem rodá-las.
+
+Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, uploads (`F06`), provisionamento de admin, gestão e denúncias persistentes (`F04`/`F05`), gateway (`F09`) e teste de carga (`F10`). A seção de disputas da interface de moderação já usa contratos/transições reais com sessão ADMIN; faltam provisionamento da conta, evidências/auditoria completa e validação ponta a ponta desse acesso. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.

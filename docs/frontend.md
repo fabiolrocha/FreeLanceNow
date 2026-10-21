@@ -1,32 +1,51 @@
 # Frontend React web
 
-React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
+Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos módulos de dados. React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
 
 ## Matriz de telas e acesso
 
-| Fluxo do protótipo | Rotas atuais | Perfil | Dados |
+| Fluxo atual | Rotas registradas | Perfil/participação | Dados |
 |---|---|---|---|
 | Início/busca/detalhe | `/`, `/servicos`, `/servicos/:id` | Público | Mock ou API (com filtro por nota mínima) |
 | Profissionais/perfil | `/profissionais`, `/profissionais/:id` | Público | Mock ou API (média com 1 decimal e avaliações reais) |
-| Entrada/cadastro/recuperação | `/login`, `/cadastro`, `/recuperar-senha` | Público | Auth mock/API; recuperação apenas visual (`F07`) |
-| Perfil/complete | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API |
+| Entrada/cadastro | `/login`, `/cadastro` | Público | Auth mock/API |
+| Recuperação de acesso | `/recuperar-senha` | Público | Apenas visual; sem envio de e-mail (`F07`) |
+| Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API |
 | Dashboard | `/inicio`, `/painel` (freelancer) | Autenticado | Mock ou API (catálogo e métricas de contratação reais) |
 | Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API |
-| Solicitação | `/servicos/:id/solicitar`, `/contratacoes/:id/enviada` | Cliente | Mock ou API (`F01`) |
+| Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
+| Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
 | Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Participantes | Mock ou API (`F01`) |
-| Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/confirmar`, `/contestar` (prefixo da contratação) | Ator da etapa | Mock ou API (`F01`) |
-| Avaliação e resposta | `/contratacoes/:id/avaliar`, `/avaliacao-publicada` e resposta no detalhe | Cliente / Freelancer | Mock ou API (`F03`) |
-| Disputa | `/contratacoes/:id/disputa` | Participantes | Abertura via API (`F01`); mediação admin simulada (`F05`) |
+| Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/contratacoes/:id/confirmar`, `/contratacoes/:id/contestar` | Freelancer conclui; cliente confirma/contesta | Mock ou API (`F01`) |
+| Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
+| Disputa | `/contratacoes/:id/disputa` | Participantes | Abertura via API (`F01`); decisão na moderação ligada à API, condicionada à sessão ADMIN (`F04`/`F05`) |
 | Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`) |
 | Avisos/chat | `/notificacoes`, `/mensagens` | Autenticado | Mock; chat nesta tela/sessão sem entrega externa (`F07`) |
-| Carteira/pagamento | `/carteira`, `/pagamento`, `/pagamento/confirmado`, `/transacao` | Perfil apropriado | Simulação financeira (`F09` pendente) |
+| Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
+| Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Simulação financeira (`F09` pendente) |
 | Saque | `/saque`, `/saque/enviado` | Freelancer | Simulação financeira (`F09` pendente) |
 | Denúncia | `/denunciar`, `/denunciar/enviada` | Autenticado | Mock; admin vê a fila na mesma sessão (`F05`) |
-| Administração | `/admin/usuarios`, `/admin/categorias`, `/admin/moderacao`, `/admin/relatorios`, `/admin/transacoes` | Admin demo | Mock; alterações de categorias/usuários restritas à tela (`F04`) |
+| Gestão/relatórios/transações | `/admin/usuarios`, `/admin/categorias`, `/admin/relatorios`, `/admin/transacoes` | Admin; conta demo só no mock | Usuários/categorias locais e financeiro simulado; relatórios derivados do estado carregado (`F04`/`F09`) |
+| Moderação | `/admin/moderacao` | Admin; provisionamento real pendente | Denúncias locais; disputas usam contratos/transições da API com sessão ADMIN (`F05` parcial) |
 | Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Texto acadêmico provisório |
 | URL desconhecida | Qualquer rota não encontrada | Público | Tela 404 com retorno ao início |
 
-Os sufixos de ação na tabela se referem sempre ao prefixo completo da contratação. Guards protegem rotas por role; regras de participação e transição também são verificadas no estado mock. O backend verifica sua própria autorização para as funcionalidades reais.
+Guards React protegem os grupos de rotas por role. Participação, estado e proprietário são verificados nos fluxos e, nas funcionalidades reais, pelo backend. O prefixo `/admin` redireciona para `/admin/usuarios`; não é outra tela de gestão.
+
+## Telas demonstrativas e componentes reutilizados
+
+Recuperação de senha, avisos/chat, financeiro, denúncias e gestão administrativa continuam no código e na navegação, mas não entregam seus fluxos completos pela API. A moderação é parcial: sua seção de disputas usa contratos e transições reais quando há sessão ADMIN; a base atual não provisiona essa conta, e denúncias/evidências/auditoria completa ainda faltam. Permanecem vinculados aos cards F04–F07/F09. Não foram classificados como abandonados apenas por serem simulados.
+
+| Rotas/estados | Reutilização atual |
+|---|---|
+| `/inicio` e `/painel` | Mesmo `Dashboard`; `/painel` exige freelancer |
+| `/perfil/editar` e `/perfil/completar` | Mesmo `EditProfile`, com título contextual |
+| `/contratacoes` e `/solicitacoes` | `ContractList` com contexto de solicitações para freelancer |
+| Ações de contratação e `/contratacoes/:id/disputa` | `ContractAction` varia conforme URL e estado |
+| Proposta/enviada, pagamento/confirmado, saque/enviado e denúncia/enviada | Estados de confirmação no mesmo componente do respectivo fluxo |
+| `/ajuda`, `/termos`, `/privacidade` | `Help` com textos/contextos diferentes |
+
+Esses endereços não equivalem a implementações independentes. A remoção de uma rota exige conferir links e testes. A única página documental confirmada para retirar a função antiga foi a de delegação nominal, agora [colaboração](equipe.md). O protótipo HTML é referência histórica, não uma segunda aplicação mantida.
 
 ## Modos e estado
 

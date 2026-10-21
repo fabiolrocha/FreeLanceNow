@@ -1,21 +1,36 @@
 # Contribuir com o FreeLanceNow
 
-Consulte [equipe](docs/equipe.md) e [backlog](docs/backlog.md) antes de escolher arquivos. O líder coordena a integração. Toda tarefa usa uma branch e um PR revisado; não fazer push direto de funcionalidades na principal.
+Revisado em **21/10/2026**. Consulte o [backlog](docs/backlog.md) para escolher uma entrega e o [guia de colaboração](docs/equipe.md) para combinar mudanças com o grupo. Não há donos de áreas ou revisores predefinidos. Toda contribuição usa branch e PR revisado por outro integrante disponível.
+
+## Branch e revisão
+
+Comece pela `main` atualizada, que contém o marco inicial e as fases já integradas:
 
 ```sh
 git switch main
-git pull --ff-only
-git switch -c codex/w01-catalogo
+git pull --ff-only origin main
+git switch -c codex/f04-administracao
 ```
 
-Antes da integração do bootstrap, crie sua branch a partir de `codex/bootstrap-freelancenow`. Após a integração, use `main`. O prefixo `codex/` é a convenção inicial deste workspace; nomes dos cards ajudam a identificar as tarefas.
+O prefixo `codex/` é a convenção deste workspace. Use um nome que descreva a entrega, mesmo quando ela não tiver card. Não é necessário partir de branches antigas como `codex/bootstrap-freelancenow` ou de fases já integradas.
 
-Faça commits pequenos com descrição clara em português ou inglês. Comandos úteis: `git status`, `git diff`, `git add <arquivos>`, `git commit`. Confira o diff antes do commit; não commitar `.env`, tokens, `node_modules`, `dist`, `target`, logs ou dados pessoais novos.
+Faça commits pequenos e confira `git status` e `git diff` antes de adicionar arquivos. Não versionar `.env`, tokens, `node_modules`, `dist`, `target`, logs ou dados pessoais novos. O PR deve descrever problema/resultado, card quando houver, validação e limites. Solicite revisão conforme disponibilidade; integre após aceite, revisão e checks relevantes, sem push direto de funcionalidades na principal.
 
-Para React, rode lint, build e testes relevantes. Use `npm run format` para formatação e `npm run format:check` para conferir. Para API, rode testes com PostgreSQL isolado. Alteração de regra requer verificação do comportamento, sem criar testes que apenas repetem a implementação.
+## Verificações por tipo de mudança
 
-Não modificar migração já aplicada. Crie uma nova `V3__descricao.sql` (ou próximo número livre) e coordene a numeração com Felipe. Mudanças em DTO exigem atualizar tipos/adapter/frontend e `docs/api.md` no mesmo conjunto de PRs.
+| Mudança | Validação |
+|---|---|
+| Documentação | Conferir links, comandos, estado mock/API e `git diff --check`; executar `node scripts/verify-documents.mjs` na raiz |
+| React | Lint, build e testes relevantes; `npm run format:check` e navegador quando o fluxo mudar |
+| API/banco | Testes com PostgreSQL exclusivo; conferir migração, autorização e cenários negativos |
+| Contrato HTTP | Atualizar DTO, tipos, adapter/store, interface e `docs/api.md`; verificar o fluxo integrado |
 
-Arquivos compartilhados (`App`, `Layout`, store, tipos, client, fixtures e CSS) exigem combinação com os responsáveis. Resolva conflitos entendendo ambos os fluxos; não descarte alterações do colega para fazer build passar.
+O [guia de testes](docs/testes-e-demonstracao.md) traz os comandos completos. Documente os comandos realmente executados no PR; registros antigos não comprovam a versão atual.
 
-Use o modelo de PR com problema/resultado, card, teste e limitações. Peça revisão ao par da tabela. O líder integra quando o aceite é cumprido e a CI está verde. Branch protection e convites de colaboradores dependem da administração do repositório e não foram configurados automaticamente.
+## Arquivos e contratos compartilhados
+
+Não modificar migrações já aplicadas. Crie a próxima versão livre — atualmente após `V5` — e confira a numeração com o trabalho em andamento. Mudanças em banco e contrato devem incluir os documentos afetados.
+
+`App.tsx`, `Layout.tsx`, store, tipos, client, fixtures e CSS são compartilhados. Combine trechos em edição com o grupo. Resolva conflitos preservando os fluxos envolvidos e execute a verificação correspondente.
+
+Fontes em `docs/originais/`, `docs/prototipo/`, `docs/legado/` e `docs/referencias/` são históricas; corrija a especificação nos Markdown atuais. Branch protection e acesso ao repositório são configurações administrativas, não garantias deste fluxo documentado.

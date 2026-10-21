@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql` e `V5__demands_and_proposals.sql`.
+Revisado em **21/10/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql` e `V5__demands_and_proposals.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Não criar todas as tabelas agora sem validar o contrato da respectiva feature. Felipe coordena migrações e Caio/Arthur revisam os vínculos com autenticação e telas.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V5, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; uma entidade própria de disputa/auditoria ainda é proposta de evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -116,5 +116,7 @@ Não criar todas as tabelas agora sem validar o contrato da respectiva feature. 
 | `message` / `notification` | Participantes autorizados e eventos; status de leitura/entrega |
 | `service_image` | Dono, storage key, tipo/tamanho, ordem e metadados; máximo 5 |
 | `payment` / `ledger_entry` | Referência gateway única, contratação, eventos idempotentes, valores e conciliação |
+
+Contratações originadas por proposta podem ter `service_id` nulo, inclusive na avaliação. O aceite guarda os vínculos de demanda/proposta e o preço acordado; a API pública da contratação ainda não expõe `demandId`/`proposalId`.
 
 O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não há seed financeiro nem admin real. Testes de API geram identificadores/e-mails novos, sem assumir IDs dos usuários do seed.

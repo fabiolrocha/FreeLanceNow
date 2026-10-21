@@ -2,7 +2,7 @@
 
 Marketplace acadêmico de serviços gerais: clientes encontram profissionais e freelancers publicam seus serviços. Este monorepositório reúne o frontend **React web**, a API **Java / Spring Boot**, PostgreSQL e a documentação do Grupo 2.
 
-**Entrega final: quarta-feira, 18 de novembro de 2026.** O marco intermediário de **7 de outubro** contempla a aplicação web navegável com dados simulados e uma API inicial persistente para cadastro, login, perfis, categorias e anúncios. O [roadmap](docs/roadmap.md) distribui as demais integrações até novembro, com datas sugeridas por etapa. React Native ficou fora deste projeto por decisão do líder.
+**Documentação revisada em 21/10/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). Administração, comunicação, upload e financeiro continuam pendentes/parciais. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
 
 ## Começar
 
@@ -27,7 +27,7 @@ docker compose up -d --build web
 
 No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias), avaliações com nota média e resposta do profissional e publicação de demandas com propostas e aceite gerando contratação (`F01`, `F02`, `F03`, `F08`)** passam pelo Spring Boot e persistem no PostgreSQL. As demais áreas continuam simuladas e exibem aviso. Não há fallback silencioso para mocks quando a API falha.
 
-Crie uma conta pela interface, ou entre com `marcos@demo.freelancenow.test` / `Demo12345` para explorar um freelancer fictício sem criar conta. O seed está restrito ao perfil `dev` com `SEED_DEMO=true`. **Admin existe somente no mock nesta etapa (`F04` pendente).** A API impede cadastro público de administradores.
+Crie uma conta pela interface, ou entre com `marcos@demo.freelancenow.test` / `Demo12345` para explorar um freelancer fictício sem criar conta. O seed está restrito ao perfil `dev` com `SEED_DEMO=true`. **A conta de demonstração Admin está disponível apenas no mock; provisionamento de admin real segue pendente (`F04`).** A API impede cadastro público de administradores.
 
 ### Desenvolver com atualização automática
 
@@ -65,7 +65,7 @@ cd web
 E2E_DATA_MODE=api npm run test:e2e
 ```
 
-Os testes integrados criam contas fictícias `@example.test`. A suíte da API usa `db-test`, nunca o banco de desenvolvimento. A CI executa lint, build, testes unitários, navegação mock e integração da API com PostgreSQL.
+Os testes integrados criam contas fictícias `@example.test`. A suíte da API usa `db-test`, nunca o banco de desenvolvimento. A CI executa preservação dos documentos originais, lint, formatação, build, testes unitários, navegação mock e integração da API com PostgreSQL. O fluxo de navegador em modo API é uma verificação local adicional. Para mudanças apenas documentais, execute também `node scripts/verify-documents.mjs` e confira links e `git diff --check`.
 
 ## Estrutura e equipe
 
@@ -80,11 +80,13 @@ compose.yml           Desenvolvimento e testes locais
 Comece por estes documentos:
 
 - [Plano da entrega e cronograma](docs/roadmap.md).
-- [Divisão entre os seis integrantes](docs/equipe.md) e [backlog com critérios de aceite](docs/backlog.md).
+- [Colaboração sem papéis fixos](docs/equipe.md) e [backlog com dependências e critérios de aceite](docs/backlog.md).
 - [Leitura dos materiais e divergências resolvidas](docs/leitura-do-projeto.md).
 - [Arquitetura](docs/arquitetura.md), [contrato da API](docs/api.md) e [modelo de dados](docs/dados.md).
-- [Imagens a definir](docs/imagens.md), [telas e design](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
+- [Marca e imagens](docs/imagens.md), [rotas e estado das telas](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
 - [Índice completo](docs/README.md) e [fluxo de contribuição](CONTRIBUTING.md).
+
+A equipe organiza contribuições por entrega, sem designar pessoas ou revisores fixos para cada caso. O índice das docs identifica os guias atuais e as fontes históricas.
 
 O repositório Git e o remoto `fabiolrocha/FreeLanceNow` já existiam no início da organização. O marco inicial (`marco-1`) foi integrado na `main`, seguido pelas entregas incrementais nas branches `fase-01` (`F01`/`F02`), `fase-02` (`F03`) e `fase-03` (`F08`). Os documentos originais foram realocados sem alterar seu conteúdo; hashes e caminhos estão no [inventário](docs/referencias/inventario.json).
 

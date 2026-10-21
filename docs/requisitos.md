@@ -1,6 +1,6 @@
 # Requisitos e rastreabilidade
 
-Referência principal: `originais/Documento Casos de Uso Final.docx`, v1.2. As regras abaixo traduzem o material em critérios de implementação. “Mock” significa comportamento demonstrativo no navegador; “API” significa verificação e persistência no backend. “Futuro” significa trabalho não entregue nesta base.
+Revisado em **21/10/2026**, conforme a base integrada. Referência principal: `originais/Documento Casos de Uso Final.docx`, v1.2. As regras abaixo traduzem o material em critérios de implementação. “Mock” significa comportamento demonstrativo no navegador; “API” significa verificação e persistência no backend. “Futuro” significa trabalho não entregue nesta base.
 
 | ID | Regra | Implementação atual | Continuação |
 |---|---|---|---|
@@ -16,14 +16,16 @@ Referência principal: `originais/Documento Casos de Uso Final.docx`, v1.2. As r
 | RN10 / UC03 | Data futura, descrição até 300, endereço opcional, uma solicitação pendente por cliente/serviço | API e frontend com lock transacional e índice único parcial | Notificações externas por e-mail (`F07`) |
 | RN11 / UC03 | Freelancer responde em até 48 horas; cancela automaticamente após prazo | Job idempotente na API com `Clock` injetável e testes de relógio | Notificação de cancelamento (`F07`) |
 | RN12 / UC06 | `PENDENTE → ACEITO → EM_ANDAMENTO → AGUARDANDO_CONFIRMACAO → CONCLUIDO` | API transacional (`contract` + `contract_event`), snapshots de título/preço e React integrado | — |
-| RN13 / UC06 | Freelancer sinaliza; cliente confirma ou contesta; disputa administrada | API persiste conclusão e abertura de disputa com motivo; admin resolve transição | Fila administrativa dedicada e anexos (`F05`) |
+| RN13 / UC06 | Freelancer sinaliza; cliente confirma ou contesta; disputa administrada | API persiste motivo e autoriza admin a concluir/retomar; interface já chama essa transição, sem conta ADMIN provisionada na base demo | Provisionar admin, persistir denúncias/evidências, completar auditoria e validar o fluxo (`F04`/`F05`) |
 | RN14 / UC06 | Confirmação automática após 5 dias | Job idempotente na API (`AGUARDANDO_CONFIRMACAO → CONCLUIDO`) com testes de relógio | Repasse automático no gateway (`F09`) |
 | RN15 / UC04 | Avaliação de 1 a 5, concluída, única, imutável, em até 7 dias; comentário até 500 | API e frontend persistentes (`review`), média com 1 decimal e resposta única do profissional até 200 caracteres | — |
 | RN16 / UC05 | Admin gerencia categorias/usuários; suspensão preserva histórico | Telas simuladas; API recusa login/token de usuário inativo | Endpoints administrativos e trilha de auditoria |
-| RN17 / UC05 | Denúncias, moderação e exportação CSV | Mock/CSV local com neutralização de fórmulas | API com fila, autorização e auditoria |
+| RN17 / UC05 | Denúncias, moderação e exportação CSV | Denúncias/CSV locais; disputa já ligada à API quando há sessão ADMIN | Persistir denúncias, completar auditoria e validar administração ponta a ponta |
 | RN18 / protótipo | Demandas, propostas e aceite | API e frontend persistentes (`demand` + `proposal`), unicidade de proposta pendente e aceite gerando `contract` em `ACEITO` (`F08`) | — |
 | RN19 / protótipo | Mensagens e notificações | Mock local; sem entrega para outras pessoas | Contrato, persistência e canal de envio |
 | RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Somente exploração visual com valores fictícios | Gateway, webhooks idempotentes, livro financeiro e conciliação |
+
+Os IDs RN/UC identificam regras e casos de uso; não atribuem pessoas. A implementação e a revisão são combinadas pela equipe conforme [colaboração](equipe.md). Para rotas demonstrativas e componentes reutilizados, consulte [frontend](frontend.md).
 
 Os requisitos não funcionais dos documentos (páginas/busca P95 até 3s, solicitação até 5s, notificação até 10s, disponibilidade 99% e 200 acessos simultâneos) são **metas futuras ainda não medidas**. A verificação atual cobre funcionalidade e layout de 390 px/desktop; não certifica SLA ou capacidade de produção.
 

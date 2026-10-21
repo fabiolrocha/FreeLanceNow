@@ -1,6 +1,6 @@
 # Arquitetura dos sistemas
 
-Monorepositório com dois aplicativos e um banco. A aplicação web é uma SPA React; o backend é um monólito Spring Boot modularizado por domínio. Uma única API atende clientes e freelancers. A administração real será incluída no mesmo backend após a etapa de demonstração.
+Revisado em **21/10/2026**. Monorepositório com dois aplicativos e um banco. A aplicação web é uma SPA React; o backend é um monólito Spring Boot modularizado por domínio. Uma única API atende clientes e freelancers. A interface de moderação já usa contratos e transições reais de disputa no modo API quando há sessão ADMIN. Provisionamento dessa conta, gestão, denúncias persistentes e auditoria completa permanecem em F04/F05.
 
 ```mermaid
 flowchart LR
@@ -11,7 +11,7 @@ flowchart LR
   API --> Security[Spring Security / JWT / bcrypt]
   API --> Modulos[auth / users / catalog / contracts / reviews / demands]
   Modulos --> JPA[JPA / transações]
-  JPA --> DB[(PostgreSQL 15 / Neon)]
+  JPA --> DB[(PostgreSQL 15 local)]
   Flyway[Flyway V1 a V5] --> DB
 ```
 
@@ -49,9 +49,11 @@ Compose publica as portas em `127.0.0.1`. Não é uma infraestrutura de produç�
 
 | Sistema | Estado atual | Provedor / Próximo passo |
 |---|---|---|
-| Contratação/reputação (`F01`/`F02`/`F03`) | Implementado na API e no React (`contract`, `contract_event`, `review`, jobs 48h/5d) | Integrar disputas à fila admin (`F05`) |
-| Administração/auditoria (`F04`/`F05`) | Planejado | Provisionar admin real, categorias/usuários e fila de moderação |
+| Contratação/reputação (`F01`/`F02`/`F03`) | Implementado na API e no React (`contract`, `contract_event`, `review`, jobs 48h/5d) | Validar a moderação integrada após provisionar admin (`F04`/`F05`) |
+| Administração/auditoria (`F04`/`F05`) | Parcial: disputa ligada à API na interface; gestão e denúncias locais | Provisionar admin real, persistir gestão/denúncias e completar evidências/auditoria |
 | Demandas/propostas (`F08`) | Implementado na API e no React (`demand`, `proposal`, aceite gerando `contract` em `ACEITO`) | — |
 | Mensagens/notificações e e-mail (`F07`) | Provedor definido (**Resend**) | Implementar envio transacional e persistência de mensagens/avisos |
-| Arquivos (`F06`) | Identidade oficial em SVG criada (`logo.svg`/`favicon.svg`) | Upload de até 5 imagens/5 MB e paginação server-side no React |
-| Financeiro e banco externo (`F09`/`F10`) | Provedores definidos (**Stripe Sandbox** e **Neon PostgreSQL**) | Implementar checkout sandbox, webhooks idempotentes e ledger |
+| Arquivos e catálogo (`F06`) | Upload ausente; busca da API paginada; marca SVG estática disponível | Definir storage, validar até 5 imagens/5 MB e paginar busca no React |
+| Financeiro e banco externo (`F09`/`F10`) | Provedores escolhidos (**Stripe Sandbox** e **Neon PostgreSQL**); Compose usa banco local | Implementar checkout sandbox, webhooks e ledger; configurar e validar ambiente remoto |
+
+As propriedades de Stripe/Resend em `application.yml` ainda não são consumidas por fluxos de pagamento ou e-mail. O Compose atual não repassa essas credenciais nem usa `DB_URL` da raiz para trocar seu banco interno. Consulte as variáveis e limites do ambiente em [desenvolvimento](desenvolvimento.md).
