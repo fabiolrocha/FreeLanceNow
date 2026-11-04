@@ -93,6 +93,7 @@ Comece por estes documentos:
 - [Arquitetura](docs/arquitetura.md), [contrato da API](docs/api.md) e [modelo de dados](docs/dados.md).
 - [Marca e imagens](docs/imagens.md), [rotas e estado das telas](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
 - [Índice completo](docs/README.md) e [fluxo de contribuição](CONTRIBUTING.md).
+- [Preparação para deploy com Vercel, Neon e Stripe](docs/deploy.md).
 
 A equipe organiza contribuições por entrega, sem designar pessoas ou revisores fixos para cada caso. O índice das docs identifica os guias atuais e as fontes históricas.
 

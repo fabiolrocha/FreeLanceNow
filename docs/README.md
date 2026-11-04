@@ -19,6 +19,7 @@ F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |
+| [Preparação para deploy](deploy.md) | Vercel, Neon, API, Stripe, variáveis e etapas futuras |
 | [Contas de desenvolvimento](contas-desenvolvimento.md) | Login local de cliente, freelancer e administrador; diferenças API/mock |
 | [Testes e demonstração](testes-e-demonstracao.md) | Comandos, roteiro, evidências históricas e limites |
 | [Backlog](backlog.md) | Entregas por funcionalidade, dependências e aceite |
