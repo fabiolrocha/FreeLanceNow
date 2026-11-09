@@ -15,7 +15,7 @@ F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/
 | [Escopo](escopo.md) | Produto, integrações disponíveis e entrega final |
 | [Requisitos](requisitos.md) | Regras dos casos de uso, estado e rastreabilidade |
 | [Arquitetura](arquitetura.md) | Camadas, módulos, ambientes e integrações |
-| [Dados](dados.md) | Migrações V1–V9, tabelas e evolução planejada |
+| [Dados](dados.md) | Migrações V1–V10, tabelas e evolução planejada |
 | [API](api.md) | Endpoints, payloads, transições, erros e autenticação |
 | [Frontend](frontend.md) | Rotas existentes, acesso, dados reais e telas demonstrativas |
 | [Desenvolvimento](desenvolvimento.md) | Instalação, variáveis, ambiente e Git |
