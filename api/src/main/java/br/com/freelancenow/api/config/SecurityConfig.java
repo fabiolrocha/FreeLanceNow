@@ -16,11 +16,8 @@ import org.springframework.security.oauth2.server.resource.authentication.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.Arrays;
-
-import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableMethodSecurity
@@ -35,23 +32,19 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    private SecretKeySpec key(String secret) {
-        byte[] bytes = secret.getBytes(StandardCharsets.UTF_8);
-        if (bytes.length < 32)
-            throw new IllegalArgumentException("JWT_SECRET precisa ter pelo menos 32 bytes.");
-        return new SecretKeySpec(bytes, "HmacSHA256");
-    }
-
     @Bean
-    JwtEncoder jwtEncoder(@Value("${app.jwt.secret}") String secret) {
-        return new NimbusJwtEncoder(new ImmutableSecret<>(key(secret)));
+    JwtEncoder jwtEncoder(
+            @Value("${app.jwt.secret}") String secret, JwtSecretValidator secretValidator) {
+        return new NimbusJwtEncoder(new ImmutableSecret<>(secretValidator.key(secret)));
     }
 
     @Bean
     JwtDecoder jwtDecoder(
-            @Value("${app.jwt.secret}") String secret, @Value("${app.jwt.issuer}") String issuer) {
+            @Value("${app.jwt.secret}") String secret,
+            @Value("${app.jwt.issuer}") String issuer,
+            JwtSecretValidator secretValidator) {
         var decoder =
-                NimbusJwtDecoder.withSecretKey(key(secret))
+                NimbusJwtDecoder.withSecretKey(secretValidator.key(secret))
                         .macAlgorithm(MacAlgorithm.HS256)
                         .build();
         decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));

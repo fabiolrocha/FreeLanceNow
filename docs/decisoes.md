@@ -1,6 +1,6 @@
 # Decisões técnicas
 
-Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabela distingue escolhas, comportamento implementado e evolução planejada. Mudanças devem atualizar os contratos afetados.
+Decisões iniciais registradas em 30/09/2026; revisão em **04/11/2026**. A tabela distingue escolhas, comportamento implementado e evolução planejada. Mudanças devem atualizar os contratos afetados.
 
 | ID | Decisão / motivo | Consequência |
 |---|---|---|
@@ -23,6 +23,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabe
 | ADR17 | Denúncia guarda relato/cópia textual; remoção de serviço/avaliação é lógica e auditada | Preserva histórico, bloqueia republicação e retira nota removida da reputação; anexos ficam em F06, avisos em F07 |
 | ADR18 | Auditoria transacional no mesmo banco, sem API de alteração/exclusão | Consulta limitada aos 200 eventos recentes; retenção/controles operacionais de produção ficam em F10 |
 | ADR19 | Feed como entrada principal, com publicações profissionais e oportunidades, retomando o HTML (mudança de escopo 21/10) | F11 implementa feed misto após login em `/inicio`; `/painel` mantém gestão; composição e visibilidade aprovadas em 21/10 |
+| ADR20 | Manter Java 21 como versão-alvo da API | POM, CI e imagens de build/runtime/teste usam Java 21; Spring Boot 4.1.1 e o Maven Wrapper permanecem sem alterações |
 
 ## Proveniência do scaffold
 

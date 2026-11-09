@@ -1,6 +1,6 @@
 # Desenvolvimento e colaboração
 
-Revisado em **21/10/2026**. O [README](../README.md) cobre o início rápido. O Compose fornece Java/Maven em container; o desenvolvimento fora dele requer JDK 21 e, para o web, Node 22.12+ e npm. Use as versões resolvidas nos arquivos de dependências do repositório.
+Revisado em **04/11/2026**. O [README](../README.md) cobre o início rápido. O Compose fornece Java/Maven em container; o desenvolvimento fora dele requer JDK 21 e, para o web, Node 22.12+ e npm. Use as versões resolvidas nos arquivos de dependências do repositório.
 
 Para entrar no aplicativo durante o desenvolvimento, consulte as [contas locais por perfil](contas-desenvolvimento.md).
 
@@ -19,7 +19,7 @@ Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --buil
 
 ## Java fora do Docker
 
-Com JDK21 e banco local ligado:
+Com JDK 21 e banco local ligado:
 
 ```sh
 docker compose up -d db
@@ -85,6 +85,6 @@ O repositório já tem histórico e remoto. Atualize `main` com `git pull --ff-o
 | PostgreSQL rejeita senha após mudar `.env` | Volume existente conserva credenciais originais; alinhe a configuração ou crie outro ambiente/banco |
 | Token expirou | Faça login novamente; expiração 15 min e sem refresh |
 | Fixtures ficaram alteradas | Limpe `sessionStorage` da aba para reiniciar somente os dados mock |
-| Java local não funciona | Use Compose; ou configure JDK21 e execute `./mvnw -v` |
+| Java local não funciona | Use Compose; ou configure JDK 21 e execute `./mvnw -v` |
 
 `docker compose down` preserva o volume. A remoção de volumes apaga os cadastros; nunca inclua essa ação em instruções de rotina de atualização.
