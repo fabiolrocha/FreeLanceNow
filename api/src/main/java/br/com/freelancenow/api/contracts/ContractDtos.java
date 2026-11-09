@@ -22,6 +22,21 @@ public final class ContractDtos {
     public record TransitionContract(
             @NotNull ContractStatus status, @Size(max = 500) String comment) {}
 
+    public record SendMessage(@NotBlank @Size(max = 1000) String text) {}
+
+    public record MessageView(
+            UUID id, UUID contractId, UUID authorId, String authorName, String text, Instant at) {
+        public static MessageView from(ContractMessage m) {
+            return new MessageView(
+                    m.getId(),
+                    m.getContract().getId(),
+                    m.getAuthor().getId(),
+                    m.getAuthor().getName(),
+                    m.getText(),
+                    m.getCreatedAt());
+        }
+    }
+
     public record HistoryItem(ContractStatus status, Instant at) {
         public static HistoryItem from(ContractEvent e) {
             return new HistoryItem(e.getStatus(), e.getCreatedAt());

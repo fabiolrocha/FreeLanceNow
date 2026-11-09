@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowRight, Search, MapPin, Check, Wrench } from 'lucide-react'
 import { useApp } from '../../app/store'
-import { client, isMock } from '../../data/client'
-import type { Review } from '../../domain/types'
-import { Avatar, CategoryIcon, Empty, PageTitle, ServiceGrid } from '../../components/ui'
+import { useReviews } from '../../app/useReviews'
+import {
+  Avatar,
+  CategoryIcon,
+  Empty,
+  PageTitle,
+  ReviewList,
+  ServiceGrid,
+} from '../../components/ui'
 import { money } from '../../domain/rules'
 
 export function Landing() {
@@ -130,6 +136,7 @@ export function Landing() {
     </>
   )
 }
+const PAGE_SIZE = 12
 export function SearchServices() {
   const { services, categories } = useApp(),
     [params, setParams] = useSearchParams()
@@ -159,11 +166,22 @@ export function SearchServices() {
           ? (b.freelancer.averageRating ?? 0) - (a.freelancer.averageRating ?? 0)
           : 0,
     )
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+    page = Math.min(Math.max(1, Number(params.get('pagina')) || 1), totalPages),
+    visible = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
   function change(key: string, value: string) {
     const next = new URLSearchParams(params)
     if (value) next.set(key, value)
     else next.delete(key)
-    setParams(next, { replace: true })
+    if (key !== 'pagina') next.delete('pagina')
+    setParams(next, { replace: key !== 'pagina' })
+  }
+  // Any filter change goes back to the first page.
+  function filter<T>(set: (v: T) => void) {
+    return (v: T) => {
+      set(v)
+      change('pagina', '')
+    }
   }
   return (
     <>
@@ -204,13 +222,13 @@ export function SearchServices() {
               type="number"
               min="0"
               value={maxPrice}
-              onChange={(e) => setMaxPrice(e.target.value)}
+              onChange={(e) => filter(setMaxPrice)(e.target.value)}
               placeholder="Sem limite"
             />
           </label>
           <label className="field">
             <span>Nota mínima</span>
-            <select value={minRating} onChange={(e) => setMinRating(e.target.value)}>
+            <select value={minRating} onChange={(e) => filter(setMinRating)(e.target.value)}>
               <option value="">Qualquer nota</option>
               <option value="4">4 estrelas ou mais</option>
               <option value="4.5">4,5 estrelas ou mais</option>
@@ -221,7 +239,7 @@ export function SearchServices() {
             <span>Localização</span>
             <input
               value={city}
-              onChange={(e) => setCity(e.target.value)}
+              onChange={(e) => filter(setCity)(e.target.value)}
               placeholder="Cidade ou região"
             />
           </label>
@@ -243,7 +261,7 @@ export function SearchServices() {
             <select
               aria-label="Ordenar resultados"
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={(e) => filter(setSort)(e.target.value)}
             >
               <option value="recent">Mais recentes</option>
               <option value="price">Menor preço</option>
@@ -255,7 +273,30 @@ export function SearchServices() {
             {filtered.length === 1 ? 'serviço encontrado' : 'serviços encontrados'}
           </p>
           {filtered.length ? (
-            <ServiceGrid services={filtered} />
+            <>
+              <ServiceGrid services={visible} />
+              {totalPages > 1 && (
+                <nav className="pager" aria-label="Páginas de resultados">
+                  <button
+                    className="button secondary"
+                    disabled={page <= 1}
+                    onClick={() => change('pagina', String(page - 1))}
+                  >
+                    Anterior
+                  </button>
+                  <span>
+                    Página {page} de {totalPages}
+                  </span>
+                  <button
+                    className="button secondary"
+                    disabled={page >= totalPages}
+                    onClick={() => change('pagina', String(page + 1))}
+                  >
+                    Próxima
+                  </button>
+                </nav>
+              )}
+            </>
           ) : (
             <Empty title="Nenhum serviço encontrado">
               <p>Amplie a faixa de preço, tente outro termo ou limpe os filtros.</p>
@@ -280,6 +321,7 @@ export function SearchServices() {
 export function ServiceDetail() {
   const { id } = useParams(),
     { services } = useApp(),
+    reviews = useReviews('service', id),
     s = services.find((x) => x.id === id)
   if (!s)
     return (
@@ -307,6 +349,12 @@ export function ServiceDetail() {
           <p>{s.description}</p>
           <h2>Antes de contratar</h2>
           <p>Confirme o escopo, os materiais necessários e a disponibilidade com o profissional.</p>
+          <h2>
+            Avaliações deste serviço
+            {reviews.length > 0 &&
+              ` · ★ ${(reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)} (${reviews.length})`}
+          </h2>
+          <ReviewList reviews={reviews} showService={false} />
         </article>
         <aside className="panel booking-panel">
           <strong className="big-price">{money(s.price)}</strong>
@@ -385,40 +433,16 @@ export function Professionals() {
 }
 export function ProfileDetail() {
   const { id } = useParams(),
-    { professionals, services, contracts } = useApp(),
-    [apiReviews, setApiReviews] = useState<Review[]>([]),
-    p = professionals.find((x) => x.id === id)
-  useEffect(() => {
-    if (isMock || !id) return
-    let active = true
-    void client
-      .freelancerReviews(id)
-      .then((items) => {
-        if (active) setApiReviews(items)
-      })
-      .catch(() => {})
-    return () => {
-      active = false
-    }
-  }, [id])
+    { professionals, services, contracts, user } = useApp(),
+    reviews = useReviews('freelancer', id),
+    p = professionals.find((x) => x.id === id),
+    conversation = contracts.find(
+      (c) =>
+        c.freelancerId === id &&
+        c.clientId === user?.id &&
+        !['RECUSADO', 'CANCELADO'].includes(c.status),
+    )
   if (!p) return <Empty title="Profissional não encontrado" />
-  const reviews: Review[] = isMock
-    ? contracts
-        .filter((c) => c.freelancerId === p.id && c.rating)
-        .map((c) => ({
-          id: c.id,
-          contractId: c.id,
-          serviceId: c.serviceId,
-          serviceTitle: c.title,
-          freelancerId: c.freelancerId,
-          clientId: c.clientId,
-          clientName: c.clientName,
-          rating: c.rating!,
-          comment: c.review || '',
-          reply: c.reviewReply,
-          createdAt: c.reviewedAt || c.completedAt || '',
-        }))
-    : apiReviews
   return (
     <>
       <div className="panel profile-cover">
@@ -431,38 +455,29 @@ export function ProfileDetail() {
               ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'})`}
           </p>
         </div>
-        <Link className="button secondary" to="/mensagens">
-          Enviar mensagem
-        </Link>
+        {conversation ? (
+          <Link className="button secondary" to={`/mensagens?contratacao=${conversation.id}`}>
+            Enviar mensagem
+          </Link>
+        ) : (
+          user?.role === 'CLIENT' && (
+            <a className="button secondary" href="#servicos-oferecidos">
+              Solicite um serviço para conversar
+            </a>
+          )
+        )}
       </div>
       <section className="panel">
         <h2>Sobre o profissional</h2>
         <p>{p.bio}</p>
       </section>
-      <PageTitle title="Serviços oferecidos" />
+      <div id="servicos-oferecidos">
+        <PageTitle title="Serviços oferecidos" />
+      </div>
       <ServiceGrid services={services.filter((s) => s.freelancer.id === p.id)} />
       <section className="panel">
         <h2>Avaliações</h2>
-        {reviews.length ? (
-          reviews.map((r) => (
-            <div className="review" key={r.id}>
-              <strong>
-                {r.rating} de 5 · {r.clientName}
-              </strong>
-              <p>{r.comment || 'Sem comentário.'}</p>
-              {r.reply && <p>Resposta do profissional: {r.reply}</p>}
-              <small>{r.serviceTitle}</small>
-              <Link
-                className="subtle-link"
-                to={`/denunciar?type=REVIEW&id=${r.id}&alvo=${encodeURIComponent(r.serviceTitle)}`}
-              >
-                Denunciar avaliação
-              </Link>
-            </div>
-          ))
-        ) : (
-          <p>Ainda não há avaliações registradas nesta versão.</p>
-        )}
+        <ReviewList reviews={reviews} />
       </section>
     </>
   )

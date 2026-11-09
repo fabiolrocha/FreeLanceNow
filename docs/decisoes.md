@@ -15,7 +15,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **21/10/2026**. A tabe
 | ADR09 | Mock explícito no marco inicial; contratações/prazos, avaliações e demandas/propostas integrados nas fases seguintes | F01/F02/F03/F08 implementados; F04/F05 integram administração/moderação no PR #40; financeiro e comunicação continuam pendentes |
 | ADR10 | Logo vetorial oficial SVG (`web/public/images/logo.svg`), ícones por categoria e avatares por iniciais | Identidade visual fechada sem depender de fotos do carômetro |
 | ADR11 | Stripe Sandbox escolhido, com comissão planejada de 10% | Checkout, registros financeiros, webhooks, reembolso e conciliação ainda serão implementados em F09 |
-| ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V8; implantação e compatibilidade remota precisam de validação |
+| ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V9; implantação e compatibilidade remota precisam de validação |
 | ADR13 | Resend escolhido como provedor transacional de e-mail | Recuperação, verificação e avisos previstos em F07; parâmetros declarados, sem envio implementado |
 | ADR14 | Organização por entrega, sem designação fixa de pessoas por caso, área, arquivo ou revisão (21/10) | Tabela de delegação retirada; backlog/roadmap sem nomes; revisão combinada por disponibilidade |
 | ADR15 | Markdown atual como referência; originais/protótipo/roadmap HTML preservados como histórico | `equipe.md` passa a guia de colaboração; evitar apagar outras páginas sem confirmar uso e conferir referências |

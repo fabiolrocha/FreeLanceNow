@@ -6,6 +6,7 @@ import br.com.freelancenow.api.catalog.ServiceStatus;
 import br.com.freelancenow.api.common.ApiException;
 import br.com.freelancenow.api.contracts.ContractRepository;
 import br.com.freelancenow.api.contracts.ContractStatus;
+import br.com.freelancenow.api.notifications.NotificationService;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.UserRepository;
 
@@ -38,6 +39,7 @@ public class ReviewService {
     private final UserRepository users;
     private final CurrentUser current;
     private final Clock clock;
+    private final NotificationService notifications;
 
     public ReviewService(
             ReviewRepository reviews,
@@ -45,13 +47,15 @@ public class ReviewService {
             ServiceRepository services,
             UserRepository users,
             CurrentUser current,
-            Clock clock) {
+            Clock clock,
+            NotificationService notifications) {
         this.reviews = reviews;
         this.contracts = contracts;
         this.services = services;
         this.users = users;
         this.current = current;
         this.clock = clock;
+        this.notifications = notifications;
     }
 
     @Transactional
@@ -74,6 +78,12 @@ public class ReviewService {
                     HttpStatus.CONFLICT,
                     "O prazo de 7 dias para avaliar esta contratação expirou.");
         var saved = reviews.save(new Review(c, request.rating(), request.comment(), now));
+        notifications.notify(
+                c.getFreelancer(),
+                "REVIEW_RECEIVED",
+                "Nova avaliação: " + request.rating() + " de 5",
+                u.getName() + " avaliou " + c.getTitle() + ". Você pode responder uma vez.",
+                "/contratacoes/" + c.getId());
         return ReviewDtos.ReviewView.from(saved);
     }
 
@@ -94,6 +104,12 @@ public class ReviewService {
         if (review.getReply() != null)
             throw new ApiException(HttpStatus.CONFLICT, "Esta avaliação já foi respondida.");
         review.registerReply(request.reply(), Instant.now(clock));
+        notifications.notify(
+                c.getClient(),
+                "REVIEW_REPLIED",
+                "O profissional respondeu sua avaliação",
+                u.getName() + " respondeu sobre " + c.getTitle() + ".",
+                "/contratacoes/" + c.getId());
         return ReviewDtos.ReviewView.from(review);
     }
 

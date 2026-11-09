@@ -39,7 +39,7 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
 | Disputa | `/contratacoes/:id/disputa` | Participantes | Abertura via API (`F01`); decisão fundamentada e auditada na moderação (`F04`/`F05`) |
 | Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`) |
-| Avisos/chat | `/notificacoes`, `/mensagens` | Autenticado | Mock; chat nesta tela/sessão sem entrega externa (`F07`) |
+| Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Autenticado; chat só entre participantes | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
 | Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
 | Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Simulação financeira (`F09` pendente) |
 | Saque | `/saque`, `/saque/enviado` | Freelancer | Simulação financeira (`F09` pendente) |
@@ -54,7 +54,7 @@ Guards React protegem os grupos de rotas por role. Participação, estado e prop
 
 ## Telas demonstrativas e componentes reutilizados
 
-Recuperação de senha, avisos/chat e financeiro continuam visuais/simulados, vinculados a F07/F09. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
+Recuperação de senha e financeiro continuam visuais/simulados, vinculados a F07/F09. Avisos e chat por contratação usam a API desde a branch `melhorias-telas`. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
 
 | Rotas/estados | Reutilização atual |
 |---|---|
@@ -71,7 +71,7 @@ Esses endereços não equivalem a implementações independentes. A remoção de
 
 - `VITE_DATA_MODE=mock`: fixtures fictícias e persistência em `sessionStorage`; cadastro mock guarda digest com salt exclusivamente para simular login, sem pretensão de autenticação segura.
 - `VITE_DATA_MODE=api`: feed/publicações, catálogo, profissionais, sessão, perfil, anúncios, contratações, avaliações, demandas e propostas via API. Erro HTTP gera mensagem; nenhuma troca automática para fixtures.
-- No modo mock, publicações/contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações, avaliações, demandas e propostas são sincronizadas com o PostgreSQL. Denúncias e ações administrativas usam `web/src/data/admin.ts` no modo API; o estado local fica restrito ao mock, às mensagens/leitura de avisos e ao financeiro ainda simulado. As telas administrativas tratam carregamento, falhas e nova tentativa.
+- No modo mock, publicações/contratações/demandas/propostas/denúncias persistem na sessão para permitir alternar contas no ensaio. No modo API, contratações, avaliações, demandas e propostas são sincronizadas com o PostgreSQL. Denúncias e ações administrativas usam `web/src/data/admin.ts` no modo API; avisos e mensagens usam `web/src/data/inbox.ts`; o estado local fica restrito ao mock e ao financeiro ainda simulado. As telas administrativas tratam carregamento, falhas e nova tentativa.
 - O token real dura 15 minutos e sua expiração absoluta sobrevive ao reload. Novo login é necessário após expiração.
 
 ## Direção visual e acessibilidade

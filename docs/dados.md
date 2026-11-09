@@ -108,12 +108,11 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V8, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V9, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
 | `dispute` / anexos de evidência | Evoluir o motivo atualmente em `contract`; vincular storage de F06 sem apagar histórico |
-| `message` / `notification` | Participantes autorizados e eventos; status de leitura/entrega |
 | `service_image` | Dono, storage key, tipo/tamanho, ordem e metadados; máximo 5 |
 | `payment` / `ledger_entry` | Referência gateway única, contratação, eventos idempotentes, valores e conciliação |
 
@@ -136,5 +135,14 @@ O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não 
 ## Publicações e feed (V8)
 
 `feed_post` guarda UUID, `author_id` com FK, texto de até 500 caracteres não vazio, `category_id` e `service_id` opcionais, `created_at` e `hidden`. Serviço vinculado deve pertencer ao autor e estar visível; retirada própria e remoção administrativa usam o mesmo sinal lógico, preservando a linha para histórico. O tipo `POST` amplia a restrição de alvos de `content_report` sem alterar V7 já aplicada.
+
+## Mensagens e avisos (V9)
+
+| Tabela | Persistência e invariantes |
+|---|---|
+| `contract_message` | UUID; contratação e autor FK; texto de 1–1000 caracteres não vazio; criação. Só cliente e freelancer da contratação escrevem; admin lê para decidir disputas; recusada/cancelada não aceita novas mensagens |
+| `notification` | UUID; destinatário FK; tipo; título 150; corpo 300; link interno 200; criação; `read_at` opcional. Gravado na mesma transação do evento (solicitação, mudança de status, prazo automático, proposta, avaliação, resposta e mensagem); quem age não recebe aviso da própria ação |
+
+Não há entrega por e-mail nem tempo real: a interface consulta o contador a cada 30 s e a conversa aberta a cada 10 s. O envio por e-mail (Resend) continua em F07.
 
 O feed não duplica serviços ou demandas: uma consulta `UNION ALL` combina as três fontes e filtra autores ativos, conteúdo visível, tipo/categoria e acesso às demandas antes de contar/paginar. Índices de criação/ID apoiam a listagem de oportunidades. Ordenação é cronológica e determinística; não existe algoritmo de relevância. A consulta retorna DTO seguro e não serializa entidades/contatos privados.

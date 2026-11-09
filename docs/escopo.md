@@ -18,10 +18,10 @@ F11 implementa o feed misto autenticado em `/inicio`, com publicação de texto,
 | Cliente | Perfil, solicitações, acompanhamento, confirmação, contestação, avaliação e demandas/propostas integrados à API | Comunicação, anexos e financeiro |
 | Freelancer | Perfil, anúncios, execução, resposta a avaliações e propostas integrados à API | Upload, comunicação e financeiro |
 | Administração | Bootstrap ADMIN, usuários/categorias, moderação de serviços/avaliações/disputas, métricas e auditoria integrados | Notificações externas (F07), anexos (F06) e financeiro (F09) |
-| API e banco | Auth JWT, perfis, catálogo, contratações, prazos de 48h/5 dias, avaliações, demandas/propostas; migrações V1–V8, feed/publicações, denúncias e auditoria | Integrações dos cards F06/F07/F09/F10 |
+| API e banco | Auth JWT, perfis, catálogo, contratações, prazos de 48h/5 dias, avaliações, demandas/propostas; migrações V1–V9, feed/publicações, denúncias, auditoria, avisos e chat por contratação | Integrações dos cards F06/F07/F09/F10 |
 | Organização | Documentação, CI e fluxo de branches/PRs | Manter critérios de aceite e evidências por entrega |
 
-**Persistência real:** usuário, categoria, anúncio, contratação e histórico, avaliação, demanda e proposta. **Persistência administrativa:** denúncias e auditoria. **Simulação:** mensagens, notificações e financeiro. Em `VITE_DATA_MODE=api`, o primeiro grupo usa PostgreSQL; telas do segundo grupo continuam demonstrativas. O ADMIN real é provisionado por configuração explícita; não há conta/senha padrão. Denúncias preservam relato e cópia textual do alvo, com decisões e atores auditados; upload de anexos permanece em F06.
+**Persistência real:** usuário, categoria, anúncio, contratação e histórico, avaliação, demanda e proposta. **Persistência administrativa:** denúncias e auditoria. **Persistência de comunicação:** avisos internos e mensagens por contratação. **Simulação:** e-mail e financeiro. Em `VITE_DATA_MODE=api`, o primeiro grupo usa PostgreSQL; telas do segundo grupo continuam demonstrativas. O ADMIN real é provisionado por configuração explícita; não há conta/senha padrão. Denúncias preservam relato e cópia textual do alvo, com decisões e atores auditados; upload de anexos permanece em F06.
 
 A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas demonstrativas não devem ser apresentadas como integrações concluídas. A antiga página de delegação foi substituída pelo [guia de colaboração](equipe.md); os originais e o protótipo são referências históricas.
 
