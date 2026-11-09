@@ -1,6 +1,6 @@
 # Documentação do FreeLanceNow
 
-Revisada em **21/10/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 (PR #40) e F11 (revisada no PR #41) também estão na `main`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
+Revisada em **09/11/2026**. A revisão documental foi integrada à `main` pelo PR #39; F04/F05 (PR #40), F11 (PR #41/PR #42), avisos/chat e melhorias de telas (PR #45), migração de pagamentos `V10` (PR #43) e preparação de deploy Vercel/Neon/Stripe (PR #44) também estão na `main`. Os Markdown desta pasta descrevem o produto atual e seu planejamento; protótipo e materiais originais são fontes históricas. A documentação é mantida por entrega, **sem atribuições fixas por pessoa**.
 
 ## Mudança de escopo: feed inicial
 

@@ -1,40 +1,37 @@
 # Roadmap — entrega final em 18 de novembro de 2026
 
-Revisado em **21/10/2026**. Prazo final: **18/11/2026, quarta-feira**, horário de Brasília. As janelas intermediárias são sugestões de planejamento, sujeitas ao andamento real do projeto. Não há distribuição fixa por pessoa; o grupo combina o trabalho por entrega e dependência.
+Revisado em **09/11/2026**. Prazo final: **18/11/2026, quarta-feira**, horário de Brasília. As janelas intermediárias são sugestões de planejamento, sujeitas ao andamento real do projeto. Não há distribuição fixa por pessoa; o grupo combina o trabalho por entrega e dependência.
 
 ## Estado atual
 
-| Etapa | Estado verificado no código da `main` em 21/10 |
+| Etapa | Estado verificado no código da `main` em 09/11 |
 |---|---|
-| Marco inicial de 07/10 (`marco-1`) | Base React navegável em mock e API persistente de auth, perfis, categorias e anúncios |
-| Contratações e prazos (`fase-01`, F01/F02) | Integrados: histórico, participantes, snapshots e jobs de 48h/5 dias |
-| Avaliações (`fase-02`, F03) | Integradas: nota, média, janela de avaliação e resposta do profissional |
-| Demandas/propostas (`fase-03`, F08) | Integradas: proposta pendente única e aceite gerando contratação |
-| Administração/moderação (F04/F05) | Integradas à `main` pelo PR #40: bootstrap ADMIN, gestão, denúncias/evidência textual, remoção lógica, métricas e auditoria |
-| Feed e publicações (F11) | Integrado à `main`: feed misto após login, publicação de texto, filtros/paginação, retirada própria e moderação |
+| Marco inicial de 07/10 (`marco-1`) | Concluído (Marco 1 fechado): base React navegável em mock e API persistente de auth, perfis, categorias e anúncios |
+| Contratações e prazos (`fase-01`, F01/F02) | Concluídos (Marco 2 fechado): histórico, participantes, snapshots, jobs de 48h/5 dias, avisos e prazos visíveis |
+| Avaliações (`fase-02`, F03) | Concluídas (Marco 3 fechado): nota, média, janela de 7 dias, resposta única e listagem no perfil e no serviço |
+| Demandas/propostas (`fase-03`, F08) | Concluídas (Marco 3 fechado): proposta pendente única e aceite gerando contratação `ACEITO` |
+| Administração/moderação (F04/F05) | Concluídas (Marco 3 fechado, PR #40): bootstrap ADMIN, gestão, denúncias/evidência textual, remoção lógica, métricas e auditoria |
+| Feed e publicações (F11) | Concluído na `main` (PR #41/PR #42): feed misto após login, publicação de texto, filtros/paginação, retirada própria e moderação |
+| Melhorias, avisos e chat (F06/F07 parciais) | Integrados à `main` (PR #45): avisos internos e chat por contratação (`V9`), paginação da busca no React, abas de contratação e avaliações no serviço |
+| DDL financeiro e preparação de deploy (F09/F10 parciais) | Integrados à `main` (PR #43 e PR #44): migração `V10__payments.sql` (`payment` e `ledger_entry`), SDK `stripe-java`, perfil `prod`, TLS Neon, `JwtSecretValidator`, `vercel.json` e `docs/deploy.md` |
 
-F04/F05 têm implementação no PR #40 e verificações descritas em [testes e demonstração](testes-e-demonstracao.md). O PR #39 integrou a revisão documental à `main`; o estado da nova entrega fica no [backlog](backlog.md). E-mail e anexos são dependências futuras de F07/F06, respectivamente.
+F04/F05 têm implementação no PR #40 e verificações descritas em [testes e demonstração](testes-e-demonstracao.md). O estado detalhado do que falta em F06, F07, F09 e F10 fica no [backlog](backlog.md).
 
-## Prioridade adicionada em 21/10: feed (F11)
+## Prioridade concluída: feed (F11) e comunicação interna (F07 parcial)
 
-O início do aplicativo deve ser o feed previsto no HTML de base, com publicação de conteúdo e descoberta de oportunidades. Essa mudança inclui experiência, persistência, autorização, moderação e testes; não se limita a trocar o título do Dashboard.
+O início do aplicativo funciona como o feed previsto no HTML de base, com publicação de conteúdo e descoberta de oportunidades (PR #41/PR #42), e o PR #45 acrescentou avisos internos persistentes (sino com contador e `/notificacoes`), chat por contratação (`/mensagens?contratacao=:id`) e paginação da busca no frontend.
 
-F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40). F11 foi revisada no PR #41 e integrada à `main`, conforme a [especificação aprovada](superpowers/specs/2026-10-21-feed-inicial-design.md). As próximas fases partem dessa base.
-
-As janelas de F06/F07 abaixo precisam ser replanejadas para acomodar F11. Não há nova data intermediária confirmada; o prazo final de 18/11 permanece como referência do grupo.
-
-## Próximas janelas sugeridas
+## Próximas janelas até a entrega final
 
 | Período | Entrega | Critério para encerrar |
 |---|---|---|
-| 21/10 | F04/F05 integradas à `main` — PR #40 | Bootstrap, gestão, denúncias, remoção lógica e auditoria testados; CI aprovada |
-| 21/10 — integrado à `main` | F11 — feed e publicações | Feed misto após login, texto persistente, oportunidades autorizadas, moderação, desktop/celular |
-| 22–28/10 | Upload, paginação no web, mensagens, notificações e e-mail — F06/F07 | Upload validado; busca paginada; comunicação entre contas e recuperação de senha verificadas |
-| 29/10–04/11 | Financeiro em Stripe Sandbox — F09 | Pagamento/reembolso de teste, comissão, eventos repetidos e conciliação testados |
-| 05–11/11 | Integração e operação — F10 | Ambiente de demonstração reproduzível, fluxos persistentes, backup/restauração e verificações de acesso/carga |
-| 12–16/11 | Regressão, correções e documentação | Sem bloqueios de entrega; documentação corresponde à versão; congelamento sugerido em 16/11 |
-| 17/11 | Ensaio e conferência dos materiais | Roteiro executado do início ao fim; versão e instruções conferidas |
-| **18/11** | **Entrega final** | **Código, sistema web, documentação, evidências e apresentação entregues** |
+| Até 21/10 — concluído | F01, F02, F03, F04, F05, F08, F11 | Marcos 1, 2 e 3 fechados; feed misto integrado à `main` |
+| 09/11 — integrado à `main` | PR #45 (F06/F07 parciais), PR #43 (`V10`) e PR #44 (deploy prep) | Avisos e chat por contratação, paginação da busca, DDL de pagamentos e configuração Vercel/Neon/Stripe integrados |
+| 10–12/11 | Concluir F06 (upload de imagens) e F07 (e-mail Resend / recuperação de senha) | Upload de até 5 imagens JPG/PNG (5 MB) validado; envio de e-mail e recuperação de senha testados |
+| 10–13/11 | Concluir F09 (fluxo Stripe Sandbox) e F10 (operação) | Checkout sandbox, webhook idempotente, comissão 10%, liberação/reembolso, conciliação, rate limit, backup/restauração e teste de carga |
+| 12–16/11 | E01 — Regressão, correções e documentação (Issue #32) | Sem bloqueios de entrega; documentação corresponde à versão; congelamento sugerido em 16/11 |
+| 17/11 | E02 — Ensaio e conferência dos materiais (Issue #33) | Roteiro executado do início ao fim; versão e instruções conferidas |
+| **18/11** | **E02 — Entrega final (Issue #33)** | **Código, sistema web, documentação, evidências e apresentação entregues** |
 
 As próximas janelas devem acomodar F11, depois F06/F07 e F09/F10. Atualizar calendário e backlog conforme a integração dos PRs e as evidências de cada entrega; a passagem de uma data não conclui a etapa. Não há previsão de trabalho obrigatório em fins de semana.
 

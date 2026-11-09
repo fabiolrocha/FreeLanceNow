@@ -1,6 +1,6 @@
 # Frontend React web
 
-Revisado em **21/10/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos módulos de dados. React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
+Revisado em **09/11/2026**, a partir de `web/src/App.tsx`, `Layout.tsx` e dos módulos de dados. React 19, TypeScript 6, Vite 8 e React Router 7. Features são carregadas por `lazy`/`Suspense`; o shell e os componentes compartilhados ficam em `app/` e `components/`. Fonte Public Sans instalada localmente. A marca oficial é exibida via `/images/logo.svg` e `/favicon.svg`; ícones Lucide ilustram as categorias de serviço até o upload de mídia (`F06`).
 
 ## Correção de direção: início como feed
 
@@ -54,7 +54,7 @@ Guards React protegem os grupos de rotas por role. Participação, estado e prop
 
 ## Telas demonstrativas e componentes reutilizados
 
-Recuperação de senha e financeiro continuam visuais/simulados, vinculados a F07/F09. Avisos e chat por contratação usam a API desde a branch `melhorias-telas`. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
+Recuperação de senha e financeiro continuam visuais/simulados, vinculados a F07/F09. Avisos e chat por contratação usam a API desde o PR #45. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
 
 | Rotas/estados | Reutilização atual |
 |---|---|

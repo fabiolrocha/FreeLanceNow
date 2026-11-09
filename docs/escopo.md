@@ -1,6 +1,6 @@
 # Escopo e entregas
 
-Revisado em **21/10/2026**. O FreeLanceNow conecta clientes que precisam de serviços gerais a profissionais que os oferecem. Clientes contratam anúncios ou publicam demandas; freelancers oferecem serviços e enviam propostas. A administração dispõe de gestão, denúncias, métricas e auditoria persistentes nesta entrega F04/F05.
+Revisado em **09/11/2026**. O FreeLanceNow conecta clientes que precisam de serviços gerais a profissionais que os oferecem. Clientes contratam anúncios ou publicam demandas; freelancers oferecem serviços e enviam propostas. A administração dispõe de gestão, denúncias, métricas e auditoria persistentes nesta entrega F04/F05.
 
 **Entrega final: 18/11/2026, quarta-feira, horário de Brasília.** O marco de 07/10 e as fases F01/F02/F03/F08 já compõem a base atual. O [roadmap](roadmap.md) distingue entregas integradas e trabalho restante. A colaboração é por entrega, sem pessoas designadas de forma fixa para cada caso.
 
@@ -27,6 +27,6 @@ A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas d
 
 ## Entrega planejada
 
-Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 foram integrados à `main` pelo PR #40. F11 (feed/publicações) foi revisada no PR #41 e integrada à `main`. F06/F07/F09/F10 seguem pendentes conforme o [backlog](backlog.md), com janelas a rever por causa do novo escopo.
+Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 foram integrados à `main` pelo PR #40. F11 (feed/publicações) foi revisada no PR #41 e integrada à `main`. Em 09/11, foram integrados avisos/chat por contratação e paginação da busca (PR #45), DDL de pagamentos `V10` (PR #43) e preparação de deploy (PR #44). O restante de F06, F07, F09 e F10 segue conforme o [backlog](backlog.md).
 
 Stripe Sandbox, Neon e Resend são escolhas de provedores; não constituem integrações entregues. Não há movimentação financeira real. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.
