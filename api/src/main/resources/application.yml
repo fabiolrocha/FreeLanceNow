@@ -37,6 +37,7 @@ app:
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
     platform-fee-percent: ${PLATFORM_FEE_PERCENT:10}
+    public-base-url: ${PUBLIC_APP_URL:}
   resend:
     api-key: ${RESEND_API_KEY:}
     from-email: ${RESEND_FROM_EMAIL:no-reply@freelancenow.test}
