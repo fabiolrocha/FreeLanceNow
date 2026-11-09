@@ -1,4 +1,4 @@
-import type { ContractStatus, Role } from './types'
+import type { Contract, ContractStatus, Role } from './types'
 export const nowIso = () => new Date().toISOString()
 
 export const money = (value: number) =>
@@ -39,6 +39,43 @@ export function canReview(status: ContractStatus, completedAt?: string, now = Da
     now >= Date.parse(completedAt) &&
     now <= Date.parse(completedAt) + 7 * 86400000
   )
+}
+export function dateLabel(iso: string) {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime())
+    ? ''
+    : new Intl.DateTimeFormat('pt-BR', {
+        timeZone: 'America/Sao_Paulo',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(d)
+}
+const HOUR = 3600000
+// Mirrors the API jobs: 48h to answer a request, 5 days to confirm, 7 days to review.
+export function contractDeadline(
+  c: Pick<Contract, 'status' | 'history' | 'completedAt' | 'rating'>,
+): { text: string; at: string } | null {
+  const since = c.history.at(-1)?.at
+  const plus = (iso: string | undefined, hours: number) =>
+    iso && !Number.isNaN(Date.parse(iso))
+      ? new Date(Date.parse(iso) + hours * HOUR).toISOString()
+      : null
+  if (c.status === 'PENDENTE') {
+    const at = plus(since, 48)
+    return at ? { text: 'Sem resposta, a solicitação é cancelada em', at } : null
+  }
+  if (c.status === 'AGUARDANDO_CONFIRMACAO') {
+    const at = plus(since, 5 * 24)
+    return at ? { text: 'Sem resposta do cliente, a conclusão é confirmada em', at } : null
+  }
+  if (c.status === 'CONCLUIDO' && !c.rating) {
+    const at = plus(c.completedAt, 7 * 24)
+    return at ? { text: 'A avaliação pode ser enviada até', at } : null
+  }
+  return null
 }
 export function validPassword(password: string) {
   return (

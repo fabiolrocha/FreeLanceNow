@@ -6,6 +6,7 @@ import br.com.freelancenow.api.catalog.ServiceListing;
 import br.com.freelancenow.api.catalog.ServiceRepository;
 import br.com.freelancenow.api.catalog.ServiceStatus;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.notifications.NotificationService;
 import br.com.freelancenow.api.reviews.ReviewRepository;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
@@ -62,6 +63,7 @@ public class ContractService {
     private final CurrentUser current;
     private final Clock clock;
     private final AuditService audit;
+    private final NotificationService notifications;
 
     public ContractService(
             ContractRepository contracts,
@@ -71,7 +73,8 @@ public class ContractService {
             UserRepository users,
             CurrentUser current,
             Clock clock,
-            AuditService audit) {
+            AuditService audit,
+            NotificationService notifications) {
         this.contracts = contracts;
         this.events = events;
         this.reviews = reviews;
@@ -80,6 +83,7 @@ public class ContractService {
         this.current = current;
         this.clock = clock;
         this.audit = audit;
+        this.notifications = notifications;
     }
 
     public List<ContractDtos.ContractView> list(Jwt jwt) {
@@ -148,6 +152,12 @@ public class ContractService {
                                 ContractStatus.PENDENTE,
                                 r.description(),
                                 now));
+        notifications.notify(
+                contract.getFreelancer(),
+                "CONTRACT_REQUESTED",
+                "Nova solicitação: " + contract.getTitle(),
+                client.getName() + " pediu este serviço. Responda em até 48 horas.",
+                link(contract));
         return ContractDtos.ContractView.from(contract, List.of(initialEvent));
     }
 
@@ -180,10 +190,32 @@ public class ContractService {
                     r.status().name(),
                     r.comment());
         events.save(new ContractEvent(c, u, previous, r.status(), r.comment(), now));
+        var title = c.getTitle() + ": " + STATUS_LABELS.get(r.status());
+        var body = u.getName() + " atualizou a contratação.";
+        // Everyone involved except the person who made the change hears about it.
+        if (!c.getClient().getId().equals(u.getId()))
+            notifications.notify(c.getClient(), "CONTRACT_STATUS", title, body, link(c));
+        if (!c.getFreelancer().getId().equals(u.getId()))
+            notifications.notify(c.getFreelancer(), "CONTRACT_STATUS", title, body, link(c));
         return ContractDtos.ContractView.from(
                 c,
                 events.findByContractIdOrderByCreatedAtAsc(c.getId()),
                 reviews.findByContractId(c.getId()).orElse(null));
+    }
+
+    private static final Map<ContractStatus, String> STATUS_LABELS =
+            Map.of(
+                    ContractStatus.PENDENTE, "pendente",
+                    ContractStatus.ACEITO, "aceita",
+                    ContractStatus.EM_ANDAMENTO, "em andamento",
+                    ContractStatus.AGUARDANDO_CONFIRMACAO, "aguardando confirmação",
+                    ContractStatus.CONCLUIDO, "concluída",
+                    ContractStatus.EM_DISPUTA, "em disputa",
+                    ContractStatus.RECUSADO, "recusada",
+                    ContractStatus.CANCELADO, "cancelada");
+
+    private static String link(Contract c) {
+        return "/contratacoes/" + c.getId();
     }
 
     @Scheduled(fixedDelayString = "${app.contracts.deadline-check-ms:60000}")
@@ -206,6 +238,10 @@ public class ContractService {
                             ContractStatus.CANCELADO,
                             "Cancelada automaticamente após 48 horas sem resposta.",
                             now));
+            var title = c.getTitle() + ": cancelada automaticamente";
+            var body = "A solicitação ficou 48 horas sem resposta.";
+            notifications.notify(c.getClient(), "CONTRACT_EXPIRED", title, body, link(c));
+            notifications.notify(c.getFreelancer(), "CONTRACT_EXPIRED", title, body, link(c));
         }
 
         var confirmCutoff = now.minus(Duration.ofDays(5));
@@ -222,6 +258,19 @@ public class ContractService {
                             ContractStatus.CONCLUIDO,
                             "Confirmada automaticamente após 5 dias corridos.",
                             now));
+            var title = c.getTitle() + ": conclusão confirmada automaticamente";
+            notifications.notify(
+                    c.getClient(),
+                    "CONTRACT_AUTO_CONFIRMED",
+                    title,
+                    "Você tem 7 dias para avaliar o serviço.",
+                    link(c));
+            notifications.notify(
+                    c.getFreelancer(),
+                    "CONTRACT_AUTO_CONFIRMED",
+                    title,
+                    "O cliente não respondeu em 5 dias.",
+                    link(c));
         }
         return expiredPending.size() + expiredConfirm.size();
     }

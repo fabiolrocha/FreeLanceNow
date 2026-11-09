@@ -4,7 +4,17 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Plus, ArrowRight } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client } from '../../data/client'
-import { Avatar, Empty, ErrorMessage, Field, PageTitle, ServiceGrid } from '../../components/ui'
+import { useReviews } from '../../app/useReviews'
+import {
+  Avatar,
+  Empty,
+  ErrorMessage,
+  Field,
+  PageTitle,
+  ReviewList,
+  ServiceGrid,
+  Stars,
+} from '../../components/ui'
 import { money, statusLabel } from '../../domain/rules'
 import type { Service } from '../../domain/types'
 
@@ -98,9 +108,19 @@ export function EditProfile() {
     </>
   )
 }
+const activeStatuses = ['ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
 export function OwnProfile() {
-  const { user } = useApp()
+  const { user, contracts } = useApp(),
+    received = useReviews('freelancer', user?.role === 'FREELANCER' ? user.id : undefined)
   if (!user) return null
+  const own = contracts.filter((c) =>
+    user.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user.id,
+  )
+  const done = own.filter((c) => c.status === 'CONCLUIDO')
+  const given = own.filter((c) => typeof c.rating === 'number')
+  const average = received.length
+    ? (received.reduce((a, r) => a + r.rating, 0) / received.length).toFixed(1)
+    : null
   return (
     <>
       <div className="panel profile-cover">
@@ -125,6 +145,62 @@ export function OwnProfile() {
               : 'Administrador'}
         </p>
       </section>
+      {user.role !== 'ADMIN' && (
+        <section className="panel">
+          <h2>Seus números</h2>
+          <div className="profile-stats">
+            <div>
+              <strong>{own.length}</strong>
+              <span>contratações</span>
+            </div>
+            <div>
+              <strong>{own.filter((c) => activeStatuses.includes(c.status)).length}</strong>
+              <span>em andamento</span>
+            </div>
+            <div>
+              <strong>{done.length}</strong>
+              <span>concluídas</span>
+            </div>
+            {user.role === 'FREELANCER' ? (
+              <div>
+                <strong>{average ? `★ ${average}` : '—'}</strong>
+                <span>
+                  {received.length} {received.length === 1 ? 'avaliação' : 'avaliações'}
+                </span>
+              </div>
+            ) : (
+              <div>
+                <strong>{given.length}</strong>
+                <span>avaliações enviadas</span>
+              </div>
+            )}
+          </div>
+          <Link to="/contratacoes">Ver contratações</Link>
+        </section>
+      )}
+      {user.role === 'FREELANCER' && (
+        <section className="panel">
+          <h2>Avaliações recebidas</h2>
+          <ReviewList reviews={received} />
+        </section>
+      )}
+      {user.role === 'CLIENT' && given.length > 0 && (
+        <section className="panel">
+          <h2>Avaliações que você enviou</h2>
+          {given.map((c) => (
+            <div className="review" key={c.id}>
+              <strong>
+                <Stars rating={c.rating!} /> {c.rating} de 5 · {c.freelancerName}
+              </strong>
+              <p>{c.review || 'Sem comentário.'}</p>
+              {c.reviewReply && (
+                <p className="review-reply">Resposta do profissional: {c.reviewReply}</p>
+              )}
+              <Link to={`/contratacoes/${c.id}`}>{c.title}</Link>
+            </div>
+          ))}
+        </section>
+      )}
     </>
   )
 }
@@ -170,15 +246,13 @@ export function Dashboard() {
             {user.role === 'CLIENT' ? own.length : mine.filter((s) => s.status === 'ACTIVE').length}
           </strong>
           <small>
-            {user.role === 'CLIENT'
-              ? 'no seu histórico de demonstração'
-              : 'limite de 20 anúncios ativos'}
+            {user.role === 'CLIENT' ? 'no seu histórico' : 'limite de 20 anúncios ativos'}
           </small>
         </div>
         <div>
           <span>Em andamento</span>
-          <strong>{own.filter((c) => c.status === 'EM_ANDAMENTO').length}</strong>
-          <small>serviços em execução na demonstração</small>
+          <strong>{own.filter((c) => activeStatuses.includes(c.status)).length}</strong>
+          <small>aceitas, em execução ou aguardando confirmação</small>
         </div>
         <div>
           <span>Aguardando resposta</span>

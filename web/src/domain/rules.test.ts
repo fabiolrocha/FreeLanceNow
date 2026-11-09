@@ -1,5 +1,28 @@
 import { describe, expect, it } from 'vitest'
-import { canReview, canTransition, validPassword } from './rules'
+import { canReview, canTransition, contractDeadline, validPassword } from './rules'
+describe('Prazos exibidos na contratação (F02/F03)', () => {
+  const at = '2026-11-01T12:00:00.000Z'
+  it('segue os jobs de 48h, 5 dias e a janela de 7 dias da avaliação', () => {
+    expect(
+      contractDeadline({ status: 'PENDENTE', history: [{ status: 'PENDENTE', at }] })?.at,
+    ).toBe('2026-11-03T12:00:00.000Z')
+    expect(
+      contractDeadline({
+        status: 'AGUARDANDO_CONFIRMACAO',
+        history: [{ status: 'AGUARDANDO_CONFIRMACAO', at }],
+      })?.at,
+    ).toBe('2026-11-06T12:00:00.000Z')
+    expect(contractDeadline({ status: 'CONCLUIDO', history: [], completedAt: at })?.at).toBe(
+      '2026-11-08T12:00:00.000Z',
+    )
+    expect(
+      contractDeadline({ status: 'CONCLUIDO', history: [], completedAt: at, rating: 5 }),
+    ).toBeNull()
+    expect(
+      contractDeadline({ status: 'EM_ANDAMENTO', history: [{ status: 'EM_ANDAMENTO', at }] }),
+    ).toBeNull()
+  })
+})
 describe('Permissões e sequência da contratação (UC06)', () => {
   it('permite somente o responsável de cada etapa', () => {
     expect(canTransition('PENDENTE', 'ACEITO', 'FREELANCER')).toBe(true)

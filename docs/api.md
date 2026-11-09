@@ -1,6 +1,6 @@
 # Contrato da API
 
-Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha, mensagens/notificações, upload e financeiro permanecem pendentes. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
+Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha, envio de e-mail, upload e financeiro permanecem pendentes; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
@@ -21,6 +21,12 @@ Revisado em **21/10/2026**, conforme controllers, DTOs e serviços da base integ
 | GET | `/contracts/{id}` | Participante/Admin | Detalhe, histórico de eventos e avaliação da contratação |
 | POST | `/contracts` | Cliente | 201 + solicitação `PENDENTE` com snapshot do serviço |
 | PATCH | `/contracts/{id}/status` | Participante/Admin | Transição de estado e registro em `contract_event` |
+| GET | `/contracts/{id}/messages` | Participante/Admin | Conversa da contratação em ordem cronológica; admin só lê |
+| POST | `/contracts/{id}/messages` | Participante | 201 + mensagem `{text}` de 1–1000 chars; 409 se a contratação foi recusada/cancelada |
+| GET | `/notifications` | Autenticado | Até 50 avisos mais recentes da própria conta e total não lido |
+| GET | `/notifications/unread-count` | Autenticado | `{unread}` para o contador do cabeçalho |
+| POST | `/notifications/{id}/read` | Dono do aviso | Marca um aviso como lido; aviso de outra conta retorna 404 |
+| POST | `/notifications/read-all` | Autenticado | Marca todos os avisos da conta como lidos |
 | POST | `/contracts/{id}/review` | Cliente (autor) | 201 + avaliação única (1–5, até 500 chars, janela de 7 dias) |
 | POST | `/contracts/{id}/review/reply` | Freelancer (dono) | 200 + resposta única do profissional (até 200 chars) |
 | GET | `/freelancers/{id}/reviews` | Público | Lista avaliações públicas recebidas pelo profissional |
