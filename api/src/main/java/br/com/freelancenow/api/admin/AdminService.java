@@ -190,4 +190,38 @@ public class AdminService {
     private ApiException missing(String entity) {
         return new ApiException(HttpStatus.NOT_FOUND, entity + " não encontrado.");
     }
+    public void uploadServiceImages(Jwt jwt, Long id, List<org.springframework.web.multipart.MultipartFile> images) {
+    // Validação de quantidade (máximo 5 imagens)
+    if (images != null && images.size() > 5) {
+        throw new IllegalArgumentException("Você pode enviar no máximo 5 imagens por anúncio.");
+    }
+
+    if (images != null) {
+        for (org.springframework.web.multipart.MultipartFile file : images) {
+            // Validar tamanho (5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                throw new IllegalArgumentException("A imagem excede o tamanho máximo de 5 MB.");
+            }
+
+            // Validar tipo (JPEG ou PNG)
+            String contentType = file.getContentType();
+            if (contentType == null || (!contentType.equals("image/jpeg") && !contentType.equals("image/png"))) {
+                throw new IllegalArgumentException("Apenas arquivos JPG ou PNG são permitidos.");
+            }
+
+            try {
+                String fileName = java.util.UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+                java.nio.file.Path uploadPath = java.nio.file.Paths.get("/app/uploads");
+                if (!java.nio.file.Files.exists(uploadPath)) {
+                    java.nio.file.Files.createDirectories(uploadPath);
+                }
+                java.nio.file.Path filePath = uploadPath.resolve(fileName);
+                java.nio.file.Files.copy(file.getInputStream(), filePath);
+
+            } catch (java.io.IOException e) {
+                throw new RuntimeException("Erro ao salvar o arquivo de imagem.", e);
+            }
+        }
+    }
+}
 }
