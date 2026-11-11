@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { CheckCircle2, Star } from 'lucide-react'
+import { CheckCircle2, Clock, MessageSquare, Star } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { isMock } from '../../data/client'
-import { Empty, ErrorMessage, Field, PageTitle, SimulationNotice } from '../../components/ui'
-import { canReview, futureDate, money, statusLabel, today } from '../../domain/rules'
+import { Empty, ErrorMessage, Field, PageTitle, SimulationNotice, Stars } from '../../components/ui'
+import {
+  canReview,
+  contractDeadline,
+  dateLabel,
+  futureDate,
+  money,
+  statusLabel,
+  today,
+} from '../../domain/rules'
 import type { Contract } from '../../domain/types'
 
 // In API mode, refetch on open so new requests and direct links appear without a manual reload.
@@ -121,15 +129,31 @@ export function RequestSent() {
     </div>
   )
 }
+const contractFilters: [string, string, Contract['status'][] | null][] = [
+  ['all', 'Todas', null],
+  ['pending', 'Pendentes', ['PENDENTE']],
+  ['active', 'Em andamento', ['ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']],
+  ['done', 'Concluídas', ['CONCLUIDO']],
+  ['dispute', 'Em disputa', ['EM_DISPUTA']],
+  ['closed', 'Recusadas/canceladas', ['RECUSADO', 'CANCELADO']],
+]
 export function ContractList({ requests = false }: { requests?: boolean }) {
   const { contracts, user } = useApp(),
-    [filter, setFilter] = useState('all')
+    [filter, setFilter] = useState('all'),
+    [q, setQ] = useState('')
   useFreshContracts()
-  const own = contracts.filter(
+  const mine = contracts.filter(
     (c) =>
       (user?.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user?.id) &&
-      (!requests || c.status === 'PENDENTE') &&
-      (filter === 'all' || c.status === filter),
+      (!requests || c.status === 'PENDENTE'),
+  )
+  const term = q.trim().toLocaleLowerCase('pt-BR')
+  const statuses = contractFilters.find(([v]) => v === filter)?.[2]
+  const own = mine.filter(
+    (c) =>
+      (!statuses || statuses.includes(c.status)) &&
+      (!term ||
+        `${c.title} ${c.clientName} ${c.freelancerName}`.toLocaleLowerCase('pt-BR').includes(term)),
   )
   return (
     <>
@@ -141,22 +165,31 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
             : 'Acompanhe cada etapa do serviço, do pedido à avaliação.'
         }
       />
-      <div className="tabs" role="group" aria-label="Filtrar contratações">
-        {[
-          ['all', 'Todas'],
-          ['EM_ANDAMENTO', 'Em andamento'],
-          ['CONCLUIDO', 'Concluídas'],
-        ].map(([v, label]) => (
-          <button
-            key={v}
-            aria-pressed={filter === v}
-            className={filter === v ? 'active' : ''}
-            onClick={() => setFilter(v)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      {!requests && (
+        <div className="tabs" role="group" aria-label="Filtrar contratações">
+          {contractFilters.map(([v, label, st]) => (
+            <button
+              key={v}
+              aria-pressed={filter === v}
+              className={filter === v ? 'active' : ''}
+              onClick={() => setFilter(v)}
+            >
+              {label} ({st ? mine.filter((c) => st.includes(c.status)).length : mine.length})
+            </button>
+          ))}
+        </div>
+      )}
+      {mine.length > 3 && (
+        <label className="search-input">
+          <span className="sr-only">Buscar contratação</span>
+          <input
+            aria-label="Buscar contratação"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Buscar por serviço ou pessoa"
+          />
+        </label>
+      )}
       {own.length ? (
         <div className="stack">
           {own.map((c) => (
@@ -167,6 +200,11 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
                   {user?.role === 'CLIENT' ? c.freelancerName : c.clientName} ·{' '}
                   {new Date(c.date + 'T12:00:00').toLocaleDateString('pt-BR')}
                 </p>
+                {contractDeadline(c) && (
+                  <small>
+                    {contractDeadline(c)!.text} {dateLabel(contractDeadline(c)!.at)}
+                  </small>
+                )}
               </div>
               <span
                 className={`badge ${c.status === 'CONCLUIDO' ? 'green' : c.status === 'EM_DISPUTA' ? 'red' : ''}`}
@@ -200,6 +238,7 @@ export function ContractDetail() {
   )
   if (!c)
     return <Empty title={syncing ? 'Carregando contratação…' : 'Contratação não encontrada'} />
+  const deadline = contractDeadline(c)
   async function action(status: Contract['status']) {
     setBusy(true)
     setError('')
@@ -235,6 +274,14 @@ export function ContractDetail() {
       <div className="detail-grid">
         <section className="panel">
           <span className="badge">{statusLabel[c.status]}</span>
+          {deadline && (
+            <p className="deadline" role="status">
+              <Clock size={18} aria-hidden />
+              <span>
+                {deadline.text} <strong>{dateLabel(deadline.at)}</strong>.
+              </span>
+            </p>
+          )}
           <h2>Escopo combinado</h2>
           <p>{c.description}</p>
           <dl className="details">
@@ -264,7 +311,7 @@ export function ContractDetail() {
           {c.rating && (
             <div className="notice">
               <p className="success">
-                Avaliação registrada: {c.rating} de 5. {c.review}
+                <Stars rating={c.rating} /> Avaliação registrada: {c.rating} de 5. {c.review}
               </p>
               {c.reviewReply ? (
                 <p>Resposta do profissional: {c.reviewReply}</p>
@@ -286,6 +333,12 @@ export function ContractDetail() {
           )}
         </section>
         <aside className="panel booking-panel">
+          {user?.role !== 'ADMIN' && (
+            <Link className="button secondary full" to={`/mensagens?contratacao=${c.id}`}>
+              <MessageSquare size={18} /> Conversar com{' '}
+              {user?.id === c.clientId ? c.freelancerName : c.clientName}
+            </Link>
+          )}
           <h2>Próximo passo</h2>
           {user?.role === 'FREELANCER' && c.status === 'PENDENTE' && (
             <>

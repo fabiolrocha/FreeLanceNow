@@ -31,7 +31,7 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 | Distribuição nominal proposta na organização inicial | Sem pessoas específicas por caso, área, arquivo ou revisão; antiga página de delegação substituída por guia de colaboração | Orientação do grupo em 21/10; ver `equipe.md` |
 | Usuário informou não haver repositório | Já existiam `.git`, `main` e remoto `fabiolrocha/FreeLanceNow` | Inspeção do workspace; histórico preservado |
 | Financeiro aparece como central no pitch/HTML e futuro em especificações | Telas financeiras simuladas agora; gateway, custódia e conciliação depois | Corte explícito da primeira entrega |
-| Java 21 / Boot 3 em planejamento antigo | Java 21 / Spring Boot 4.1.1 na base do repositório | `pom.xml` e decisão registrada em `decisoes.md` |
+| Java 21 / Boot 3 em planejamento antigo | Java 21 / Spring Boot 4.1.1; ADR05 registra a decisão histórica inicial de Java 21 | `api/pom.xml`, container e CI; `decisoes.md` preserva a proveniência do scaffold |
 | Prazos de 48h, 5 dias, 7 dias | API implementa jobs de 48h/5 dias e janela de avaliação de 7 dias | F01/F02/F03 e testes existentes; mock não equivale ao job agendado |
 | Fotos de pessoas nos materiais | Carômetro não vira imagem de usuários; marca SVG, iniciais e ícones disponíveis | Decisões de `imagens.md`; upload ainda pendente |
 

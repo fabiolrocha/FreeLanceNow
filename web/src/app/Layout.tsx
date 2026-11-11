@@ -17,6 +17,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { useApp } from './store'
+import { useUnreadCount } from './useUnread'
 import { isMock } from '../data/client'
 import { Avatar } from '../components/ui'
 import '../features/feed/feed.css'
@@ -41,6 +42,7 @@ export function Brand() {
 }
 export function Layout() {
   const { user, signOut, loading, error, refresh } = useApp(),
+    unread = useUnreadCount(),
     navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const social = !!user && user.role !== 'ADMIN'
@@ -88,7 +90,7 @@ export function Layout() {
       <div className="demo-banner">
         {isMock
           ? 'Demonstração acadêmica · dados fictícios · nenhum pagamento real'
-          : 'Ambiente acadêmico · cadastro, login, perfis, serviços e contratações conectados à API'}
+          : 'Ambiente acadêmico · contas, serviços, contratações, mensagens e avisos conectados à API'}
       </div>
       <header className={`topbar ${social ? 'social-header' : ''}`}>
         <Brand />
@@ -121,8 +123,23 @@ export function Layout() {
         <div className="top-actions">
           {user ? (
             <>
-              <Link className="icon-link" to="/notificacoes" aria-label="Notificações">
+              {social && (
+                <Link className="icon-link" to="/mensagens" aria-label="Mensagens">
+                  <MessageSquare size={20} />
+                </Link>
+              )}
+              <Link
+                className="icon-link"
+                to="/notificacoes"
+                aria-label={unread ? `Notificações: ${unread} não lidas` : 'Notificações'}
+                style={{ position: 'relative' }}
+              >
                 <Bell size={20} />
+                {unread > 0 && (
+                  <span className="badge-count" aria-hidden="true">
+                    {unread > 99 ? '99+' : unread}
+                  </span>
+                )}
               </Link>
               <span className="user-top">
                 <Avatar name={user.name} />

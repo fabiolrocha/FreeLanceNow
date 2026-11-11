@@ -10,6 +10,7 @@ import br.com.freelancenow.api.contracts.ContractEvent;
 import br.com.freelancenow.api.contracts.ContractEventRepository;
 import br.com.freelancenow.api.contracts.ContractRepository;
 import br.com.freelancenow.api.contracts.ContractStatus;
+import br.com.freelancenow.api.notifications.NotificationService;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
 
@@ -37,6 +38,7 @@ public class DemandService {
     private final ContractEventRepository contractEvents;
     private final CurrentUser current;
     private final Clock clock;
+    private final NotificationService notifications;
 
     public DemandService(
             DemandRepository demands,
@@ -45,7 +47,9 @@ public class DemandService {
             ContractRepository contracts,
             ContractEventRepository contractEvents,
             CurrentUser current,
-            Clock clock) {
+            Clock clock,
+            NotificationService notifications) {
+        this.notifications = notifications;
         this.demands = demands;
         this.proposals = proposals;
         this.categories = categories;
@@ -149,6 +153,12 @@ public class DemandService {
                     HttpStatus.CONFLICT, "Você já enviou uma proposta para esta demanda.");
         var now = Instant.now(clock);
         var saved = proposals.save(new Proposal(d, u, r.price(), r.days(), r.message(), now));
+        notifications.notify(
+                d.getClient(),
+                "PROPOSAL_RECEIVED",
+                "Nova proposta: " + d.getTitle(),
+                u.getName() + " enviou uma proposta para sua demanda.",
+                "/demandas/" + d.getId());
         return DemandDtos.ProposalView.from(saved);
     }
 
@@ -169,6 +179,12 @@ public class DemandService {
         for (var other : allProposals) {
             if (!other.getId().equals(p.getId()) && other.getStatus() == ProposalStatus.PENDING) {
                 other.reject(now);
+                notifications.notify(
+                        other.getFreelancer(),
+                        "PROPOSAL_REJECTED",
+                        "Proposta não selecionada: " + d.getTitle(),
+                        "O cliente escolheu outra proposta.",
+                        "/demandas/" + d.getId());
             }
         }
         d.close(now);
@@ -181,6 +197,12 @@ public class DemandService {
                 contractEvents.save(
                         new ContractEvent(
                                 contract, u, null, ContractStatus.ACEITO, note, now));
+        notifications.notify(
+                p.getFreelancer(),
+                "PROPOSAL_ACCEPTED",
+                "Proposta aceita: " + d.getTitle(),
+                "A contratação foi criada e já está aceita.",
+                "/contratacoes/" + contract.getId());
         return new DemandDtos.ProposalAcceptance(
                 DemandDtos.DemandView.from(d),
                 DemandDtos.ProposalView.from(p),
@@ -199,6 +221,12 @@ public class DemandService {
         if (d.getStatus() != DemandStatus.OPEN || p.getStatus() != ProposalStatus.PENDING)
             throw new ApiException(HttpStatus.CONFLICT, "Esta proposta não pode ser recusada.");
         p.reject(Instant.now(clock));
+        notifications.notify(
+                p.getFreelancer(),
+                "PROPOSAL_REJECTED",
+                "Proposta recusada: " + d.getTitle(),
+                "O cliente recusou sua proposta.",
+                "/demandas/" + d.getId());
         return DemandDtos.ProposalView.from(p);
     }
 

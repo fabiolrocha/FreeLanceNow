@@ -10,5 +10,6 @@ playwright-report/
 test-results/
 *.log
 .idea/
+.vscode/
 *.iml
 coverage/

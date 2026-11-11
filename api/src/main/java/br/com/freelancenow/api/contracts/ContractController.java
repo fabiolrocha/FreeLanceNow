@@ -15,9 +15,26 @@ import java.util.UUID;
 @RequestMapping("/api/v1/contracts")
 public class ContractController {
     private final ContractService contracts;
+    private final ContractMessageService messages;
 
-    public ContractController(ContractService contracts) {
+    public ContractController(ContractService contracts, ContractMessageService messages) {
         this.contracts = contracts;
+        this.messages = messages;
+    }
+
+    @GetMapping("/{id}/messages")
+    public List<ContractDtos.MessageView> messages(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
+        return messages.list(jwt, id);
+    }
+
+    @PostMapping("/{id}/messages")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ContractDtos.MessageView send(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id,
+            @Valid @RequestBody ContractDtos.SendMessage r) {
+        return messages.send(jwt, id, r);
     }
 
     @GetMapping

@@ -9,10 +9,12 @@ import {
   MapPin,
   ArrowRight,
   Wrench,
+  Star,
 } from 'lucide-react'
-import type { Service } from '../domain/types'
-import { initials, money } from '../domain/rules'
+import type { Review, Service } from '../domain/types'
+import { dateLabel, initials, money } from '../domain/rules'
 import { isMock } from '../data/client'
+import './extras.css'
 
 export function CategoryIcon({ slug, size = 24 }: { slug: string; size?: number }) {
   const Icon =
@@ -26,6 +28,43 @@ export function CategoryIcon({ slug, size = 24 }: { slug: string; size?: number 
       } as Record<string, typeof Zap>
     )[slug] || Wrench
   return <Icon size={size} aria-hidden="true" />
+}
+export function Stars({ rating }: { rating: number }) {
+  return (
+    <span className="stars" role="img" aria-label={`${rating} de 5 estrelas`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star key={n} size={14} className={n <= Math.round(rating) ? 'on' : ''} aria-hidden />
+      ))}
+    </span>
+  )
+}
+export function ReviewList({
+  reviews,
+  showService = true,
+}: {
+  reviews: Review[]
+  showService?: boolean
+}) {
+  if (!reviews.length) return <p>Ainda não há avaliações.</p>
+  return reviews.map((r) => (
+    <div className="review" key={r.id}>
+      <strong>
+        <Stars rating={r.rating} /> {r.rating} de 5 · {r.clientName}
+      </strong>
+      <p>{r.comment || 'Sem comentário.'}</p>
+      {r.reply && <p className="review-reply">Resposta do profissional: {r.reply}</p>}
+      <small>
+        {showService && `${r.serviceTitle} · `}
+        {r.createdAt && dateLabel(r.createdAt)}
+      </small>
+      <Link
+        className="subtle-link"
+        to={`/denunciar?type=REVIEW&id=${r.id}&alvo=${encodeURIComponent(r.serviceTitle)}`}
+      >
+        Denunciar avaliação
+      </Link>
+    </div>
+  ))
 }
 export function Avatar({ name, large = false }: { name: string; large?: boolean }) {
   return (

@@ -2,7 +2,7 @@
 
 Marketplace acadêmico de serviços gerais: clientes encontram profissionais e freelancers publicam seus serviços. Este monorepositório reúne o frontend **React web**, a API **Java / Spring Boot**, PostgreSQL e a documentação do Grupo 2.
 
-**Documentação revisada em 21/10/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). F04/F05 acrescentam administração e moderação persistentes. Comunicação, upload e financeiro continuam pendentes. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
+**Documentação revisada em 09/11/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). F04/F05 acrescentam administração e moderação persistentes. Avisos e chat por contratação já persistem (`F07` parcial, PR #45), assim como a migração de pagamentos (`V10`, PR #43) e a preparação de deploy (`F10` parcial, PR #44); e-mail, upload de imagens e fluxo financeiro em sandbox continuam pendentes. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
 
 **F11 — feed inicial e publicações** está integrada à `main`: após login, publicações profissionais, serviços e demandas aparecem em um feed cronológico com filtros e paginação. A [especificação aprovada](docs/superpowers/specs/2026-10-21-feed-inicial-design.md) registra o escopo, retomando o HTML de referência. F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40).
 
@@ -31,7 +31,7 @@ Altere `VITE_DATA_MODE=api` no `.env` da raiz e reconstrua o frontend:
 docker compose up -d --build web
 ```
 
-No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias), avaliações com nota média e resposta do profissional e publicação de demandas com propostas e aceite gerando contratação (`F01`, `F02`, `F03`, `F08`)** passam pelo Spring Boot e persistem no PostgreSQL. Gestão de usuários/categorias, denúncias de anúncios/avaliações, decisões de moderação, métricas e auditoria também estão integradas (`F04`/`F05`). Comunicação e financeiro continuam simulados; upload permanece pendente. Não há fallback silencioso para mocks quando a API falha.
+No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias), avaliações com nota média e resposta do profissional e publicação de demandas com propostas e aceite gerando contratação (`F01`, `F02`, `F03`, `F08`)** passam pelo Spring Boot e persistem no PostgreSQL. Gestão de usuários/categorias, denúncias de anúncios/avaliações, decisões de moderação, métricas e auditoria também estão integradas (`F04`/`F05`). Avisos internos (com contador de não lidos) e o chat entre cliente e freelancer de cada contratação também persistem. E-mail e financeiro continuam simulados; upload permanece pendente. Não há fallback silencioso para mocks quando a API falha.
 
 Crie uma conta pela interface, ou entre com `marcos@demo.freelancenow.test` / `Demo12345` para explorar um freelancer fictício sem criar conta. O seed está restrito ao perfil `dev` com `SEED_DEMO=true`. A API impede cadastro público de administradores. Para criar o primeiro ADMIN real, configure no `.env` ignorado `ADMIN_BOOTSTRAP_ENABLED=true`, `ADMIN_BOOTSTRAP_EMAIL` e `ADMIN_BOOTSTRAP_PASSWORD` (mínimo 8 caracteres com letras/números, máximo 72 bytes), então reconstrua/recrie `api`. Não há credenciais padrão. Depois da criação, desabilite o bootstrap e recrie a API. Reiniciar não redefine senha nem promove uma conta comum existente. Veja [desenvolvimento](docs/desenvolvimento.md).
 
@@ -93,6 +93,7 @@ Comece por estes documentos:
 - [Arquitetura](docs/arquitetura.md), [contrato da API](docs/api.md) e [modelo de dados](docs/dados.md).
 - [Marca e imagens](docs/imagens.md), [rotas e estado das telas](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
 - [Índice completo](docs/README.md) e [fluxo de contribuição](CONTRIBUTING.md).
+- [Preparação para deploy com Vercel, Neon e Stripe](docs/deploy.md).
 
 A equipe organiza contribuições por entrega, sem designar pessoas ou revisores fixos para cada caso. O índice das docs identifica os guias atuais e as fontes históricas.
 
