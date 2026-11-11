@@ -1,0 +1,8 @@
+CREATE TABLE payments (
+    id BIGSERIAL PRIMARY KEY,
+    contract_id BIGINT NOT NULL,
+    amount DECIMAL(10, 2) NOT NULL,
+    status VARCHAR(50) DEFAULT 'PENDING',
+    payment_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
