@@ -413,6 +413,14 @@ class AdminIntegrationTests {
                 "/contracts/" + cid + "/status",
                 Map.of("status", "EM_DISPUTA", "comment", "Evidência textual da contestação"),
                 client);
+        expect(
+                400,
+                () ->
+                        call(
+                                HttpMethod.PATCH,
+                                "/contracts/" + cid + "/status",
+                                Map.of("status", "CONCLUIDO"),
+                                admin));
         call(
                 HttpMethod.PATCH,
                 "/contracts/" + cid + "/status",
