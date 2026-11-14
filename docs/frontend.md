@@ -28,10 +28,12 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Profissionais/perfil | `/profissionais`, `/profissionais/:id` | Público | Mock ou API (média com 1 decimal e avaliações reais) |
 | Entrada/cadastro | `/login`, `/cadastro` | Público | Auth mock/API |
 | Recuperação de acesso | `/recuperar-senha`, `/redefinir-senha?token=` | Público | API: pede o link por e-mail e define nova senha; mock apenas registra o pedido |
-| Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API |
+| Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API. Edição traz foto (só API), área de atendimento (freelancer), troca de senha e exclusão de conta com senha |
+| Minhas denúncias | `/denuncias` | Autenticado | Mock ou API: estado da análise e nota da moderação |
 | Feed | `/inicio` | Autenticado | Mock ou API: publicações, serviços e demandas autorizadas, filtros e paginação |
-| Dashboard de gestão | `/painel` | Freelancer | Mock ou API: catálogo e métricas de contratação reais |
-| Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API |
+| Dashboard de gestão | `/painel` | Freelancer | Mock ou API: métricas reais, propostas pendentes e demandas abertas compatíveis (categorias dos anúncios e cidade primeiro) |
+| Minhas propostas | `/propostas` | Freelancer | Mock ou API: filtro por situação, retirada de pendentes e link para a contratação gerada |
+| Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API; rascunho ou inativo nunca contratado pode ser excluído |
 | Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
 | Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
 | Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Participantes | Mock ou API (`F01`) |
@@ -39,7 +41,8 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
 | Disputa | `/contratacoes/:id/disputa` | Participantes | Motivo, quem abriu e decisão da administração lidos do histórico; sem disputa, a tela informa isso |
 | Cancelar contratação | `/contratacoes/:id/cancelar` | Participantes | Contratação aceita, antes de iniciar; motivo obrigatório |
-| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`) |
+| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`): filtros por categoria e cidade, "Mostrar mais", marcação de demanda já respondida |
+| Editar/aceitar | `/demandas/:id/editar`, `/demandas/:id/propostas/:pid/aceitar` | Cliente dono | Edição só sem propostas; cancelamento no detalhe; aceite escolhe data e endereço da contratação |
 | Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Autenticado; chat só entre participantes | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
 | Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
 | Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Simulação financeira (`F09` pendente) |

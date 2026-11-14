@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **09/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql` e `V11__service_images.sql`.
+Revisado em **09/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql` e `V12__profiles_and_demand_management.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V11, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V12, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -150,6 +150,18 @@ Não há entrega por e-mail nem tempo real: a interface consulta o contador a ca
 | `service_image` | UUID; anúncio FK com `ON DELETE CASCADE`; `content_type` (`image/jpeg`, `image/png`) detectado pela assinatura; `size_bytes` de 1 a 5 242 880; conteúdo `bytea`; criação. Ordem de exibição = criação; a primeira é a capa. O limite de 5 por anúncio é verificado na transação com lock do anúncio |
 
 As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do restante dos dados. As listagens leem só os metadados; o conteúdo é carregado apenas no GET da imagem.
+
+## Perfis, fotos e gestão de demandas (V12)
+
+| Tabela/coluna | Persistência e invariantes |
+|---|---|
+| `app_user.service_area` | Área de atendimento do freelancer, até 150 caracteres, vazia por padrão |
+| `app_user.avatar_updated_at` | Muda a cada troca de foto; vira `avatarVersion` (epoch ms) para invalidar o cache do navegador |
+| `app_user.deleted_at` | Preenchida na exclusão pelo titular (ADR24); conta anonimizada e inativa, sem reativação pelo admin |
+| `user_avatar` | Uma foto por usuário (PK = FK com `ON DELETE CASCADE`); `content_type` JPG/PNG detectado pela assinatura; até 2 097 152 bytes; `bytea`, como as fotos de anúncio (ADR21) |
+| `demand.status` | Aceita `CANCELLED`, além de `OPEN` e `CLOSED` |
+| `proposal.status` | Aceita `WITHDRAWN` (retirada pelo autor) |
+| `feed_post.service_id` | FK passa a `ON DELETE SET NULL`: excluir um rascunho não apaga publicações que o citavam |
 
 ## Pagamentos e livro financeiro (V10)
 
