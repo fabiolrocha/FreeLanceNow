@@ -73,6 +73,7 @@ public class SecurityConfig {
                                                 "/api/v1/services",
                                                 "/api/v1/services/*",
                                                 "/api/v1/services/*/reviews",
+                                                "/api/v1/services/*/images/*",
                                                 "/api/v1/freelancers",
                                                 "/api/v1/freelancers/*",
                                                 "/api/v1/freelancers/*/reviews")
@@ -111,7 +112,7 @@ public class SecurityConfig {
     CorsConfigurationSource cors(@Value("${app.cors-origins}") String origins) {
         var config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(origins.split(",")));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

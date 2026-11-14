@@ -85,6 +85,17 @@ export function validPassword(password: string) {
     new TextEncoder().encode(password).length <= 72
   )
 }
+export const MAX_SERVICE_IMAGES = 5
+export const MAX_IMAGE_BYTES = 5 * 1024 * 1024
+/** Client-side mirror of RN08; the API re-checks the file signature and size. */
+export function imageSelectionError(files: { type: string; size: number }[], current = 0) {
+  if (current + files.length > MAX_SERVICE_IMAGES)
+    return `Cada anúncio pode ter no máximo ${MAX_SERVICE_IMAGES} imagens.`
+  if (files.some((f) => f.type !== 'image/jpeg' && f.type !== 'image/png'))
+    return 'Envie apenas imagens JPG ou PNG.'
+  if (files.some((f) => f.size > MAX_IMAGE_BYTES)) return 'Cada imagem pode ter no máximo 5 MB.'
+  return ''
+}
 export function today() {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: 'America/Sao_Paulo',

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { canReview, canTransition, contractDeadline, validPassword } from './rules'
+import {
+  canReview,
+  canTransition,
+  contractDeadline,
+  imageSelectionError,
+  MAX_IMAGE_BYTES,
+  validPassword,
+} from './rules'
 describe('Prazos exibidos na contratação (F02/F03)', () => {
   const at = '2026-11-01T12:00:00.000Z'
   it('segue os jobs de 48h, 5 dias e a janela de 7 dias da avaliação', () => {
@@ -53,5 +60,16 @@ describe('Senha de cadastro (UC01)', () => {
     expect(validPassword('abc123')).toBe(false)
     expect(validPassword('á'.repeat(36) + '1')).toBe(false)
     expect(validPassword('a'.repeat(71) + '1')).toBe(true)
+  })
+})
+describe('Fotos do anúncio (F06 / RN08)', () => {
+  const png = { type: 'image/png', size: 1000 }
+  it('aceita até 5 imagens JPG/PNG de até 5 MB', () => {
+    expect(imageSelectionError([png, { type: 'image/jpeg', size: MAX_IMAGE_BYTES }], 3)).toBe('')
+  })
+  it('bloqueia excesso, formato e tamanho', () => {
+    expect(imageSelectionError([png, png], 4)).toMatch(/no máximo 5 imagens/)
+    expect(imageSelectionError([{ type: 'image/gif', size: 10 }])).toMatch(/JPG ou PNG/)
+    expect(imageSelectionError([{ type: 'image/png', size: MAX_IMAGE_BYTES + 1 }])).toMatch(/5 MB/)
   })
 })

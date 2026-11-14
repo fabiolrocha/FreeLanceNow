@@ -3,9 +3,10 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { useApp } from '../../app/store'
-import { client } from '../../data/client'
+import { client, isMock, serviceImageUrl } from '../../data/client'
 import { CategoryIcon, Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
-import type { Service, ServiceStatus } from '../../domain/types'
+import type { Service, ServiceImage, ServiceStatus } from '../../domain/types'
+import { ServiceImagesField } from './ServiceImagesField'
 import { money } from '../../domain/rules'
 
 const labels = { ACTIVE: 'Ativo', DRAFT: 'Rascunho', INACTIVE: 'Desativado' }
@@ -54,7 +55,11 @@ export function MyServices() {
           {items.map((s) => (
             <article className="panel professional-row" key={s.id}>
               <span className="category-thumb">
-                <CategoryIcon slug={s.category.slug} size={30} />
+                {s.images?.[0] ? (
+                  <img src={serviceImageUrl(s.id, s.images[0].id)} alt="" />
+                ) : (
+                  <CategoryIcon slug={s.category.slug} size={30} />
+                )}
               </span>
               <div>
                 <h2>{s.title}</h2>
@@ -100,7 +105,12 @@ export function ServiceForm() {
   const [existing, setExisting] = useState<Service | null>(null),
     [loading, setLoading] = useState(!!id),
     [error, setError] = useState(''),
-    [busy, setBusy] = useState(false)
+    [busy, setBusy] = useState(false),
+    [saved, setSaved] = useState<ServiceImage[]>([]),
+    [pending, setPending] = useState<File[]>([]),
+    // Set when a new listing was saved but its photos failed, so a retry updates it.
+    [createdId, setCreatedId] = useState('')
+  const targetId = id || createdId || undefined
   useEffect(() => {
     if (id && user)
       void client
@@ -109,6 +119,7 @@ export function ServiceForm() {
           const s = ss.find((x) => x.id === id)
           if (!s) setError('Serviço não encontrado na sua conta.')
           setExisting(s || null)
+          setSaved(s?.images || [])
         })
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false))
@@ -121,7 +132,7 @@ export function ServiceForm() {
     setBusy(true)
     setError('')
     try {
-      await client.saveService(
+      const service = await client.saveService(
         user,
         {
           title: String(d.get('title')),
@@ -131,11 +142,41 @@ export function ServiceForm() {
           deliveryDays: Number(d.get('deliveryDays')),
           status,
         },
-        id,
+        targetId,
       )
+      if (pending.length) {
+        try {
+          const withImages = await client.uploadServiceImages(service.id, pending)
+          setSaved(withImages.images || [])
+          setPending([])
+        } catch (uploadError) {
+          setCreatedId(service.id)
+          setSaved(service.images || [])
+          await refresh()
+          setError(
+            `O anúncio foi salvo, mas as fotos não foram enviadas: ${(uploadError as Error).message}`,
+          )
+          return
+        }
+      }
       await refresh()
       notify(status === 'ACTIVE' ? 'Serviço publicado.' : 'Rascunho salvo.')
       navigate('/meus-servicos')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  async function removeSaved(image: ServiceImage) {
+    if (!targetId) return
+    setBusy(true)
+    setError('')
+    try {
+      const changed = await client.deleteServiceImage(targetId, image.id)
+      setSaved(changed.images || [])
+      await refresh()
+      notify('Foto removida.')
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -208,9 +249,21 @@ export function ServiceForm() {
               defaultValue={existing?.deliveryDays || 1}
             />
           </div>
-          <p className="notice">
-            Fotos ainda estão em definição. Esta versão usa ícones por categoria.
-          </p>
+          {isMock ? (
+            <p className="notice">
+              No modo demonstração os anúncios usam ícones por categoria. O envio de fotos funciona
+              com a API.
+            </p>
+          ) : (
+            <ServiceImagesField
+              serviceId={targetId}
+              saved={saved}
+              pending={pending}
+              onPendingChange={setPending}
+              onRemoveSaved={(img) => void removeSaved(img)}
+              busy={busy}
+            />
+          )}
           <div className="row">
             <Link className="button secondary" to="/meus-servicos">
               Cancelar

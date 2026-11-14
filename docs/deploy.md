@@ -48,7 +48,7 @@ O perfil Spring `prod` usa variáveis obrigatórias para conectar ao banco:
 
 Obtenha host, database, role e senha no painel Neon e monte a JDBC URL a partir do endpoint mostrado. O perfil `prod` força `sslmode=verify-full` no driver PostgreSQL: a conexão exige TLS e verifica certificado e hostname. Isso é mais estrito que apenas criptografar o tráfego. A aplicação local continua usando a URL local definida em `application.yml`.
 
-Flyway permanece habilitado e executa V1–V10 na inicialização. Hibernate continua com `ddl-auto: validate`: depois das migrações, confere se o mapeamento Java corresponde ao schema, sem criar nem atualizar tabelas. Use primeiro uma branch/banco vazio de teste; não aponte a API para um banco com dados importantes durante a validação inicial. O papel configurado precisa ter permissões para as migrações e para as operações normais da API.
+Flyway permanece habilitado e executa V1–V11 na inicialização. Hibernate continua com `ddl-auto: validate`: depois das migrações, confere se o mapeamento Java corresponde ao schema, sem criar nem atualizar tabelas. Use primeiro uma branch/banco vazio de teste; não aponte a API para um banco com dados importantes durante a validação inicial. O papel configurado precisa ter permissões para as migrações e para as operações normais da API.
 
 O datasource Spring é compartilhado pelo Hibernate e Flyway, então ambos recebem as mesmas opções TLS e credenciais. Prefira inicialmente o endpoint direto do Neon; antes de usar o endpoint pooled, valide a inicialização concorrente de múltiplas instâncias e as necessidades de lock do Flyway. Ajuste limites do pool de conexões somente após escolher a hospedagem e conhecer os limites do compute Neon.
 

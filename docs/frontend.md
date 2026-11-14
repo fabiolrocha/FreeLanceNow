@@ -91,6 +91,6 @@ Preservar o verde, Public Sans, cards e ícones de serviço do HTML original. He
 
 Inputs têm rótulo, formulários validação básica, feedback com `role=alert/status`, controles com foco visível, link para pular conteúdo, idioma `pt-BR` e respeito a movimento reduzido. Layouts usam grid adaptativo, tabelas com rolagem interna e breakpoint 760 px. Não declarar conformidade WCAG completa sem auditoria própria.
 
-A identidade oficial foi consolidada em `web/public/images/logo.svg` e `web/public/favicon.svg`. O upload de fotos reais de serviço será integrado no card `F06`. Ver [imagens.md](imagens.md).
+A identidade oficial foi consolidada em `web/public/images/logo.svg` e `web/public/favicon.svg`. No modo API, o formulário de serviço envia até 5 fotos JPG/PNG (prévia local, validação de tipo/tamanho/quantidade e remoção); a primeira vira capa no card e a galeria aparece no detalhe. No modo mock, o envio fica desativado e o ícone da categoria continua. Ver [imagens.md](imagens.md).
 
 No painel do freelancer, anúncios removidos pela moderação exibem esse estado e não oferecem edição/republicação. Relatórios administrativos exportam dados reais filtrados; a auditoria mostra até 200 eventos recentes sem filtro de período. Filtros de período dos totais usam a data de criação dos registros, não a data de cada transição.

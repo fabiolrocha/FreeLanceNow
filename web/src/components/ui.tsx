@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import type { Review, Service } from '../domain/types'
 import { dateLabel, initials, money } from '../domain/rules'
-import { isMock } from '../data/client'
+import { isMock, serviceImageUrl } from '../data/client'
 import './extras.css'
 
 export function CategoryIcon({ slug, size = 24 }: { slug: string; size?: number }) {
@@ -135,8 +135,18 @@ export function ServiceCard({ service: s }: { service: Service }) {
   return (
     <article className="service-card">
       <div className={`service-visual ${s.category.slug}`}>
-        <CategoryIcon slug={s.category.slug} size={48} />
-        <span>{s.category.name}</span>
+        {s.images?.[0] ? (
+          <img
+            src={serviceImageUrl(s.id, s.images[0].id)}
+            alt={`Foto de ${s.title}`}
+            loading="lazy"
+          />
+        ) : (
+          <>
+            <CategoryIcon slug={s.category.slug} size={48} />
+            <span>{s.category.name}</span>
+          </>
+        )}
       </div>
       <div className="service-body">
         <small className="category-text">{s.category.name}</small>

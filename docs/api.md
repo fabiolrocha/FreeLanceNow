@@ -103,7 +103,7 @@ Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não
 }
 ```
 
-Resposta inclui `id`, `moderated` (booleano), campos do anúncio, `category: {id,name,slug}` e `freelancer: {id,name,role,city,bio,averageRating,reviewCount}`. O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
+Resposta inclui `id`, `moderated` (booleano), campos do anúncio, `category: {id,name,slug}`, `freelancer: {id,name,role,city,bio,averageRating,reviewCount}` e `images: [{id,contentType}]` (ordem de envio; a primeira é a capa). O PATCH recebe `{"status":"INACTIVE"}`. O PUT envia o formulário completo; rascunhos também precisam de conteúdo válido nesta base.
 
 Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `city` (cidade exata sem diferenciar maiúsculas, máx 100), `minPrice`, `maxPrice`, `minRating` (1–5), `page` (>=0), `size` (1–50, padrão 12). Ordenação por criação decrescente. Faixa invertida retorna 400. Pesquisa textual escapa caracteres especiais de LIKE.
 
@@ -112,6 +112,18 @@ Parâmetros de GET `/services`: `q` (texto, máx 100), `categoryId` (UUID), `cit
 ```
 
 O React atual carrega páginas de 50 para compor o catálogo da entrega e filtra localmente (incluindo nota mínima e ordenação por melhor avaliação); paginação server-side na interface é tarefa futura (`F06`).
+
+### Fotos do anúncio (F06 / RN08)
+
+| Método | Rota | Acesso | Resultado |
+|---|---|---|---|
+| POST | `/services/{id}/images` | FREELANCER dono | `multipart/form-data` com uma ou mais partes `files`; 201 com o `ServiceView` atualizado |
+| DELETE | `/services/{id}/images/{imageId}` | FREELANCER dono | 200 com o `ServiceView` atualizado |
+| GET | `/services/{id}/images/{imageId}` | Público | Bytes da imagem com `Content-Type` detectado, `Cache-Control: public, max-age=604800` e `X-Content-Type-Options: nosniff` |
+
+Regras: no máximo 5 imagens por anúncio somando as já salvas (409 ao exceder); cada arquivo com até 5 MB (413) e envio total até 25 MB; somente JPG/PNG, identificados pela assinatura do arquivo e não pelo nome ou `Content-Type` informado (415); o cabeçalho precisa ser legível e as dimensões não passam de 8000 px (415/400). Um envio é atômico: se um arquivo falha, nenhum é gravado. Outro freelancer recebe 403, CLIENT/ADMIN recebem 403 e sem token 401. Anúncio removido pela moderação não aceita alterações (409) e suas imagens deixam de ser servidas (404), assim como as de contas suspensas.
+
+O GET é público porque `<img>` não envia o token; o identificador da imagem é um UUID aleatório e só é exposto nas respostas do anúncio. Imagens de rascunhos ficam acessíveis a quem tiver o link, para o dono conferir a capa antes de publicar.
 
 ## Contratações e prazos (F01/F02)
 

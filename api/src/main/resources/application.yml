@@ -11,8 +11,14 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 26MB
 server:
   port: ${PORT:8081}
+  tomcat:
+    max-swallow-size: 30MB
   error:
     include-message: never
     include-stacktrace: never
