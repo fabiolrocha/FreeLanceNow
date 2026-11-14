@@ -62,6 +62,7 @@ O administrador do mock é diferente do administrador da API. As contas mock fic
 ## Trocar de perfil e preservar os acessos
 
 - Use **Sair da conta** e entre com o outro e-mail. No celular, a saída fica no menu da conta.
-- A sessão da API dura 15 minutos. Se expirar, entre novamente.
+- A sessão da API se renova sozinha por até 30 dias. Com **Manter conectado neste dispositivo** marcado, ela sobrevive ao fechamento do navegador; desmarcado, termina com a aba.
+- **Esqueci minha senha** funciona no modo API. Sem `RESEND_API_KEY`, a API não envia e-mail: o link de redefinição aparece no log (`docker compose logs api`).
 - Reiniciar os containers preserva o banco local; remover o volume do PostgreSQL apaga as contas e os demais dados persistidos.
 - Se um login falhar, confira primeiro se está usando API ou mock. No modo API, confirme que banco/API estão ligados e que a conta não foi suspensa.

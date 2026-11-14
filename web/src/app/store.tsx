@@ -20,7 +20,8 @@ import {
   demands as initialDemands,
   proposals as initialProposals,
 } from '../data/fixtures'
-import { client, isMock, setToken } from '../data/client'
+import { client, isMock, onSessionChange, renewSession, setToken } from '../data/client'
+import { clearSession, loadSession, saveSession, timed, usable } from '../data/session'
 import { canReview, canTransition, futureDate, nowIso, today } from '../domain/rules'
 
 function saved<T>(key: string, fallback: T) {
@@ -29,6 +30,13 @@ function saved<T>(key: string, fallback: T) {
   } catch {
     return fallback
   }
+}
+/** Private data is dropped, not reported as an error, when the session ends mid-request. */
+function whileSignedIn<T>(request: Promise<T>): Promise<T | null> {
+  return request.catch((e: unknown) => {
+    if (!loadSession()) return null
+    throw e
+  })
 }
 interface Store {
   user: User | null
@@ -40,8 +48,10 @@ interface Store {
   contracts: Contract[]
   demands: Demand[]
   proposals: Proposal[]
-  signIn: (s: Session) => void
+  signIn: (s: Session, remember?: boolean) => void
   signOut: () => void
+  /** True after the user chose to leave; false when the session expired on its own. */
+  signedOut: boolean
   refresh: () => Promise<void>
   updateUser: (u: User) => void
   setDemands: (fn: (d: Demand[]) => Demand[]) => void
@@ -73,10 +83,15 @@ function mockRating(contracts: Contract[], freelancerId: string) {
 const Context = createContext<Store | null>(null)
 export function Provider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(() => {
-    const s = saved<Session | null>('fln-session', null)
-    const valid = s?.expiresAt && s.expiresAt > Date.now() ? s : null
-    setToken(valid?.accessToken || '')
-    return valid
+    const s = loadSession()
+    if (!usable(s)) {
+      clearSession()
+      setToken('')
+      return null
+    }
+    // An expired access token is renewed by the timer effect below before any request needs it.
+    setToken((s.expiresAt || 0) > Date.now() ? s.accessToken : '')
+    return s
   })
   const [services, setServices] = useState<Service[]>([]),
     [categories, setCategories] = useState<Category[]>([]),
@@ -90,6 +105,7 @@ export function Provider({ children }: { children: ReactNode }) {
   const [proposals, setProposals] = useState<Proposal[]>(() =>
     isMock ? saved('fln-proposals', initialProposals) : saved('fln-api-proposals', []),
   )
+  const [signedOut, setSignedOut] = useState(false)
   const [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [toast, notify] = useState('')
@@ -99,14 +115,14 @@ export function Provider({ children }: { children: ReactNode }) {
     setError('')
     if (!loaded.current) setLoading(true)
     try {
-      const hasToken = !isMock && !!saved<Session | null>('fln-session', null)?.accessToken
+      const hasToken = !isMock && !!loadSession()?.accessToken
       const [s, c, p, ct, dm, pr] = await Promise.all([
         client.services(),
         client.categories(),
         client.professionals(),
-        hasToken ? client.contracts() : Promise.resolve(null),
-        hasToken ? client.demands() : Promise.resolve(null),
-        hasToken ? client.proposals() : Promise.resolve(null),
+        hasToken ? whileSignedIn(client.contracts()) : Promise.resolve(null),
+        hasToken ? whileSignedIn(client.demands()) : Promise.resolve(null),
+        hasToken ? whileSignedIn(client.proposals()) : Promise.resolve(null),
       ])
       setServices(s)
       setCategories(c)
@@ -128,15 +144,28 @@ export function Provider({ children }: { children: ReactNode }) {
     // oxlint-disable-next-line react/set-state-in-effect
     void refresh()
   }, [])
+  function expire() {
+    clearSession()
+    setToken('')
+    setSession(null)
+    notify('Sua sessão terminou. Entre novamente.')
+  }
+  useEffect(
+    () =>
+      // The API client renews tokens on 401 responses; keep React state in step with it.
+      onSessionChange((next) => {
+        if (next) setSession(next)
+        else expire()
+      }),
+    [],
+  )
+  const userId = session?.user.id
   useEffect(() => {
-    if (!session) return
+    const current = loadSession()
+    if (!userId || !current) return
     let active = true
-    void client.me(session.user).catch(() => {
-      if (active) {
-        setSession(null)
-        setToken('')
-        sessionStorage.removeItem('fln-session')
-      }
+    void client.me(current.user).catch(() => {
+      if (active && !loadSession()) setSession(null)
     })
     if (!isMock) {
       void Promise.all([client.contracts(), client.demands(), client.proposals()])
@@ -149,20 +178,25 @@ export function Provider({ children }: { children: ReactNode }) {
         })
         .catch(() => {})
     }
-    const timer = setTimeout(
-      () => {
-        setSession(null)
-        setToken('')
-        sessionStorage.removeItem('fln-session')
-        notify('Sua sessão terminou. Entre novamente.')
-      },
-      Math.max(0, (session.expiresAt || 0) - Date.now()),
-    )
     return () => {
       active = false
-      clearTimeout(timer)
     }
-  }, [session])
+  }, [userId])
+  const expiresAt = session?.expiresAt,
+    canRenew = !!session?.refreshToken
+  useEffect(() => {
+    if (!expiresAt) return
+    // Renew a minute before the access token expires; without a refresh token (mock mode or an
+    // old session) the user is signed out when it expires.
+    const timer = setTimeout(
+      () => {
+        if (canRenew) void renewSession()
+        else expire()
+      },
+      Math.max(0, expiresAt - Date.now() - (canRenew ? 60000 : 0)),
+    )
+    return () => clearTimeout(timer)
+  }, [expiresAt, canRenew])
   useEffect(() => {
     sessionStorage.setItem(
       isMock ? 'fln-contracts' : 'fln-api-contracts',
@@ -183,11 +217,14 @@ export function Provider({ children }: { children: ReactNode }) {
     const t = setTimeout(() => notify(''), 4500)
     return () => clearTimeout(t)
   }, [toast])
-  function signIn(s: Session) {
-    const timed = { ...s, expiresAt: s.expiresAt || Date.now() + s.expiresIn * 1000 }
-    setToken(timed.accessToken)
-    setSession(timed)
-    sessionStorage.setItem('fln-session', JSON.stringify(timed))
+  function signIn(s: Session, remember?: boolean) {
+    const next = s.expiresAt
+      ? { ...s, remember: remember ?? s.remember }
+      : timed({ ...s, remember }, session)
+    setToken(next.accessToken)
+    setSession(next)
+    setSignedOut(false)
+    saveSession(next)
   }
   async function reloadContracts() {
     if (isMock || !session) return
@@ -455,10 +492,12 @@ export function Provider({ children }: { children: ReactNode }) {
         demands,
         proposals,
         signIn,
+        signedOut,
         signOut: () => {
+          setSignedOut(true)
           setSession(null)
           setToken('')
-          sessionStorage.removeItem('fln-session')
+          clearSession()
           if (!isMock) {
             setContracts([])
             setDemands([])

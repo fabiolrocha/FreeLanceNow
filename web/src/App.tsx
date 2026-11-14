@@ -25,7 +25,8 @@ const auth = () => import('./features/auth/pages'),
   admin = () => import('./features/admin/pages')
 const Login = feature(auth, 'Login'),
   Signup = feature(auth, 'Signup'),
-  Recovery = feature(auth, 'Recovery')
+  Recovery = feature(auth, 'Recovery'),
+  ResetPassword = feature(auth, 'ResetPassword')
 const Landing = feature(catalog, 'Landing'),
   Search = feature(catalog, 'SearchServices'),
   Detail = feature(catalog, 'ServiceDetail'),
@@ -61,8 +62,15 @@ const Users = feature(admin, 'AdminUsers'),
   Reports = feature(admin, 'AdminReports'),
   Transactions = feature(admin, 'AdminTransactions')
 function Guard({ roles }: { roles?: Role[] }) {
-  const { user } = useApp()
-  if (!user) return <Navigate to="/login" replace />
+  const { user, signedOut } = useApp(),
+    { pathname, search } = useLocation()
+  // After an expired session the user returns to the same page; after "Sair" nobody should.
+  if (!user)
+    return signedOut ? (
+      <Navigate to="/" replace />
+    ) : (
+      <Navigate to="/login" replace state={{ from: pathname + search }} />
+    )
   return roles && !roles.includes(user.role) ? (
     <section className="panel">
       <h1>Acesso restrito</h1>
@@ -99,6 +107,7 @@ export default function App() {
               <Route path="login" element={<Login />} />
               <Route path="cadastro" element={<Signup />} />
               <Route path="recuperar-senha" element={<Recovery />} />
+              <Route path="redefinir-senha" element={<ResetPassword />} />
               <Route path="servicos" element={<Search />} />
               <Route path="servicos/:id" element={<Detail />} />
               <Route path="profissionais" element={<Professionals />} />

@@ -52,13 +52,15 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | CONTRACT_DEADLINE_CHECK_MS | API | Intervalo do job de prazos, lido em `app.contracts.deadline-check-ms` (padrão `60000` ms) |
 | STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API (reservadas) | Propriedades declaradas; checkout/webhooks ainda não implementados (`F09`) |
 | PLATFORM_FEE_PERCENT | API (reservada) | Propriedade de comissão planejada, padrão `10`; não aplicada a pagamentos atuais |
-| RESEND_API_KEY / RESEND_FROM_EMAIL | API (reservadas) | Propriedades declaradas; envio ainda não implementado (`F07`) |
+| RESEND_API_KEY / RESEND_FROM_EMAIL | API/Compose | Envio de e-mail (recuperação de senha) pela API HTTP do Resend; sem chave real, o perfil dev registra o e-mail no log |
+| PUBLIC_APP_URL | API/Compose | URL pública do frontend usada nos links de e-mail; Compose usa `http://127.0.0.1:${WEB_PORT}` |
+| JWT_REFRESH_TTL_SECONDS | API | Validade do refresh token, padrão `2592000` (30 dias) |
 | VITE_DATA_MODE | Web build/dev | `mock` ou `api` |
 | VITE_API_BASE_URL | Web build/dev | Padrão `/api/v1`; somente valor público |
 | API_PROXY_TARGET | Vite | Destino de `/api` e `/actuator` em dev |
 | E2E_DATA_MODE | Testes web | `api` seleciona teste com backend real |
 
-A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e as credenciais Stripe/Resend, CORS e intervalo do job não são repassadas por ele atualmente. Uma futura implantação precisa configurar esse repasse e validar as integrações.
+A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e as credenciais Stripe, CORS e intervalo do job não são repassadas por ele atualmente. `RESEND_API_KEY`, `RESEND_FROM_EMAIL` e `PUBLIC_APP_URL` são repassadas. Uma futura implantação precisa configurar esse repasse e validar as integrações.
 
 As credenciais de exemplo são públicas e locais. `.env`/`.env.local` são ignorados por Git. Não usar `VITE_*` para segredos.
 
@@ -83,7 +85,7 @@ O repositório já tem histórico e remoto. Atualize `main` com `git pull --ff-o
 | `/inicio` abre o painel antigo em vez do feed | Imagem `web` anterior a F11 ou checkout desatualizado. Atualize a `main` com `git pull --ff-only origin main`, execute `docker compose up -d --build` e recarregue a página. O Nginx envia `Cache-Control: no-cache` no `index.html`; páginas guardadas de imagens anteriores a essa configuração podem exigir uma recarga forçada uma única vez |
 | API indisponível | `docker compose logs api db`; confira health, JWT_SECRET e DB_URL |
 | PostgreSQL rejeita senha após mudar `.env` | Volume existente conserva credenciais originais; alinhe a configuração ou crie outro ambiente/banco |
-| Token expirou | Faça login novamente; expiração 15 min e sem refresh |
+| Sessão terminou | O access token (15 min) se renova com o refresh token (30 dias). Se a senha foi trocada ou o refresh expirou, entre novamente |
 | Fixtures ficaram alteradas | Limpe `sessionStorage` da aba para reiniciar somente os dados mock |
 | Java local não funciona | Use Compose; ou configure JDK 21 e execute `./mvnw -v` |
 

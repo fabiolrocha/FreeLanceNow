@@ -10,13 +10,13 @@ Decisões iniciais registradas em 30/09/2026; revisão em **14/11/2026**. A tabe
 | ADR04 | Uma aplicação React com administração por perfil, mock/API | F04/F05 usam as mesmas rotas; não criar um frontend administrativo separado |
 | ADR05 | Java 21, Maven Wrapper e Spring Boot 4.1.1 via Initializr | Usar documentação de Boot 4; material antigo Boot 3 fica como histórico |
 | ADR06 | PostgreSQL 15 acompanha especificação existente | Flyway e teste real de banco; futuras atualizações precisam de validação |
-| ADR07 | JWT HS256 com validade de 15 min, bcrypt, perfis públicos sem contato | Autenticação local funcional; sem refresh, 2FA ou login social |
+| ADR07 | JWT HS256 com validade de 15 min, bcrypt, perfis públicos sem contato | Autenticação local funcional; refresh token stateless de 30 dias revogado pela troca de senha (ADR22); sem 2FA ou login social |
 | ADR08 | Modo mock explícito e adapter HTTP no mesmo frontend | Grupo desenvolve telas sem backend; falha de API não vira mock silencioso |
 | ADR09 | Mock explícito no marco inicial; contratações/prazos, avaliações e demandas/propostas integrados nas fases seguintes | F01/F02/F03/F08 implementados; F04/F05 integram administração/moderação no PR #40; financeiro e comunicação continuam pendentes |
 | ADR10 | Logo vetorial oficial SVG (`web/public/images/logo.svg`), ícones por categoria e avatares por iniciais | Identidade visual fechada sem depender de fotos do carômetro |
 | ADR11 | Stripe Sandbox escolhido, com comissão planejada de 10% | Checkout, registros financeiros, webhooks, reembolso e conciliação ainda serão implementados em F09 |
 | ADR12 | Neon PostgreSQL escolhido para ambiente remoto; PostgreSQL 15 no Compose local | Migrações atuais V1–V11; implantação e compatibilidade remota precisam de validação |
-| ADR13 | Resend escolhido como provedor transacional de e-mail | Recuperação, verificação e avisos previstos em F07; parâmetros declarados, sem envio implementado |
+| ADR13 | Resend escolhido como provedor transacional de e-mail | Recuperação de senha enviada pela API HTTP do Resend; verificação e avisos por e-mail ainda previstos em F07 |
 | ADR14 | Organização por entrega, sem designação fixa de pessoas por caso, área, arquivo ou revisão (21/10) | Tabela de delegação retirada; backlog/roadmap sem nomes; revisão combinada por disponibilidade |
 | ADR15 | Markdown atual como referência; originais/protótipo/roadmap HTML preservados como histórico | `equipe.md` passa a guia de colaboração; evitar apagar outras páginas sem confirmar uso e conferir referências |
 | ADR16 | Bootstrap administrativo opt-in, sem senha padrão e sem promoção automática de conta existente | Cadastro público continua sem ADMIN; reinício não altera credenciais nem reativa conta |
@@ -25,6 +25,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **14/11/2026**. A tabe
 | ADR19 | Feed como entrada principal, com publicações profissionais e oportunidades, retomando o HTML (mudança de escopo 21/10) | F11 implementa feed misto após login em `/inicio`; `/painel` mantém gestão; composição e visibilidade aprovadas em 21/10 |
 | ADR20 | Manter Java 21 como versão-alvo da API | POM, CI e imagens de build/runtime/teste usam Java 21; Spring Boot 4.1.1 e o Maven Wrapper permanecem sem alterações |
 | ADR21 | Fotos dos anúncios guardadas no PostgreSQL (`bytea`), sem storage externo (14/11) | A hospedagem da API ainda não foi escolhida e pode ter disco efêmero; o volume previsto (5 × 5 MB por anúncio) cabe no banco e segue o mesmo backup. Migrar para object storage (ex.: S3/R2) exige só trocar a camada de leitura/gravação |
+| ADR22 | Refresh e redefinição de senha com JWT stateless e impressão do hash da senha (14/11) | Sem tabela nem migração. Trocar a senha invalida refresh tokens e links antigos, e o link de redefinição só funciona uma vez. Access tokens já emitidos valem até 15 min; revogação imediata exigiria lista de bloqueio |
 
 ## Proveniência do scaffold
 

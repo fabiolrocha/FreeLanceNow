@@ -5,8 +5,10 @@ import {
   contractDeadline,
   imageSelectionError,
   MAX_IMAGE_BYTES,
+  safeRedirect,
   validPassword,
 } from './rules'
+import { usable } from '../data/session'
 describe('Prazos exibidos na contratação (F02/F03)', () => {
   const at = '2026-11-01T12:00:00.000Z'
   it('segue os jobs de 48h, 5 dias e a janela de 7 dias da avaliação', () => {
@@ -71,5 +73,40 @@ describe('Fotos do anúncio (F06 / RN08)', () => {
     expect(imageSelectionError([png, png], 4)).toMatch(/no máximo 5 imagens/)
     expect(imageSelectionError([{ type: 'image/gif', size: 10 }])).toMatch(/JPG ou PNG/)
     expect(imageSelectionError([{ type: 'image/png', size: MAX_IMAGE_BYTES + 1 }])).toMatch(/5 MB/)
+  })
+})
+describe('Retorno após login', () => {
+  it('volta para a página protegida que o visitante tentou abrir', () => {
+    expect(safeRedirect('/servicos/abc/solicitar', '/inicio')).toBe('/servicos/abc/solicitar')
+    expect(safeRedirect('/mensagens?contratacao=1', '/inicio')).toBe('/mensagens?contratacao=1')
+  })
+  it('ignora destinos externos, ausentes ou de autenticação', () => {
+    for (const from of [undefined, 42, '', 'https://evil.test', '//evil.test', '/\\evil.test'])
+      expect(safeRedirect(from, '/inicio')).toBe('/inicio')
+    for (const from of ['/login', '/cadastro?tipo=freelancer', '/redefinir-senha?token=x'])
+      expect(safeRedirect(from, '/inicio')).toBe('/inicio')
+  })
+})
+describe('Sessão renovável', () => {
+  const user = {
+    id: '1',
+    name: 'A',
+    email: 'a@a',
+    phone: '',
+    role: 'CLIENT',
+    city: '',
+    bio: '',
+  } as const
+  const base = { accessToken: 't', tokenType: 'Bearer', expiresIn: 900, user }
+  it('continua válida enquanto o refresh token não expira', () => {
+    expect(usable({ ...base, expiresAt: 2000 }, 1000)).toBe(true)
+    expect(
+      usable({ ...base, expiresAt: 500, refreshToken: 'r', refreshExpiresAt: 5000 }, 1000),
+    ).toBe(true)
+    expect(usable({ ...base, expiresAt: 500 }, 1000)).toBe(false)
+    expect(
+      usable({ ...base, expiresAt: 500, refreshToken: 'r', refreshExpiresAt: 900 }, 1000),
+    ).toBe(false)
+    expect(usable(null)).toBe(false)
   })
 })

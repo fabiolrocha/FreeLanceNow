@@ -113,3 +113,21 @@ export function futureDate(days = 7) {
     day: '2-digit',
   }).format(d)
 }
+/** Only same-app paths are accepted as post-login destinations (no external or auth pages). */
+export function safeRedirect(from: unknown, fallback: string) {
+  if (typeof from !== 'string' || !from.startsWith('/') || from.startsWith('//')) return fallback
+  if (
+    from.includes('\\') ||
+    /^\/(login|cadastro|recuperar-senha|redefinir-senha)(\/|\?|$)/.test(from)
+  )
+    return fallback
+  return from
+}
+/** Returns an error message, or '' when the new password and its confirmation are valid. */
+export function checkNewPassword(d: FormData) {
+  const password = String(d.get('password'))
+  if (!validPassword(password))
+    return 'Use pelo menos 8 caracteres com letras e números, até 72 bytes.'
+  if (password !== String(d.get('confirm'))) return 'As senhas não conferem.'
+  return ''
+}

@@ -10,12 +10,13 @@ import {
   Empty,
   ErrorMessage,
   Field,
+  NewPasswordFields,
   PageTitle,
   ReviewList,
   ServiceGrid,
   Stars,
 } from '../../components/ui'
-import { money, statusLabel } from '../../domain/rules'
+import { checkNewPassword, money, statusLabel } from '../../domain/rules'
 import type { Service } from '../../domain/types'
 
 export function EditProfile() {
@@ -105,7 +106,52 @@ export function EditProfile() {
           </button>
         </div>
       </form>
+      {!pathname.endsWith('completar') && <ChangePassword />}
     </>
+  )
+}
+function ChangePassword() {
+  const { user, signIn, notify } = useApp()
+  const [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (!user) return
+    const form = e.currentTarget,
+      d = new FormData(form),
+      invalid = checkNewPassword(d)
+    if (invalid) return setError(invalid)
+    setBusy(true)
+    setError('')
+    try {
+      // The API answers with a new session because older refresh tokens stop working.
+      signIn(await client.changePassword(user, String(d.get('current')), String(d.get('password'))))
+      form.reset()
+      notify('Senha alterada.')
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <form className="form-panel" onSubmit={submit} aria-labelledby="security-title">
+      <h2 id="security-title">Segurança</h2>
+      <p>Troque sua senha. Outros aparelhos conectados serão desconectados em até 15 minutos.</p>
+      <Field
+        label="Senha atual"
+        name="current"
+        type="password"
+        required
+        maxLength={72}
+        autoComplete="current-password"
+      />
+      <NewPasswordFields />
+      <ErrorMessage message={error} />
+      <button className="button" disabled={busy}>
+        {busy ? 'Alterando…' : 'Alterar senha'}
+      </button>
+    </form>
   )
 }
 const activeStatuses = ['ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
