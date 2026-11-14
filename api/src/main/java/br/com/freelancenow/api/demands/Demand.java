@@ -75,6 +75,26 @@ public class Demand {
         this.closedAt = now;
     }
 
+    public void cancel(Instant now) {
+        this.status = DemandStatus.CANCELLED;
+        this.closedAt = now;
+    }
+
+    public void update(
+            Category category,
+            String title,
+            String description,
+            BigDecimal budget,
+            int days,
+            String city) {
+        this.category = category;
+        this.title = title.trim();
+        this.description = description.trim();
+        this.budget = budget;
+        this.days = days;
+        this.city = city.trim();
+    }
+
     public UUID getId() {
         return id;
     }

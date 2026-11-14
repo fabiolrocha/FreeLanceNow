@@ -25,6 +25,8 @@ public class CurrentUser {
                                         new ApiException(
                                                 HttpStatus.UNAUTHORIZED,
                                                 "Entre novamente para continuar."));
+        if (u.isDeleted())
+            throw new ApiException(HttpStatus.UNAUTHORIZED, "Esta conta foi excluída.");
         if (!u.isActive())
             throw new ApiException(HttpStatus.FORBIDDEN, "Esta conta está suspensa.");
         return u;

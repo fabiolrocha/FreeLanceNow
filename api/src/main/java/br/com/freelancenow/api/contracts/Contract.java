@@ -98,6 +98,7 @@ public class Contract {
             Demand demand,
             Proposal proposal,
             LocalDate scheduledDate,
+            String address,
             Instant now) {
         this.id = UUID.randomUUID();
         this.demand = demand;
@@ -109,7 +110,7 @@ public class Contract {
         this.scheduledDate = scheduledDate;
         String desc = demand.getDescription().trim();
         this.description = desc.length() > 300 ? desc.substring(0, 300) : desc;
-        this.address = demand.getCity().trim();
+        this.address = address == null || address.isBlank() ? demand.getCity().trim() : address.trim();
         this.status = ContractStatus.ACEITO;
         this.createdAt = now;
         this.statusUpdatedAt = now;
@@ -132,6 +133,10 @@ public class Contract {
 
     public UUID getId() {
         return id;
+    }
+
+    public Proposal getProposal() {
+        return proposal;
     }
 
     public ServiceListing getService() {

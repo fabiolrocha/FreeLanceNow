@@ -56,6 +56,9 @@ public class AdminService {
         if (u.getRole() == Role.ADMIN)
             throw new ApiException(
                     HttpStatus.CONFLICT, "Administradores não podem ser suspensos por este fluxo.");
+        if (u.isDeleted())
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "Conta excluída pelo titular não pode ser reativada.");
         if (u.isActive() != r.active()) {
             var before = Boolean.toString(u.isActive());
             u.setActive(r.active());

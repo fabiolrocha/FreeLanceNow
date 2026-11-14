@@ -14,4 +14,12 @@ public interface ServiceRepository
     long countByFreelancerIdAndStatus(UUID freelancerId, ServiceStatus status);
 
     List<ServiceListing> findByFreelancerIdOrderByCreatedAtDesc(UUID freelancerId);
+
+    /** Pairs of (freelancer id, category name) for the freelancers' active, visible services. */
+    @Query(
+            "select distinct s.freelancer.id, s.category.name from ServiceListing s"
+                    + " where s.freelancer.id in :ids and s.moderated = false"
+                    + " and s.status = br.com.freelancenow.api.catalog.ServiceStatus.ACTIVE")
+    List<Object[]> activeCategories(
+            @org.springframework.data.repository.query.Param("ids") Collection<UUID> ids);
 }

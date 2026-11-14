@@ -116,7 +116,8 @@ public class DemoData implements CommandLineRunner {
     private void seed(String name, String email, Role role, String city, String bio, String cat) {
         if (users.existsByEmail(email)) return;
         var user = new User(name, email, passwords.encode("Demo12345"), "61999990000", role);
-        user.updateProfile(name, user.getPhone(), city, bio);
+        user.updateProfile(
+                name, user.getPhone(), city, bio, role == Role.FREELANCER ? city + " e região" : "");
         users.saveAndFlush(user);
         if (cat == null) return;
         var category =

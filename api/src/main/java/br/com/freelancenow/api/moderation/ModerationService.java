@@ -83,6 +83,13 @@ public class ModerationService {
                 .view();
     }
 
+    public List<ContentReport.OwnView> mine(Jwt jwt) {
+        return reports.findByReporterIdOrderByCreatedAtDescIdDesc(current.require(jwt).getId())
+                .stream()
+                .map(ContentReport::ownView)
+                .toList();
+    }
+
     public List<ContentReport.View> list(Jwt jwt) {
         admin.require(jwt);
         return reports.findAllByOrderByCreatedAtDescIdDesc().stream()

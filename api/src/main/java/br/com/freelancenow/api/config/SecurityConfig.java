@@ -90,7 +90,8 @@ public class SecurityConfig {
                                                 "/api/v1/services/*/images/*",
                                                 "/api/v1/freelancers",
                                                 "/api/v1/freelancers/*",
-                                                "/api/v1/freelancers/*/reviews")
+                                                "/api/v1/freelancers/*/reviews",
+                                                "/api/v1/users/*/avatar")
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated())

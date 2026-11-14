@@ -37,6 +37,20 @@ public class DemandController {
         return demands.createDemand(jwt, request);
     }
 
+    @PutMapping("/demands/{id}")
+    public DemandDtos.DemandView updateDemand(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id,
+            @Valid @RequestBody DemandDtos.CreateDemand request) {
+        return demands.updateDemand(jwt, id, request);
+    }
+
+    @PostMapping("/demands/{id}/cancel")
+    public DemandDtos.DemandView cancelDemand(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
+        return demands.cancelDemand(jwt, id);
+    }
+
     @GetMapping("/proposals")
     public List<DemandDtos.ProposalView> listProposals(@AuthenticationPrincipal Jwt jwt) {
         return demands.listProposals(jwt);
@@ -59,8 +73,16 @@ public class DemandController {
 
     @PostMapping("/proposals/{id}/accept")
     public DemandDtos.ProposalAcceptance acceptProposal(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id,
+            @Valid @RequestBody(required = false) DemandDtos.AcceptProposal request) {
+        return demands.acceptProposal(jwt, id, request);
+    }
+
+    @PostMapping("/proposals/{id}/withdraw")
+    public DemandDtos.ProposalView withdrawProposal(
             @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
-        return demands.acceptProposal(jwt, id);
+        return demands.withdrawProposal(jwt, id);
     }
 
     @PostMapping("/proposals/{id}/reject")

@@ -549,7 +549,8 @@ class AdminIntegrationTests {
                                                             "Perfil editado concorrentemente",
                                                             u.getPhone(),
                                                             "Brasília, DF",
-                                                            "Bio editada");
+                                                            "Bio editada",
+                                                            "");
                                                     loaded.countDown();
                                                     await(release);
                                                 }));

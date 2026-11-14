@@ -11,6 +11,7 @@ import br.com.freelancenow.api.contracts.ContractEventRepository;
 import br.com.freelancenow.api.contracts.ContractRepository;
 import br.com.freelancenow.api.contracts.ContractStatus;
 import br.com.freelancenow.api.notifications.NotificationService;
+import br.com.freelancenow.api.reviews.ReviewService;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
 
@@ -24,7 +25,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,6 +42,7 @@ public class DemandService {
     private final CurrentUser current;
     private final Clock clock;
     private final NotificationService notifications;
+    private final ReviewService reviews;
 
     public DemandService(
             DemandRepository demands,
@@ -48,8 +52,10 @@ public class DemandService {
             ContractEventRepository contractEvents,
             CurrentUser current,
             Clock clock,
-            NotificationService notifications) {
+            NotificationService notifications,
+            ReviewService reviews) {
         this.notifications = notifications;
+        this.reviews = reviews;
         this.demands = demands;
         this.proposals = proposals;
         this.categories = categories;
@@ -82,14 +88,7 @@ public class DemandService {
         if (u.getRole() != Role.CLIENT)
             throw new ApiException(
                     HttpStatus.FORBIDDEN, "Somente clientes podem publicar demandas.");
-        Category category =
-                categories
-                        .findById(r.categoryId())
-                        .filter(Category::isActive)
-                        .orElseThrow(
-                                () ->
-                                        new ApiException(
-                                                HttpStatus.BAD_REQUEST, "Categoria inválida."));
+        Category category = activeCategory(r.categoryId());
         var now = Instant.now(clock);
         var saved =
                 demands.save(
@@ -105,6 +104,68 @@ public class DemandService {
         return DemandDtos.DemandView.from(saved);
     }
 
+    /** The owner edits an open demand only before anyone has answered it. */
+    @Transactional
+    public DemandDtos.DemandView updateDemand(Jwt jwt, UUID id, DemandDtos.CreateDemand r) {
+        var u = current.require(jwt);
+        var d = ownedOpenDemand(u, id);
+        if (proposals.existsByDemandId(d.getId()))
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "A demanda já recebeu propostas e não pode mais ser editada. Cancele-a e"
+                            + " publique outra, se precisar mudar o pedido.");
+        d.update(
+                activeCategory(r.categoryId()),
+                r.title(),
+                r.description(),
+                r.budget(),
+                r.days(),
+                r.city());
+        return DemandDtos.DemandView.from(d);
+    }
+
+    /** Cancels an open demand and declines its pending proposals. */
+    @Transactional
+    public DemandDtos.DemandView cancelDemand(Jwt jwt, UUID id) {
+        var u = current.require(jwt);
+        var d = ownedOpenDemand(u, id);
+        var now = Instant.now(clock);
+        for (var p : proposals.findByDemandIdOrderByCreatedAtAsc(d.getId())) {
+            if (p.getStatus() != ProposalStatus.PENDING) continue;
+            p.reject(now);
+            notifications.notify(
+                    p.getFreelancer(),
+                    "PROPOSAL_REJECTED",
+                    "Demanda cancelada: " + d.getTitle(),
+                    "O cliente cancelou a demanda e não vai contratar por ela.",
+                    "/propostas");
+        }
+        d.cancel(now);
+        return DemandDtos.DemandView.from(d);
+    }
+
+    /** The freelancer takes back a proposal the client has not decided yet. */
+    @Transactional
+    public DemandDtos.ProposalView withdrawProposal(Jwt jwt, UUID proposalId) {
+        var u = current.require(jwt);
+        var p = proposals.lockById(proposalId).orElseThrow(this::proposalNotFound);
+        if (u.getRole() != Role.FREELANCER || !p.getFreelancer().getId().equals(u.getId()))
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN, "Somente o autor pode retirar a proposta.");
+        var d = demands.lockById(p.getDemand().getId()).orElseThrow(this::demandNotFound);
+        if (p.getStatus() != ProposalStatus.PENDING || d.getStatus() != DemandStatus.OPEN)
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "Somente propostas aguardando decisão podem ser retiradas.");
+        p.withdraw(Instant.now(clock));
+        notifications.notify(
+                d.getClient(),
+                "PROPOSAL_WITHDRAWN",
+                "Proposta retirada: " + d.getTitle(),
+                u.getName() + " retirou a proposta enviada.",
+                "/demandas/" + d.getId());
+        return views(List.of(p)).getFirst();
+    }
+
     public List<DemandDtos.ProposalView> listProposals(Jwt jwt) {
         var u = current.require(jwt);
         List<Proposal> items =
@@ -113,7 +174,7 @@ public class DemandService {
                     case FREELANCER -> proposals.findByFreelancerIdOrderByCreatedAtAsc(u.getId());
                     case ADMIN -> proposals.findAllByOrderByCreatedAtAsc();
                 };
-        return items.stream().map(DemandDtos.ProposalView::from).toList();
+        return views(items);
     }
 
     public List<DemandDtos.ProposalView> listProposalsByDemand(Jwt jwt, UUID demandId) {
@@ -133,7 +194,7 @@ public class DemandService {
                             proposals.findByDemandIdAndFreelancerIdOrderByCreatedAtAsc(
                                     d.getId(), u.getId());
                 };
-        return items.stream().map(DemandDtos.ProposalView::from).toList();
+        return views(items);
     }
 
     @Transactional
@@ -159,11 +220,12 @@ public class DemandService {
                 "Nova proposta: " + d.getTitle(),
                 u.getName() + " enviou uma proposta para sua demanda.",
                 "/demandas/" + d.getId());
-        return DemandDtos.ProposalView.from(saved);
+        return views(List.of(saved)).getFirst();
     }
 
     @Transactional
-    public DemandDtos.ProposalAcceptance acceptProposal(Jwt jwt, UUID proposalId) {
+    public DemandDtos.ProposalAcceptance acceptProposal(
+            Jwt jwt, UUID proposalId, DemandDtos.AcceptProposal r) {
         var u = current.require(jwt);
         var p = proposals.lockById(proposalId).orElseThrow(this::proposalNotFound);
         var d = demands.lockById(p.getDemand().getId()).orElseThrow(this::demandNotFound);
@@ -173,6 +235,10 @@ public class DemandService {
                     "Somente o cliente que publicou a demanda pode aceitar propostas.");
         if (d.getStatus() != DemandStatus.OPEN || p.getStatus() != ProposalStatus.PENDING)
             throw new ApiException(HttpStatus.CONFLICT, "Esta proposta não pode ser aceita.");
+        var today = LocalDate.now(clock.withZone(BRAZIL_ZONE));
+        var date = r == null ? null : r.date();
+        if (date != null && !date.isAfter(today))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "Selecione uma data futura.");
         var now = Instant.now(clock);
         p.accept(now);
         var allProposals = proposals.findByDemandIdOrderByCreatedAtAsc(d.getId());
@@ -189,8 +255,10 @@ public class DemandService {
         }
         d.close(now);
 
-        var scheduledDate = LocalDate.now(clock.withZone(BRAZIL_ZONE)).plusDays(p.getDays());
-        var contract = contracts.save(new Contract(d, p, scheduledDate, now));
+        var scheduledDate = date != null ? date : today.plusDays(p.getDays());
+        var contract =
+                contracts.save(
+                        new Contract(d, p, scheduledDate, r == null ? null : r.address(), now));
         String note = p.getMessage().trim();
         if (note.length() > 500) note = note.substring(0, 500);
         var event =
@@ -227,7 +295,57 @@ public class DemandService {
                 "Proposta recusada: " + d.getTitle(),
                 "O cliente recusou sua proposta.",
                 "/demandas/" + d.getId());
-        return DemandDtos.ProposalView.from(p);
+        return views(List.of(p)).getFirst();
+    }
+
+    private List<DemandDtos.ProposalView> views(List<Proposal> items) {
+        if (items.isEmpty()) return List.of();
+        var ratings =
+                reviews.ratingSummaries(
+                        items.stream().map(p -> p.getFreelancer().getId()).distinct().toList());
+        var accepted =
+                items.stream()
+                        .filter(p -> p.getStatus() == ProposalStatus.ACCEPTED)
+                        .map(Proposal::getId)
+                        .toList();
+        Map<UUID, UUID> contractByProposal =
+                accepted.isEmpty()
+                        ? Map.of()
+                        : contracts.findByProposalIdIn(accepted).stream()
+                                .collect(
+                                        Collectors.toMap(
+                                                c -> c.getProposal().getId(), Contract::getId));
+        return items.stream()
+                .map(
+                        p -> {
+                            var s =
+                                    ratings.getOrDefault(
+                                            p.getFreelancer().getId(),
+                                            ReviewService.RatingSummary.EMPTY);
+                            return DemandDtos.ProposalView.from(
+                                    p,
+                                    s.averageRating(),
+                                    s.reviewCount(),
+                                    contractByProposal.get(p.getId()));
+                        })
+                .toList();
+    }
+
+    private Demand ownedOpenDemand(User u, UUID id) {
+        var d = demands.lockById(id).orElseThrow(this::demandNotFound);
+        if (u.getRole() != Role.CLIENT || !d.getClient().getId().equals(u.getId()))
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN, "Somente o cliente que publicou a demanda pode alterá-la.");
+        if (d.getStatus() != DemandStatus.OPEN)
+            throw new ApiException(HttpStatus.CONFLICT, "Esta demanda já foi encerrada.");
+        return d;
+    }
+
+    private Category activeCategory(UUID id) {
+        return categories
+                .findById(id)
+                .filter(Category::isActive)
+                .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "Categoria inválida."));
     }
 
     private void ensureCanViewDemand(User u, Demand d) {
