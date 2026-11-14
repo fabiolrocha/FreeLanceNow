@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **09/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql` e `V10__payments.sql`.
+Revisado em **09/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql` e `V11__service_images.sql`.
 
 ```mermaid
 erDiagram
@@ -108,12 +108,11 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V10, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V11, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
 | `dispute` / anexos de evidência | Evoluir o motivo atualmente em `contract`; vincular storage de F06 sem apagar histórico |
-| `service_image` | Dono, storage key, tipo/tamanho, ordem e metadados; máximo 5 |
 
 Contratações originadas por proposta podem ter `service_id` nulo, inclusive na avaliação. O aceite guarda os vínculos de demanda/proposta e o preço acordado; a API pública da contratação ainda não expõe `demandId`/`proposalId`.
 
@@ -143,6 +142,14 @@ O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não 
 | `notification` | UUID; destinatário FK; tipo; título 150; corpo 300; link interno 200; criação; `read_at` opcional. Gravado na mesma transação do evento (solicitação, mudança de status, prazo automático, proposta, avaliação, resposta e mensagem); quem age não recebe aviso da própria ação |
 
 Não há entrega por e-mail nem tempo real: a interface consulta o contador a cada 30 s e a conversa aberta a cada 10 s. O envio por e-mail (Resend) continua em F07.
+
+## Fotos dos anúncios (V11)
+
+| Tabela | Persistência e invariantes |
+|---|---|
+| `service_image` | UUID; anúncio FK com `ON DELETE CASCADE`; `content_type` (`image/jpeg`, `image/png`) detectado pela assinatura; `size_bytes` de 1 a 5 242 880; conteúdo `bytea`; criação. Ordem de exibição = criação; a primeira é a capa. O limite de 5 por anúncio é verificado na transação com lock do anúncio |
+
+As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do restante dos dados. As listagens leem só os metadados; o conteúdo é carregado apenas no GET da imagem.
 
 ## Pagamentos e livro financeiro (V10)
 

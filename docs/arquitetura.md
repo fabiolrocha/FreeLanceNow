@@ -14,7 +14,7 @@ flowchart LR
   Modulos --> JDBC[JDBC / feed paginado]
   JDBC --> DB
   JPA --> DB[(PostgreSQL 15 local)]
-  Flyway[Flyway V1 a V10] --> DB
+  Flyway[Flyway V1 a V11] --> DB
 ```
 
 | Camada | Local | Responsabilidade |
@@ -27,7 +27,7 @@ flowchart LR
 | Services | Mesmos módulos | Regras de negócio, prazos agendados (`@Scheduled`) e fronteiras transacionais |
 | Repositories/entidades | Mesmos módulos | Persistência, busca, locks pessimistas e vínculos |
 | Config/common | `api/.../{config,common}` | Segurança, `Clock` injetável, CORS, seed e Problem Details |
-| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V10`) |
+| Banco | `api/src/main/resources/db/migration/` | Esquema evolutivo versionado (`V1` a `V11`) |
 
 JWT HS256 é emitido pelo próprio backend com issuer validado, expiração de 900s e segredo configurado por ambiente com pelo menos 32 bytes. Os endpoints de perfil privado, gestão de anúncios, contratações, avaliações e demandas/propostas verificam também que a conta existe e está ativa. O frontend guarda a sessão em `sessionStorage`, conserva a expiração absoluta após reload e elimina a sessão ao expirar. Uma fase futura deve avaliar cookies HttpOnly/CSRF ou outra política de sessão adequada à implantação pública.
 
@@ -55,7 +55,7 @@ Compose publica as portas em `127.0.0.1`. Não é uma infraestrutura de produç�
 | Administração/auditoria (`F04`/`F05`) | Implementadas: bootstrap opt-in, usuários/categorias, denúncias, remoção lógica, métricas e auditoria | E-mail em F07 e anexos em F06; manter verificação de autorização e regressão |
 | Demandas/propostas (`F08`) | Implementado na API e no React (`demand`, `proposal`, aceite gerando `contract` em `ACEITO`) | — |
 | Mensagens/notificações e e-mail (`F07`) | Parcial: avisos internos e chat por contratação persistentes (`notification`, `contract_message`, PR #45); provedor de e-mail definido (**Resend**) | Implementar envio transacional de e-mail e recuperação de senha |
-| Arquivos e catálogo (`F06`) | Busca paginada na API e no React (PR #45); avaliações no detalhe do serviço; marca SVG estática disponível | Definir storage e validar upload de até 5 imagens/5 MB |
+| Arquivos e catálogo (`F06`) | Busca paginada na API e no React (PR #45); avaliações no detalhe do serviço; upload de até 5 fotos JPG/PNG de 5 MB por anúncio, guardadas no PostgreSQL (`V11`, ADR21) | Anexos de evidência em disputas/denúncias; object storage se o volume crescer |
 | Financeiro e banco externo (`F09`/`F10`) | Provedores escolhidos (**Stripe Sandbox** e **Neon PostgreSQL**); DDL `V10` (`payment` e `ledger_entry`, PR #43), `stripe-java`, perfil `prod`, TLS Neon e `JwtSecretValidator` prontos (PR #44) | Implementar checkout sandbox, webhooks e conciliação (`F09`); concluir rate limit, backup e teste de carga (`F10`) |
 
 As propriedades de Stripe/Resend em `application.yml` ainda não são consumidas por fluxos de pagamento ou e-mail. O Compose atual não repassa essas credenciais nem usa `DB_URL` da raiz para trocar seu banco interno. Consulte as variáveis e limites do ambiente em [desenvolvimento](desenvolvimento.md).

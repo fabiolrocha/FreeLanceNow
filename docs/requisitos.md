@@ -11,7 +11,7 @@ Revisado em **09/11/2026**, conforme a base integrada. Referência principal: `o
 | RN05 / UC02 | Anúncio: título até 80, descrição até 500, preço positivo, prazo positivo, categoria ativa | API e frontend; precisão monetária 2 casas, prazo técnico 1–365 | Refinar limite de prazo com o grupo |
 | RN06 / UC02 | Até 20 anúncios ativos por freelancer | API com bloqueio do usuário na transação; mock valida limite | Teste de concorrência e carga |
 | RN07 / UC02 | Rascunho, ativo e inativo; edição pelo dono | API preserva registros e restringe proprietário; público vê ativos | Histórico/auditoria de alterações |
-| RN08 / UC02 | Até 5 imagens JPG/PNG, cada uma até 5 MB | Ícones provisórios | Storage, validação real de conteúdo, tamanho e autorização (`F06`) |
+| RN08 / UC02 | Até 5 imagens JPG/PNG, cada uma até 5 MB | API (`V11`, `service_image`) valida assinatura, cabeçalho, tamanho, quantidade e dono; React envia, mostra prévia, remove e exibe capa/galeria; ícone por categoria quando não há foto | Object storage externo se o volume crescer (ADR21) |
 | RN09 / UC03 | Buscar por texto, categoria, localização, preço, avaliação | API e React: texto, categoria, cidade, faixa de preço, nota mínima (`minRating`) e paginação (12 por página no web, PR #45) | — |
 | RN10 / UC03 | Data futura, descrição até 300, endereço opcional, uma solicitação pendente por cliente/serviço | API e frontend com lock transacional e índice único parcial | Notificações externas por e-mail (`F07`) |
 | RN11 / UC03 | Freelancer responde em até 48 horas; cancela automaticamente após prazo | Job idempotente na API com `Clock` injetável e testes de relógio | Aviso interno de cancelamento já existe; e-mail (`F07`) |

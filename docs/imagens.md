@@ -1,6 +1,6 @@
 # Imagens e identidade visual
 
-Revisado em **21/10/2026**. **Decisão registrada (Passo 0):** o produto utiliza a **logo oficial em SVG** (`web/public/images/logo.svg` e `web/public/favicon.svg`), **ícones vetoriais Lucide por categoria** nos cards do catálogo e **avatares com iniciais** para os perfis até a etapa de upload de imagens (`F06`).
+Revisado em **14/11/2026**. **Decisão registrada (Passo 0):** o produto utiliza a **logo oficial em SVG** (`web/public/images/logo.svg` e `web/public/favicon.svg`), **ícones vetoriais Lucide por categoria** nos cards do catálogo e **avatares com iniciais** para os perfis até a etapa de upload de imagens (`F06`).
 
 | Material existente | O que contém | Uso atual |
 |---|---|---|
@@ -16,7 +16,7 @@ Revisado em **21/10/2026**. **Decisão registrada (Passo 0):** o produto utiliza
 | ID | Decisão | Status |
 |---|---|---|
 | IMG01 | Logo oficial criada em SVG (`web/public/images/logo.svg` e `web/public/favicon.svg`) | Concluído |
-| IMG02 | Ícones Lucide por categoria no catálogo; fotos reais dependem de `F06` | Ícones disponíveis; upload pendente |
+| IMG02 | Ícones Lucide por categoria no catálogo; fotos enviadas pelo freelancer substituem o ícone quando existem (`F06`) | Concluído: upload no modo API; ícone continua como padrão |
 | IMG03 | Avatares com iniciais por padrão na demonstração | Concluído |
 | IMG04 | Manter registro de origem e autorização/licença dos assets utilizados | Conferir antes de distribuição pública; não há arquivo LICENSE na raiz |
 
@@ -26,4 +26,6 @@ A escolha deve identificar arquivo, finalidade, autor/origem e licença/autoriza
 
 Assets estáticos: `web/public/images/` com nomes descritivos em minúsculas. Registrar aqui o caminho, origem e uso. A identidade atual já está definida; novos ativos não dependem de uma pessoa designada para a área. Preferir WebP/AVIF para fotos e SVG validado para marca; dimensionar conforme cards e detalhamento, sem ampliar arquivos grandes desnecessariamente. Ícones decorativos usam `aria-hidden`; fotos informativas precisam de texto alternativo adequado.
 
-Upload de usuário será uma feature diferente, com storage e validação server-side: até 5 JPG/PNG de até 5 MB por serviço, conforme UC02. Selecionar imagens estáticas não significa que upload já esteja implementado.
+## Fotos enviadas pelos freelancers (F06)
+
+O dono do anúncio envia até 5 JPG/PNG de até 5 MB pelo formulário de serviço (`/meus-servicos/novo` ou `/editar`). A API confere a assinatura do arquivo, o cabeçalho e as dimensões (até 8000 px) e guarda o conteúdo no PostgreSQL (ADR21). A primeira foto é a capa no card da busca e em "Meus serviços"; o detalhe do serviço mostra a galeria com miniaturas. Sem foto, o card mantém o ícone da categoria. No modo mock o envio fica desativado, porque o `sessionStorage` não comporta arquivos desse tamanho. Contratos HTTP em [api.md](api.md).
