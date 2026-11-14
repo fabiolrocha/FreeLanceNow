@@ -59,10 +59,9 @@ public class AdminBootstrap implements CommandLineRunner {
                         "Bootstrap ADMIN não promove uma conta comum existente.");
             return;
         }
-        var u =
-                users.saveAndFlush(
-                        new User(
-                                name, email, passwords.encode(password), "0000000000", Role.ADMIN));
+        var admin = new User(name, email, passwords.encode(password), "0000000000", Role.ADMIN);
+        admin.markEmailVerified(admin.getCreatedAt());
+        var u = users.saveAndFlush(admin);
         audit.record(
                 u,
                 "ADMIN_CREATED",

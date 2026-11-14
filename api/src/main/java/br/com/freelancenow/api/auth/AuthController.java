@@ -36,6 +36,12 @@ public class AuthController {
         auth.forgotPassword(request);
     }
 
+    @PostMapping("/email/verify")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void verifyEmail(@Valid @RequestBody AuthDtos.VerifyEmail request) {
+        auth.verifyEmail(request);
+    }
+
     @PostMapping("/password/reset")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void resetPassword(@Valid @RequestBody AuthDtos.ResetPassword request) {

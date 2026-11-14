@@ -30,6 +30,8 @@ public class TokenService {
     public static final String PURPOSE = "purpose";
     public static final String REFRESH = "refresh";
     public static final String PASSWORD_RESET = "password-reset";
+    public static final String EMAIL_VERIFY = "email-verify";
+    private static final String EMAIL = "email";
     private static final String PASSWORD_VERSION = "pv";
 
     private final JwtEncoder encoder;
@@ -38,6 +40,7 @@ public class TokenService {
     private final long accessTtl;
     private final long refreshTtl;
     private final long resetTtl;
+    private final long verifyTtl;
 
     public TokenService(
             JwtEncoder encoder,
@@ -46,7 +49,8 @@ public class TokenService {
             @Value("${app.jwt.issuer}") String issuer,
             @Value("${app.jwt.ttl-seconds}") long accessTtl,
             @Value("${app.jwt.refresh-ttl-seconds}") long refreshTtl,
-            @Value("${app.jwt.reset-ttl-seconds}") long resetTtl) {
+            @Value("${app.jwt.reset-ttl-seconds}") long resetTtl,
+            @Value("${app.jwt.verify-ttl-seconds:86400}") long verifyTtl) {
         this.encoder = encoder;
         var decoder =
                 NimbusJwtDecoder.withSecretKey(secretValidator.key(secret))
@@ -58,6 +62,11 @@ public class TokenService {
         this.accessTtl = accessTtl;
         this.refreshTtl = refreshTtl;
         this.resetTtl = resetTtl;
+        this.verifyTtl = verifyTtl;
+    }
+
+    public long verifyTtl() {
+        return verifyTtl;
     }
 
     public long accessTtl() {
@@ -90,6 +99,19 @@ public class TokenService {
                         .claim(PURPOSE, PASSWORD_RESET)
                         .claim(PASSWORD_VERSION, passwordVersion(u))
                         .build());
+    }
+
+    /** Bound to the address it was sent to, so it cannot confirm a different e-mail. */
+    public String emailVerification(User u) {
+        return encode(
+                base(u, verifyTtl)
+                        .claim(PURPOSE, EMAIL_VERIFY)
+                        .claim(EMAIL, u.getEmail())
+                        .build());
+    }
+
+    public boolean matchesEmail(Jwt jwt, User u) {
+        return u.getEmail().equals(jwt.getClaimAsString(EMAIL));
     }
 
     /**

@@ -18,6 +18,7 @@ public final class AdminDtos {
             String phone,
             Role role,
             boolean active,
+            boolean deleted,
             String city,
             String bio,
             Instant createdAt) {
@@ -29,6 +30,7 @@ public final class AdminDtos {
                     u.getPhone(),
                     u.getRole(),
                     u.isActive(),
+                    u.isDeleted(),
                     u.getCity(),
                     u.getBio(),
                     u.getCreatedAt());

@@ -97,6 +97,13 @@ public class UserController {
         account.deleteAccount(current.require(jwt), r.password());
     }
 
+    /** Sends a new e-mail confirmation link; does nothing once the address is confirmed. */
+    @PostMapping("/users/me/email-verification")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void resendVerification(@AuthenticationPrincipal Jwt jwt) {
+        auth.resendVerification(current.require(jwt));
+    }
+
     /** Changes the password and returns a fresh session; older refresh tokens stop working. */
     @PutMapping("/users/me/password")
     public AuthDtos.Session changePassword(
