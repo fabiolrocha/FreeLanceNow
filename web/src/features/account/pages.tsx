@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
-import type { FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Plus, ArrowRight } from 'lucide-react'
 import { useApp } from '../../app/store'
-import { client } from '../../data/client'
+import { avatarUrl, client, isMock } from '../../data/client'
 import { useReviews } from '../../app/useReviews'
 import {
   Avatar,
+  ConfirmButton,
   Empty,
   ErrorMessage,
   Field,
@@ -16,8 +17,15 @@ import {
   ServiceGrid,
   Stars,
 } from '../../components/ui'
-import { checkNewPassword, money, statusLabel } from '../../domain/rules'
-import type { Service } from '../../domain/types'
+import {
+  checkNewPassword,
+  compatibleDemands,
+  dateLabel,
+  money,
+  reportStatusLabel,
+  statusLabel,
+} from '../../domain/rules'
+import type { OwnReport, Service } from '../../domain/types'
 
 export function EditProfile() {
   const { user, updateUser, refresh } = useApp(),
@@ -39,6 +47,7 @@ export function EditProfile() {
         phone: String(d.get('phone')),
         city: String(d.get('city')),
         bio: String(d.get('bio')),
+        serviceArea: String(d.get('serviceArea') ?? user.serviceArea ?? ''),
       })
       updateUser(u)
       await refresh()
@@ -56,13 +65,7 @@ export function EditProfile() {
         description="Conte um pouco sobre você e onde está."
       />
       <form className="form-panel" onSubmit={submit}>
-        <div className="person">
-          <Avatar name={user.name} large />
-          <div>
-            <strong>{user.name}</strong>
-            <small>Seu perfil mostra suas iniciais.</small>
-          </div>
-        </div>
+        <AvatarField />
         <Field
           label="Nome completo"
           name="name"
@@ -92,9 +95,29 @@ export function EditProfile() {
           defaultValue={user.city}
           placeholder="Taguatinga, DF"
         />
+        {user.role === 'FREELANCER' && (
+          <Field
+            label="Área de atendimento"
+            name="serviceArea"
+            maxLength={150}
+            defaultValue={user.serviceArea}
+            placeholder="Taguatinga, Ceilândia e Águas Claras"
+            hint="Bairros ou cidades onde você atende. Aparece no seu perfil público."
+          />
+        )}
         <label className="field">
           <span>{user.role === 'FREELANCER' ? 'Descrição profissional' : 'Sobre você'}</span>
-          <textarea name="bio" maxLength={600} rows={4} defaultValue={user.bio} />
+          <textarea
+            name="bio"
+            maxLength={600}
+            rows={4}
+            defaultValue={user.bio}
+            placeholder={
+              user.role === 'FREELANCER'
+                ? 'Experiência, especialidades, garantia que oferece.'
+                : 'Conte um pouco sobre você para os profissionais.'
+            }
+          />
         </label>
         <ErrorMessage message={error} />
         <div className="row">
@@ -106,7 +129,192 @@ export function EditProfile() {
           </button>
         </div>
       </form>
-      {!pathname.endsWith('completar') && <ChangePassword />}
+      {!pathname.endsWith('completar') && (
+        <>
+          <ChangePassword />
+          {user.role !== 'ADMIN' && <DeleteAccount />}
+        </>
+      )}
+    </>
+  )
+}
+const MAX_AVATAR = 2 * 1024 * 1024
+function AvatarField() {
+  const { user, updateUser, notify } = useApp(),
+    input = useRef<HTMLInputElement>(null),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  if (!user) return null
+  async function change(work: () => Promise<typeof user>, done: string) {
+    setBusy(true)
+    setError('')
+    try {
+      const u = await work()
+      if (u) updateUser({ ...user!, ...u })
+      notify(done)
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy(false)
+      if (input.current) input.current.value = ''
+    }
+  }
+  function pick(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!['image/jpeg', 'image/png'].includes(file.type))
+      return setError('Envie uma foto JPG ou PNG.')
+    if (file.size > MAX_AVATAR) return setError('A foto deve ter até 2 MB.')
+    void change(() => client.uploadAvatar(file), 'Foto atualizada.')
+  }
+  const src = avatarUrl(user.id, user.avatarVersion)
+  return (
+    <div className="avatar-field">
+      <Avatar name={user.name} large src={src} />
+      <div>
+        <strong>{user.name}</strong>
+        <small>
+          {isMock
+            ? 'Na demonstração o perfil mostra suas iniciais.'
+            : 'Foto JPG ou PNG de até 2 MB. Sem foto, o perfil mostra suas iniciais.'}
+        </small>
+        {!isMock && (
+          <div className="row">
+            <label className="button secondary">
+              {busy ? 'Enviando…' : src ? 'Trocar foto' : 'Enviar foto'}
+              <input
+                ref={input}
+                className="sr-only"
+                type="file"
+                accept="image/jpeg,image/png"
+                disabled={busy}
+                onChange={pick}
+              />
+            </label>
+            {src && (
+              <button
+                type="button"
+                className="text-button"
+                disabled={busy}
+                onClick={() => void change(() => client.deleteAvatar(), 'Foto removida.')}
+              >
+                Remover foto
+              </button>
+            )}
+          </div>
+        )}
+        <ErrorMessage message={error} />
+      </div>
+    </div>
+  )
+}
+function DeleteAccount() {
+  const { user, signOut, notify } = useApp(),
+    navigate = useNavigate(),
+    [password, setPassword] = useState(''),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  async function remove() {
+    if (!user) return
+    setBusy(true)
+    setError('')
+    try {
+      await client.deleteAccount(user, password)
+      signOut()
+      navigate('/')
+      notify('Sua conta foi excluída.')
+    } catch (e) {
+      setError((e as Error).message)
+      setBusy(false)
+    }
+  }
+  return (
+    <section className="form-panel danger-zone" aria-labelledby="delete-title">
+      <h2 id="delete-title">Excluir conta</h2>
+      <p>
+        Seus dados pessoais são apagados e o histórico de contratações fica anônimo para a outra
+        parte. Contratações em aberto precisam ser concluídas ou canceladas antes.
+        {user?.role === 'FREELANCER'
+          ? ' Seus anúncios saem do ar e as propostas pendentes são retiradas.'
+          : ' Suas demandas abertas são canceladas.'}
+      </p>
+      <Field
+        label="Confirme com sua senha"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        maxLength={72}
+        autoComplete="current-password"
+      />
+      <ErrorMessage message={error} />
+      <ConfirmButton
+        className="button danger"
+        disabled={busy || !password}
+        label={busy ? 'Excluindo…' : 'Excluir minha conta'}
+        title="Excluir sua conta?"
+        message="Esta ação não pode ser desfeita. Você será desconectado e não poderá mais entrar com este e-mail e senha."
+        confirmLabel="Sim, excluir conta"
+        danger
+        onConfirm={() => void remove()}
+      />
+    </section>
+  )
+}
+export function MyReports() {
+  const { user } = useApp(),
+    [items, setItems] = useState<OwnReport[] | null>(null),
+    [error, setError] = useState('')
+  useEffect(() => {
+    if (user)
+      void client
+        .myReports(user)
+        .then(setItems)
+        .catch((e) => setError(e.message))
+  }, [user])
+  return (
+    <>
+      <PageTitle
+        title="Minhas denúncias"
+        description="Acompanhe a análise da moderação sobre o que você denunciou."
+      />
+      <ErrorMessage message={error} />
+      {items === null && !error && (
+        <p role="status" className="loading">
+          Carregando denúncias…
+        </p>
+      )}
+      <div className="stack">
+        {items?.map((r) => (
+          <article className="panel" key={r.id}>
+            <span className={`badge ${r.status === 'REMOVED' ? 'green' : ''}`}>
+              {reportStatusLabel[r.status]}
+            </span>
+            <h2>{r.targetTitle}</h2>
+            <p className="meta">
+              {r.targetType === 'SERVICE'
+                ? 'Anúncio'
+                : r.targetType === 'REVIEW'
+                  ? 'Avaliação'
+                  : 'Publicação'}{' '}
+              · {r.reason}
+              {r.createdAt && ` · enviada em ${dateLabel(r.createdAt)}`}
+            </p>
+            <p>{r.comment}</p>
+            {r.decisionNote && (
+              <p className="review-reply">Resposta da moderação: {r.decisionNote}</p>
+            )}
+          </article>
+        ))}
+      </div>
+      {items?.length === 0 && (
+        <Empty title="Você não fez denúncias">
+          <p>
+            Viu um anúncio, avaliação ou publicação que viola as regras? Use o link “Denunciar” no
+            próprio conteúdo.
+          </p>
+          <Link to="/ajuda">Ver as regras da plataforma</Link>
+        </Empty>
+      )}
     </>
   )
 }
@@ -170,10 +378,13 @@ export function OwnProfile() {
   return (
     <>
       <div className="panel profile-cover">
-        <Avatar name={user.name} large />
+        <Avatar name={user.name} large src={avatarUrl(user.id, user.avatarVersion)} />
         <div>
           <h1>{user.name}</h1>
           <p>{user.city || 'Localização não informada'}</p>
+          {user.role === 'FREELANCER' && user.serviceArea && (
+            <p className="meta">Atende em {user.serviceArea}</p>
+          )}
         </div>
         <Link className="button secondary" to="/perfil/editar">
           Editar perfil
@@ -182,6 +393,11 @@ export function OwnProfile() {
       <section className="panel">
         <h2>Sobre você</h2>
         <p>{user.bio || 'Complete seu perfil para contar um pouco sobre você.'}</p>
+        {user.role === 'FREELANCER' && (
+          <p>
+            <Link to={`/profissionais/${user.id}`}>Ver como os clientes veem seu perfil</Link>
+          </p>
+        )}
         <p>
           Tipo de conta:{' '}
           {user.role === 'CLIENT'
@@ -251,7 +467,7 @@ export function OwnProfile() {
   )
 }
 export function Dashboard() {
-  const { user, services, contracts } = useApp(),
+  const { user, services, contracts, demands, proposals } = useApp(),
     [mine, setMine] = useState<Service[]>([]),
     [error, setError] = useState('')
   useEffect(() => {
@@ -301,10 +517,25 @@ export function Dashboard() {
           <small>aceitas, em execução ou aguardando confirmação</small>
         </div>
         <div>
-          <span>Aguardando resposta</span>
+          <span>{user.role === 'CLIENT' ? 'Aguardando resposta' : 'Solicitações novas'}</span>
           <strong>{own.filter((c) => c.status === 'PENDENTE').length}</strong>
-          <small>prazo de até 48 horas</small>
+          <small>
+            {user.role === 'CLIENT'
+              ? 'o profissional tem até 48 horas'
+              : 'responda em até 48 horas'}
+          </small>
         </div>
+        {user.role === 'FREELANCER' && (
+          <div>
+            <span>Propostas pendentes</span>
+            <strong>
+              {proposals.filter((p) => p.freelancerId === user.id && p.status === 'PENDING').length}
+            </strong>
+            <small>
+              <Link to="/propostas">aguardando o cliente</Link>
+            </small>
+          </div>
+        )}
       </div>
       <div className="dashboard-grid">
         <section className="panel">
@@ -334,17 +565,70 @@ export function Dashboard() {
         </section>
         <aside className="panel tip-panel">
           <CheckCircle2 size={28} />
-          <h2>Tudo combinado, tudo registrado.</h2>
-          <p>Descreva o que precisa, confirme a data e acompanhe cada mudança de status.</p>
+          {user.role === 'CLIENT' ? (
+            <>
+              <h2>Tudo combinado, tudo registrado.</h2>
+              <p>Descreva o que precisa, confirme a data e acompanhe cada mudança de status.</p>
+            </>
+          ) : (
+            <>
+              <h2>Responda rápido, conquiste avaliações.</h2>
+              <p>
+                Aceite ou recuse solicitações em até 48 horas, marque a conclusão com uma observação
+                e mantenha sua área de atendimento atualizada.
+              </p>
+            </>
+          )}
           <Link to="/ajuda">Conhecer as regras</Link>
         </aside>
       </div>
+      {user.role === 'FREELANCER' ? (
+        <FreelancerOpportunities
+          demands={compatibleDemands(
+            demands,
+            proposals,
+            user.id,
+            [...new Set(mine.map((s) => s.category.id))],
+            user.city,
+          ).slice(0, 3)}
+        />
+      ) : (
+        <>
+          <PageTitle
+            title="Explore serviços"
+            description="Profissionais avaliados perto de você."
+            action={<Link to="/servicos">Ver mais</Link>}
+          />
+          <ServiceGrid services={services.slice(0, 3)} />
+        </>
+      )}
+    </>
+  )
+}
+function FreelancerOpportunities({ demands }: { demands: ReturnType<typeof compatibleDemands> }) {
+  return (
+    <>
       <PageTitle
-        title={user.role === 'FREELANCER' ? 'Oportunidades para você' : 'Explore serviços'}
-        description="Serviços e profissionais da plataforma."
-        action={<Link to={user.role === 'FREELANCER' ? '/demandas' : '/servicos'}>Ver mais</Link>}
+        title="Demandas para você"
+        description="Pedidos abertos nas suas categorias e na sua cidade aparecem primeiro."
+        action={<Link to="/demandas">Ver todas</Link>}
       />
-      <ServiceGrid services={services.slice(0, 3)} />
+      <div className="stack">
+        {demands.map((d) => (
+          <article className="panel" key={d.id}>
+            <h2>{d.title}</h2>
+            <p className="meta">
+              {money(d.budget)} · {d.days} {d.days === 1 ? 'dia' : 'dias'} · {d.city}
+            </p>
+            <Link to={`/demandas/${d.id}`}>Ver demanda e enviar proposta</Link>
+          </article>
+        ))}
+      </div>
+      {!demands.length && (
+        <Empty title="Nenhuma demanda nova agora">
+          <p>Você já respondeu às demandas abertas. Avisamos quando chegar um pedido novo.</p>
+        </Empty>
+      )}
     </>
   )
 }

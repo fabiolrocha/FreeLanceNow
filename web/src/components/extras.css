@@ -268,3 +268,63 @@
 .button.danger:hover {
   background: #93321f;
 }
+
+/* Profile photos and per-role screens */
+.avatar {
+  overflow: hidden;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+a.user-top {
+  color: inherit;
+  text-decoration: none;
+}
+.text-button.danger-text {
+  color: #b42318;
+}
+.avatar-field {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.avatar-field .row {
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.avatar-field strong,
+.avatar-field small {
+  display: block;
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+.filters .field {
+  flex: 1 1 180px;
+  margin: 0;
+}
+.meta {
+  color: #5b6472;
+  font-size: 0.85rem;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+  padding: 0;
+  list-style: none;
+}
+.danger-zone {
+  border: 1px solid #f3c7c2;
+}
+.danger-zone h2 {
+  color: #b42318;
+}

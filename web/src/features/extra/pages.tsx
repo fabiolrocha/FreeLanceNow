@@ -462,7 +462,8 @@ export function Withdraw() {
   )
 }
 function MockReport() {
-  const [params] = useSearchParams(),
+  const { user } = useApp(),
+    [params] = useSearchParams(),
     { pathname } = useLocation(),
     navigate = useNavigate()
   const sent = pathname.endsWith('enviada')
@@ -481,6 +482,8 @@ function MockReport() {
         ...reports,
         {
           id: crypto.randomUUID(),
+          reporterId: user?.id,
+          createdAt: new Date().toISOString(),
           target: params.get('alvo') || 'Conteúdo da demonstração',
           targetType: params.get('type'),
           targetId: params.get('id'),

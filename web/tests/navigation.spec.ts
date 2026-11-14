@@ -45,6 +45,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
     '/transacao',
     '/denunciar',
     '/denunciar/enviada',
+    '/denuncias',
   ]
   const roles = [
     {
@@ -53,6 +54,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
         ...shared,
         '/servicos/12/solicitar',
         '/demandas/nova',
+        '/demandas/d1/propostas/p1/aceitar',
         '/contratacoes/103/confirmar',
         '/contratacoes/103/contestar',
         '/contratacoes/104/avaliar',
@@ -65,6 +67,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
       user: 'marcos' as const,
       paths: [
         '/painel',
+        '/propostas',
         '/meus-servicos',
         '/meus-servicos/novo',
         '/meus-servicos/11/editar',

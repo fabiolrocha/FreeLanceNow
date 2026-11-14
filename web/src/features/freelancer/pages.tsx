@@ -44,6 +44,20 @@ export function MyServices() {
       setBusy('')
     }
   }
+  async function remove(s: Service) {
+    if (!user) return
+    setBusy(s.id)
+    setError('')
+    try {
+      await client.deleteService(user, s)
+      setItems((ss) => ss.filter((x) => x.id !== s.id))
+      notify('Anúncio excluído.')
+    } catch (e) {
+      setError((e as Error).message)
+    } finally {
+      setBusy('')
+    }
+  }
   return (
     <>
       <PageTitle
@@ -102,6 +116,18 @@ export function MyServices() {
                   >
                     Publicar
                   </button>
+                )}
+                {s.status !== 'ACTIVE' && !s.moderated && (
+                  <ConfirmButton
+                    disabled={busy === s.id}
+                    className="text-button danger-text"
+                    label="Excluir"
+                    title={`Excluir "${s.title}"?`}
+                    message="O anúncio e as fotos são apagados. Anúncios que já tiveram contratações não podem ser excluídos: deixe-os desativados para manter o histórico."
+                    confirmLabel="Sim, excluir"
+                    danger
+                    onConfirm={() => void remove(s)}
+                  />
                 )}
               </div>
             </article>

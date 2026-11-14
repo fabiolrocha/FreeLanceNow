@@ -7,13 +7,14 @@ import {
   Avatar,
   CategoryIcon,
   Empty,
+  Field,
   PageTitle,
   ReviewList,
   ServiceGrid,
 } from '../../components/ui'
 import { money } from '../../domain/rules'
-import { serviceImageUrl } from '../../data/client'
-import type { Service } from '../../domain/types'
+import { avatarUrl, serviceImageUrl } from '../../data/client'
+import type { Profile, Service } from '../../domain/types'
 
 export function Landing() {
   const { categories, services, user } = useApp()
@@ -395,9 +396,37 @@ export function ServiceDetail() {
     </>
   )
 }
+const PROFESSIONALS_PAGE = 12
+/** Specialties from the API, or from the visible listings in the demo data. */
+function useSpecialties() {
+  const { services } = useApp()
+  return (p: Profile) =>
+    p.specialties ??
+    [
+      ...new Set(services.filter((s) => s.freelancer.id === p.id).map((s) => s.category.name)),
+    ].sort()
+}
 export function Professionals() {
-  const { professionals } = useApp(),
-    [q, setQ] = useState('')
+  const { professionals, categories } = useApp(),
+    specialties = useSpecialties(),
+    [q, setQ] = useState(''),
+    [city, setCity] = useState(''),
+    [category, setCategory] = useState(''),
+    [sort, setSort] = useState('rating'),
+    [shown, setShown] = useState(PROFESSIONALS_PAGE)
+  const term = q.trim().toLowerCase(),
+    town = city.trim().toLowerCase()
+  const list = professionals
+    .map((p) => ({ ...p, specialties: specialties(p) }))
+    .filter((p) => `${p.name} ${p.bio} ${p.specialties.join(' ')}`.toLowerCase().includes(term))
+    .filter((p) => !town || `${p.city} ${p.serviceArea || ''}`.toLowerCase().includes(town))
+    .filter((p) => !category || p.specialties.includes(category))
+    .sort((a, b) =>
+      sort === 'name'
+        ? a.name.localeCompare(b.name)
+        : (b.averageRating ?? 0) - (a.averageRating ?? 0) ||
+          (b.reviewCount ?? 0) - (a.reviewCount ?? 0),
+    )
   return (
     <>
       <PageTitle
@@ -410,36 +439,80 @@ export function Professionals() {
           aria-label="Buscar profissionais"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Nome, especialidade ou cidade"
+          placeholder="Nome ou especialidade"
         />
       </label>
-      <div className="professional-list">
-        {professionals
-          .filter((p) => `${p.name} ${p.city} ${p.bio}`.toLowerCase().includes(q.toLowerCase()))
-          .map((p) => (
-            <article className="panel professional-row" key={p.id}>
-              <Avatar name={p.name} large />
-              <div>
-                <h2>{p.name}</h2>
-                <p>{p.bio}</p>
-                <small>
-                  <MapPin size={14} /> {p.city}
-                  {typeof p.averageRating === 'number' &&
-                    ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount})`}
-                </small>
-              </div>
-              <Link className="button secondary" to={`/profissionais/${p.id}`}>
-                Ver perfil
-              </Link>
-            </article>
-          ))}
+      <div className="filters">
+        <Field
+          label="Cidade ou bairro"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder="Taguatinga"
+        />
+        <label className="field">
+          <span>Especialidade</span>
+          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+            <option value="">Todas</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field">
+          <span>Ordenar por</span>
+          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="rating">Melhor avaliados</option>
+            <option value="name">Nome</option>
+          </select>
+        </label>
       </div>
+      <p className="meta" role="status">
+        {list.length} {list.length === 1 ? 'profissional' : 'profissionais'}
+      </p>
+      <div className="professional-list">
+        {list.slice(0, shown).map((p) => (
+          <article className="panel professional-row" key={p.id}>
+            <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
+            <div>
+              <h2>{p.name}</h2>
+              {p.specialties.length > 0 && (
+                <ul className="chips" aria-label="Especialidades">
+                  {p.specialties.map((s) => (
+                    <li className="badge" key={s}>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p>{p.bio}</p>
+              <small>
+                <MapPin size={14} /> {p.serviceArea || p.city}
+                {typeof p.averageRating === 'number'
+                  ? ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount})`
+                  : ' · Novo na plataforma'}
+              </small>
+            </div>
+            <Link className="button secondary" to={`/profissionais/${p.id}`}>
+              Ver perfil
+            </Link>
+          </article>
+        ))}
+      </div>
+      {list.length > shown && (
+        <button className="button secondary" onClick={() => setShown(shown + PROFESSIONALS_PAGE)}>
+          Mostrar mais
+        </button>
+      )}
+      {!list.length && <Empty title="Nenhum profissional com esses filtros" />}
     </>
   )
 }
 export function ProfileDetail() {
   const { id } = useParams(),
     { professionals, services, contracts, user } = useApp(),
+    specialties = useSpecialties(),
     reviews = useReviews('freelancer', id),
     p = professionals.find((x) => x.id === id),
     conversation = contracts.find(
@@ -449,17 +522,31 @@ export function ProfileDetail() {
         !['RECUSADO', 'CANCELADO'].includes(c.status),
     )
   if (!p) return <Empty title="Profissional não encontrado" />
+  const tags = specialties(p)
   return (
     <>
       <div className="panel profile-cover">
-        <Avatar name={p.name} large />
+        <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
         <div>
           <h1>{p.name}</h1>
           <p>
-            <MapPin size={16} /> {p.city}
-            {typeof p.averageRating === 'number' &&
-              ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'})`}
+            {typeof p.averageRating === 'number'
+              ? `★ ${p.averageRating.toFixed(1)} · ${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'}`
+              : 'Ainda sem avaliações'}
           </p>
+          <p>
+            <MapPin size={16} /> {p.city}
+            {p.serviceArea && ` · atende em ${p.serviceArea}`}
+          </p>
+          {p.memberSince && (
+            <p className="meta">
+              Na plataforma desde{' '}
+              {new Date(p.memberSince).toLocaleDateString('pt-BR', {
+                month: 'long',
+                year: 'numeric',
+              })}
+            </p>
+          )}
         </div>
         {conversation ? (
           <Link className="button secondary" to={`/mensagens?contratacao=${conversation.id}`}>
@@ -475,7 +562,16 @@ export function ProfileDetail() {
       </div>
       <section className="panel">
         <h2>Sobre o profissional</h2>
-        <p>{p.bio}</p>
+        <p>{p.bio || 'O profissional ainda não escreveu sua apresentação.'}</p>
+        {tags.length > 0 && (
+          <ul className="chips" aria-label="Especialidades">
+            {tags.map((s) => (
+              <li className="badge" key={s}>
+                {s}
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       <div id="servicos-oferecidos">
         <PageTitle title="Serviços oferecidos" />

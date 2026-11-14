@@ -8,10 +8,18 @@ export interface Profile {
   bio: string
   averageRating?: number | null
   reviewCount?: number
+  /** Neighbourhoods or cities a freelancer serves. */
+  serviceArea?: string
+  /** Changes whenever the photo changes; null when the user has no photo. */
+  avatarVersion?: number | null
+  memberSince?: string
+  /** Categories of the freelancer's active listings. */
+  specialties?: string[]
 }
 export interface User extends Profile {
   email: string
   phone: string
+  createdAt?: string
 }
 export interface Session {
   accessToken: string
@@ -129,8 +137,10 @@ export interface Demand {
   budget: number
   days: number
   city: string
-  status: 'OPEN' | 'CLOSED'
+  status: DemandStatus
+  categoryName?: string
 }
+export type DemandStatus = 'OPEN' | 'CLOSED' | 'CANCELLED'
 export interface CreateDemand {
   title: string
   description: string
@@ -139,15 +149,43 @@ export interface CreateDemand {
   days: number
   city: string
 }
+export type ProposalStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN'
 export interface Proposal {
   id: string
   demandId: string
+  demandTitle?: string
+  demandStatus?: DemandStatus
   freelancerId: string
   freelancerName: string
+  freelancerAverageRating?: number | null
+  freelancerReviewCount?: number
+  freelancerAvatarVersion?: number | null
   price: number
   days: number
   message: string
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED'
+  status: ProposalStatus
+  createdAt?: string
+  decidedAt?: string | null
+  /** Contract created when the proposal was accepted. */
+  contractId?: string | null
+}
+export interface AcceptProposal {
+  date?: string
+  address?: string
+}
+export type ReportStatus = 'PENDING' | 'KEPT' | 'REMOVED'
+/** A report as its author sees it: the decision, never who on the team decided. */
+export interface OwnReport {
+  id: string
+  targetType: 'SERVICE' | 'REVIEW' | 'POST'
+  targetId: string
+  targetTitle: string
+  reason: string
+  comment: string
+  status: ReportStatus
+  decisionNote?: string | null
+  createdAt: string
+  decidedAt?: string | null
 }
 export interface CreateProposal {
   price: number
