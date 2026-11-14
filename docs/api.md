@@ -159,15 +159,17 @@ PATCH `/contracts/{id}/status` recebe `status` e `comment` opcional de até 500 
 | `PENDENTE` | `ACEITO` ou `RECUSADO` | Freelancer participante |
 | `PENDENTE` | `CANCELADO` | Cliente participante |
 | `ACEITO` | `EM_ANDAMENTO` | Freelancer participante |
+| `ACEITO` | `CANCELADO` | Cliente ou freelancer participante, com motivo |
 | `EM_ANDAMENTO` | `AGUARDANDO_CONFIRMACAO` | Freelancer participante |
+| `EM_ANDAMENTO` | `EM_DISPUTA` | Cliente ou freelancer participante, com motivo |
 | `AGUARDANDO_CONFIRMACAO` | `CONCLUIDO` ou `EM_DISPUTA` | Cliente participante |
-| `EM_DISPUTA` | `CONCLUIDO` ou `EM_ANDAMENTO` | Admin |
+| `EM_DISPUTA` | `CONCLUIDO`, `EM_ANDAMENTO` ou `CANCELADO` | Admin, com justificativa |
 
-Contestação exige motivo não vazio de até 300 caracteres em `comment`. Participante incorreto recebe 403; transição incompatível com estado/perfil recebe 409. Não há transições manuais a partir de estados finais.
+Regra de saída (ADR23): qualquer parte cancela com motivo até o serviço começar; depois de `EM_ANDAMENTO`, só por disputa decidida pela administração. Contestação/disputa e cancelamento de contratação aceita exigem motivo não vazio de até 300 caracteres em `comment`; a decisão do admin exige justificativa de até 500 caracteres. Os três casos retornam 400 sem o texto. Participante incorreto recebe 403; transição incompatível com estado/perfil recebe 409. Não há transições manuais a partir de estados finais.
 
 O job cancela `PENDENTE` após 48 horas sem resposta e confirma `AGUARDANDO_CONFIRMACAO` após 5 dias corridos. A checagem periódica usa `CONTRACT_DEADLINE_CHECK_MS`, padrão 60000 ms, e registra eventos idempotentes. Não depende do navegador aberto, mas exige API em execução. Não dispara pagamentos ou e-mails.
 
-`ContractView` inclui IDs dos participantes, nomes, `serviceId` (pode ser nulo em contratação por proposta), título/preço, `date`, descrição/endereço, `status`, `history: [{status,at}]`, `completedAt`, `rating`, `review`, `reviewReply`, `reviewedAt`, `dispute` e `observations`. Campos opcionais podem ser nulos. Ator, estado anterior e nota dos eventos ficam no banco, mas não são expostos em `history`. Decisões de disputa por ADMIN também são registradas em `audit_event`; a interface solicita justificativa.
+`ContractView` inclui IDs dos participantes, nomes, `serviceId` (pode ser nulo em contratação por proposta), título/preço, `date`, descrição/endereço, `status`, `history: [{status,at,comment,actorRole}]`, `completedAt`, `rating`, `review`, `reviewReply`, `reviewedAt`, `dispute` e `observations`. Campos opcionais podem ser nulos. Cada item de `history` traz o comentário do evento (motivo, observação ou justificativa) e o papel de quem agiu (`CLIENT`, `FREELANCER`, `ADMIN`, ou nulo para o job de prazos); o nome do administrador não é exposto. Decisões de disputa por ADMIN também são registradas em `audit_event`; a interface solicita justificativa.
 
 ## Avaliações e resposta (F03)
 

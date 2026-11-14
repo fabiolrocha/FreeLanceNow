@@ -37,7 +37,8 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Participantes | Mock ou API (`F01`) |
 | Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/contratacoes/:id/confirmar`, `/contratacoes/:id/contestar` | Freelancer conclui; cliente confirma/contesta | Mock ou API (`F01`) |
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
-| Disputa | `/contratacoes/:id/disputa` | Participantes | Abertura via API (`F01`); decisão fundamentada e auditada na moderação (`F04`/`F05`) |
+| Disputa | `/contratacoes/:id/disputa` | Participantes | Motivo, quem abriu e decisão da administração lidos do histórico; sem disputa, a tela informa isso |
+| Cancelar contratação | `/contratacoes/:id/cancelar` | Participantes | Contratação aceita, antes de iniciar; motivo obrigatório |
 | Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`) |
 | Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Autenticado; chat só entre participantes | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
 | Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
