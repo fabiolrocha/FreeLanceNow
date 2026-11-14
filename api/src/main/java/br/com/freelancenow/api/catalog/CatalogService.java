@@ -25,18 +25,21 @@ public class CatalogService {
     private final UserRepository users;
     private final CurrentUser current;
     private final ReviewService reviews;
+    private final ServiceImageRepository images;
 
     public CatalogService(
             ServiceRepository services,
             CategoryRepository categories,
             UserRepository users,
             CurrentUser current,
-            ReviewService reviews) {
+            ReviewService reviews,
+            ServiceImageRepository images) {
         this.services = services;
         this.categories = categories;
         this.users = users;
         this.current = current;
         this.reviews = reviews;
+        this.images = images;
     }
 
     public List<CatalogDtos.CategoryView> categories() {
@@ -108,21 +111,8 @@ public class CatalogService {
                                 page,
                                 size,
                                 Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by("id"))));
-        var stats =
-                reviews.ratingSummaries(
-                        result.stream().map(s -> s.getFreelancer().getId()).distinct().toList());
         return new CatalogDtos.PageView<>(
-                result.stream()
-                        .map(
-                                s -> {
-                                    var st =
-                                            stats.getOrDefault(
-                                                    s.getFreelancer().getId(),
-                                                    ReviewService.RatingSummary.EMPTY);
-                                    return CatalogDtos.ServiceView.from(
-                                            s, st.averageRating(), st.reviewCount());
-                                })
-                        .toList(),
+                views(result.getContent()),
                 page,
                 size,
                 result.getTotalElements(),
@@ -134,27 +124,19 @@ public class CatalogService {
         if (s.isModerated()
                 || s.getStatus() != ServiceStatus.ACTIVE
                 || !s.getFreelancer().isActive()) throw notFound();
-        var st = reviews.ratingSummary(s.getFreelancer().getId());
-        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
+        return view(s);
     }
 
     public List<CatalogDtos.ServiceView> mine(Jwt jwt) {
         var u = freelancer(jwt);
-        var st = reviews.ratingSummary(u.getId());
-        return services.findByFreelancerIdOrderByCreatedAtDesc(u.getId()).stream()
-                .map(s -> CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount()))
-                .toList();
+        return views(services.findByFreelancerIdOrderByCreatedAtDesc(u.getId()));
     }
 
     @Transactional
     public CatalogDtos.ServiceView create(Jwt jwt, CatalogDtos.SaveService r) {
         var u = lockedFreelancer(jwt);
         checkLimit(u, null, r.status());
-        var st = reviews.ratingSummary(u.getId());
-        return CatalogDtos.ServiceView.from(
-                services.save(new ServiceListing(u, category(r.categoryId()), r)),
-                st.averageRating(),
-                st.reviewCount());
+        return view(services.save(new ServiceListing(u, category(r.categoryId()), r)));
     }
 
     @Transactional
@@ -167,8 +149,7 @@ public class CatalogService {
                         ? s.getCategory()
                         : category(r.categoryId());
         s.update(cat, r);
-        var st = reviews.ratingSummary(u.getId());
-        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
+        return view(s);
     }
 
     @Transactional
@@ -177,8 +158,43 @@ public class CatalogService {
         var s = owned(u, id);
         checkLimit(u, s, status);
         s.setStatus(status);
-        var st = reviews.ratingSummary(u.getId());
-        return CatalogDtos.ServiceView.from(s, st.averageRating(), st.reviewCount());
+        return view(s);
+    }
+
+    /** Locks the freelancer and the listing they own, rejecting moderated listings. */
+    ServiceListing ownedForUpdate(Jwt jwt, UUID id) {
+        return owned(lockedFreelancer(jwt), id);
+    }
+
+    CatalogDtos.ServiceView view(ServiceListing s) {
+        return views(List.of(s)).getFirst();
+    }
+
+    private List<CatalogDtos.ServiceView> views(List<ServiceListing> listings) {
+        if (listings.isEmpty()) return List.of();
+        var stats =
+                reviews.ratingSummaries(
+                        listings.stream().map(s -> s.getFreelancer().getId()).distinct().toList());
+        var gallery = new HashMap<UUID, List<CatalogDtos.ImageView>>();
+        images.summaries(listings.stream().map(ServiceListing::getId).toList())
+                .forEach(
+                        i ->
+                                gallery.computeIfAbsent(i.serviceId(), k -> new ArrayList<>())
+                                        .add(CatalogDtos.ImageView.from(i)));
+        return listings.stream()
+                .map(
+                        s -> {
+                            var st =
+                                    stats.getOrDefault(
+                                            s.getFreelancer().getId(),
+                                            ReviewService.RatingSummary.EMPTY);
+                            return CatalogDtos.ServiceView.from(
+                                    s,
+                                    st.averageRating(),
+                                    st.reviewCount(),
+                                    gallery.getOrDefault(s.getId(), List.of()));
+                        })
+                .toList();
     }
 
     private void checkLimit(User u, ServiceListing existing, ServiceStatus desired) {

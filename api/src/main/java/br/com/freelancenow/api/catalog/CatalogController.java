@@ -3,22 +3,26 @@ package br.com.freelancenow.api.catalog;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1")
 public class CatalogController {
     private final CatalogService catalog;
+    private final ServiceImageService images;
 
-    public CatalogController(CatalogService catalog) {
+    public CatalogController(CatalogService catalog, ServiceImageService images) {
         this.catalog = catalog;
+        this.images = images;
     }
 
     @GetMapping("/categories")
@@ -74,5 +78,33 @@ public class CatalogController {
             @PathVariable UUID id,
             @Valid @RequestBody CatalogDtos.ChangeStatus r) {
         return catalog.status(jwt, id, r.status());
+    }
+
+    @PostMapping(path = "/services/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('FREELANCER')")
+    public CatalogDtos.ServiceView uploadImages(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable UUID id,
+            @RequestPart(name = "files", required = false) List<MultipartFile> files) {
+        return images.upload(jwt, id, files);
+    }
+
+    @DeleteMapping("/services/{id}/images/{imageId}")
+    @PreAuthorize("hasRole('FREELANCER')")
+    public CatalogDtos.ServiceView deleteImage(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @PathVariable UUID imageId) {
+        return images.delete(jwt, id, imageId);
+    }
+
+    @GetMapping("/services/{id}/images/{imageId}")
+    public ResponseEntity<byte[]> image(@PathVariable UUID id, @PathVariable UUID imageId) {
+        var image = images.find(id, imageId);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(image.getContentType()))
+                .cacheControl(CacheControl.maxAge(Duration.ofDays(7)).cachePublic())
+                .header("X-Content-Type-Options", "nosniff")
+                .header("Content-Disposition", "inline")
+                .body(image.getData());
     }
 }
