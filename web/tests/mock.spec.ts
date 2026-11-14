@@ -120,7 +120,7 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   await page.getByRole('link', { name: 'Aceitar proposta' }).click()
   await page.getByRole('button', { name: 'Confirmar contratação' }).click()
   await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
-  await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Aceita', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('heading', { name: title })).toBeVisible()
   await logout(page)
 
@@ -156,7 +156,7 @@ test('cliente contesta conclusão e admin decide a disputa na moderação', asyn
 
   await loginAs(page, 'ana')
   await page.goto('/contratacoes/103')
-  await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Concluída', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Avaliar serviço' })).toBeVisible()
   await page.getByRole('link', { name: 'Ver disputa encerrada' }).click()
   await expect(page.getByText('Disputa encerrada')).toBeVisible()
@@ -187,7 +187,7 @@ test('contratação aceita pode ser cancelada com motivo; depois de iniciada, s�
   await expect(page).toHaveURL(/\/cancelar$/)
   await page.getByLabel('Motivo do cancelamento').fill('Fiquei sem agenda na data pedida.')
   await page.getByRole('button', { name: 'Cancelar contratação' }).click()
-  await expect(page.getByText('Cancelado', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Cancelada', { exact: true }).first()).toBeVisible()
   await expect(page.getByText('Fiquei sem agenda na data pedida.')).toBeVisible()
 
   // Work in progress has no cancel option; either party opens a dispute instead.

@@ -539,65 +539,145 @@ function MockReport() {
     </>
   )
 }
+const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL as string | undefined
+function Contact() {
+  return supportEmail ? (
+    <p>
+      Fale com a equipe pelo e-mail <a href={`mailto:${supportEmail}`}>{supportEmail}</a>.
+    </p>
+  ) : (
+    <p>Fale com a equipe pelos canais informados na página inicial do projeto.</p>
+  )
+}
 export function Help({ kind = 'help' }: { kind?: string }) {
   return (
     <article className="prose">
       <h1>
         {kind === 'terms'
-          ? 'Termos de uso da demonstração'
+          ? 'Termos de uso'
           : kind === 'privacy'
-            ? 'Privacidade na demonstração'
+            ? 'Política de privacidade'
             : 'Como usar o FreeLanceNow'}
       </h1>
-      {kind === 'help' ? (
+      {isMock && (
+        <p>
+          <strong>Demonstração:</strong> as contas e os dados desta versão são fictícios e ficam só
+          neste navegador.
+        </p>
+      )}
+      {kind === 'help' && (
         <>
           <h2>Para clientes</h2>
           <p>
-            Busque um serviço, veja o perfil do profissional e envie uma solicitação com data
-            futura. Depois do aceite e da execução, confirme ou conteste a entrega.
+            Busque um serviço, veja o perfil do profissional e envie uma solicitação com uma data
+            futura. Você também pode publicar uma demanda e escolher entre as propostas recebidas.
+            Depois do aceite e da execução, confirme ou conteste a entrega e avalie o profissional.
           </p>
           <h2>Para profissionais</h2>
           <p>
-            Publique até 20 serviços ativos. Aceite ou recuse solicitações em até 48 horas. Quando
-            terminar, sinalize a conclusão e aguarde a confirmação do cliente.
+            Publique até 20 serviços ativos e responda às demandas da sua região. Aceite ou recuse
+            solicitações em até 48 horas. Quando terminar, marque a conclusão e aguarde a
+            confirmação do cliente.
           </p>
-          <h2>Prazos do produto</h2>
+          <h2>Prazos</h2>
           <p>
-            48 horas para responder, 5 dias para confirmar a conclusão e 7 dias para avaliar um
-            serviço concluído. Sem resposta em 48 horas, a solicitação é cancelada automaticamente;
-            sem resposta do cliente em 5 dias, a conclusão é confirmada automaticamente. Cada
-            contratação mostra a data-limite da etapa atual.
+            48 horas para responder a uma solicitação, 5 dias para o cliente confirmar a conclusão e
+            7 dias para avaliar um serviço concluído. Sem resposta em 48 horas, a solicitação é
+            cancelada automaticamente; sem resposta do cliente em 5 dias, a conclusão é confirmada
+            automaticamente. Cada contratação mostra a data-limite da etapa atual.
+          </p>
+          <h2>Problemas com um serviço</h2>
+          <p>
+            Antes do início, qualquer uma das partes pode cancelar com um motivo. Depois do início,
+            abra uma disputa na contratação: a administração analisa o histórico e decide. Conteúdo
+            impróprio pode ser denunciado no anúncio, na avaliação ou na publicação.
           </p>
           <h2>Pagamentos</h2>
           <p>
-            As telas financeiras usam valores fictícios. Não existe cobrança, custódia ou saque real
-            nesta etapa.
+            {isMock
+              ? 'As telas financeiras desta demonstração usam valores fictícios. Não existe cobrança, custódia ou saque real.'
+              : 'O pagamento pela plataforma ainda não está disponível. Por enquanto, cliente e profissional combinam o pagamento diretamente, pelas mensagens da contratação.'}
           </p>
+          <h2>Contato</h2>
+          <Contact />
         </>
-      ) : (
+      )}
+      {kind === 'terms' && (
         <>
+          <p>Versão de novembro de 2026.</p>
+          <h2>O que é o FreeLanceNow</h2>
           <p>
-            Versão academic-v1, preparada para a demonstração acadêmica do Grupo 2. Este texto é
-            provisório e deve ser revisado antes de disponibilizar o produto ao público.
+            O FreeLanceNow aproxima clientes e profissionais de serviços gerais. A plataforma não
+            executa os serviços nem é parte do acordo entre cliente e profissional: cada um responde
+            pelo que oferece, combina e entrega.
           </p>
-          <h2>Uso de dados fictícios</h2>
+          <h2>Sua conta</h2>
           <p>
-            Utilize as contas de demonstração e evite inserir dados pessoais reais. No modo mock,
-            dados são guardados somente nesta sessão do navegador. No modo API, o cadastro é
-            persistido no banco local do projeto.
+            Para usar a plataforma você precisa ter 18 anos ou mais, informar dados verdadeiros e
+            manter sua senha em segredo. Você responde pelas ações feitas com a sua conta.
           </p>
-          <h2>Finalidade</h2>
+          <h2>Regras de uso</h2>
           <p>
-            Os dados de cadastro permitem demonstrar a autenticação e o vínculo entre usuários e
-            serviços. Senhas da API recebem hash bcrypt. Contatos não são expostos nos perfis
-            públicos.
+            Não publique conteúdo falso, ofensivo, discriminatório ou que viole direitos de
+            terceiros. Anúncios, demandas, publicações e avaliações devem tratar de serviços reais.
+            Contas ou conteúdos que descumpram estas regras podem ser removidos ou suspensos pela
+            administração, com o motivo registrado.
           </p>
-          <h2>Limites desta versão</h2>
+          <h2>Contratações e avaliações</h2>
           <p>
-            Não há intermediação financeira ou contratação comercial efetiva. O grupo ainda precisa
-            definir políticas de retenção, exclusão de dados, suporte e condições comerciais antes
-            de um lançamento público.
+            Cada contratação segue as etapas e os prazos mostrados na tela. Avaliações só podem ser
+            feitas por quem contratou o serviço e ficam públicas no perfil do profissional, que pode
+            responder uma vez.
           </p>
+          <h2>Pagamentos</h2>
+          <p>
+            Nesta versão a plataforma não processa pagamentos. Valores exibidos são estimativas
+            combinadas entre as partes.
+          </p>
+          <h2>Encerramento</h2>
+          <p>
+            Você pode excluir sua conta a qualquer momento em Configurações da conta. Estes termos
+            podem mudar; avisaremos na plataforma quando houver mudança relevante.
+          </p>
+          <h2>Contato</h2>
+          <Contact />
+        </>
+      )}
+      {kind === 'privacy' && (
+        <>
+          <p>Versão de novembro de 2026, em conformidade com a LGPD (Lei 13.709/2018).</p>
+          <h2>Dados que coletamos</h2>
+          <p>
+            Nome, e-mail, telefone, cidade e tipo de conta no cadastro; foto, descrição e área de
+            atendimento se você completar o perfil; e o que você publica ou troca na plataforma:
+            anúncios e fotos, demandas, propostas, contratações, mensagens, avaliações e denúncias.
+          </p>
+          <h2>Para que usamos</h2>
+          <p>
+            Para criar e proteger sua conta, mostrar seu perfil público, conectar clientes e
+            profissionais, enviar avisos e e-mails sobre a sua conta e suas contratações, e moderar
+            conteúdo denunciado. Não vendemos seus dados.
+          </p>
+          <h2>O que fica público</h2>
+          <p>
+            Nome, foto, cidade, descrição, anúncios e avaliações. E-mail e telefone nunca aparecem
+            no perfil público.
+          </p>
+          <h2>Segurança e fornecedores</h2>
+          <p>
+            Senhas são guardadas com hash e o acesso usa conexões criptografadas. Os dados ficam em
+            servidores de provedores de nuvem contratados para hospedar o site, a API, o banco de
+            dados e o envio de e-mails.
+          </p>
+          <h2>Seus direitos</h2>
+          <p>
+            Você pode consultar e corrigir seus dados no perfil e excluir a conta em Configurações
+            da conta. Na exclusão, seus dados pessoais são apagados ou anonimizados; o histórico de
+            contratações, mensagens e avaliações permanece sem identificar você, para preservar a
+            confiabilidade das avaliações de outras pessoas.
+          </p>
+          <h2>Contato</h2>
+          <Contact />
         </>
       )}
       <ErrorMessage message="" />

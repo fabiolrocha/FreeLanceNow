@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { ShieldCheck, ArrowLeft, CheckCircle2 } from 'lucide-react'
@@ -47,7 +47,7 @@ export function Login() {
         <div className="auth-story-bottom">Elétrica, limpeza, encanamento, pintura e TI.</div>
       </div>
       <section className="auth-panel">
-        <h2>Bem-vindo de volta</h2>
+        <h2>Que bom ver você de novo</h2>
         <p>{from ? 'Entre para continuar de onde parou.' : 'Entre para continuar.'}</p>
         <form onSubmit={submit}>
           <Field label="E-mail" name="email" type="email" required autoComplete="email" />
@@ -191,7 +191,7 @@ export function Signup() {
           <ErrorMessage message={error} />
           <div className="row">
             <button type="button" className="button secondary" onClick={() => setRole(null)}>
-              Alterar perfil
+              Trocar tipo de conta
             </button>
             <button disabled={busy} className="button">
               {busy ? 'Criando…' : 'Criar conta'}
@@ -319,6 +319,67 @@ export function ResetPassword() {
             </Link>
           )}
         </form>
+      )}
+    </section>
+  )
+}
+/** Opened from the registration e-mail. Works signed in or out; the link carries the account. */
+export function VerifyEmail() {
+  const [params] = useSearchParams(),
+    verifyToken = params.get('token') || ''
+  const { user, updateUser } = useApp()
+  const [state, setState] = useState<'busy' | 'done' | 'error'>(verifyToken ? 'busy' : 'error'),
+    [error, setError] = useState(
+      verifyToken ? '' : 'Este link está incompleto. Abra o link do e-mail novamente.',
+    )
+  useEffect(() => {
+    if (!verifyToken) return
+    let active = true
+    client
+      .verifyEmail(verifyToken)
+      .then(() => {
+        if (!active) return
+        setState('done')
+        if (user) updateUser({ ...user, emailVerified: true })
+      })
+      .catch((e: Error) => {
+        if (!active) return
+        setError(e.message)
+        setState('error')
+      })
+    return () => {
+      active = false
+    }
+    // Run once per link; the user object changes after confirming.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verifyToken])
+  return (
+    <section className="form-panel auth-single">
+      <h1>Confirmação de e-mail</h1>
+      {state === 'busy' && <p>Confirmando seu e-mail…</p>}
+      {state === 'done' && (
+        <>
+          <p className="success">
+            <CheckCircle2 />
+            E-mail confirmado. Agora você recebe por e-mail os avisos da sua conta.
+          </p>
+          <Link className="button" to={user ? '/inicio' : '/login'}>
+            {user ? 'Ir para o início' : 'Entrar'}
+          </Link>
+        </>
+      )}
+      {state === 'error' && (
+        <>
+          <ErrorMessage message={error} />
+          <p>
+            {user
+              ? 'Use "Reenviar link" no aviso do topo da página para receber um link novo.'
+              : 'Entre na sua conta para pedir um link novo.'}
+          </p>
+          <Link className="button" to={user ? '/inicio' : '/login'}>
+            {user ? 'Voltar ao início' : 'Entrar'}
+          </Link>
+        </>
       )}
     </section>
   )

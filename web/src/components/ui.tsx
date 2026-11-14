@@ -13,7 +13,7 @@ import {
   Star,
 } from 'lucide-react'
 import type { Review, Service } from '../domain/types'
-import { dateLabel, initials, money } from '../domain/rules'
+import { dateLabel, initials, money, ratingLabel } from '../domain/rules'
 import { isMock, serviceImageUrl } from '../data/client'
 import './extras.css'
 
@@ -235,7 +235,7 @@ export function ServiceCard({ service: s }: { service: Service }) {
             <span>
               {s.freelancer.name}
               {typeof s.freelancer.averageRating === 'number' &&
-                ` · ★ ${s.freelancer.averageRating.toFixed(1)}`}
+                ` · ★ ${ratingLabel(s.freelancer.averageRating)}`}
             </span>
             <small>
               <MapPin size={12} />

@@ -12,8 +12,8 @@ import {
   ReviewList,
   ServiceGrid,
 } from '../../components/ui'
-import { money } from '../../domain/rules'
-import { avatarUrl, serviceImageUrl } from '../../data/client'
+import { money, ratingLabel } from '../../domain/rules'
+import { avatarUrl, isMock, serviceImageUrl } from '../../data/client'
 import type { Profile, Service } from '../../domain/types'
 
 export function Landing() {
@@ -71,7 +71,7 @@ export function Landing() {
               <strong>Marcos Vieira</strong>
               <p>Eletricista · Taguatinga, DF</p>
             </div>
-            <span className="badge">Demonstração</span>
+            {isMock && <span className="badge">Demonstração</span>}
           </div>
           <div className="board-footer">
             <span>
@@ -323,7 +323,7 @@ export function SearchServices() {
 }
 export function ServiceDetail() {
   const { id } = useParams(),
-    { services } = useApp(),
+    { services, user } = useApp(),
     reviews = useReviews('service', id),
     s = services.find((x) => x.id === id)
   if (!s)
@@ -359,7 +359,7 @@ export function ServiceDetail() {
           <h2>
             Avaliações deste serviço
             {reviews.length > 0 &&
-              ` · ★ ${(reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1)} (${reviews.length})`}
+              ` · ★ ${ratingLabel(reviews.reduce((a, r) => a + r.rating, 0) / reviews.length)} (${reviews.length})`}
           </h2>
           <ReviewList reviews={reviews} showService={false} />
         </article>
@@ -368,29 +368,47 @@ export function ServiceDetail() {
           <p>
             Valor estimado · {s.deliveryDays} {s.deliveryDays === 1 ? 'dia' : 'dias'} para execução
           </p>
-          <Link className="button full" to={`/servicos/${s.id}/solicitar`}>
-            Solicitar serviço
-          </Link>
-          <small>O profissional tem até 48 horas para responder.</small>
+          {(!user || user.role === 'CLIENT') && (
+            <>
+              <Link className="button full" to={`/servicos/${s.id}/solicitar`}>
+                Solicitar serviço
+              </Link>
+              <small>O profissional tem até 48 horas para responder.</small>
+            </>
+          )}
+          {user?.id === s.freelancer.id && (
+            <Link className="button secondary full" to={`/meus-servicos/${s.id}/editar`}>
+              Editar meu anúncio
+            </Link>
+          )}
           <hr />
           <div className="person">
-            <Avatar name={s.freelancer.name} />
+            <Avatar
+              name={s.freelancer.name}
+              src={avatarUrl(s.freelancer.id, s.freelancer.avatarVersion)}
+            />
             <div>
               <strong>{s.freelancer.name}</strong>
               <p>
-                {s.freelancer.city}
-                {typeof s.freelancer.averageRating === 'number' &&
-                  ` · ★ ${s.freelancer.averageRating.toFixed(1)} (${s.freelancer.reviewCount})`}
+                {[
+                  s.freelancer.city,
+                  typeof s.freelancer.averageRating === 'number' &&
+                    `★ ${ratingLabel(s.freelancer.averageRating)} (${s.freelancer.reviewCount})`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               </p>
             </div>
           </div>
           <Link to={`/profissionais/${s.freelancer.id}`}>Ver perfil completo</Link>
-          <Link
-            className="subtle-link"
-            to={`/denunciar?type=SERVICE&id=${s.id}&alvo=${encodeURIComponent(s.title)}`}
-          >
-            Denunciar anúncio
-          </Link>
+          {user && user.id !== s.freelancer.id && user.role !== 'ADMIN' && (
+            <Link
+              className="subtle-link"
+              to={`/denunciar?type=SERVICE&id=${s.id}&alvo=${encodeURIComponent(s.title)}`}
+            >
+              Denunciar anúncio
+            </Link>
+          )}
         </aside>
       </div>
     </>
@@ -488,10 +506,13 @@ export function Professionals() {
               )}
               <p>{p.bio}</p>
               <small>
-                <MapPin size={14} /> {p.serviceArea || p.city}
-                {typeof p.averageRating === 'number'
-                  ? ` · ★ ${p.averageRating.toFixed(1)} (${p.reviewCount})`
-                  : ' · Novo na plataforma'}
+                <MapPin size={14} />{' '}
+                {[
+                  p.serviceArea || p.city || 'Localização não informada',
+                  typeof p.averageRating === 'number'
+                    ? `★ ${ratingLabel(p.averageRating)} (${p.reviewCount})`
+                    : 'Novo na plataforma',
+                ].join(' · ')}
               </small>
             </div>
             <Link className="button secondary" to={`/profissionais/${p.id}`}>
@@ -531,7 +552,7 @@ export function ProfileDetail() {
           <h1>{p.name}</h1>
           <p>
             {typeof p.averageRating === 'number'
-              ? `★ ${p.averageRating.toFixed(1)} · ${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'}`
+              ? `★ ${ratingLabel(p.averageRating)} · ${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'}`
               : 'Ainda sem avaliações'}
           </p>
           <p>

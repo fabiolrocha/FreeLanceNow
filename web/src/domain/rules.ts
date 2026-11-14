@@ -23,14 +23,49 @@ export const initials = (name: string) =>
     .toUpperCase()
 export const statusLabel: Record<ContractStatus, string> = {
   PENDENTE: 'Pendente',
-  ACEITO: 'Aceito',
+  ACEITO: 'Aceita',
   EM_ANDAMENTO: 'Em andamento',
   AGUARDANDO_CONFIRMACAO: 'Aguardando confirmação',
-  CONCLUIDO: 'Concluído',
+  CONCLUIDO: 'Concluída',
   EM_DISPUTA: 'Em disputa',
-  RECUSADO: 'Recusado',
-  CANCELADO: 'Cancelado',
+  RECUSADO: 'Recusada',
+  CANCELADO: 'Cancelada',
 }
+/** Explains, to whoever is looking, what happens next in a contract. */
+export function nextStepHint(status: ContractStatus, role: Role | undefined, other: string) {
+  const client = role === 'CLIENT'
+  switch (status) {
+    case 'PENDENTE':
+      return client
+        ? `${other} tem até 48 horas para aceitar ou recusar. Sem resposta, a solicitação é cancelada.`
+        : `Aceite ou recuse em até 48 horas. Sem resposta, a solicitação é cancelada.`
+    case 'ACEITO':
+      return client
+        ? `${other} inicia o serviço na data combinada. Até lá, qualquer parte pode cancelar com motivo.`
+        : `Inicie o serviço na data combinada. Até lá, qualquer parte pode cancelar com motivo.`
+    case 'EM_ANDAMENTO':
+      return client
+        ? `Quando terminar, ${other} marca a conclusão e você confirma a entrega.`
+        : `Quando terminar, marque a conclusão com uma observação para ${other} confirmar.`
+    case 'AGUARDANDO_CONFIRMACAO':
+      return client
+        ? 'Confirme a entrega ou conteste em até 5 dias. Sem resposta, a conclusão é confirmada.'
+        : `${other} tem até 5 dias para confirmar ou contestar. Sem resposta, a conclusão é confirmada.`
+    case 'CONCLUIDO':
+      return client
+        ? 'Serviço concluído. Você pode avaliar o profissional em até 7 dias.'
+        : 'Serviço concluído. Se o cliente avaliar, você pode responder uma vez.'
+    case 'EM_DISPUTA':
+      return 'A administração analisa o caso e decide. Você recebe um aviso quando houver decisão.'
+    case 'RECUSADO':
+      return 'A solicitação foi recusada. Nenhuma outra ação é necessária.'
+    case 'CANCELADO':
+      return 'A contratação foi cancelada. Nenhuma outra ação é necessária.'
+  }
+}
+/** Ratings in Brazilian format: 4,5. */
+export const ratingLabel = (value: number) =>
+  value.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 const transitions: Partial<Record<ContractStatus, Partial<Record<Role, ContractStatus[]>>>> = {
   PENDENTE: { CLIENT: ['CANCELADO'], FREELANCER: ['ACEITO', 'RECUSADO'] },
   // Either party cancels (with a reason) until the work starts; afterwards only a dispute remains.
@@ -157,6 +192,46 @@ export function checkNewPassword(d: FormData) {
     return 'Use pelo menos 8 caracteres com letras e números, até 72 bytes.'
   if (password !== String(d.get('confirm'))) return 'As senhas não conferem.'
   return ''
+}
+export const roleLabel: Record<Role, string> = {
+  CLIENT: 'Cliente',
+  FREELANCER: 'Profissional',
+  ADMIN: 'Administração',
+}
+export const accountStatusLabel = (u: { active: boolean; deleted?: boolean }) =>
+  u.deleted ? 'Excluída' : u.active ? 'Ativa' : 'Suspensa'
+const auditActions: Record<string, string> = {
+  ACCOUNT_DELETED: 'Conta excluída pelo titular',
+  ADMIN_CREATED: 'Conta de administração criada',
+  CATEGORY_CREATED: 'Categoria criada',
+  CATEGORY_UPDATED: 'Categoria atualizada',
+  DISPUTE_DECIDED: 'Disputa decidida',
+  REPORT_DECIDED: 'Denúncia decidida',
+  USER_STATUS: 'Status de conta alterado',
+}
+const auditTargets: Record<string, string> = {
+  CATEGORY: 'Categoria',
+  CONTRACT: 'Contratação',
+  REPORT: 'Denúncia',
+  USER: 'Conta',
+}
+export const auditActionLabel = (code: string) => auditActions[code] || code
+export const auditTargetLabel = (code: string) => auditTargets[code] || code
+/** Turns stored before/after codes (statuses, flags) into words for the audit log. */
+export function auditValueLabel(value: string | null | undefined) {
+  if (!value) return '—'
+  const words: Record<string, string> = {
+    true: 'Ativa',
+    false: 'Inativa',
+    PENDING: 'Pendente',
+    KEPT: 'Mantido',
+    REMOVED: 'Removido',
+    ...roleLabel,
+    ...statusLabel,
+  }
+  const category = /^(.*) \/ active=(true|false)$/.exec(value)
+  if (category) return `${category[1]} · ${category[2] === 'true' ? 'ativa' : 'inativa'}`
+  return words[value] || value
 }
 export const demandStatusLabel: Record<DemandStatus, string> = {
   OPEN: 'Aberta',

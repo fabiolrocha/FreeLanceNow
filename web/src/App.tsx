@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect } from 'react'
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactElement } from 'react'
 import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation, Link } from 'react-router-dom'
 import { Provider, useApp } from './app/store'
 import { Layout } from './app/Layout'
 import type { Role } from './domain/types'
+import { isMock } from './data/client'
 
 function feature<T extends Record<string, unknown>, K extends keyof T>(
   load: () => Promise<T>,
@@ -26,7 +27,8 @@ const auth = () => import('./features/auth/pages'),
 const Login = feature(auth, 'Login'),
   Signup = feature(auth, 'Signup'),
   Recovery = feature(auth, 'Recovery'),
-  ResetPassword = feature(auth, 'ResetPassword')
+  ResetPassword = feature(auth, 'ResetPassword'),
+  VerifyEmail = feature(auth, 'VerifyEmail')
 const Landing = feature(catalog, 'Landing'),
   Search = feature(catalog, 'SearchServices'),
   Detail = feature(catalog, 'ServiceDetail'),
@@ -77,12 +79,49 @@ function Guard({ roles }: { roles?: Role[] }) {
   return roles && !roles.includes(user.role) ? (
     <section className="panel">
       <h1>Acesso restrito</h1>
-      <p>Esta área exige outro tipo de conta.</p>
-      <Link to="/inicio">Voltar ao início</Link>
+      <p>
+        {roles.length === 1 && roles[0] === 'ADMIN'
+          ? 'Esta área é exclusiva da administração.'
+          : roles.length === 1 && roles[0] === 'CLIENT'
+            ? 'Esta área é para contas de cliente.'
+            : roles.length === 1 && roles[0] === 'FREELANCER'
+              ? 'Esta área é para contas de profissional.'
+              : 'Esta área não está disponível para o seu tipo de conta.'}
+      </p>
+      <Link to={user.role === 'ADMIN' ? '/admin' : '/inicio'}>Voltar ao início</Link>
     </section>
   ) : (
     <Outlet />
   )
+}
+/**
+ * Payments are the last integration. Until then the API build shows what is coming instead of
+ * simulated balances; the mock build keeps the full demonstration.
+ */
+function PaymentsSoon() {
+  const { user } = useApp()
+  return (
+    <section className="panel">
+      <span className="badge">Em breve</span>
+      <h1>Pagamentos pela plataforma</h1>
+      <p>
+        {user?.role === 'FREELANCER'
+          ? 'Em breve você vai receber pelos serviços concluídos e acompanhar saques por aqui. Por enquanto, combine o pagamento diretamente com o cliente pelas mensagens da contratação.'
+          : user?.role === 'ADMIN'
+            ? 'O acompanhamento de transações e repasses chega junto com a integração de pagamentos.'
+            : 'Em breve você vai pagar com segurança pela plataforma, com o valor liberado ao profissional só depois da sua confirmação. Por enquanto, combine o pagamento diretamente com o profissional pelas mensagens da contratação.'}
+      </p>
+      <Link to={user?.role === 'ADMIN' ? '/admin' : '/contratacoes'}>
+        {user?.role === 'ADMIN' ? 'Voltar ao painel' : 'Ver minhas contratações'}
+      </Link>
+    </section>
+  )
+}
+const money = (element: ReactElement) => (isMock ? element : <PaymentsSoon />)
+/** The feed is for clients and freelancers; the team starts on its own panel. */
+function Home() {
+  const { user } = useApp()
+  return user?.role === 'ADMIN' ? <Navigate to="/admin/usuarios" replace /> : <Feed />
 }
 function ScrollReset() {
   const { pathname } = useLocation()
@@ -111,6 +150,7 @@ export default function App() {
               <Route path="cadastro" element={<Signup />} />
               <Route path="recuperar-senha" element={<Recovery />} />
               <Route path="redefinir-senha" element={<ResetPassword />} />
+              <Route path="verificar-email" element={<VerifyEmail />} />
               <Route path="servicos" element={<Search />} />
               <Route path="servicos/:id" element={<Detail />} />
               <Route path="profissionais" element={<Professionals />} />
@@ -119,23 +159,26 @@ export default function App() {
               <Route path="termos" element={<Help kind="terms" />} />
               <Route path="privacidade" element={<Help kind="privacy" />} />
               <Route element={<Guard />}>
-                <Route path="inicio" element={<Feed />} />
+                <Route path="inicio" element={<Home />} />
                 <Route path="perfil" element={<OwnProfile />} />
                 <Route path="perfil/editar" element={<EditProfile />} />
                 <Route path="perfil/completar" element={<EditProfile />} />
-                <Route path="contratacoes" element={<ContractList />} />
                 <Route path="contratacoes/:id" element={<ContractDetail />} />
                 <Route path="contratacoes/:id/enviada" element={<Sent />} />
                 <Route path="contratacoes/:id/avaliacao-publicada" element={<Reviewed />} />
                 {['disputa', 'contestar', 'cancelar'].map((p) => (
                   <Route key={p} path={`contratacoes/:id/${p}`} element={<ContractAction />} />
                 ))}
-                <Route path="demandas" element={<Demands />} />
                 <Route path="demandas/:id" element={<DemandDetail />} />
                 <Route path="notificacoes" element={<Notifications />} />
+              </Route>
+              {/* Marketplace areas: the team works from its own panel. */}
+              <Route element={<Guard roles={['CLIENT', 'FREELANCER']} />}>
+                <Route path="contratacoes" element={<ContractList />} />
+                <Route path="demandas" element={<Demands />} />
                 <Route path="mensagens" element={<Messages />} />
-                <Route path="carteira" element={<Wallet />} />
-                <Route path="transacao" element={<Transaction />} />
+                <Route path="carteira" element={money(<Wallet />)} />
+                <Route path="transacao" element={money(<Transaction />)} />
                 <Route path="denunciar" element={<Report />} />
                 <Route path="denunciar/enviada" element={<Report />} />
                 <Route path="denuncias" element={<MyReports />} />
@@ -145,8 +188,8 @@ export default function App() {
                 <Route path="demandas/nova" element={<DemandForm />} />
                 <Route path="demandas/:id/editar" element={<DemandForm />} />
                 <Route path="demandas/:id/propostas/:pid/aceitar" element={<AcceptProposal />} />
-                <Route path="pagamento" element={<Payment />} />
-                <Route path="pagamento/confirmado" element={<Payment />} />
+                <Route path="pagamento" element={money(<Payment />)} />
+                <Route path="pagamento/confirmado" element={money(<Payment />)} />
                 {['confirmar', 'avaliar'].map((p) => (
                   <Route key={p} path={`contratacoes/:id/${p}`} element={<ContractAction />} />
                 ))}
@@ -161,8 +204,8 @@ export default function App() {
                 <Route path="contratacoes/:id/concluir" element={<ContractAction />} />
                 <Route path="demandas/:id/proposta" element={<ProposalForm />} />
                 <Route path="demandas/:id/proposta/enviada" element={<ProposalForm />} />
-                <Route path="saque" element={<Withdraw />} />
-                <Route path="saque/enviado" element={<Withdraw />} />
+                <Route path="saque" element={money(<Withdraw />)} />
+                <Route path="saque/enviado" element={money(<Withdraw />)} />
               </Route>
               <Route element={<Guard roles={['ADMIN']} />}>
                 <Route path="admin" element={<Navigate to="/admin/usuarios" replace />} />
@@ -170,7 +213,7 @@ export default function App() {
                 <Route path="admin/categorias" element={<Categories />} />
                 <Route path="admin/moderacao" element={<Moderation />} />
                 <Route path="admin/relatorios" element={<Reports />} />
-                <Route path="admin/transacoes" element={<Transactions />} />
+                <Route path="admin/transacoes" element={money(<Transactions />)} />
               </Route>
               <Route
                 path="*"

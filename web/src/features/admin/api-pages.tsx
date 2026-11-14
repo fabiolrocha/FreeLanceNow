@@ -5,6 +5,13 @@ import { useApp } from '../../app/store'
 import { adminApi } from '../../data/admin'
 import type { AdminCategory, ContentReport, Metrics } from '../../data/admin'
 import { exportCsv } from '../../data/exportCsv'
+import {
+  accountStatusLabel,
+  auditActionLabel,
+  auditTargetLabel,
+  auditValueLabel,
+  roleLabel,
+} from '../../domain/rules'
 import { ConfirmButton, ErrorMessage, Field, PageTitle, Empty } from '../../components/ui'
 
 function useResource<T>(load: () => Promise<T>) {
@@ -74,7 +81,8 @@ export function ApiAdminUsers() {
     (u) =>
       `${u.name} ${u.email}`.toLowerCase().includes(q.toLowerCase()) &&
       (!role || u.role === role) &&
-      (!status || String(u.active) === status) &&
+      (!status ||
+        (status === 'deleted' ? !!u.deleted : !u.deleted && String(u.active) === status)) &&
       (!from || u.createdAt.slice(0, 10) >= from) &&
       (!to || u.createdAt.slice(0, 10) <= to),
   )
@@ -99,14 +107,14 @@ export function ApiAdminUsers() {
     <>
       <PageTitle
         title="Gerenciamento de usuários"
-        description="Contas persistidas. Suspensão preserva o histórico e bloqueia o acesso."
+        description="Suspender preserva o histórico e bloqueia o acesso até a reativação."
         action={
           <button
             className="button secondary"
             onClick={() =>
               exportCsv('usuarios.csv', [
                 ['Nome', 'E-mail', 'Perfil', 'Status'],
-                ...items.map((u) => [u.name, u.email, u.role, u.active ? 'Ativo' : 'Suspenso']),
+                ...items.map((u) => [u.name, u.email, roleLabel[u.role], accountStatusLabel(u)]),
               ])
             }
           >
@@ -123,16 +131,17 @@ export function ApiAdminUsers() {
             <select value={role} onChange={(e) => setRole(e.target.value)}>
               <option value="">Todos</option>
               <option value="CLIENT">Cliente</option>
-              <option value="FREELANCER">Freelancer</option>
-              <option value="ADMIN">Admin</option>
+              <option value="FREELANCER">Profissional</option>
+              <option value="ADMIN">Administração</option>
             </select>
           </label>
           <label className="field">
             <span>Status da conta</span>
             <select value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="">Todos</option>
-              <option value="true">Ativo</option>
-              <option value="false">Suspenso</option>
+              <option value="true">Ativa</option>
+              <option value="false">Suspensa</option>
+              <option value="deleted">Excluída</option>
             </select>
           </label>
           <Field
@@ -181,10 +190,10 @@ export function ApiAdminUsers() {
                     <small>Cadastro: {new Date(u.createdAt).toLocaleDateString('pt-BR')}</small>
                   </details>
                 </td>
-                <td>{u.role}</td>
-                <td>{u.active ? 'Ativo' : 'Suspenso'}</td>
+                <td>{roleLabel[u.role]}</td>
+                <td>{accountStatusLabel(u)}</td>
                 <td>
-                  {u.role !== 'ADMIN' && (
+                  {u.role !== 'ADMIN' && !u.deleted && (
                     <button
                       className="text-button"
                       disabled={!!busy}
@@ -413,7 +422,7 @@ export function ApiAdminModeration() {
     <>
       <PageTitle
         title="Fila de moderação"
-        description="Denúncias e disputas persistidas; decisões registradas na auditoria."
+        description="Denúncias e disputas aguardando decisão. Toda decisão fica registrada na auditoria."
         action={
           <button
             className="button secondary"
@@ -521,7 +530,7 @@ export function ApiAdminReports() {
     <>
       <PageTitle
         title="Relatórios da plataforma"
-        description="Totais persistidos por data de criação. A auditoria exibe as 200 ações mais recentes, sem filtro de período."
+        description="Totais por data de criação. A auditoria mostra as 200 ações mais recentes."
         action={
           <button
             className="button secondary"
@@ -565,15 +574,15 @@ export function ApiAdminReports() {
       <div className="stack">
         {audit.data?.map((e) => (
           <article className="panel" key={e.id}>
-            <strong>{e.action}</strong>
+            <strong>{auditActionLabel(e.action)}</strong>
             <p>
               {e.actorName} · {new Date(e.createdAt).toLocaleString('pt-BR')}
             </p>
             <p>
-              {e.targetType} · {e.targetId}
+              {auditTargetLabel(e.targetType)} · <small>{e.targetId}</small>
             </p>
             <p>
-              {e.beforeValue || '—'} → {e.afterValue}
+              {auditValueLabel(e.beforeValue)} → {auditValueLabel(e.afterValue)}
             </p>
             {e.reason && <p>{e.reason}</p>}
           </article>

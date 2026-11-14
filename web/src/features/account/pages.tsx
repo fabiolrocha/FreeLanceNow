@@ -24,6 +24,7 @@ import {
   money,
   reportStatusLabel,
   statusLabel,
+  ratingLabel,
 } from '../../domain/rules'
 import type { OwnReport, Service } from '../../domain/types'
 
@@ -373,7 +374,7 @@ export function OwnProfile() {
   const done = own.filter((c) => c.status === 'CONCLUIDO')
   const given = own.filter((c) => typeof c.rating === 'number')
   const average = received.length
-    ? (received.reduce((a, r) => a + r.rating, 0) / received.length).toFixed(1)
+    ? ratingLabel(received.reduce((a, r) => a + r.rating, 0) / received.length)
     : null
   return (
     <>

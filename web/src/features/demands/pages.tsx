@@ -11,6 +11,7 @@ import {
   futureDate,
   money,
   proposalStatusLabel,
+  ratingLabel,
 } from '../../domain/rules'
 import type { Demand, Proposal } from '../../domain/types'
 
@@ -294,7 +295,7 @@ function ProposalCard({
           {owner && (
             <small>
               {rating
-                ? `★ ${rating.toFixed(1)} · ${reviews} ${reviews === 1 ? 'avaliação' : 'avaliações'}`
+                ? `★ ${ratingLabel(rating)} · ${reviews} ${reviews === 1 ? 'avaliação' : 'avaliações'}`
                 : 'Ainda sem avaliações'}
             </small>
           )}

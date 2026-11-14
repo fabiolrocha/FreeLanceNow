@@ -2,6 +2,8 @@ import { request } from './client'
 import type { Category, User } from '../domain/types'
 export interface AdminUser extends User {
   active: boolean
+  /** Closed by its owner (LGPD): data is anonymised and the account cannot be reactivated. */
+  deleted?: boolean
   createdAt: string
 }
 export interface AdminCategory extends Category {

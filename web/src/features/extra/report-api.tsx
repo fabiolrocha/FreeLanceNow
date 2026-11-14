@@ -1,21 +1,25 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
-import { useApp } from '../../app/store'
 import { adminApi } from '../../data/admin'
 import { ErrorMessage, PageTitle } from '../../components/ui'
 
 export function ApiReport() {
   const [params] = useSearchParams(),
     { pathname } = useLocation(),
-    navigate = useNavigate(),
-    { services } = useApp()
-  const [target, setTarget] = useState(params.get('id') || ''),
-    [error, setError] = useState(''),
+    navigate = useNavigate()
+  const target = params.get('id') || ''
+  const [error, setError] = useState(''),
     [busy, setBusy] = useState(false)
   const type =
     params.get('type') === 'POST' ? 'POST' : params.get('type') === 'REVIEW' ? 'REVIEW' : 'SERVICE'
   const sent = pathname.endsWith('enviada')
+  const reasons =
+    type === 'REVIEW'
+      ? ['Avaliação falsa ou suspeita', 'Conteúdo ofensivo', 'Outro motivo']
+      : type === 'POST'
+        ? ['Conteúdo ofensivo', 'Spam ou propaganda', 'Possível golpe', 'Outro motivo']
+        : ['Anúncio enganoso ou incorreto', 'Conteúdo ofensivo', 'Possível golpe', 'Outro motivo']
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setBusy(true)
@@ -45,14 +49,23 @@ export function ApiReport() {
         {sent ? (
           <>
             <p>
-              A denúncia foi registrada. Um administrador poderá analisar o conteúdo e registrar sua
-              decisão.
+              A denúncia foi registrada. A administração vai analisar o conteúdo e você acompanha a
+              decisão em Minhas denúncias.
             </p>
-            <Link to="/inicio">Voltar ao início</Link>
+            <Link to="/denuncias">Ver minhas denúncias</Link>
+          </>
+        ) : !target ? (
+          <>
+            <p>
+              Para denunciar, abra o anúncio, a avaliação ou a publicação e use o link
+              &quot;Denunciar&quot; ao lado do conteúdo. Assim a moderação recebe exatamente o que
+              você viu.
+            </p>
+            <Link to="/denuncias">Acompanhar minhas denúncias</Link>
           </>
         ) : (
           <form onSubmit={(e) => void submit(e)}>
-            {params.get('id') ? (
+            {
               <p>
                 Conteúdo:{' '}
                 {params.get('alvo') ||
@@ -62,28 +75,11 @@ export function ApiReport() {
                       ? 'Avaliação selecionada'
                       : 'Anúncio selecionado')}
               </p>
-            ) : (
-              <label className="field">
-                <span>Anúncio a denunciar</span>
-                <select required value={target} onChange={(e) => setTarget(e.target.value)}>
-                  <option value="">Selecione o anúncio</option>
-                  {services.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            )}
+            }
             <label className="field">
               <span>Motivo *</span>
               <select name="reason" required>
-                {[
-                  'Conteúdo ofensivo',
-                  'Anúncio incorreto',
-                  'Avaliação suspeita',
-                  'Outro motivo',
-                ].map((reason) => (
+                {reasons.map((reason) => (
                   <option key={reason}>{reason}</option>
                 ))}
               </select>

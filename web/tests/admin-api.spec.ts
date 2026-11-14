@@ -83,7 +83,7 @@ test('admin gerencia categorias e usuários; denúncia e auditoria persistem ap�
   await page.getByLabel('Motivo da alteração').fill('Suspensão para verificar bloqueio do acesso')
   const userRow = page.getByRole('row').filter({ hasText: client.email })
   await userRow.getByRole('button', { name: 'Suspender', exact: true }).click()
-  await expect(userRow.getByText('Suspenso', { exact: true })).toBeVisible()
+  await expect(userRow.getByText('Suspensa', { exact: true })).toBeVisible()
   expect(
     (
       await request.get(`${api}/users/me`, {
@@ -93,7 +93,7 @@ test('admin gerencia categorias e usuários; denúncia e auditoria persistem ap�
   ).toBe(403)
   await page.getByLabel('Motivo da alteração').fill('Reativação para continuar o ensaio')
   await userRow.getByRole('button', { name: 'Reativar', exact: true }).click()
-  await expect(userRow.getByText('Ativo', { exact: true })).toBeVisible()
+  await expect(userRow.getByText('Ativa', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await login(client.email, 'Strong12345')
   await page.goto(`/servicos/${service.id}`)
@@ -120,7 +120,7 @@ test('admin gerencia categorias e usuários; denúncia e auditoria persistem ap�
   expect((await request.get(`${api}/services/${service.id}`)).status()).toBe(404)
   await page.goto('/admin/relatorios')
   await expect(page.getByRole('heading', { name: 'Auditoria administrativa' })).toBeVisible()
-  await expect(page.getByText('REPORT_DECIDED').first()).toBeVisible()
+  await expect(page.getByText('Denúncia decidida', { exact: true }).first()).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await login(freelancer.email, 'Strong12345')
   await page.goto(`/meus-servicos/${linkedService.id}/editar`)
@@ -128,7 +128,9 @@ test('admin gerencia categorias e usuários; denúncia e auditoria persistem ap�
   await page
     .getByLabel('Descrição detalhada')
     .fill('Descrição alterada preservando a categoria desativada do anúncio.')
-  await page.getByRole('button', { name: 'Publicar serviço', exact: true }).click()
+  // An active listing is edited in place; there is no draft button that would unpublish it.
+  await expect(page.getByRole('button', { name: 'Salvar rascunho' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Salvar alterações', exact: true }).click()
   await expect(page).toHaveURL(/\/meus-servicos$/)
   await page.goto(`/meus-servicos/${linkedService.id}/editar`)
   await expect(page.getByLabel(/^Categoria/)).toHaveValue(category.id)
