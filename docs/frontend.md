@@ -28,33 +28,34 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Profissionais/perfil | `/profissionais`, `/profissionais/:id` | Público | Mock ou API (média com 1 decimal e avaliações reais) |
 | Entrada/cadastro | `/login`, `/cadastro` | Público | Auth mock/API |
 | Recuperação de acesso | `/recuperar-senha`, `/redefinir-senha?token=` | Público | API: pede o link por e-mail e define nova senha; mock apenas registra o pedido |
+| Confirmação de e-mail | `/verificar-email?token=` | Público | API: confirma o e-mail do link do cadastro. Enquanto não confirmado, um aviso no topo oferece "Reenviar link" (ADR25) |
 | Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API. Edição traz foto (só API), área de atendimento (freelancer), troca de senha e exclusão de conta com senha |
 | Minhas denúncias | `/denuncias` | Autenticado | Mock ou API: estado da análise e nota da moderação |
-| Feed | `/inicio` | Autenticado | Mock ou API: publicações, serviços e demandas autorizadas, filtros e paginação |
+| Feed | `/inicio` | Cliente/freelancer (admin vai para `/admin/usuarios`) | Mock ou API: publicações, serviços e demandas autorizadas, filtros e paginação. Rótulos do compositor e textos laterais mudam por perfil |
 | Dashboard de gestão | `/painel` | Freelancer | Mock ou API: métricas reais, propostas pendentes e demandas abertas compatíveis (categorias dos anúncios e cidade primeiro) |
 | Minhas propostas | `/propostas` | Freelancer | Mock ou API: filtro por situação, retirada de pendentes e link para a contratação gerada |
 | Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API; rascunho ou inativo nunca contratado pode ser excluído |
 | Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
 | Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
-| Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Participantes | Mock ou API (`F01`) |
+| Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Lista: cliente/freelancer; detalhe: participantes e admin | Mock ou API (`F01`). O detalhe mostra o próximo passo conforme status e perfil (`nextStepHint`) |
 | Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/contratacoes/:id/confirmar`, `/contratacoes/:id/contestar` | Freelancer conclui; cliente confirma/contesta | Mock ou API (`F01`) |
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
 | Disputa | `/contratacoes/:id/disputa` | Participantes | Motivo, quem abriu e decisão da administração lidos do histórico; sem disputa, a tela informa isso |
 | Cancelar contratação | `/contratacoes/:id/cancelar` | Participantes | Contratação aceita, antes de iniciar; motivo obrigatório |
-| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer | Mock ou API (`F08`): filtros por categoria e cidade, "Mostrar mais", marcação de demanda já respondida |
+| Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer (detalhe também admin) | Mock ou API (`F08`): filtros por categoria e cidade, "Mostrar mais", marcação de demanda já respondida |
 | Editar/aceitar | `/demandas/:id/editar`, `/demandas/:id/propostas/:pid/aceitar` | Cliente dono | Edição só sem propostas; cancelamento no detalhe; aceite escolhe data e endereço da contratação |
-| Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Autenticado; chat só entre participantes | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
-| Carteira/transação | `/carteira`, `/transacao` | Autenticado | Simulação financeira (`F09` pendente) |
-| Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Simulação financeira (`F09` pendente) |
-| Saque | `/saque`, `/saque/enviado` | Freelancer | Simulação financeira (`F09` pendente) |
-| Denúncia | `/denunciar`, `/denunciar/enviada` | Autenticado ativo | Mock ou API: anúncios/avaliações/publicações com relato e cópia textual (`F05`) |
-| Gestão e relatórios | `/admin/usuarios`, `/admin/categorias`, `/admin/relatorios` | Admin | Mock ou API: usuários/categorias, filtros, métricas por período, CSV e auditoria (`F04`) |
-| Transações administrativas | `/admin/transacoes` | Admin | Financeiro ainda simulado (`F09`) |
+| Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Avisos: autenticado; chat: cliente/freelancer participante | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
+| Carteira/transação | `/carteira`, `/transacao` | Cliente/freelancer | Mock: simulação financeira. API: tela "Em breve" e item fora do menu até `F09` (ADR27) |
+| Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Mock: simulação. API: "Em breve" (ADR27) |
+| Saque | `/saque`, `/saque/enviado` | Freelancer | Mock: simulação. API: "Em breve" (ADR27) |
+| Denúncia | `/denunciar`, `/denunciar/enviada` | Cliente/freelancer | Mock ou API: aberta pelo link "Denunciar" do anúncio, avaliação ou publicação, com motivos por tipo; sem conteúdo escolhido, a tela orienta onde denunciar (`F05`). O dono e o admin não veem o link no próprio anúncio |
+| Gestão e relatórios | `/admin/usuarios`, `/admin/categorias`, `/admin/relatorios` | Admin | Mock ou API: usuários/categorias, filtros, métricas por período, CSV e auditoria (`F04`). Perfis e status traduzidos; conta excluída aparece como "Excluída", sem ação; auditoria mostra ação, alvo e valores em português |
+| Transações administrativas | `/admin/transacoes` | Admin | Mock: simulação. API: "Em breve" e item fora do menu (ADR27) |
 | Moderação | `/admin/moderacao` | Admin ativo | Mock ou API: denúncias/decisões persistentes, remoção lógica e disputas auditadas (`F05`) |
-| Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Texto acadêmico provisório |
+| Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Textos de produção (versão 2026-11, LGPD); no mock, aviso de dados fictícios. Contato opcional via `VITE_SUPPORT_EMAIL` |
 | URL desconhecida | Qualquer rota não encontrada | Público | Tela 404 com retorno ao início |
 
-Guards React protegem os grupos de rotas por role. Participação, estado e proprietário são verificados nos fluxos e, nas funcionalidades reais, pelo backend. O prefixo `/admin` redireciona para `/admin/usuarios`; não é outra tela de gestão.
+Guards React protegem os grupos de rotas por role e explicam a restrição pelo perfil exigido ("Esta área é para contas de cliente", "...de profissional", "...exclusiva da administração"). O menu lateral do freelancer prioriza o trabalho (painel, solicitações, contratações, demandas, propostas, serviços); o do cliente prioriza busca, profissionais, demandas e contratações. Status de contratação usam o feminino ("Aceita", "Concluída", "Recusada", "Cancelada") e notas usam vírgula decimal (`ratingLabel`). Participação, estado e proprietário são verificados nos fluxos e, nas funcionalidades reais, pelo backend. O prefixo `/admin` redireciona para `/admin/usuarios`; não é outra tela de gestão.
 
 ## Telas demonstrativas e componentes reutilizados
 

@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **09/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql` e `V12__profiles_and_demand_management.sql`.
+Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql` e `V13__email_verification.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V12, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V13, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -162,6 +162,12 @@ As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do rest
 | `demand.status` | Aceita `CANCELLED`, além de `OPEN` e `CLOSED` |
 | `proposal.status` | Aceita `WITHDRAWN` (retirada pelo autor) |
 | `feed_post.service_id` | FK passa a `ON DELETE SET NULL`: excluir um rascunho não apaga publicações que o citavam |
+
+## Confirmação de e-mail (V13)
+
+| Tabela/coluna | Persistência e invariantes |
+|---|---|
+| `app_user.email_verified_at` | Preenchida quando o titular abre o link de confirmação (ADR25); nula enquanto não confirmado. Contas existentes antes da V13, o seed de demonstração e o admin provisionado são marcados como confirmados |
 
 ## Pagamentos e livro financeiro (V10)
 
