@@ -24,4 +24,21 @@ public class AuthController {
     public AuthDtos.Session login(@Valid @RequestBody AuthDtos.Login request) {
         return auth.login(request);
     }
+
+    @PostMapping("/refresh")
+    public AuthDtos.Session refresh(@Valid @RequestBody AuthDtos.Refresh request) {
+        return auth.refresh(request);
+    }
+
+    @PostMapping("/password/forgot")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void forgotPassword(@Valid @RequestBody AuthDtos.ForgotPassword request) {
+        auth.forgotPassword(request);
+    }
+
+    @PostMapping("/password/reset")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void resetPassword(@Valid @RequestBody AuthDtos.ResetPassword request) {
+        auth.resetPassword(request);
+    }
 }

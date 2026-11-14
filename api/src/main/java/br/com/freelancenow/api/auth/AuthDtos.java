@@ -7,14 +7,15 @@ import jakarta.validation.constraints.*;
 public final class AuthDtos {
     private AuthDtos() {}
 
+    static final String PASSWORD_PATTERN = "(?s)^(?=.*\\p{L})(?=.*\\d).{8,72}$";
+    static final String PASSWORD_MESSAGE = "Use pelo menos 8 caracteres com letras e números.";
+
     public record Register(
             @NotBlank @Size(max = 100) String name,
             @NotBlank @Email @Size(max = 254) String email,
             @NotBlank
                     @Size(min = 8, max = 72)
-                    @Pattern(
-                            regexp = "(?s)^(?=.*\\p{L})(?=.*\\d).{8,72}$",
-                            message = "Use pelo menos 8 caracteres com letras e números.")
+                    @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_MESSAGE)
                     String password,
             @NotBlank @Pattern(regexp = "\\+?[0-9 ()-]{10,20}") String phone,
             @NotNull Role role,
@@ -24,5 +25,29 @@ public final class AuthDtos {
             @NotBlank @Email @Size(max = 254) String email,
             @NotBlank @Size(max = 72) String password) {}
 
-    public record Session(String accessToken, String tokenType, long expiresIn, UserDtos.Me user) {}
+    public record Refresh(@NotBlank @Size(max = 2048) String refreshToken) {}
+
+    public record ForgotPassword(@NotBlank @Email @Size(max = 254) String email) {}
+
+    public record ResetPassword(
+            @NotBlank @Size(max = 2048) String token,
+            @NotBlank
+                    @Size(min = 8, max = 72)
+                    @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_MESSAGE)
+                    String password) {}
+
+    public record ChangePassword(
+            @NotBlank @Size(max = 72) String currentPassword,
+            @NotBlank
+                    @Size(min = 8, max = 72)
+                    @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_MESSAGE)
+                    String newPassword) {}
+
+    public record Session(
+            String accessToken,
+            String tokenType,
+            long expiresIn,
+            String refreshToken,
+            long refreshExpiresIn,
+            UserDtos.Me user) {}
 }

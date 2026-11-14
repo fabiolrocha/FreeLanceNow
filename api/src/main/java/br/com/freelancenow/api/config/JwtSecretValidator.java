@@ -24,7 +24,7 @@ public class JwtSecretValidator {
         this.environment = environment;
     }
 
-    SecretKeySpec key(String secret) {
+    public SecretKeySpec key(String secret) {
         if (secret == null || secret.isBlank())
             throw new IllegalArgumentException("JWT_SECRET deve estar definido e não pode estar em branco.");
 

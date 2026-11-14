@@ -1,5 +1,7 @@
 package br.com.freelancenow.api.users;
 
+import br.com.freelancenow.api.auth.AuthDtos;
+import br.com.freelancenow.api.auth.AuthService;
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.common.ApiException;
 import br.com.freelancenow.api.reviews.ReviewService;
@@ -20,11 +22,14 @@ public class UserController {
     private final CurrentUser current;
     private final UserRepository users;
     private final ReviewService reviews;
+    private final AuthService auth;
 
-    public UserController(CurrentUser current, UserRepository users, ReviewService reviews) {
+    public UserController(
+            CurrentUser current, UserRepository users, ReviewService reviews, AuthService auth) {
         this.current = current;
         this.users = users;
         this.reviews = reviews;
+        this.auth = auth;
     }
 
     @GetMapping("/users/me")
@@ -39,6 +44,13 @@ public class UserController {
         var u = current.require(jwt);
         u.updateProfile(r.name().trim(), r.phone(), r.city().trim(), r.bio().trim());
         return UserDtos.Me.from(u);
+    }
+
+    /** Changes the password and returns a fresh session; older refresh tokens stop working. */
+    @PutMapping("/users/me/password")
+    public AuthDtos.Session changePassword(
+            @AuthenticationPrincipal Jwt jwt, @Valid @RequestBody AuthDtos.ChangePassword r) {
+        return auth.changePassword(current.require(jwt), r);
     }
 
     @GetMapping("/freelancers")

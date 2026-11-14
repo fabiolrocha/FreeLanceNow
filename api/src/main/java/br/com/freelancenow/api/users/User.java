@@ -66,6 +66,10 @@ public class User {
         this.bio = bio;
     }
 
+    public void changePassword(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public UUID getId() {
         return id;
     }

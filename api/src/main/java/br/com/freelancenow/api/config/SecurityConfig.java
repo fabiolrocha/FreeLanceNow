@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.*;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.*;
@@ -47,7 +48,20 @@ public class SecurityConfig {
                 NimbusJwtDecoder.withSecretKey(secretValidator.key(secret))
                         .macAlgorithm(MacAlgorithm.HS256)
                         .build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(issuer));
+        // Refresh and password-reset tokens share the signing key but carry a "purpose" claim;
+        // only plain access tokens may authenticate API requests.
+        OAuth2TokenValidator<Jwt> accessOnly =
+                jwt ->
+                        jwt.hasClaim("purpose")
+                                ? OAuth2TokenValidatorResult.failure(
+                                        new OAuth2Error(
+                                                "invalid_token",
+                                                "Token sem permissão de acesso.",
+                                                null))
+                                : OAuth2TokenValidatorResult.success();
+        decoder.setJwtValidator(
+                new DelegatingOAuth2TokenValidator<>(
+                        JwtValidators.createDefaultWithIssuer(issuer), accessOnly));
         return decoder;
     }
 
