@@ -11,6 +11,8 @@ public interface ReportRepository extends JpaRepository<ContentReport, UUID> {
     @EntityGraph(attributePaths = {"reporter", "decidedBy"})
     List<ContentReport> findAllByOrderByCreatedAtDescIdDesc();
 
+    List<ContentReport> findByReporterIdOrderByCreatedAtDescIdDesc(UUID reporterId);
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select r from ContentReport r where r.id=:id")
     Optional<ContentReport> lockById(@Param("id") UUID id);

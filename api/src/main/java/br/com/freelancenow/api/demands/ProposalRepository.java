@@ -17,6 +17,8 @@ public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
 
     boolean existsByDemandIdAndFreelancerId(UUID demandId, UUID freelancerId);
 
+    boolean existsByDemandId(UUID demandId);
+
     @EntityGraph(attributePaths = {"demand", "freelancer"})
     List<Proposal> findByDemandIdOrderByCreatedAtAsc(UUID demandId);
 

@@ -5,7 +5,9 @@ import type {
   CreateContract,
   CreateDemand,
   CreateProposal,
+  AcceptProposal,
   Demand,
+  OwnReport,
   Profile,
   Proposal,
   ProposalAcceptance,
@@ -50,6 +52,7 @@ const fieldLabels: Record<string, string> = {
   comment: 'comentário',
   rating: 'nota',
   reply: 'resposta',
+  serviceArea: 'área de atendimento',
 }
 export function setToken(value: string) {
   token = value
@@ -154,6 +157,10 @@ const publicProfile = ({
   bio,
   averageRating,
   reviewCount,
+  serviceArea,
+  avatarVersion,
+  memberSince,
+  specialties,
 }: Profile): Profile => ({
   id,
   name,
@@ -162,6 +169,10 @@ const publicProfile = ({
   bio,
   averageRating,
   reviewCount,
+  serviceArea,
+  avatarVersion,
+  memberSince,
+  specialties,
 })
 let listings = read<Service[]>('fln-mock-services', services).map((s) => ({
   ...s,
@@ -183,6 +194,9 @@ function persist() {
   sessionStorage.setItem('fln-mock-profiles', JSON.stringify(profiles))
   sessionStorage.setItem('fln-mock-hashes', JSON.stringify(hashes))
 }
+/** Public photo URL; the version busts the browser cache when the photo changes. */
+export const avatarUrl = (userId: string, version?: number | null) =>
+  version ? `${baseUrl}/users/${userId}/avatar?v=${version}` : undefined
 /** Public URL served by the API; `<img>` tags cannot send the bearer token. */
 export const serviceImageUrl = (serviceId: string, imageId: string) =>
   `${baseUrl}/services/${serviceId}/images/${imageId}`
@@ -264,7 +278,13 @@ export const client = {
     if (!isMock)
       return request('/users/me', {
         method: 'PUT',
-        body: JSON.stringify({ name: u.name, phone: u.phone, city: u.city, bio: u.bio }),
+        body: JSON.stringify({
+          name: u.name,
+          phone: u.phone,
+          city: u.city,
+          bio: u.bio,
+          serviceArea: u.serviceArea || '',
+        }),
       })
     accounts = accounts.map((x) => (x.id === u.id ? u : x))
     profiles = profiles.map((x) => (x.id === u.id ? publicProfile(u) : x))
@@ -273,6 +293,33 @@ export const client = {
     )
     persist()
     return u
+  },
+  async uploadAvatar(file: File): Promise<User> {
+    if (isMock) throw new Error('A foto de perfil funciona somente com a API.')
+    const body = new FormData()
+    body.append('file', file)
+    return request('/users/me/avatar', { method: 'PUT', body })
+  },
+  async deleteAvatar(): Promise<User> {
+    if (isMock) throw new Error('A foto de perfil funciona somente com a API.')
+    return request('/users/me/avatar', { method: 'DELETE' })
+  },
+  /** Anonymizes the account; the API refuses while a contract is still open. */
+  async deleteAccount(u: User, password: string): Promise<void> {
+    if (!isMock)
+      return request('/users/me', { method: 'DELETE', body: JSON.stringify({ password }) })
+    const hash = hashes[u.id]
+    const valid = hash
+      ? (await digest(hash.salt + password)) === hash.digest
+      : password === 'Demo12345'
+    if (!valid) throw new Error('A senha não confere.')
+    accounts = accounts.filter((x) => x.id !== u.id)
+    profiles = profiles.filter((x) => x.id !== u.id)
+    listings = listings.map((s) =>
+      s.freelancer.id === u.id ? { ...s, status: 'INACTIVE' as const } : s,
+    )
+    delete hashes[u.id]
+    persist()
   },
   async categories(): Promise<Category[]> {
     return isMock ? categories : request('/categories')
@@ -330,6 +377,15 @@ export const client = {
         body: JSON.stringify({ status }),
       })
     return this.saveService(u, { ...service, categoryId: service.category.id, status }, service.id)
+  },
+  /** Only drafts or paused listings that were never hired can be deleted. */
+  async deleteService(u: User, service: Service): Promise<void> {
+    if (!isMock) return request(`/services/${service.id}`, { method: 'DELETE' })
+    if (service.freelancer.id !== u.id)
+      throw new Error('Este serviço pertence a outro profissional.')
+    if (service.status === 'ACTIVE') throw new Error('Pause o anúncio antes de excluí-lo.')
+    listings = listings.filter((s) => s.id !== service.id)
+    persist()
   },
   async uploadServiceImages(serviceId: string, files: File[]): Promise<Service> {
     if (isMock) throw new Error('O envio de fotos funciona somente com a API.')
@@ -396,10 +452,27 @@ export const client = {
       body: JSON.stringify(r),
     })
   },
-  async acceptProposal(proposalId: string): Promise<ProposalAcceptance> {
+  async updateDemand(id: string, r: CreateDemand): Promise<Demand> {
+    return request(`/demands/${id}`, { method: 'PUT', body: JSON.stringify(r) })
+  },
+  async cancelDemand(id: string): Promise<Demand> {
+    return request(`/demands/${id}/cancel`, { method: 'POST' })
+  },
+  async acceptProposal(proposalId: string, r: AcceptProposal = {}): Promise<ProposalAcceptance> {
     return request(`/proposals/${proposalId}/accept`, {
       method: 'POST',
+      body: JSON.stringify(r),
     })
+  },
+  async withdrawProposal(proposalId: string): Promise<Proposal> {
+    return request(`/proposals/${proposalId}/withdraw`, { method: 'POST' })
+  },
+  async myReports(u: User): Promise<OwnReport[]> {
+    if (!isMock) return request('/reports/mine')
+    return read<(OwnReport & { reporterId?: string; target?: string })[]>('fln-reports', [])
+      .filter((r) => r.reporterId === u.id)
+      .map((r) => ({ ...r, targetTitle: r.targetTitle || r.target || 'Conteúdo denunciado' }))
+      .reverse()
   },
   async rejectProposal(proposalId: string): Promise<Proposal> {
     return request(`/proposals/${proposalId}/reject`, {

@@ -114,6 +114,33 @@ public class ContentReport {
             Instant createdAt,
             Instant decidedAt) {}
 
+    /** What the reporter sees: the decision and its note, never who on the team decided. */
+    public record OwnView(
+            UUID id,
+            Target targetType,
+            UUID targetId,
+            String targetTitle,
+            String reason,
+            String comment,
+            Status status,
+            String decisionNote,
+            Instant createdAt,
+            Instant decidedAt) {}
+
+    public OwnView ownView() {
+        return new OwnView(
+                id,
+                targetType,
+                targetId,
+                targetTitle,
+                reason,
+                comment,
+                status,
+                decisionNote,
+                createdAt,
+                decidedAt);
+    }
+
     public View view() {
         return new View(
                 id,

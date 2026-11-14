@@ -104,7 +104,7 @@ public class ServiceImageService {
     }
 
     /** Trusts the file signature, not the client-supplied name or Content-Type. */
-    static String detectType(byte[] data) {
+    public static String detectType(byte[] data) {
         if (startsWith(data, JPEG)) return "image/jpeg";
         if (startsWith(data, PNG)) return "image/png";
         throw new ApiException(
@@ -112,7 +112,7 @@ public class ServiceImageService {
     }
 
     /** Parses the header to reject corrupted files and oversized dimensions without decoding. */
-    static void checkReadable(byte[] data) {
+    public static void checkReadable(byte[] data) {
         try (var in = ImageIO.createImageInputStream(new ByteArrayInputStream(data))) {
             var readers = in == null ? null : ImageIO.getImageReaders(in);
             if (readers == null || !readers.hasNext()) throw unreadable();

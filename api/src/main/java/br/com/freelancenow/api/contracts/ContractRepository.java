@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,4 +39,12 @@ public interface ContractRepository extends JpaRepository<Contract, UUID> {
             "select c from Contract c where c.status = :status and c.statusUpdatedAt <= :cutoff"
                     + " order by c.statusUpdatedAt asc")
     List<Contract> findExpiredForUpdate(ContractStatus status, Instant cutoff);
+
+    List<Contract> findByProposalIdIn(Collection<UUID> proposalIds);
+
+    boolean existsByServiceId(UUID serviceId);
+
+    boolean existsByClientIdAndStatusIn(UUID clientId, Collection<ContractStatus> statuses);
+
+    boolean existsByFreelancerIdAndStatusIn(UUID freelancerId, Collection<ContractStatus> statuses);
 }

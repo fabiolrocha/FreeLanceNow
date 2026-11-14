@@ -2,6 +2,7 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type {
+  AcceptProposal,
   Category,
   Contract,
   ContractStatus,
@@ -59,8 +60,11 @@ interface Store {
   addContract: (c: Contract) => void
   createDemand: (r: CreateDemand) => Promise<Demand>
   createProposal: (demandId: string, r: CreateProposal) => Promise<Proposal>
-  acceptProposal: (proposalId: string) => Promise<Contract>
+  updateDemand: (id: string, r: CreateDemand) => Promise<Demand>
+  cancelDemand: (id: string) => Promise<void>
+  acceptProposal: (proposalId: string, r?: AcceptProposal) => Promise<Contract>
   rejectProposal: (proposalId: string) => Promise<void>
+  withdrawProposal: (proposalId: string) => Promise<void>
   requestContract: (r: CreateContract) => Promise<Contract>
   transition: (id: string, status: ContractStatus, dispute?: string) => Promise<void>
   review: (id: string, rating: number, comment: string) => Promise<void>
@@ -405,15 +409,77 @@ export function Provider({ children }: { children: ReactNode }) {
     setProposals((ps) => [...ps, created])
     return created
   }
-  async function acceptProposal(proposalId: string): Promise<Contract> {
+  async function updateDemand(id: string, r: CreateDemand): Promise<Demand> {
+    const u = session?.user
+    const d = demands.find((x) => x.id === id)
+    if (!u || !d || d.clientId !== u.id) throw new Error('Esta demanda pertence a outro cliente.')
+    if (!isMock) {
+      const updated = await client.updateDemand(id, r)
+      setDemands((ds) => ds.map((x) => (x.id === id ? updated : x)))
+      notify('Demanda atualizada.')
+      return updated
+    }
+    if (d.status !== 'OPEN' || proposals.some((p) => p.demandId === id))
+      throw new Error('A demanda só pode ser editada enquanto está aberta e sem propostas.')
+    const updated = { ...d, ...r }
+    setDemands((ds) => ds.map((x) => (x.id === id ? updated : x)))
+    notify('Demanda atualizada.')
+    return updated
+  }
+  async function cancelDemand(id: string): Promise<void> {
+    const u = session?.user
+    const d = demands.find((x) => x.id === id)
+    if (!u || !d || d.clientId !== u.id) throw new Error('Esta demanda pertence a outro cliente.')
+    if (!isMock) {
+      const updated = await client.cancelDemand(id)
+      setDemands((ds) => ds.map((x) => (x.id === id ? updated : x)))
+      setProposals((ps) =>
+        ps.map((p) =>
+          p.demandId === id && p.status === 'PENDING'
+            ? { ...p, status: 'REJECTED', demandStatus: 'CANCELLED' }
+            : p,
+        ),
+      )
+      notify('Demanda cancelada.')
+      return
+    }
+    if (d.status !== 'OPEN') throw new Error('Somente demandas abertas podem ser canceladas.')
+    setDemands((ds) => ds.map((x) => (x.id === id ? { ...x, status: 'CANCELLED' } : x)))
+    setProposals((ps) =>
+      ps.map((p) =>
+        p.demandId === id && p.status === 'PENDING' ? { ...p, status: 'REJECTED' } : p,
+      ),
+    )
+    notify('Demanda cancelada.')
+  }
+  async function withdrawProposal(proposalId: string): Promise<void> {
+    const u = session?.user
+    const p = proposals.find((x) => x.id === proposalId)
+    if (!u || !p || p.freelancerId !== u.id) throw new Error('Esta proposta não é sua.')
+    if (!isMock) {
+      const updated = await client.withdrawProposal(proposalId)
+      setProposals((ps) => ps.map((x) => (x.id === proposalId ? { ...x, ...updated } : x)))
+      notify('Proposta retirada.')
+      return
+    }
+    if (p.status !== 'PENDING')
+      throw new Error('Somente propostas aguardando decisão podem ser retiradas.')
+    setProposals((ps) =>
+      ps.map((x) => (x.id === proposalId ? { ...x, status: 'WITHDRAWN', decidedAt: nowIso() } : x)),
+    )
+    notify('Proposta retirada.')
+  }
+  async function acceptProposal(proposalId: string, r: AcceptProposal = {}): Promise<Contract> {
     const u = session?.user
     if (!u || u.role !== 'CLIENT') throw new Error('Esta proposta não pode ser aceita.')
+    if (r.date && r.date <= today()) throw new Error('Selecione uma data futura.')
     if (!isMock) {
-      const accepted = await client.acceptProposal(proposalId)
+      const accepted = await client.acceptProposal(proposalId, r)
       setDemands((ds) => ds.map((x) => (x.id === accepted.demand.id ? accepted.demand : x)))
       setProposals((ps) =>
         ps.map((x) => {
-          if (x.id === accepted.proposal.id) return accepted.proposal
+          if (x.id === accepted.proposal.id)
+            return { ...accepted.proposal, contractId: accepted.contract.id }
           if (x.demandId === accepted.demand.id && x.status === 'PENDING')
             return { ...x, status: 'REJECTED' }
           return x
@@ -435,6 +501,7 @@ export function Provider({ children }: { children: ReactNode }) {
               ...x,
               status:
                 x.id === proposalId ? 'ACCEPTED' : x.status === 'PENDING' ? 'REJECTED' : x.status,
+              contractId: x.id === proposalId ? cid : x.contractId,
             }
           : x,
       ),
@@ -449,9 +516,9 @@ export function Provider({ children }: { children: ReactNode }) {
       clientId: u.id,
       clientName: u.name,
       price: p.price,
-      date: futureDate(),
+      date: r.date || futureDate(),
       description: d.description,
-      address: d.city,
+      address: r.address?.trim() || d.city,
       status: 'ACEITO',
       history: [{ status: 'ACEITO', at: nowIso() }],
     }
@@ -516,8 +583,11 @@ export function Provider({ children }: { children: ReactNode }) {
         addContract: (c) => setContracts((cs) => [c, ...cs]),
         createDemand,
         createProposal,
+        updateDemand,
+        cancelDemand,
         acceptProposal,
         rejectProposal,
+        withdrawProposal,
         requestContract,
         transition,
         review,

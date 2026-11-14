@@ -35,7 +35,8 @@ const Landing = feature(catalog, 'Landing'),
 const Feed = feature(() => import('./features/feed/pages'), 'Feed')
 const Dashboard = feature(account, 'Dashboard'),
   OwnProfile = feature(account, 'OwnProfile'),
-  EditProfile = feature(account, 'EditProfile')
+  EditProfile = feature(account, 'EditProfile'),
+  MyReports = feature(account, 'MyReports')
 const MyServices = feature(freelancer, 'MyServices'),
   ServiceForm = feature(freelancer, 'ServiceForm')
 const ContractList = feature(contracts, 'ContractList'),
@@ -47,7 +48,9 @@ const ContractList = feature(contracts, 'ContractList'),
 const Demands = feature(demands, 'Demands'),
   DemandForm = feature(demands, 'DemandForm'),
   DemandDetail = feature(demands, 'DemandDetail'),
-  ProposalForm = feature(demands, 'ProposalForm')
+  ProposalForm = feature(demands, 'ProposalForm'),
+  AcceptProposal = feature(demands, 'AcceptProposal'),
+  MyProposals = feature(demands, 'MyProposals')
 const Help = feature(extra, 'Help'),
   Notifications = feature(extra, 'Notifications'),
   Messages = feature(extra, 'Messages'),
@@ -135,10 +138,13 @@ export default function App() {
                 <Route path="transacao" element={<Transaction />} />
                 <Route path="denunciar" element={<Report />} />
                 <Route path="denunciar/enviada" element={<Report />} />
+                <Route path="denuncias" element={<MyReports />} />
               </Route>
               <Route element={<Guard roles={['CLIENT']} />}>
                 <Route path="servicos/:id/solicitar" element={<Request />} />
                 <Route path="demandas/nova" element={<DemandForm />} />
+                <Route path="demandas/:id/editar" element={<DemandForm />} />
+                <Route path="demandas/:id/propostas/:pid/aceitar" element={<AcceptProposal />} />
                 <Route path="pagamento" element={<Payment />} />
                 <Route path="pagamento/confirmado" element={<Payment />} />
                 {['confirmar', 'avaliar'].map((p) => (
@@ -147,6 +153,7 @@ export default function App() {
               </Route>
               <Route element={<Guard roles={['FREELANCER']} />}>
                 <Route path="painel" element={<Dashboard />} />
+                <Route path="propostas" element={<MyProposals />} />
                 <Route path="meus-servicos" element={<MyServices />} />
                 <Route path="meus-servicos/novo" element={<ServiceForm />} />
                 <Route path="meus-servicos/:id/editar" element={<ServiceForm />} />

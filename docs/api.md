@@ -10,7 +10,11 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/auth/password/forgot` | Público | 202 sempre; envia link de redefinição se a conta existir e estiver ativa |
 | POST | `/auth/password/reset` | Público (token do e-mail) | 204; define nova senha |
 | GET | `/users/me` | Autenticado | Perfil privado |
-| PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade e bio |
+| PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade, bio e área de atendimento (`serviceArea`, até 150, opcional) |
+| PUT | `/users/me/avatar` | Autenticado | `multipart/form-data` com a parte `file` (JPG/PNG, até 2 MB); 200 + perfil com novo `avatarVersion` |
+| DELETE | `/users/me/avatar` | Autenticado | 200 + perfil sem foto |
+| GET | `/users/{id}/avatar` | Público | Bytes da foto, cache de 7 dias e `nosniff`; 404 sem foto ou conta inativa |
+| DELETE | `/users/me` | Cliente/freelancer | Body `{password}`; 204. Anonimiza a conta (ADR24); 400 senha errada; 409 com contratação em aberto ou para admin |
 | PUT | `/users/me/password` | Autenticado | 200 + nova sessão; exige a senha atual |
 | GET | `/categories` | Público | Categorias ativas |
 | GET | `/freelancers` | Público | Perfis públicos ativos |
@@ -21,6 +25,7 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/services` | Freelancer | 201 + anúncio |
 | PUT | `/services/{id}` | Freelancer/dono | Atualização completa |
 | PATCH | `/services/{id}/status` | Freelancer/dono | Ativa, desativa ou põe em rascunho |
+| DELETE | `/services/{id}` | Freelancer/dono | 204; só rascunho ou inativo nunca contratado (409 nos demais) |
 | GET | `/contracts` | Autenticado | Lista contratações do participante (ou todas para admin) |
 | GET | `/contracts/{id}` | Participante/Admin | Detalhe, histórico de eventos e avaliação da contratação |
 | POST | `/contracts` | Cliente | 201 + solicitação `PENDENTE` com snapshot do serviço |
@@ -38,11 +43,14 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | GET | `/demands` | Autenticado | Demandas do cliente ou todas as demandas para freelancer/admin |
 | GET | `/demands/{id}` | Autorizado | Cliente dono, admin ou freelancer com acesso à demanda aberta/que já recebeu sua proposta |
 | POST | `/demands` | Cliente | 201 + nova demanda aberta (`OPEN`) |
+| PUT | `/demands/{id}` | Cliente dono | Edita a demanda aberta ainda sem propostas; 409 depois da primeira proposta |
+| POST | `/demands/{id}/cancel` | Cliente dono | Demanda `CANCELLED`; propostas pendentes recusadas e profissionais avisados |
 | GET | `/proposals` | Autenticado | Propostas recebidas (cliente), enviadas (freelancer) ou todas (admin) |
 | GET | `/demands/{id}/proposals` | Autorizado | Propostas da demanda (todas para o dono/admin ou própria para freelancer) |
 | POST | `/demands/{id}/proposals` | Freelancer | 201 + proposta única `PENDING` por profissional/demanda |
 | POST | `/proposals/{id}/accept` | Cliente (dono da demanda) | 200 + encerra demanda, recusa demais propostas e cria contratação `ACEITO` |
 | POST | `/proposals/{id}/reject` | Cliente (dono da demanda) | 200 + marca proposta como `REJECTED` |
+| POST | `/proposals/{id}/withdraw` | Freelancer autor | 200 + proposta `WITHDRAWN`; só pendente em demanda aberta; cliente avisado |
 | GET | `/admin/users` | Admin ativo | Contas, contatos privados, status e data de cadastro; sem senha/hash |
 | PATCH | `/admin/users/{id}/status` | Admin ativo | Suspende/reativa conta não-admin, com motivo e auditoria |
 | GET | `/admin/categories` | Admin ativo | Categorias ativas/inativas |
@@ -51,6 +59,7 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | GET | `/admin/metrics` | Admin ativo | Totais reais por período de criação |
 | GET | `/admin/audit` | Admin ativo | Até 200 ações mais recentes, ordem decrescente |
 | POST | `/reports` | Autenticado ativo | 201 + denúncia de serviço/avaliação/publicação visível |
+| GET | `/reports/mine` | Autenticado | Denúncias da própria conta com estado e nota da decisão, sem o nome de quem decidiu |
 | GET | `/admin/reports` | Admin ativo | Fila e decisões, com relato e cópia do conteúdo |
 | PATCH | `/admin/reports/{id}` | Admin ativo | Manter/remover com justificativa; remoção lógica e auditoria |
 | GET | `/feed` | Autenticado ativo | Página cronológica mista de publicações, serviços e demandas autorizadas |
@@ -194,13 +203,15 @@ POST `/demands` recebe:
 }
 ```
 
-Use UUID válido em `categoryId`. Título até 80, descrição até 500, orçamento positivo com até 2 casas decimais, prazo de 1–365 dias e cidade obrigatória até 100 caracteres. Apenas clientes publicam. `DemandView` retorna os campos da demanda, `id`, `clientId`, `status`, `createdAt` e `closedAt`.
+Use UUID válido em `categoryId`. Título até 80, descrição até 500, orçamento positivo com até 2 casas decimais, prazo de 1–365 dias e cidade obrigatória até 100 caracteres. Apenas clientes publicam. `DemandView` retorna os campos da demanda, `id`, `clientId`, `categoryName`, `status` (`OPEN`, `CLOSED`, `CANCELLED`), `createdAt` e `closedAt`.
 
-POST `/demands/{id}/proposals` recebe `{"price":450.00,"days":4,"message":"Posso executar conforme a descrição."}`. Apenas freelancers enviam para demanda aberta; preço positivo com 2 casas decimais, prazo 1–365 e mensagem não vazia até 600 caracteres. Há no máximo uma proposta **pendente** por profissional/demanda; a restrição não impede nova proposta após recusa enquanto a demanda estiver aberta. `ProposalView` inclui `id`, `demandId`, `freelancerId`, `freelancerName`, preço, prazo, mensagem, estado e datas (`createdAt`, `decidedAt`).
+PUT `/demands/{id}` recebe o mesmo corpo e só vale enquanto a demanda está aberta e sem nenhuma proposta, para que todos os profissionais respondam ao mesmo pedido. POST `/demands/{id}/cancel` encerra a demanda aberta como `CANCELLED`, recusa as propostas pendentes e avisa cada profissional com link para `/propostas`.
+
+POST `/demands/{id}/proposals` recebe `{"price":450.00,"days":4,"message":"Posso executar conforme a descrição."}`. Apenas freelancers enviam para demanda aberta; preço positivo com 2 casas decimais, prazo 1–365 e mensagem não vazia até 600 caracteres. Há no máximo uma proposta **pendente** por profissional/demanda; a restrição não impede nova proposta após recusa enquanto a demanda estiver aberta. `ProposalView` inclui `id`, `demandId`, `demandTitle`, `demandStatus`, `freelancerId`, `freelancerName`, `freelancerAverageRating`, `freelancerReviewCount`, `freelancerAvatarVersion`, preço, prazo, mensagem, estado (`PENDING`, `ACCEPTED`, `REJECTED`, `WITHDRAWN`), datas (`createdAt`, `decidedAt`) e `contractId` da contratação gerada no aceite. O autor retira uma proposta pendente com POST `/proposals/{id}/withdraw`; a retirada libera nova proposta enquanto a demanda estiver aberta.
 
 As listas são arrays sem paginação nesta base. O cliente lista suas demandas/propostas recebidas; o freelancer lista todas as demandas e suas próprias propostas; o admin lista todas. No detalhe, o freelancer acessa demanda aberta ou uma demanda para a qual já enviou proposta. Na lista de propostas por demanda, o freelancer vê somente as próprias; dono/admin veem todas.
 
-O cliente dono decide uma proposta pendente com POST `/proposals/{id}/accept` ou `/reject`, sem payload obrigatório. O aceite retorna `{demand,proposal,contract}`, fecha a demanda, aceita a proposta escolhida, recusa as demais pendentes e cria contratação `ACEITO`, em transação. A data da contratação é o dia do aceite em São Paulo acrescido do prazo da proposta. O título/valor acordado e os vínculos são preservados no banco; `demandId`/`proposalId` ainda não fazem parte de `ContractView`.
+O cliente dono decide uma proposta pendente com POST `/proposals/{id}/accept` ou `/reject`. O aceite aceita o corpo opcional `{"date":"2026-11-20","address":"QNA 12 casa 3"}` e retorna `{demand,proposal,contract}`: fecha a demanda, aceita a proposta escolhida, recusa as demais pendentes e cria contratação `ACEITO`, em transação. A data deve ser futura (400 caso contrário); sem data, vale o dia do aceite em São Paulo acrescido do prazo da proposta. Sem endereço (até 200), a contratação usa a cidade da demanda. O título/valor acordado e os vínculos são preservados no banco; `demandId`/`proposalId` ainda não fazem parte de `ContractView`.
 
 A recusa retorna a proposta `REJECTED` e mantém a demanda aberta. Demanda fechada ou proposta já decidida retorna 409; decisão por quem não é cliente dono retorna 403. A interface atual oferece ações de aceite e recusa no detalhe da demanda para o cliente dono.
 

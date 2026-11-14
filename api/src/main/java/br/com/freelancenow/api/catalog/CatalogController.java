@@ -80,6 +80,13 @@ public class CatalogController {
         return catalog.status(jwt, id, r.status());
     }
 
+    @DeleteMapping("/services/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('FREELANCER')")
+    public void delete(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
+        catalog.delete(jwt, id);
+    }
+
     @PostMapping(path = "/services/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('FREELANCER')")

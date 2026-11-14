@@ -1,4 +1,13 @@
-import type { Contract, ContractStatus, Role } from './types'
+import type {
+  Contract,
+  ContractStatus,
+  Demand,
+  DemandStatus,
+  Proposal,
+  ProposalStatus,
+  ReportStatus,
+  Role,
+} from './types'
 export const nowIso = () => new Date().toISOString()
 
 export const money = (value: number) =>
@@ -148,4 +157,48 @@ export function checkNewPassword(d: FormData) {
     return 'Use pelo menos 8 caracteres com letras e números, até 72 bytes.'
   if (password !== String(d.get('confirm'))) return 'As senhas não conferem.'
   return ''
+}
+export const demandStatusLabel: Record<DemandStatus, string> = {
+  OPEN: 'Aberta',
+  CLOSED: 'Encerrada',
+  CANCELLED: 'Cancelada',
+}
+export const proposalStatusLabel: Record<ProposalStatus, string> = {
+  PENDING: 'Aguardando decisão',
+  ACCEPTED: 'Aceita',
+  REJECTED: 'Não selecionada',
+  WITHDRAWN: 'Retirada',
+}
+export const reportStatusLabel: Record<ReportStatus, string> = {
+  PENDING: 'Em análise',
+  KEPT: 'Conteúdo mantido',
+  REMOVED: 'Conteúdo removido',
+}
+/** The text of a demand is locked once the first proposal arrives, as in the API. */
+export function canEditDemand(
+  d: Pick<Demand, 'id' | 'status'>,
+  proposals: Pick<Proposal, 'demandId'>[],
+) {
+  return d.status === 'OPEN' && !proposals.some((p) => p.demandId === d.id)
+}
+/** Open demands a freelancer can still answer, best matches (their categories and city) first. */
+export function compatibleDemands(
+  demands: Demand[],
+  proposals: Pick<Proposal, 'demandId' | 'freelancerId' | 'status'>[],
+  freelancerId: string,
+  categoryIds: string[],
+  city: string,
+) {
+  const answered = new Set(
+    proposals
+      .filter((p) => p.freelancerId === freelancerId && p.status !== 'WITHDRAWN')
+      .map((p) => p.demandId),
+  )
+  const town = city.split(',')[0].trim().toLowerCase()
+  const score = (d: Demand) =>
+    (categoryIds.includes(d.categoryId) ? 2 : 0) +
+    (town && d.city.toLowerCase().includes(town) ? 1 : 0)
+  return demands
+    .filter((d) => d.status === 'OPEN' && !answered.has(d.id))
+    .sort((a, b) => score(b) - score(a) || (b.createdAt || '').localeCompare(a.createdAt || ''))
 }

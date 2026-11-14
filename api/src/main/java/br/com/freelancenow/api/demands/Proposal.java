@@ -69,6 +69,11 @@ public class Proposal {
         this.decidedAt = now;
     }
 
+    public void withdraw(Instant now) {
+        this.status = ProposalStatus.WITHDRAWN;
+        this.decidedAt = now;
+    }
+
     public UUID getId() {
         return id;
     }

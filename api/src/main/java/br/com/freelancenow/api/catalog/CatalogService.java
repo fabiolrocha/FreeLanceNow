@@ -26,6 +26,7 @@ public class CatalogService {
     private final CurrentUser current;
     private final ReviewService reviews;
     private final ServiceImageRepository images;
+    private final br.com.freelancenow.api.contracts.ContractRepository contracts;
 
     public CatalogService(
             ServiceRepository services,
@@ -33,13 +34,15 @@ public class CatalogService {
             UserRepository users,
             CurrentUser current,
             ReviewService reviews,
-            ServiceImageRepository images) {
+            ServiceImageRepository images,
+            br.com.freelancenow.api.contracts.ContractRepository contracts) {
         this.services = services;
         this.categories = categories;
         this.users = users;
         this.current = current;
         this.reviews = reviews;
         this.images = images;
+        this.contracts = contracts;
     }
 
     public List<CatalogDtos.CategoryView> categories() {
@@ -159,6 +162,21 @@ public class CatalogService {
         checkLimit(u, s, status);
         s.setStatus(status);
         return view(s);
+    }
+
+    /** Only drafts or paused listings that were never hired can disappear; the rest keeps history. */
+    @Transactional
+    public void delete(Jwt jwt, UUID id) {
+        var u = lockedFreelancer(jwt);
+        var s = owned(u, id);
+        if (s.getStatus() == ServiceStatus.ACTIVE)
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "Pause o anúncio antes de excluí-lo.");
+        if (contracts.existsByServiceId(s.getId()))
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    "Este anúncio já teve contratações e fica no histórico. Deixe-o inativo.");
+        services.delete(s);
     }
 
     /** Locks the freelancer and the listing they own, rejecting moderated listings. */

@@ -25,6 +25,11 @@ public class ReportController {
         return moderation.create(jwt, r);
     }
 
+    @GetMapping("/reports/mine")
+    public List<ContentReport.OwnView> mine(@AuthenticationPrincipal Jwt jwt) {
+        return moderation.mine(jwt);
+    }
+
     @GetMapping("/admin/reports")
     public List<ContentReport.View> list(@AuthenticationPrincipal Jwt jwt) {
         return moderation.list(jwt);

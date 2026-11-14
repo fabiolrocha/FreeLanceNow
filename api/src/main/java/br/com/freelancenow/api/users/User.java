@@ -45,6 +45,15 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
+    @Column(name = "service_area", nullable = false, length = 150)
+    private String serviceArea = "";
+
+    @Column(name = "avatar_updated_at")
+    private Instant avatarUpdatedAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
+
     protected User() {}
 
     public User(String name, String email, String passwordHash, String phone, Role role) {
@@ -59,11 +68,34 @@ public class User {
         this.termsVersion = "academic-v1";
     }
 
-    public void updateProfile(String name, String phone, String city, String bio) {
+    public void updateProfile(
+            String name, String phone, String city, String bio, String serviceArea) {
         this.name = name;
         this.phone = phone;
         this.city = city;
         this.bio = bio;
+        this.serviceArea = serviceArea;
+    }
+
+    public void setAvatarUpdatedAt(Instant avatarUpdatedAt) {
+        this.avatarUpdatedAt = avatarUpdatedAt;
+    }
+
+    /**
+     * Removes personal data while keeping the row, so contracts, reviews and audit history stay
+     * consistent. The e-mail becomes free for a new registration.
+     */
+    public void anonymize(String unusablePasswordHash, Instant now) {
+        this.name = "Conta excluída";
+        this.email = "excluida-" + id + "@freelancenow.invalid";
+        this.phone = "0000000000";
+        this.city = "";
+        this.bio = "";
+        this.serviceArea = "";
+        this.passwordHash = unusablePasswordHash;
+        this.avatarUpdatedAt = null;
+        this.active = false;
+        this.deletedAt = now;
     }
 
     public void changePassword(String passwordHash) {
@@ -112,5 +144,18 @@ public class User {
 
     public String getBio() {
         return bio;
+    }
+
+    public String getServiceArea() {
+        return serviceArea;
+    }
+
+    /** Changes whenever the avatar changes, so clients can cache the image by version. */
+    public Long getAvatarVersion() {
+        return avatarUpdatedAt == null ? null : avatarUpdatedAt.toEpochMilli();
+    }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
     }
 }

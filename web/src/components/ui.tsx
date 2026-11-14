@@ -1,4 +1,4 @@
-import { useId, useRef } from 'react'
+import { useId, useRef, useState } from 'react'
 import type { ReactNode, InputHTMLAttributes } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -67,10 +67,24 @@ export function ReviewList({
     </div>
   ))
 }
-export function Avatar({ name, large = false }: { name: string; large?: boolean }) {
+/** Shows the photo when there is one and falls back to the initials. */
+export function Avatar({
+  name,
+  large = false,
+  src,
+}: {
+  name: string
+  large?: boolean
+  src?: string
+}) {
+  const [failed, setFailed] = useState('')
   return (
     <span className={`avatar ${large ? 'large' : ''}`} aria-hidden="true">
-      {initials(name)}
+      {src && failed !== src ? (
+        <img src={src} alt="" onError={() => setFailed(src)} />
+      ) : (
+        initials(name)
+      )}
     </span>
   )
 }

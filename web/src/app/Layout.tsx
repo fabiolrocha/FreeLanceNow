@@ -15,10 +15,14 @@ import {
   Shield,
   X,
   Plus,
+  Send,
+  Flag,
+  CircleHelp,
+  UserRound,
 } from 'lucide-react'
 import { useApp } from './store'
 import { useUnreadCount } from './useUnread'
-import { isMock } from '../data/client'
+import { avatarUrl, isMock } from '../data/client'
 import { Avatar } from '../components/ui'
 import '../features/feed/feed.css'
 
@@ -59,6 +63,7 @@ export function Layout() {
           ['/admin/moderacao', 'Moderação', Shield],
           ['/admin/relatorios', 'Relatórios', ClipboardList],
           ['/admin/transacoes', 'Transações', Wallet],
+          ['/perfil/editar', 'Minha conta', Settings],
         ] as const)
       : ([
           ['/inicio', 'Início', Home],
@@ -72,6 +77,7 @@ export function Layout() {
           ['/contratacoes', 'Contratações', BriefcaseBusiness],
           ...(user?.role === 'FREELANCER'
             ? ([
+                ['/propostas', 'Minhas propostas', Send],
                 ['/meus-servicos', 'Meus serviços', Plus],
                 ['/solicitacoes', 'Solicitações', ClipboardList],
                 ['/painel', 'Meu painel', Home],
@@ -80,7 +86,10 @@ export function Layout() {
           ['/mensagens', 'Mensagens', MessageSquare],
           ['/notificacoes', 'Notificações', Bell],
           ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
-          ['/perfil/editar', 'Meu perfil', Settings],
+          ['/denuncias', 'Minhas denúncias', Flag],
+          ['/perfil', 'Meu perfil', UserRound],
+          ['/perfil/editar', 'Configurações da conta', Settings],
+          ['/ajuda', 'Ajuda', CircleHelp],
         ] as const)
   return (
     <>
@@ -101,6 +110,7 @@ export function Layout() {
               {user.role === 'FREELANCER' ? (
                 <>
                   <NavLink to="/demandas">Demandas abertas</NavLink>
+                  <NavLink to="/propostas">Minhas propostas</NavLink>
                   <NavLink to="/meus-servicos">Meus serviços</NavLink>
                   <NavLink to="/solicitacoes">Solicitações</NavLink>
                 </>
@@ -116,6 +126,7 @@ export function Layout() {
           {!user && (
             <>
               <Link to="/servicos">Encontrar serviços</Link>
+              <Link to="/profissionais">Profissionais</Link>
               <Link to="/cadastro?tipo=freelancer">Para profissionais</Link>
             </>
           )}
@@ -141,8 +152,8 @@ export function Layout() {
                   </span>
                 )}
               </Link>
-              <span className="user-top">
-                <Avatar name={user.name} />
+              <Link className="user-top" to={user.role === 'ADMIN' ? '/perfil/editar' : '/perfil'}>
+                <Avatar name={user.name} src={avatarUrl(user.id, user.avatarVersion)} />
                 <span>
                   {user.name}
                   <small>
@@ -153,7 +164,7 @@ export function Layout() {
                         : 'Administrador'}
                   </small>
                 </span>
-              </span>
+              </Link>
               {social && !open && (
                 <button className="text-button desktop-signout" onClick={logout}>
                   Sair da conta

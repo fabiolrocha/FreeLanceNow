@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  canEditDemand,
   canReview,
+  compatibleDemands,
   canTransition,
   contractDeadline,
   imageSelectionError,
@@ -116,5 +118,35 @@ describe('Sessão renovável', () => {
       usable({ ...base, expiresAt: 500, refreshToken: 'r', refreshExpiresAt: 900 }, 1000),
     ).toBe(false)
     expect(usable(null)).toBe(false)
+  })
+})
+describe('Gestão de demandas (cliente e freelancer)', () => {
+  const base = {
+    clientId: 'c',
+    title: 't',
+    description: 'd',
+    budget: 100,
+    days: 2,
+  }
+  it('libera edição só enquanto a demanda está aberta e sem propostas', () => {
+    expect(canEditDemand({ id: 'd1', status: 'OPEN' }, [])).toBe(true)
+    expect(canEditDemand({ id: 'd1', status: 'OPEN' }, [{ demandId: 'd1' }])).toBe(false)
+    expect(canEditDemand({ id: 'd1', status: 'CANCELLED' }, [])).toBe(false)
+  })
+  it('mostra ao freelancer só demandas abertas que ele não respondeu, na sua área primeiro', () => {
+    const demands = [
+      { ...base, id: 'a', categoryId: 'x', city: 'Ceilândia, DF', status: 'OPEN' as const },
+      { ...base, id: 'b', categoryId: 'e', city: 'Taguatinga, DF', status: 'OPEN' as const },
+      { ...base, id: 'c', categoryId: 'e', city: 'Gama, DF', status: 'CLOSED' as const },
+      { ...base, id: 'd', categoryId: 'e', city: 'Gama, DF', status: 'OPEN' as const },
+      { ...base, id: 'e', categoryId: 'e', city: 'Gama, DF', status: 'OPEN' as const },
+    ]
+    const proposals = [
+      { demandId: 'd', freelancerId: 'f', status: 'PENDING' as const },
+      { demandId: 'e', freelancerId: 'f', status: 'WITHDRAWN' as const },
+    ]
+    expect(
+      compatibleDemands(demands, proposals, 'f', ['e'], 'Taguatinga, DF').map((d) => d.id),
+    ).toEqual(['b', 'e', 'a'])
   })
 })
