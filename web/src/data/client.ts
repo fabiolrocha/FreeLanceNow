@@ -57,7 +57,8 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
   const res = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
-      'Content-Type': 'application/json',
+      // FormData sets its own multipart boundary.
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options.headers,
     },
@@ -116,6 +117,9 @@ function persist() {
   sessionStorage.setItem('fln-mock-profiles', JSON.stringify(profiles))
   sessionStorage.setItem('fln-mock-hashes', JSON.stringify(hashes))
 }
+/** Public URL served by the API; `<img>` tags cannot send the bearer token. */
+export const serviceImageUrl = (serviceId: string, imageId: string) =>
+  `${baseUrl}/services/${serviceId}/images/${imageId}`
 const session = (user: User): Session => ({
   accessToken: `mock-${user.id}`,
   tokenType: 'Bearer',
@@ -229,6 +233,16 @@ export const client = {
         body: JSON.stringify({ status }),
       })
     return this.saveService(u, { ...service, categoryId: service.category.id, status }, service.id)
+  },
+  async uploadServiceImages(serviceId: string, files: File[]): Promise<Service> {
+    if (isMock) throw new Error('O envio de fotos funciona somente com a API.')
+    const body = new FormData()
+    files.forEach((f) => body.append('files', f))
+    return request(`/services/${serviceId}/images`, { method: 'POST', body })
+  },
+  async deleteServiceImage(serviceId: string, imageId: string): Promise<Service> {
+    if (isMock) throw new Error('O envio de fotos funciona somente com a API.')
+    return request(`/services/${serviceId}/images/${imageId}`, { method: 'DELETE' })
   },
   async contracts(): Promise<Contract[]> {
     return request('/contracts')

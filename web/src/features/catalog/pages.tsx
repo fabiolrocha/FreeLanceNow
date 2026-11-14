@@ -12,6 +12,8 @@ import {
   ServiceGrid,
 } from '../../components/ui'
 import { money } from '../../domain/rules'
+import { serviceImageUrl } from '../../data/client'
+import type { Service } from '../../domain/types'
 
 export function Landing() {
   const { categories, services, user } = useApp()
@@ -336,10 +338,14 @@ export function ServiceDetail() {
       </p>
       <div className="detail-grid">
         <article className="panel detail-main">
-          <div className={`detail-visual ${s.category.slug}`}>
-            <CategoryIcon slug={s.category.slug} size={90} />
-            <span>Fotos deste serviço serão definidas pelo grupo.</span>
-          </div>
+          {s.images?.length ? (
+            <ServiceGallery service={s} />
+          ) : (
+            <div className={`detail-visual ${s.category.slug}`}>
+              <CategoryIcon slug={s.category.slug} size={90} />
+              <span>Este anúncio ainda não tem fotos.</span>
+            </div>
+          )}
           <small className="category-text">{s.category.name}</small>
           <h1>{s.title}</h1>
           <p>
@@ -480,5 +486,35 @@ export function ProfileDetail() {
         <ReviewList reviews={reviews} />
       </section>
     </>
+  )
+}
+function ServiceGallery({ service: s }: { service: Service }) {
+  const images = s.images || [],
+    [index, setIndex] = useState(0),
+    current = images[Math.min(index, images.length - 1)]
+  return (
+    <div className="gallery">
+      <img
+        className="gallery-main"
+        src={serviceImageUrl(s.id, current.id)}
+        alt={`Foto ${index + 1} de ${images.length}: ${s.title}`}
+      />
+      {images.length > 1 && (
+        <ul className="gallery-thumbs" aria-label="Fotos do serviço">
+          {images.map((img, i) => (
+            <li key={img.id}>
+              <button
+                type="button"
+                aria-label={`Ver foto ${i + 1}`}
+                aria-pressed={i === index}
+                onClick={() => setIndex(i)}
+              >
+                <img src={serviceImageUrl(s.id, img.id)} alt="" loading="lazy" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   )
 }

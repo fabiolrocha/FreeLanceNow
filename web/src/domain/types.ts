@@ -25,6 +25,10 @@ export interface Category {
   name: string
   slug: string
 }
+export interface ServiceImage {
+  id: string
+  contentType: 'image/jpeg' | 'image/png'
+}
 export interface Service {
   createdAt?: string
   id: string
@@ -36,6 +40,7 @@ export interface Service {
   moderated?: boolean
   category: Category
   freelancer: Profile
+  images?: ServiceImage[]
 }
 export interface SaveService {
   title: string
