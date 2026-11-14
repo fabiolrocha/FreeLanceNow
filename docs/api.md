@@ -1,13 +1,17 @@
 # Contrato da API
 
-Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha, envio de e-mail, upload e financeiro permanecem pendentes; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
+Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha por e-mail, renovação de sessão e troca de senha estão em [Cadastro e login](#cadastro-e-login); financeiro permanece pendente; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
 | POST | `/auth/register` | Público | 201 + sessão; cliente/freelancer |
 | POST | `/auth/login` | Público | 200 + sessão |
+| POST | `/auth/refresh` | Público (refresh token) | 200 + nova sessão; refresh token rotacionado |
+| POST | `/auth/password/forgot` | Público | 202 sempre; envia link de redefinição se a conta existir e estiver ativa |
+| POST | `/auth/password/reset` | Público (token do e-mail) | 204; define nova senha |
 | GET | `/users/me` | Autenticado | Perfil privado |
 | PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade e bio |
+| PUT | `/users/me/password` | Autenticado | 200 + nova sessão; exige a senha atual |
 | GET | `/categories` | Público | Categorias ativas |
 | GET | `/freelancers` | Público | Perfis públicos ativos |
 | GET | `/freelancers/{id}` | Público | Perfil público de freelancer |
@@ -74,6 +78,8 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
   "accessToken": "JWT emitido pela API",
   "tokenType": "Bearer",
   "expiresIn": 900,
+  "refreshToken": "JWT de renovação",
+  "refreshExpiresIn": 2592000,
   "user": {
     "id": "UUID",
     "name": "Pessoa de demonstração",
@@ -86,7 +92,13 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 }
 ```
 
-`expiresAt` é calculado pelo frontend e não pertence à resposta HTTP. Logout apaga a sessão local; não existe refresh/revogação individual. Conta desativada não consegue login e perde acesso ao perfil privado e à gestão de serviços mesmo com token ainda válido.
+`expiresAt` e `refreshExpiresAt` são calculados pelo frontend e não pertencem à resposta HTTP. O access token vale 15 minutos. O refresh token vale 30 dias (`JWT_REFRESH_TTL_SECONDS`), só é aceito em `POST /auth/refresh` (`{refreshToken}`) e não autentica outras rotas. Cada renovação devolve um par novo. Logout apaga a sessão local.
+
+**Recuperação de senha.** `POST /auth/password/forgot` recebe `{email}` e sempre responde 202, sem revelar se a conta existe. Pedidos repetidos para o mesmo e-mail em menos de 60 s são ignorados. A conta ativa recebe um link `PUBLIC_APP_URL/redefinir-senha?token=...` válido por 30 minutos. `POST /auth/password/reset` recebe `{token, password}`, aplica a regra de senha forte e responde 204; link inválido, expirado ou já usado retorna 400.
+
+**Troca de senha.** `PUT /users/me/password` recebe `{currentPassword, newPassword}`. Senha atual errada ou nova senha igual à atual retornam 400. A resposta é uma sessão nova.
+
+**Revogação.** Refresh tokens e links de redefinição carregam uma impressão do hash da senha. Trocar ou redefinir a senha invalida todos os refresh tokens e links emitidos antes, sem tabela extra. Access tokens já emitidos continuam válidos até expirar (no máximo 15 minutos). Conta desativada não consegue login e perde acesso ao perfil privado e à gestão de serviços mesmo com token ainda válido.
 
 Perfil privado recebe PUT com `name`, `phone`, `city`, `bio`. E-mail e role não são alteráveis por esse endpoint. Perfil público retorna `id`, `name`, `role`, `city`, `bio`, `averageRating` (média com 1 casa decimal) e `reviewCount`, sem dados de contato.
 

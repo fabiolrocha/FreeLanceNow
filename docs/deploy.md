@@ -72,12 +72,12 @@ Não inclua valores de segredos neste arquivo nem em exemplos versionados. Confi
 
 ## Stripe: somente preparação
 
-O `application.yml` já declara `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`; `PUBLIC_APP_URL` foi declarado como URL pública futura para redirecionamentos. A dependência oficial `stripe-java` foi adicionada ao Maven para a etapa de integração. Nenhum código atual consome essas propriedades ou a biblioteca.
+O `application.yml` já declara `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`; `PUBLIC_APP_URL` já é usado nos links de redefinição de senha e será reaproveitado nos redirecionamentos do checkout. A dependência oficial `stripe-java` foi adicionada ao Maven para a etapa de integração. Nenhum código atual consome essas propriedades ou a biblioteca.
 
 As tabelas `payment` e `ledger_entry` já estão mapeadas na migração `V10__payments.sql`, mas ainda não existem endpoint de criação de checkout, entidades/serviços de pagamento na API, endpoint receptor de webhook, validação da assinatura do webhook, política de idempotência ou reconciliação de estados. Portanto:
 
 - Não cadastre uma URL de webhook Stripe ainda: não há endpoint implementado para receber eventos.
-- Não configure `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` ou `PUBLIC_APP_URL` como se isso ativasse pagamentos.
+- Não configure `STRIPE_SECRET_KEY` ou `STRIPE_WEBHOOK_SECRET` como se isso ativasse pagamentos. `PUBLIC_APP_URL` deve apontar para o frontend publicado, porque os e-mails de recuperação usam esse endereço.
 - A interface atual continua simulando pagamentos e não deve ser apresentada como apta a cobrar ou confirmar transações reais.
 
 Quando a implementação for aprovada, obtenha as chaves do ambiente de teste em **Stripe Dashboard → Developers → API keys**. O segredo de assinatura é específico de cada webhook e fica em **Developers → Webhooks**, não é a chave da API. Configure credenciais de teste e produção separadamente nos ambientes da hospedagem; mantenha qualquer chave secreta somente no backend. O frontend não precisa de chave publicável enquanto não integrar Stripe.js/Elements.

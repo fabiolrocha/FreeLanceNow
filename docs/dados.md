@@ -141,7 +141,7 @@ O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não 
 | `contract_message` | UUID; contratação e autor FK; texto de 1–1000 caracteres não vazio; criação. Só cliente e freelancer da contratação escrevem; admin lê para decidir disputas; recusada/cancelada não aceita novas mensagens |
 | `notification` | UUID; destinatário FK; tipo; título 150; corpo 300; link interno 200; criação; `read_at` opcional. Gravado na mesma transação do evento (solicitação, mudança de status, prazo automático, proposta, avaliação, resposta e mensagem); quem age não recebe aviso da própria ação |
 
-Não há entrega por e-mail nem tempo real: a interface consulta o contador a cada 30 s e a conversa aberta a cada 10 s. O envio por e-mail (Resend) continua em F07.
+Não há entrega por e-mail nem tempo real: a interface consulta o contador a cada 30 s e a conversa aberta a cada 10 s. Avisos por e-mail continuam em F07; o Resend hoje só envia a recuperação de senha.
 
 ## Fotos dos anúncios (V11)
 
