@@ -191,3 +191,27 @@ export function ServiceGrid({ services }: { services: Service[] }) {
     </div>
   )
 }
+export function NewPasswordFields({ label = 'Nova senha' }: { label?: string }) {
+  return (
+    <>
+      <Field
+        label={label}
+        name="password"
+        type="password"
+        required
+        minLength={8}
+        maxLength={72}
+        autoComplete="new-password"
+        hint="Ao menos 8 caracteres, com letras e números."
+      />
+      <Field
+        label="Confirme a nova senha"
+        name="confirm"
+        type="password"
+        required
+        maxLength={72}
+        autoComplete="new-password"
+      />
+    </>
+  )
+}

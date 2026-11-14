@@ -1,24 +1,28 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { ShieldCheck, ArrowLeft, CheckCircle2 } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client, isMock } from '../../data/client'
-import { validPassword } from '../../domain/rules'
-import { ErrorMessage, Field } from '../../components/ui'
+import { checkNewPassword, safeRedirect, validPassword } from '../../domain/rules'
+import { ErrorMessage, Field, NewPasswordFields } from '../../components/ui'
 
 export function Login() {
   const { signIn } = useApp(),
-    navigate = useNavigate()
+    navigate = useNavigate(),
+    { state } = useLocation()
+  const from = (state as { from?: unknown } | null)?.from
   const [error, setError] = useState(''),
     [busy, setBusy] = useState(false)
-  async function enter(email: string, password: string) {
+  async function enter(email: string, password: string, remember: boolean) {
     setBusy(true)
     setError('')
     try {
       const s = await client.login(email, password)
-      signIn(s)
-      navigate(s.user.role === 'ADMIN' ? '/admin/usuarios' : '/inicio')
+      signIn(s, remember)
+      navigate(safeRedirect(from, s.user.role === 'ADMIN' ? '/admin/usuarios' : '/inicio'), {
+        replace: true,
+      })
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -28,7 +32,11 @@ export function Login() {
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = new FormData(e.currentTarget)
-    void enter(String(data.get('email')), String(data.get('password')))
+    void enter(
+      String(data.get('email')),
+      String(data.get('password')),
+      data.get('remember') === 'on',
+    )
   }
   return (
     <div className="auth-layout">
@@ -40,7 +48,7 @@ export function Login() {
       </div>
       <section className="auth-panel">
         <h2>Bem-vindo de volta</h2>
-        <p>Entre para continuar.</p>
+        <p>{from ? 'Entre para continuar de onde parou.' : 'Entre para continuar.'}</p>
         <form onSubmit={submit}>
           <Field label="E-mail" name="email" type="email" required autoComplete="email" />
           <Field
@@ -51,6 +59,10 @@ export function Login() {
             maxLength={72}
             autoComplete="current-password"
           />
+          <label className="check">
+            <input type="checkbox" name="remember" defaultChecked />
+            <span>Manter conectado neste dispositivo</span>
+          </label>
           <Link className="subtle-link" to="/recuperar-senha">
             Esqueci minha senha
           </Link>
@@ -194,33 +206,120 @@ export function Signup() {
   )
 }
 export function Recovery() {
-  const [sent, setSent] = useState(false)
+  const [sent, setSent] = useState(''),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const email = String(new FormData(e.currentTarget).get('email')).trim()
+    setBusy(true)
+    setError('')
+    try {
+      await client.forgotPassword(email)
+      setSent(email)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
     <section className="form-panel auth-single">
+      <Link to="/login" className="subtle-link">
+        <ArrowLeft size={16} />
+        Voltar ao login
+      </Link>
       <h1>Recuperar acesso</h1>
-      <p>
-        {isMock
-          ? 'Simulação do pedido de recuperação. Nenhum e-mail será enviado.'
-          : 'O envio de e-mail ainda está em desenvolvimento. Entre em contato com o grupo responsável pela demonstração.'}
-      </p>
-      {isMock && !sent && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            setSent(true)
-          }}
-        >
-          <Field label="E-mail cadastrado" type="email" required />
-          <button className="button">Simular envio do link</button>
+      {sent ? (
+        <>
+          <p className="success">
+            <CheckCircle2 />
+            {isMock
+              ? 'Pedido registrado. No modo de demonstração nenhum e-mail é enviado.'
+              : `Se houver uma conta ativa para ${sent}, enviamos um link para criar uma nova senha. Ele vale por 30 minutos.`}
+          </p>
+          <p>Não recebeu? Confira a caixa de spam ou peça outro link em 1 minuto.</p>
+          <button type="button" className="button secondary" onClick={() => setSent('')}>
+            Pedir outro link
+          </button>
+        </>
+      ) : (
+        <form onSubmit={submit}>
+          <p>Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</p>
+          <Field
+            label="E-mail cadastrado"
+            name="email"
+            type="email"
+            required
+            maxLength={254}
+            autoComplete="email"
+          />
+          <ErrorMessage message={error} />
+          <button disabled={busy} className="button full">
+            {busy ? 'Enviando…' : 'Enviar link'}
+          </button>
         </form>
       )}
-      {sent && (
-        <p className="success">
-          <CheckCircle2 />
-          Pedido simulado. Na versão integrada, o link terá validade de 30 minutos.
-        </p>
+    </section>
+  )
+}
+export function ResetPassword() {
+  const [params] = useSearchParams(),
+    resetToken = params.get('token') || ''
+  const [done, setDone] = useState(false),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false)
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const d = new FormData(e.currentTarget),
+      invalid = checkNewPassword(d)
+    if (invalid) return setError(invalid)
+    setBusy(true)
+    setError('')
+    try {
+      await client.resetPassword(resetToken, String(d.get('password')))
+      setDone(true)
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <section className="form-panel auth-single">
+      <h1>Criar nova senha</h1>
+      {done ? (
+        <>
+          <p className="success">
+            <CheckCircle2 />
+            Senha alterada. Entre com a nova senha.
+          </p>
+          <Link className="button" to="/login">
+            Entrar
+          </Link>
+        </>
+      ) : !resetToken ? (
+        <>
+          <p>Este link está incompleto. Abra o link do e-mail novamente ou peça um novo.</p>
+          <Link className="button" to="/recuperar-senha">
+            Pedir novo link
+          </Link>
+        </>
+      ) : (
+        <form onSubmit={submit}>
+          <p>Escolha uma senha que você não usa em outros sites.</p>
+          <NewPasswordFields />
+          <ErrorMessage message={error} />
+          <button disabled={busy} className="button full">
+            {busy ? 'Salvando…' : 'Salvar nova senha'}
+          </button>
+          {error && (
+            <Link className="subtle-link" to="/recuperar-senha">
+              Pedir novo link
+            </Link>
+          )}
+        </form>
       )}
-      <Link to="/login">Voltar ao login</Link>
     </section>
   )
 }

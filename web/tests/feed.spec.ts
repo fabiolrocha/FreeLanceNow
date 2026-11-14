@@ -101,7 +101,7 @@ test('retirar o último item da última página retorna aos resultados restantes
   await page.goto('/login')
   await loginAs(page, 'marcos')
   await page.evaluate(() => {
-    const { user } = JSON.parse(sessionStorage.getItem('fln-session')!)
+    const { user } = JSON.parse(localStorage.getItem('fln-session')!)
     const author = { id: user.id, name: user.name, role: user.role, city: user.city }
     sessionStorage.setItem(
       'fln-feed-posts',

@@ -18,6 +18,10 @@ export interface Session {
   tokenType: string
   expiresIn: number
   expiresAt?: number
+  refreshToken?: string
+  refreshExpiresIn?: number
+  refreshExpiresAt?: number
+  remember?: boolean
   user: User
 }
 export interface Category {

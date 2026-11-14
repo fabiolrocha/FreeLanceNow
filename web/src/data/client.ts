@@ -19,6 +19,7 @@ import type {
 } from '../domain/types'
 import { categories, demoUsers, professionals, services } from './fixtures'
 import { validPassword } from '../domain/rules'
+import { clearSession, loadSession, saveSession, timed } from './session'
 
 export const dataMode = import.meta.env.VITE_DATA_MODE || 'mock'
 if (!['mock', 'api'].includes(dataMode)) throw new Error('VITE_DATA_MODE deve ser mock ou api.')
@@ -53,13 +54,56 @@ const fieldLabels: Record<string, string> = {
 export function setToken(value: string) {
   token = value
 }
-export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+type SessionListener = (s: Session | null) => void
+const sessionListeners = new Set<SessionListener>()
+/** Notified when the client renews the session or finds that it can no longer be renewed. */
+export function onSessionChange(listener: SessionListener) {
+  sessionListeners.add(listener)
+  return () => {
+    sessionListeners.delete(listener)
+  }
+}
+let renewing: Promise<Session | null> | null = null
+/**
+ * Exchanges the stored refresh token for a new session. Concurrent callers share one request.
+ * Resolves to null (and clears the stored session) when the refresh token is missing or rejected.
+ */
+export function renewSession(): Promise<Session | null> {
+  if (isMock) return Promise.resolve(null)
+  renewing ??= (async () => {
+    const current = loadSession()
+    try {
+      if (!current?.refreshToken) throw new Error('Sem sessão para renovar.')
+      const next = timed(
+        await send<Session>(
+          '/auth/refresh',
+          { method: 'POST', body: JSON.stringify({ refreshToken: current.refreshToken }) },
+          '',
+        ),
+        current,
+      )
+      saveSession(next)
+      token = next.accessToken
+      sessionListeners.forEach((l) => l(next))
+      return next
+    } catch {
+      clearSession()
+      token = ''
+      sessionListeners.forEach((l) => l(null))
+      return null
+    } finally {
+      renewing = null
+    }
+  })()
+  return renewing
+}
+async function send<T>(path: string, options: RequestInit, bearer: string): Promise<T> {
   const res = await fetch(`${baseUrl}${path}`, {
     ...options,
     headers: {
       // FormData sets its own multipart boundary.
       ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       ...options.headers,
     },
     signal: AbortSignal.timeout(15000),
@@ -68,9 +112,31 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     const problem = await res.json().catch(() => ({}))
     const fields = Object.keys(problem.errors || {}).map((k) => fieldLabels[k] || k)
     const detail = problem.detail || `Não foi possível concluir (${res.status}).`
-    throw new Error(fields.length ? `${detail} Campos: ${fields.join(', ')}.` : detail)
+    throw Object.assign(
+      new Error(fields.length ? `${detail} Campos: ${fields.join(', ')}.` : detail),
+      { status: res.status },
+    )
   }
+  if (res.status === 204 || res.status === 202) return undefined as T
   return res.json() as Promise<T>
+}
+export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  try {
+    return await send<T>(path, options, token)
+  } catch (e) {
+    // An expired access token is renewed once with the refresh token, then the call is retried.
+    if ((e as { status?: number }).status !== 401 || !token || path.startsWith('/auth/')) throw e
+    const renewed = await renewSession()
+    if (renewed) return send<T>(path, options, renewed.accessToken)
+    // Public endpoints still answer without credentials; private ones report the ended session.
+    try {
+      return await send<T>(path, options, '')
+    } catch (anonymous) {
+      if ((anonymous as { status?: number }).status === 401)
+        throw new Error('Sua sessão terminou. Entre novamente.', { cause: e })
+      throw anonymous
+    }
+  }
 }
 function read<T>(key: string, fallback: T): T {
   try {
@@ -159,6 +225,37 @@ export const client = {
     if (user.role === 'FREELANCER') profiles.push(publicProfile(user))
     persist()
     return session(user)
+  },
+  async forgotPassword(email: string): Promise<void> {
+    if (isMock) return
+    await request('/auth/password/forgot', { method: 'POST', body: JSON.stringify({ email }) })
+  },
+  async resetPassword(resetToken: string, password: string): Promise<void> {
+    if (isMock) throw new Error('A redefinição por e-mail só funciona com a API ligada.')
+    await request('/auth/password/reset', {
+      method: 'POST',
+      body: JSON.stringify({ token: resetToken, password }),
+    })
+  },
+  async changePassword(u: User, currentPassword: string, newPassword: string): Promise<Session> {
+    if (!isMock)
+      return request('/users/me/password', {
+        method: 'PUT',
+        body: JSON.stringify({ currentPassword, newPassword }),
+      })
+    if (!validPassword(newPassword))
+      throw new Error('Use pelo menos 8 caracteres com letras e números, até 72 bytes.')
+    const hash = hashes[u.id]
+    const valid = hash
+      ? (await digest(hash.salt + currentPassword)) === hash.digest
+      : currentPassword === 'Demo12345'
+    if (!valid) throw new Error('A senha atual não confere.')
+    if (currentPassword === newPassword)
+      throw new Error('A nova senha deve ser diferente da atual.')
+    const salt = crypto.randomUUID()
+    hashes[u.id] = { salt, digest: await digest(salt + newPassword) }
+    persist()
+    return session(u)
   },
   async me(user: User): Promise<User> {
     return isMock ? accounts.find((u) => u.id === user.id) || user : request('/users/me')
