@@ -19,7 +19,9 @@ test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e
   await loginAs(page, 'marcos')
   await page.goto(contractUrl)
   await page.getByRole('button', { name: 'Aceitar solicitação' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Sim, aceitar' }).click()
   await page.getByRole('button', { name: 'Iniciar serviço' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Sim, iniciar' }).click()
   await page.getByRole('link', { name: 'Marcar como concluído' }).click()
   await page.getByRole('button', { name: 'Confirmar conclusão' }).click()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
@@ -28,6 +30,7 @@ test('cliente solicita serviço e freelancer aceita, executa; cliente confirma e
   await page.goto(contractUrl)
   await page.getByRole('link', { name: 'Confirmar ou contestar' }).click()
   await page.getByRole('button', { name: 'Confirmar recebimento' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Sim, confirmar' }).click()
   await page.getByRole('link', { name: 'Avaliar serviço' }).click()
   await page.getByRole('button', { name: '4 estrelas', exact: true }).click()
   await page.getByLabel('Comentário').fill('Serviço concluído conforme o combinado.')
@@ -115,6 +118,7 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   await loginAs(page, 'ana')
   await page.goto(demandUrl)
   await page.getByRole('button', { name: 'Aceitar proposta' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Sim, aceitar' }).click()
   await expect(page).toHaveURL(/\/contratacoes\/[^/]+$/)
   await expect(page.getByText('Aceito', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('heading', { name: title })).toBeVisible()
@@ -133,18 +137,19 @@ test('cliente contesta conclusão e admin decide a disputa na moderação', asyn
     .getByLabel('Motivo da contestação')
     .fill('O chuveiro continua sem aquecer depois da instalação.')
   await page.getByRole('button', { name: 'Enviar contestação' }).click()
-  await expect(page.getByText('O chuveiro continua sem aquecer')).toBeVisible()
+  await expect(page.getByText('O chuveiro continua sem aquecer').first()).toBeVisible()
   await expect(page.getByText('Em disputa', { exact: true }).first()).toBeVisible()
+  await page.goto('/contratacoes/103/disputa')
+  await expect(page.getByText('Em análise pela administração')).toBeVisible()
   await page.goto('/contratacoes/103/confirmar')
-  await page.getByRole('button', { name: 'Confirmar recebimento' }).click()
-  await expect(
-    page.getByText('Esta mudança de status não é permitida para seu perfil.'),
-  ).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Ação indisponível' })).toBeVisible()
   await logout(page)
 
   await loginAs(page, 'admin')
   await page.goto('/admin/moderacao')
   const dispute = page.locator('article').filter({ hasText: 'O chuveiro continua sem aquecer' })
+  await expect(dispute.getByRole('button', { name: 'Confirmar conclusão' })).toBeDisabled()
+  await page.getByLabel('Justificativa da mediação').fill('Teste no local confirmou o aquecimento.')
   await dispute.getByRole('button', { name: 'Confirmar conclusão' }).click()
   await expect(dispute).toHaveCount(0)
   await logout(page)
@@ -153,6 +158,47 @@ test('cliente contesta conclusão e admin decide a disputa na moderação', asyn
   await page.goto('/contratacoes/103')
   await expect(page.getByText('Concluído', { exact: true }).first()).toBeVisible()
   await expect(page.getByRole('link', { name: 'Avaliar serviço' })).toBeVisible()
+  await page.getByRole('link', { name: 'Ver disputa encerrada' }).click()
+  await expect(page.getByText('Disputa encerrada')).toBeVisible()
+  await expect(page.getByText('Conclusão confirmada')).toBeVisible()
+  await expect(page.getByText('Teste no local confirmou o aquecimento.')).toBeVisible()
+})
+test('contratação aceita pode ser cancelada com motivo; depois de iniciada, só por disputa', async ({
+  page,
+}) => {
+  await loginAs(page, 'ana')
+  await page.goto('/contratacoes/101')
+  // Pending requests are cancelled only after confirming the consequence.
+  await page.getByRole('button', { name: 'Cancelar solicitação' }).click()
+  await expect(page.getByRole('dialog')).toContainText('não é possível desfazer', {
+    ignoreCase: true,
+  })
+  await page.getByRole('dialog').getByRole('button', { name: 'Voltar' }).click()
+  await expect(page.getByText('Pendente', { exact: true }).first()).toBeVisible()
+  await logout(page)
+
+  await loginAs(page, 'marcos')
+  await page.goto('/contratacoes/101')
+  await expect(page.getByRole('link', { name: 'Denunciar anúncio' })).toHaveCount(0)
+  await page.getByRole('button', { name: 'Aceitar solicitação' }).click()
+  await page.getByRole('dialog').getByRole('button', { name: 'Sim, aceitar' }).click()
+  await page.getByRole('link', { name: 'Cancelar contratação' }).click()
+  await page.getByRole('button', { name: 'Cancelar contratação' }).click()
+  await expect(page).toHaveURL(/\/cancelar$/)
+  await page.getByLabel('Motivo do cancelamento').fill('Fiquei sem agenda na data pedida.')
+  await page.getByRole('button', { name: 'Cancelar contratação' }).click()
+  await expect(page.getByText('Cancelado', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Fiquei sem agenda na data pedida.')).toBeVisible()
+
+  // Work in progress has no cancel option; either party opens a dispute instead.
+  await page.goto('/contratacoes/102')
+  await expect(page.getByRole('link', { name: 'Cancelar contratação' })).toHaveCount(0)
+  await page.getByRole('link', { name: 'Abrir disputa' }).click()
+  await page.getByLabel('Motivo da disputa').fill('Cliente não liberou o acesso ao local.')
+  await page.getByRole('button', { name: 'Abrir disputa' }).click()
+  await expect(page.getByText('Em disputa', { exact: true }).first()).toBeVisible()
+  await page.getByRole('link', { name: 'Acompanhar disputa' }).click()
+  await expect(page.getByText('Aberta pelo profissional')).toBeVisible()
 })
 test('denúncia entra na fila do admin, recebe decisão e relatório exporta CSV', async ({
   page,

@@ -4,7 +4,14 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { client, isMock, serviceImageUrl } from '../../data/client'
-import { CategoryIcon, Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
+import {
+  CategoryIcon,
+  ConfirmButton,
+  Empty,
+  ErrorMessage,
+  Field,
+  PageTitle,
+} from '../../components/ui'
 import type { Service, ServiceImage, ServiceStatus } from '../../domain/types'
 import { ServiceImagesField } from './ServiceImagesField'
 import { money } from '../../domain/rules'
@@ -64,7 +71,8 @@ export function MyServices() {
               <div>
                 <h2>{s.title}</h2>
                 <p>
-                  {s.category.name} · {money(s.price)} · {s.deliveryDays} dias
+                  {s.category.name} · {money(s.price)} · {s.deliveryDays}{' '}
+                  {s.deliveryDays === 1 ? 'dia' : 'dias'}
                 </p>
                 <span className={`badge ${s.status === 'ACTIVE' ? 'green' : ''}`}>
                   {s.moderated ? 'Removido pela moderação' : labels[s.status]}
@@ -76,13 +84,25 @@ export function MyServices() {
                     Editar
                   </Link>
                 )}
-                <button
-                  disabled={busy === s.id || s.moderated}
-                  className="text-button"
-                  onClick={() => void status(s)}
-                >
-                  {s.status === 'ACTIVE' ? 'Desativar' : 'Publicar'}
-                </button>
+                {s.status === 'ACTIVE' ? (
+                  <ConfirmButton
+                    disabled={busy === s.id || s.moderated}
+                    className="text-button"
+                    label="Desativar"
+                    title={`Desativar "${s.title}"?`}
+                    message="O anúncio sai da busca e não recebe novas solicitações. Contratações em andamento continuam. Você pode publicá-lo de novo quando quiser."
+                    confirmLabel="Sim, desativar"
+                    onConfirm={() => void status(s)}
+                  />
+                ) : (
+                  <button
+                    disabled={busy === s.id || s.moderated}
+                    className="text-button"
+                    onClick={() => void status(s)}
+                  >
+                    Publicar
+                  </button>
+                )}
               </div>
             </article>
           ))}
@@ -251,8 +271,8 @@ export function ServiceForm() {
           </div>
           {isMock ? (
             <p className="notice">
-              No modo demonstração os anúncios usam ícones por categoria. O envio de fotos funciona
-              com a API.
+              Os anúncios do modo mock usam ícones por categoria. O envio de fotos funciona com a
+              API.
             </p>
           ) : (
             <ServiceImagesField

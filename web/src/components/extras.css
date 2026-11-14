@@ -241,3 +241,30 @@
     height: 220px;
   }
 }
+
+/* Confirmação de ações irreversíveis */
+.confirm-dialog {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: min(440px, calc(100vw - 2rem));
+  box-shadow: 0 20px 50px rgb(23 75 53 / 0.18);
+}
+.confirm-dialog::backdrop {
+  background: rgb(23 43 35 / 0.45);
+}
+.confirm-dialog h2 {
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+.confirm-dialog .row {
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+}
+.button.danger {
+  background: #b3412b;
+  border-color: #b3412b;
+}
+.button.danger:hover {
+  background: #93321f;
+}

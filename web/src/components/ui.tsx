@@ -1,3 +1,4 @@
+import { useId, useRef } from 'react'
 import type { ReactNode, InputHTMLAttributes } from 'react'
 import { Link } from 'react-router-dom'
 import {
@@ -123,6 +124,67 @@ export function ErrorMessage({ message }: { message: string }) {
       {message}
     </p>
   ) : null
+}
+/**
+ * Button for actions that cannot be undone. It opens a modal that states the consequence and runs
+ * `onConfirm` only after the person confirms.
+ */
+export function ConfirmButton({
+  label,
+  title,
+  message,
+  confirmLabel,
+  onConfirm,
+  className = 'button',
+  disabled,
+  danger,
+}: {
+  label: ReactNode
+  title: string
+  message: ReactNode
+  confirmLabel: string
+  onConfirm: () => void
+  className?: string
+  disabled?: boolean
+  danger?: boolean
+}) {
+  const dialog = useRef<HTMLDialogElement>(null),
+    id = useId()
+  return (
+    <>
+      <button
+        type="button"
+        className={className}
+        disabled={disabled}
+        onClick={() => dialog.current?.showModal()}
+      >
+        {label}
+      </button>
+      <dialog ref={dialog} className="confirm-dialog" aria-labelledby={`${id}-title`}>
+        <h2 id={`${id}-title`}>{title}</h2>
+        <div>{message}</div>
+        <div className="row">
+          <button
+            type="button"
+            className="button secondary"
+            onClick={() => dialog.current?.close()}
+          >
+            Voltar
+          </button>
+          <button
+            type="button"
+            className={danger ? 'button danger' : 'button'}
+            onClick={() => {
+              dialog.current?.close()
+              onConfirm()
+            }}
+          >
+            {confirmLabel}
+          </button>
+        </div>
+      </dialog>
+    </>
+  )
 }
 export function SimulationNotice() {
   return !isMock ? (

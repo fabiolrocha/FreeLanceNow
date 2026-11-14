@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useApp } from '../../app/store'
-import { Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
+import { ConfirmButton, Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
 import { money } from '../../domain/rules'
 
 export function Demands() {
@@ -189,16 +189,29 @@ export function DemandDetail() {
           </span>
           {user?.id === d.clientId && p.status === 'PENDING' && d.status === 'OPEN' && (
             <div className="row">
-              <button className="button" disabled={busy} onClick={() => void accept(p.id)}>
-                Aceitar proposta
-              </button>
-              <button
+              <ConfirmButton
+                disabled={busy}
+                label="Aceitar proposta"
+                title={`Aceitar a proposta de ${p.freelancerName}?`}
+                message={
+                  <p>
+                    A demanda será encerrada, as outras propostas serão recusadas e uma contratação
+                    de {money(p.price)} será criada com {p.freelancerName}. Não é possível desfazer.
+                  </p>
+                }
+                confirmLabel="Sim, aceitar"
+                onConfirm={() => void accept(p.id)}
+              />
+              <ConfirmButton
                 className="button secondary"
                 disabled={busy}
-                onClick={() => void reject(p.id)}
-              >
-                Recusar
-              </button>
+                label="Recusar"
+                title={`Recusar a proposta de ${p.freelancerName}?`}
+                message={`${p.freelancerName} será avisado. A proposta recusada não pode ser reaberta.`}
+                confirmLabel="Sim, recusar"
+                danger
+                onConfirm={() => void reject(p.id)}
+              />
             </div>
           )}
         </article>
@@ -224,7 +237,7 @@ export function ProposalForm() {
     return (
       <div className="form-panel confirmation">
         <h1>Proposta enviada</h1>
-        <p>O cliente poderá comparar sua proposta com as demais na demonstração.</p>
+        <p>O cliente compara as propostas recebidas e você recebe um aviso quando ele decidir.</p>
         <Link className="button" to={`/demandas/${id}`}>
           Ver demanda
         </Link>

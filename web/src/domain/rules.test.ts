@@ -42,6 +42,14 @@ describe('Permissões e sequência da contratação (UC06)', () => {
     expect(canTransition('EM_DISPUTA', 'CONCLUIDO', 'CLIENT')).toBe(false)
     expect(canTransition('CONCLUIDO', 'EM_ANDAMENTO', 'ADMIN')).toBe(false)
   })
+  it('permite cancelar até o início e, depois, apenas abrir disputa', () => {
+    expect(canTransition('ACEITO', 'CANCELADO', 'CLIENT')).toBe(true)
+    expect(canTransition('ACEITO', 'CANCELADO', 'FREELANCER')).toBe(true)
+    expect(canTransition('EM_ANDAMENTO', 'CANCELADO', 'CLIENT')).toBe(false)
+    expect(canTransition('EM_ANDAMENTO', 'EM_DISPUTA', 'CLIENT')).toBe(true)
+    expect(canTransition('EM_ANDAMENTO', 'EM_DISPUTA', 'FREELANCER')).toBe(true)
+    expect(canTransition('EM_DISPUTA', 'CANCELADO', 'ADMIN')).toBe(true)
+  })
 })
 describe('Janela de avaliação (UC04)', () => {
   const at = '2026-09-30T12:00:00Z',
