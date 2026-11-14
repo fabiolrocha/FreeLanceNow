@@ -1,6 +1,7 @@
 package br.com.freelancenow.api.contracts;
 
 import br.com.freelancenow.api.reviews.Review;
+import br.com.freelancenow.api.users.Role;
 
 import jakarta.validation.constraints.*;
 
@@ -37,9 +38,17 @@ public final class ContractDtos {
         }
     }
 
-    public record HistoryItem(ContractStatus status, Instant at) {
+    /**
+     * One step of the contract history. {@code actorRole} is null for automatic steps (deadline
+     * job); administrators are identified only by role.
+     */
+    public record HistoryItem(ContractStatus status, Instant at, String comment, Role actorRole) {
         public static HistoryItem from(ContractEvent e) {
-            return new HistoryItem(e.getStatus(), e.getCreatedAt());
+            return new HistoryItem(
+                    e.getStatus(),
+                    e.getCreatedAt(),
+                    e.getNote(),
+                    e.getActor() == null ? null : e.getActor().getRole());
         }
     }
 

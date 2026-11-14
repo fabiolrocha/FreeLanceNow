@@ -35,6 +35,10 @@ import java.util.stream.Collectors;
 public class ContractService {
     private static final ZoneId BRAZIL_ZONE = ZoneId.of("America/Sao_Paulo");
 
+    /**
+     * Either party may cancel, with a reason, until the work starts. Once it has started, the
+     * only way out is a dispute decided by an administrator, who may also cancel the contract.
+     */
     private static final Map<ContractStatus, Map<Role, Set<ContractStatus>>> TRANSITIONS =
             Map.of(
                     ContractStatus.PENDENTE,
@@ -43,9 +47,17 @@ public class ContractService {
                             Role.FREELANCER,
                                     Set.of(ContractStatus.ACEITO, ContractStatus.RECUSADO)),
                     ContractStatus.ACEITO,
-                    Map.of(Role.FREELANCER, Set.of(ContractStatus.EM_ANDAMENTO)),
+                    Map.of(
+                            Role.CLIENT, Set.of(ContractStatus.CANCELADO),
+                            Role.FREELANCER,
+                                    Set.of(ContractStatus.EM_ANDAMENTO, ContractStatus.CANCELADO)),
                     ContractStatus.EM_ANDAMENTO,
-                    Map.of(Role.FREELANCER, Set.of(ContractStatus.AGUARDANDO_CONFIRMACAO)),
+                    Map.of(
+                            Role.CLIENT, Set.of(ContractStatus.EM_DISPUTA),
+                            Role.FREELANCER,
+                                    Set.of(
+                                            ContractStatus.AGUARDANDO_CONFIRMACAO,
+                                            ContractStatus.EM_DISPUTA)),
                     ContractStatus.AGUARDANDO_CONFIRMACAO,
                     Map.of(
                             Role.CLIENT,
@@ -53,7 +65,10 @@ public class ContractService {
                     ContractStatus.EM_DISPUTA,
                     Map.of(
                             Role.ADMIN,
-                            Set.of(ContractStatus.CONCLUIDO, ContractStatus.EM_ANDAMENTO)));
+                            Set.of(
+                                    ContractStatus.CONCLUIDO,
+                                    ContractStatus.EM_ANDAMENTO,
+                                    ContractStatus.CANCELADO)));
 
     private final ContractRepository contracts;
     private final ContractEventRepository events;
@@ -170,13 +185,20 @@ public class ContractService {
         if (!canTransition(c.getStatus(), r.status(), u.getRole()))
             throw new ApiException(
                     HttpStatus.CONFLICT, "Esta mudança de status não é permitida para seu perfil.");
-        if (r.status() == ContractStatus.EM_DISPUTA
-                && (r.comment() == null
-                        || r.comment().isBlank()
-                        || r.comment().trim().length() > 300))
+        if (r.status() == ContractStatus.EM_DISPUTA && !hasText(r.comment(), 300))
             throw new ApiException(
                     HttpStatus.BAD_REQUEST,
                     "Informe o motivo da contestação (até 300 caracteres).");
+        if (c.getStatus() == ContractStatus.ACEITO
+                && r.status() == ContractStatus.CANCELADO
+                && !hasText(r.comment(), 300))
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Informe o motivo do cancelamento (até 300 caracteres).");
+        if (c.getStatus() == ContractStatus.EM_DISPUTA && !hasText(r.comment(), 500))
+            throw new ApiException(
+                    HttpStatus.BAD_REQUEST,
+                    "Informe a justificativa da decisão (até 500 caracteres).");
         var previous = c.getStatus();
         var now = Instant.now(clock);
         c.transitionTo(r.status(), r.comment(), now);
@@ -277,6 +299,10 @@ public class ContractService {
 
     public static boolean canTransition(ContractStatus from, ContractStatus to, Role role) {
         return TRANSITIONS.getOrDefault(from, Map.of()).getOrDefault(role, Set.of()).contains(to);
+    }
+
+    private static boolean hasText(String text, int max) {
+        return text != null && !text.isBlank() && text.trim().length() <= max;
     }
 
     private void ensureParticipantOrAdmin(User u, Contract c) {

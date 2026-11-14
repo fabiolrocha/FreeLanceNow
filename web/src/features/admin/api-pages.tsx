@@ -5,7 +5,7 @@ import { useApp } from '../../app/store'
 import { adminApi } from '../../data/admin'
 import type { AdminCategory, ContentReport, Metrics } from '../../data/admin'
 import { exportCsv } from '../../data/exportCsv'
-import { ErrorMessage, Field, PageTitle, Empty } from '../../components/ui'
+import { ConfirmButton, ErrorMessage, Field, PageTitle, Empty } from '../../components/ui'
 
 function useResource<T>(load: () => Promise<T>) {
   const [data, setData] = useState<T>(),
@@ -396,11 +396,12 @@ export function ApiAdminModeration() {
       setBusy(false)
     }
   }
-  async function dispute(id: string, status: 'CONCLUIDO' | 'EM_ANDAMENTO') {
+  async function dispute(id: string, status: 'CONCLUIDO' | 'EM_ANDAMENTO' | 'CANCELADO') {
     setBusy(true)
     r.setError('')
     try {
       await transition(id, status, note)
+      setNote('')
       await reloadContracts()
     } catch (e) {
       r.setError((e as Error).message)
@@ -460,6 +461,16 @@ export function ApiAdminModeration() {
             >
               Voltar para execução
             </button>
+            <ConfirmButton
+              className="button danger"
+              disabled={busy || !note.trim()}
+              label="Cancelar contratação"
+              title="Cancelar esta contratação?"
+              message="A contratação será encerrada como cancelada para cliente e profissional. A decisão não pode ser desfeita."
+              confirmLabel="Sim, cancelar"
+              danger
+              onConfirm={() => void dispute(c.id, 'CANCELADO')}
+            />
           </div>
         </article>
       ))}

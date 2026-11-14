@@ -124,7 +124,9 @@ export default function App() {
                 <Route path="contratacoes/:id" element={<ContractDetail />} />
                 <Route path="contratacoes/:id/enviada" element={<Sent />} />
                 <Route path="contratacoes/:id/avaliacao-publicada" element={<Reviewed />} />
-                <Route path="contratacoes/:id/disputa" element={<ContractAction />} />
+                {['disputa', 'contestar', 'cancelar'].map((p) => (
+                  <Route key={p} path={`contratacoes/:id/${p}`} element={<ContractAction />} />
+                ))}
                 <Route path="demandas" element={<Demands />} />
                 <Route path="demandas/:id" element={<DemandDetail />} />
                 <Route path="notificacoes" element={<Notifications />} />
@@ -139,7 +141,7 @@ export default function App() {
                 <Route path="demandas/nova" element={<DemandForm />} />
                 <Route path="pagamento" element={<Payment />} />
                 <Route path="pagamento/confirmado" element={<Payment />} />
-                {['confirmar', 'contestar', 'avaliar'].map((p) => (
+                {['confirmar', 'avaliar'].map((p) => (
                   <Route key={p} path={`contratacoes/:id/${p}`} element={<ContractAction />} />
                 ))}
               </Route>

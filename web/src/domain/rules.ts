@@ -24,10 +24,28 @@ export const statusLabel: Record<ContractStatus, string> = {
 }
 const transitions: Partial<Record<ContractStatus, Partial<Record<Role, ContractStatus[]>>>> = {
   PENDENTE: { CLIENT: ['CANCELADO'], FREELANCER: ['ACEITO', 'RECUSADO'] },
-  ACEITO: { FREELANCER: ['EM_ANDAMENTO'] },
-  EM_ANDAMENTO: { FREELANCER: ['AGUARDANDO_CONFIRMACAO'] },
+  // Either party cancels (with a reason) until the work starts; afterwards only a dispute remains.
+  ACEITO: { CLIENT: ['CANCELADO'], FREELANCER: ['EM_ANDAMENTO', 'CANCELADO'] },
+  EM_ANDAMENTO: { CLIENT: ['EM_DISPUTA'], FREELANCER: ['AGUARDANDO_CONFIRMACAO', 'EM_DISPUTA'] },
   AGUARDANDO_CONFIRMACAO: { CLIENT: ['CONCLUIDO', 'EM_DISPUTA'] },
-  EM_DISPUTA: { ADMIN: ['CONCLUIDO', 'EM_ANDAMENTO'] },
+  EM_DISPUTA: { ADMIN: ['CONCLUIDO', 'EM_ANDAMENTO', 'CANCELADO'] },
+}
+/** Dispute opening and the administrator's decision, read from the contract history. */
+export function disputeOf(c: Contract) {
+  const i = c.history.findLastIndex((h) => h.status === 'EM_DISPUTA')
+  if (i < 0) return null
+  const opened = c.history[i],
+    decision = c.history[i + 1]
+  return {
+    reason: opened.comment || c.dispute || '',
+    at: opened.at,
+    by: opened.actorRole,
+    decision: decision && {
+      status: decision.status,
+      at: decision.at,
+      note: decision.comment || '',
+    },
+  }
 }
 export function canTransition(from: ContractStatus, to: ContractStatus, role: Role) {
   return transitions[from]?.[role]?.includes(to) ?? false

@@ -26,6 +26,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **14/11/2026**. A tabe
 | ADR20 | Manter Java 21 como versão-alvo da API | POM, CI e imagens de build/runtime/teste usam Java 21; Spring Boot 4.1.1 e o Maven Wrapper permanecem sem alterações |
 | ADR21 | Fotos dos anúncios guardadas no PostgreSQL (`bytea`), sem storage externo (14/11) | A hospedagem da API ainda não foi escolhida e pode ter disco efêmero; o volume previsto (5 × 5 MB por anúncio) cabe no banco e segue o mesmo backup. Migrar para object storage (ex.: S3/R2) exige só trocar a camada de leitura/gravação |
 | ADR22 | Refresh e redefinição de senha com JWT stateless e impressão do hash da senha (14/11) | Sem tabela nem migração. Trocar a senha invalida refresh tokens e links antigos, e o link de redefinição só funciona uma vez. Access tokens já emitidos valem até 15 min; revogação imediata exigiria lista de bloqueio |
+| ADR23 | Saída de contratação: cancelamento com motivo até o início; depois, só por disputa (14/11) | Cliente ou freelancer cancela `ACEITO` com motivo. `EM_ANDAMENTO` não é cancelável: qualquer parte abre disputa e o admin confirma a conclusão, devolve à execução ou cancela, sempre com justificativa. Ações irreversíveis na interface pedem confirmação |
 
 ## Proveniência do scaffold
 

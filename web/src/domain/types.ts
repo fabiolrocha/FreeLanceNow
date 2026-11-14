@@ -84,7 +84,13 @@ export interface Contract {
   description: string
   address: string
   status: ContractStatus
-  history: { status: ContractStatus; at: string }[]
+  history: {
+    status: ContractStatus
+    at: string
+    comment?: string | null
+    /** Null for automatic steps such as deadline expiry. */
+    actorRole?: Role | null
+  }[]
   completedAt?: string
   rating?: number
   review?: string

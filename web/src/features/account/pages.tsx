@@ -60,7 +60,7 @@ export function EditProfile() {
           <Avatar name={user.name} large />
           <div>
             <strong>{user.name}</strong>
-            <small>Foto de perfil será definida depois. Usamos suas iniciais por enquanto.</small>
+            <small>Seu perfil mostra suas iniciais.</small>
           </div>
         </div>
         <Field

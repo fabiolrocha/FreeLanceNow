@@ -5,7 +5,7 @@ import { ApiAdminUsers, ApiAdminCategories, ApiAdminModeration, ApiAdminReports 
 import { Link } from 'react-router-dom'
 import { useApp } from '../../app/store'
 import { demoUsers, professionals } from '../../data/fixtures'
-import { Avatar, Field, PageTitle, Empty } from '../../components/ui'
+import { Avatar, ConfirmButton, Field, PageTitle, Empty } from '../../components/ui'
 import { exportCsv } from '../../data/exportCsv'
 
 function MockAdminUsers() {
@@ -171,6 +171,7 @@ interface ReportRecord {
 }
 function MockAdminModeration() {
   const { contracts, transition } = useApp(),
+    [note, setNote] = useState(''),
     [reports, setReports] = useState<ReportRecord[]>(() => {
       try {
         return JSON.parse(sessionStorage.getItem('fln-reports') || '[]')
@@ -212,18 +213,45 @@ function MockAdminModeration() {
             )}
           </article>
         ))}
+        {!!disputes.length && (
+          <Field
+            label="Justificativa da mediação"
+            value={note}
+            maxLength={500}
+            onChange={(e) => setNote(e.target.value)}
+          />
+        )}
         {disputes.map((c) => (
           <article className="panel" key={c.id}>
             <span className="badge red">Disputa</span>
             <h2>{c.title}</h2>
             <p>{c.dispute}</p>
+            <Link to={`/contratacoes/${c.id}`}>Consultar histórico</Link>
             <div className="row">
-              <button className="button" onClick={() => transition(c.id, 'CONCLUIDO')}>
+              <button
+                className="button"
+                disabled={!note.trim()}
+                onClick={() => void transition(c.id, 'CONCLUIDO', note).then(() => setNote(''))}
+              >
                 Confirmar conclusão
               </button>
-              <button className="button secondary" onClick={() => transition(c.id, 'EM_ANDAMENTO')}>
+              <button
+                className="button secondary"
+                disabled={!note.trim()}
+                onClick={() => void transition(c.id, 'EM_ANDAMENTO', note).then(() => setNote(''))}
+              >
                 Voltar para execução
               </button>
+              <ConfirmButton
+                className="button danger"
+                disabled={!note.trim()}
+                label="Cancelar contratação"
+                title="Cancelar esta contratação?"
+                message="A contratação será encerrada como cancelada para cliente e profissional. A decisão não pode ser desfeita."
+                confirmLabel="Sim, cancelar"
+                danger
+                onConfirm={() => void transition(c.id, 'CANCELADO', note).then(() => setNote(''))}
+              />
             </div>
           </article>
         ))}

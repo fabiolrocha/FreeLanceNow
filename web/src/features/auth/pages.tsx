@@ -179,13 +179,13 @@ export function Signup() {
             <span>
               Li os{' '}
               <Link to="/termos" target="_blank">
-                termos de uso acadêmico
+                termos de uso
               </Link>{' '}
               e a{' '}
               <Link to="/privacidade" target="_blank">
-                política de privacidade da demonstração
-              </Link>
-              . Autorizo o uso dos dados para esta demonstração.
+                política de privacidade
+              </Link>{' '}
+              e autorizo o uso dos meus dados para operar minha conta.
             </span>
           </label>
           <ErrorMessage message={error} />

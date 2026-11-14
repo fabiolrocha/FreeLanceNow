@@ -296,7 +296,7 @@ export function Provider({ children }: { children: ReactNode }) {
               dispute: status === 'EM_DISPUTA' ? dispute : x.dispute,
               observations: status === 'AGUARDANDO_CONFIRMACAO' ? dispute : x.observations,
               completedAt: status === 'CONCLUIDO' ? at : x.completedAt,
-              history: [...x.history, { status, at }],
+              history: [...x.history, { status, at, comment: dispute || null, actorRole: u.role }],
             }
           : x,
       ),

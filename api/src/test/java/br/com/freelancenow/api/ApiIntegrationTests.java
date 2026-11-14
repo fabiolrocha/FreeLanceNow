@@ -1040,6 +1040,71 @@ class ApiIntegrationTests {
                                 clientToken));
     }
 
+    private String acceptedContract(String description) {
+        var date = LocalDate.now(ZoneId.of("America/Sao_Paulo")).plusDays(9).toString();
+        var id =
+                post(
+                                "/api/v1/contracts",
+                                Map.of(
+                                        "serviceId", contractServiceId,
+                                        "date", date,
+                                        "description", description,
+                                        "address", ""),
+                                clientToken)
+                        .get("id")
+                        .toString();
+        send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + id + "/status",
+                Map.of("status", "ACEITO"),
+                contractFreelaToken);
+        return id;
+    }
+
+    private Map<String, Object> changeStatus(String id, String token, String status, String comment) {
+        return send(
+                HttpMethod.PATCH,
+                "/api/v1/contracts/" + id + "/status",
+                comment == null ? Map.of("status", status) : Map.of("status", status, "comment", comment),
+                token);
+    }
+
+    @Test
+    @Order(18)
+    @SuppressWarnings("unchecked")
+    void eitherPartyCancelsWithReasonUntilWorkStartsThenOnlyDisputeRemains() {
+        // Client cancels an accepted contract; the reason is required and kept in the history.
+        var byClient = acceptedContract("Cancelamento pelo cliente.");
+        expect(400, () -> changeStatus(byClient, clientToken, "CANCELADO", null));
+        expect(400, () -> changeStatus(byClient, clientToken, "CANCELADO", "   "));
+        var cancelled = changeStatus(byClient, clientToken, "CANCELADO", "Mudei a data da reforma.");
+        assertEquals("CANCELADO", cancelled.get("status"));
+        var last = ((List<Map<String, Object>>) cancelled.get("history")).getLast();
+        assertEquals("Mudei a data da reforma.", last.get("comment"));
+        assertEquals("CLIENT", last.get("actorRole"));
+
+        // The freelancer can also give up before starting.
+        var byFreelancer = acceptedContract("Cancelamento pelo profissional.");
+        assertEquals(
+                "CANCELADO",
+                changeStatus(byFreelancer, contractFreelaToken, "CANCELADO", "Agenda indisponível.")
+                        .get("status"));
+
+        // After the work starts nobody can cancel; either party can open a dispute instead.
+        var started = acceptedContract("Disputa durante a execução.");
+        changeStatus(started, contractFreelaToken, "EM_ANDAMENTO", null);
+        expect(409, () -> changeStatus(started, clientToken, "CANCELADO", "Desisti."));
+        expect(409, () -> changeStatus(started, contractFreelaToken, "CANCELADO", "Desisti."));
+        expect(400, () -> changeStatus(started, contractFreelaToken, "EM_DISPUTA", null));
+        var disputed =
+                changeStatus(started, contractFreelaToken, "EM_DISPUTA", "Cliente não liberou o acesso.");
+        assertEquals("EM_DISPUTA", disputed.get("status"));
+        assertEquals("Cliente não liberou o acesso.", disputed.get("dispute"));
+        assertEquals(
+                "FREELANCER",
+                ((List<Map<String, Object>>) disputed.get("history")).getLast().get("actorRole"));
+    }
+
     @Test
     @Order(17)
     @SuppressWarnings("unchecked")
