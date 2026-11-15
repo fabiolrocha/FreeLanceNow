@@ -314,12 +314,25 @@ export function ServiceForm() {
             <Link className="button secondary" to="/meus-servicos">
               Cancelar
             </Link>
-            <button name="status" value="DRAFT" className="button secondary" disabled={busy}>
-              Salvar rascunho
-            </button>
-            <button name="status" value="ACTIVE" className="button" disabled={busy}>
-              Publicar serviço
-            </button>
+            {existing?.status === 'ACTIVE' ? (
+              <button name="status" value="ACTIVE" className="button" disabled={busy}>
+                Salvar alterações
+              </button>
+            ) : (
+              <>
+                <button
+                  name="status"
+                  value={existing?.status === 'INACTIVE' ? 'INACTIVE' : 'DRAFT'}
+                  className="button secondary"
+                  disabled={busy}
+                >
+                  {existing?.status === 'INACTIVE' ? 'Salvar sem publicar' : 'Salvar rascunho'}
+                </button>
+                <button name="status" value="ACTIVE" className="button" disabled={busy}>
+                  {existing ? 'Salvar e publicar' : 'Publicar serviço'}
+                </button>
+              </>
+            )}
           </div>
         </form>
       )}

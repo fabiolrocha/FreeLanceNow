@@ -118,6 +118,7 @@ public class DemoData implements CommandLineRunner {
         var user = new User(name, email, passwords.encode("Demo12345"), "61999990000", role);
         user.updateProfile(
                 name, user.getPhone(), city, bio, role == Role.FREELANCER ? city + " e região" : "");
+        user.markEmailVerified(user.getCreatedAt());
         users.saveAndFlush(user);
         if (cat == null) return;
         var category =

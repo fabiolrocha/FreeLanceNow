@@ -4,14 +4,30 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
+      # Small pool: Render's free instance has 512 MB and Neon's free compute limits connections.
+      maximum-pool-size: ${DB_POOL_SIZE:5}
+      # Neon suspends idle compute; the first connection after a pause can take a few seconds.
+      connection-timeout: 30000
       data-source-properties:
         sslmode: verify-full
+        # Validate Neon's certificate against the JVM trust store instead of ~/.postgresql/root.crt,
+        # which does not exist in the container.
+        sslfactory: org.postgresql.ssl.DefaultJavaSSLFactory
   jpa:
     hibernate:
       ddl-auto: validate
   flyway:
     enabled: true
 
+server:
+  # Render terminates TLS and forwards X-Forwarded-* headers.
+  forward-headers-strategy: framework
+
 app:
   cors-origins: ${CORS_ORIGINS}
+  # Links in e-mails must point to the published frontend; no localhost fallback in production.
+  web-base-url: ${PUBLIC_APP_URL}
   seed-demo: false
+  resend:
+    # Without a verified domain, Resend only delivers from onboarding@resend.dev to the account owner.
+    from-email: ${RESEND_FROM_EMAIL:FreeLanceNow <onboarding@resend.dev>}

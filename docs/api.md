@@ -1,6 +1,6 @@
 # Contrato da API
 
-Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha por e-mail, renovação de sessão e troca de senha estão em [Cadastro e login](#cadastro-e-login); financeiro permanece pendente; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
+Revisado em **14/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha por e-mail, renovação de sessão e troca de senha estão em [Cadastro e login](#cadastro-e-login); financeiro permanece pendente; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
@@ -9,6 +9,8 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/auth/refresh` | Público (refresh token) | 200 + nova sessão; refresh token rotacionado |
 | POST | `/auth/password/forgot` | Público | 202 sempre; envia link de redefinição se a conta existir e estiver ativa |
 | POST | `/auth/password/reset` | Público (token do e-mail) | 204; define nova senha |
+| POST | `/auth/email/verify` | Público (token do e-mail) | 204; confirma o e-mail da conta (ADR25); link inválido ou expirado retorna 400 |
+| POST | `/users/me/email-verification` | Autenticado | 202; reenvia o link de confirmação; 429 se pedido há menos de 60 s; nada faz se já confirmado |
 | GET | `/users/me` | Autenticado | Perfil privado |
 | PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade, bio e área de atendimento (`serviceArea`, até 150, opcional) |
 | PUT | `/users/me/avatar` | Autenticado | `multipart/form-data` com a parte `file` (JPG/PNG, até 2 MB); 200 + perfil com novo `avatarVersion` |
@@ -51,7 +53,7 @@ Revisado em **09/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/proposals/{id}/accept` | Cliente (dono da demanda) | 200 + encerra demanda, recusa demais propostas e cria contratação `ACEITO` |
 | POST | `/proposals/{id}/reject` | Cliente (dono da demanda) | 200 + marca proposta como `REJECTED` |
 | POST | `/proposals/{id}/withdraw` | Freelancer autor | 200 + proposta `WITHDRAWN`; só pendente em demanda aberta; cliente avisado |
-| GET | `/admin/users` | Admin ativo | Contas, contatos privados, status e data de cadastro; sem senha/hash |
+| GET | `/admin/users` | Admin ativo | Contas, contatos privados, status (`active`, `deleted`) e data de cadastro; sem senha/hash |
 | PATCH | `/admin/users/{id}/status` | Admin ativo | Suspende/reativa conta não-admin, com motivo e auditoria |
 | GET | `/admin/categories` | Admin ativo | Categorias ativas/inativas |
 | POST | `/admin/categories` | Admin ativo | 201 + categoria criada e auditada |
@@ -104,6 +106,8 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 `expiresAt` e `refreshExpiresAt` são calculados pelo frontend e não pertencem à resposta HTTP. O access token vale 15 minutos. O refresh token vale 30 dias (`JWT_REFRESH_TTL_SECONDS`), só é aceito em `POST /auth/refresh` (`{refreshToken}`) e não autentica outras rotas. Cada renovação devolve um par novo. Logout apaga a sessão local.
 
 **Recuperação de senha.** `POST /auth/password/forgot` recebe `{email}` e sempre responde 202, sem revelar se a conta existe. Pedidos repetidos para o mesmo e-mail em menos de 60 s são ignorados. A conta ativa recebe um link `PUBLIC_APP_URL/redefinir-senha?token=...` válido por 30 minutos. `POST /auth/password/reset` recebe `{token, password}`, aplica a regra de senha forte e responde 204; link inválido, expirado ou já usado retorna 400.
+
+**Confirmação de e-mail.** O cadastro envia, em segundo plano, um link `PUBLIC_APP_URL/verificar-email?token=...` válido por 24 horas (`app.jwt.verify-ttl-seconds`). O token tem propósito `email-verify` e carrega o e-mail de destino, então não confirma outro endereço. `POST /auth/email/verify` recebe `{token}` e responde 204, também quando o e-mail já estava confirmado. `GET /users/me` e a sessão trazem `emailVerified`. A confirmação não bloqueia o uso da conta (ADR25).
 
 **Troca de senha.** `PUT /users/me/password` recebe `{currentPassword, newPassword}`. Senha atual errada ou nova senha igual à atual retornam 400. A resposta é uma sessão nova.
 

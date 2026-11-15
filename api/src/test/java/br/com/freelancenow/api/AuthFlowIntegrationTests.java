@@ -91,7 +91,7 @@ class AuthFlowIntegrationTests {
         do {
             sent = CapturingMail.SENT.poll(5, TimeUnit.SECONDS);
             assertNotNull(sent, "reset e-mail was not sent to " + email);
-        } while (!sent.to().equals(email));
+        } while (!sent.to().equals(email) || !sent.text().contains("redefinir-senha"));
         var m = Pattern.compile("redefinir-senha\\?token=([^\\s\"]+)").matcher(sent.text());
         assertTrue(m.find());
         return URLDecoder.decode(m.group(1), StandardCharsets.UTF_8);
@@ -263,6 +263,63 @@ class AuthFlowIntegrationTests {
         resetTokenFor(email);
         send("POST", "/api/v1/auth/password/forgot", Map.of("email", email), null);
         var second = CapturingMail.SENT.poll(1, TimeUnit.SECONDS);
-        assertTrue(second == null || !second.to().equals(email));
+        assertTrue(
+                second == null
+                        || !second.to().equals(email)
+                        || !second.text().contains("redefinir-senha"));
+    }
+
+    private String verifyTokenFor(String email) throws InterruptedException {
+        MailSender.Mail sent;
+        do {
+            sent = CapturingMail.SENT.poll(5, TimeUnit.SECONDS);
+            assertNotNull(sent, "confirmation e-mail was not sent to " + email);
+        } while (!sent.to().equals(email) || !sent.text().contains("verificar-email"));
+        var m = Pattern.compile("verificar-email\\?token=([^\\s\"]+)").matcher(sent.text());
+        assertTrue(m.find());
+        return URLDecoder.decode(m.group(1), StandardCharsets.UTF_8);
+    }
+
+    @Test
+    void registrationSendsConfirmationLinkThatVerifiesTheAddress() throws InterruptedException {
+        var session = register("verify", "Strong12345");
+        var access = session.get("accessToken").toString();
+        var email = prefix + "verify@example.test";
+        assertEquals(false, ((Map<?, ?>) session.get("user")).get("emailVerified"));
+        var token = verifyTokenFor(email);
+
+        // A reset or access token cannot confirm an address.
+        assertEquals(
+                400,
+                status(
+                        () ->
+                                send(
+                                        "POST",
+                                        "/api/v1/auth/email/verify",
+                                        Map.of("token", access),
+                                        null)));
+
+        send("POST", "/api/v1/auth/email/verify", Map.of("token", token), null);
+        assertEquals(true, send("GET", "/api/v1/users/me", null, access).get("emailVerified"));
+        // Using the link again is harmless, and asking for a new one does nothing now.
+        send("POST", "/api/v1/auth/email/verify", Map.of("token", token), null);
+        send("POST", "/api/v1/users/me/email-verification", null, access);
+        var again = CapturingMail.SENT.poll(1, TimeUnit.SECONDS);
+        assertTrue(again == null || !again.to().equals(email));
+    }
+
+    @Test
+    void confirmationLinkCanBeResentOnlyOncePerMinute() throws InterruptedException {
+        var session = register("resend", "Strong12345");
+        var access = session.get("accessToken").toString();
+        var email = prefix + "resend@example.test";
+        verifyTokenFor(email);
+        send("POST", "/api/v1/users/me/email-verification", null, access);
+        verifyTokenFor(email);
+        assertEquals(
+                429,
+                status(() -> send("POST", "/api/v1/users/me/email-verification", null, access)));
+        assertEquals(
+                401, status(() -> send("POST", "/api/v1/users/me/email-verification", null, null)));
     }
 }

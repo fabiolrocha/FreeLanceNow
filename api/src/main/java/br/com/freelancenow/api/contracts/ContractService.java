@@ -213,7 +213,11 @@ public class ContractService {
                     r.comment());
         events.save(new ContractEvent(c, u, previous, r.status(), r.comment(), now));
         var title = c.getTitle() + ": " + STATUS_LABELS.get(r.status());
-        var body = u.getName() + " atualizou a contratação.";
+        // The team decides disputes as an institution; members are named only in the audit log.
+        var body =
+                u.getRole() == Role.ADMIN
+                        ? "A administração decidiu a disputa."
+                        : u.getName() + " atualizou a contratação.";
         // Everyone involved except the person who made the change hears about it.
         if (!c.getClient().getId().equals(u.getId()))
             notifications.notify(c.getClient(), "CONTRACT_STATUS", title, body, link(c));

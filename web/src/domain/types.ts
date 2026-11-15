@@ -19,6 +19,8 @@ export interface Profile {
 export interface User extends Profile {
   email: string
   phone: string
+  /** False until the link sent at registration is opened; absent (treated as confirmed) in mock mode. */
+  emailVerified?: boolean
   createdAt?: string
 }
 export interface Session {

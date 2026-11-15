@@ -64,7 +64,7 @@ test('solicitação gera aviso para o profissional e o chat da contratação per
 
   await page.getByRole('link', { name: /Conversar com Cliente Chat/ }).click()
   await page.getByLabel('Escrever mensagem').fill('Olá! Posso ir amanhã às 9h?')
-  await page.getByRole('button', { name: 'Enviar' }).click()
+  await page.getByRole('button', { name: 'Enviar', exact: true }).click()
   await expect(page.getByText('Olá! Posso ir amanhã às 9h?')).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
 
@@ -73,7 +73,7 @@ test('solicitação gera aviso para o profissional e o chat da contratação per
   await page.goto(`/mensagens?contratacao=${contract.id}`)
   await expect(page.getByText('Olá! Posso ir amanhã às 9h?')).toBeVisible()
   await page.getByLabel('Escrever mensagem').fill('Combinado, até amanhã.')
-  await page.getByRole('button', { name: 'Enviar' }).click()
+  await page.getByRole('button', { name: 'Enviar', exact: true }).click()
   await page.reload()
   await expect(page.getByText('Combinado, até amanhã.')).toBeVisible()
   await expect(page.getByText('Olá! Posso ir amanhã às 9h?')).toBeVisible()

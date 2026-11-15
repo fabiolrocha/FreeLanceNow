@@ -1,100 +1,139 @@
-# Preparação para deploy
+# Deploy: Vercel, Render, Neon e Resend
 
-Este guia registra a configuração local preparada para uma futura publicação. Nenhuma conta externa foi conectada e nenhum deploy foi realizado. A API não tem hospedagem escolhida; os passos abaixo descrevem os contratos de configuração, não uma implantação concluída.
+Revisado em **14/11/2026**. O repositório está pronto para publicar. Nenhuma conta externa foi conectada e nenhum deploy foi feito: os passos abaixo dependem das contas da equipe. Pagamentos (Stripe, F09) ficam para a última etapa e não fazem parte deste roteiro.
 
-## Arquitetura prevista
+## Arquitetura
 
 ```mermaid
 flowchart LR
-  Browser[ navegador ] --> Vercel[Vercel: React + Vite, arquivos estáticos]
-  Vercel -->|HTTPS, JSON, JWT| API[API Spring Boot em hospedagem a escolher]
-  API -->|JDBC + TLS| Neon[Neon: PostgreSQL]
-  API -. integração futura, ainda não implementada .-> Stripe[Stripe]
+  Browser[navegador] --> Vercel[Vercel: React + Vite estático]
+  Browser -->|HTTPS, JSON, JWT| Render[Render: API Spring Boot em Docker]
+  Render -->|JDBC + TLS verify-full| Neon[Neon: PostgreSQL]
+  Render -->|HTTPS| Resend[Resend: e-mails]
 ```
 
-- **Vercel** serve a SPA React. O frontend chama a API hospedada separadamente; CORS da API precisa permitir a origem pública da Vercel.
-- **API** executa Java 21 / Spring Boot e as migrações Flyway. O Docker Compose continua sendo o ambiente local e não foi alterado.
-- **Neon** fornece PostgreSQL gerenciado. Não há conexão remota configurada neste repositório.
-- **Stripe** não processa pagamentos atualmente. As telas financeiras do frontend são demonstrações; a existência de propriedades e da biblioteca cliente não implementa checkout nem webhooks.
-
-## Vercel: frontend
-
-O app Vite fica em `web/`. O arquivo `web/vercel.json` define `npm run build`, a saída `dist` e o rewrite de SPA para que o React Router resolva URLs diretas. O build também executa `tsc -b`, portanto verifica os projetos TypeScript antes de gerar os arquivos estáticos.
-
-Na configuração futura do projeto Vercel:
-
-1. Importe o repositório e defina **Root Directory** como `web`.
-2. Use Vite, Node.js 22.12 ou superior, instalação `npm ci`, build `npm run build` e saída `dist` (os dois últimos também estão no `vercel.json`).
-3. Configure estas variáveis para os ambientes Preview e Production conforme necessário:
-
-| Variável | Valor futuro | Observação |
+| Peça | Onde | Arquivo de configuração |
 |---|---|---|
-| `VITE_DATA_MODE` | `api` | Faz a interface usar o backend; `mock` continua disponível para demonstrações locais. |
-| `VITE_API_BASE_URL` | URL HTTPS pública da API seguida de `/api/v1` | É incorporada ao bundle e visível no navegador; só pode conter dados públicos. |
+| Frontend | Vercel, root `web` | `web/vercel.json` |
+| API | Render, Docker, plano free, região Virginia (ADR26) | `render.yaml`, `api/Dockerfile`, `application-prod.yml` |
+| Banco | Neon, região `aws-us-east-1` | variáveis `DB_*` no Render |
+| E-mail | Resend | variáveis `RESEND_*` no Render |
 
-`API_PROXY_TARGET` serve somente ao proxy do Vite durante desenvolvimento local. Ele não configura proxy em produção. Como a API será outro serviço, use a URL HTTPS absoluta em `VITE_API_BASE_URL`; uma URL relativa só funcionará se uma hospedagem futura configurar um proxy reverso.
+O navegador chama a API direto (CORS). A Vercel só serve os arquivos estáticos.
 
-Nunca coloque `JWT_SECRET`, credenciais do Neon ou segredos Stripe em variáveis `VITE_*`. A configuração CORS da API deve listar exatamente as origens Vercel usadas (Production e, se necessário, Preview), separadas por vírgulas e sem espaços extras. O código atual compara origens exatas.
+## Ordem recomendada
 
-## Neon: PostgreSQL
+1. Neon: criar o banco.
+2. Resend: criar a chave e, se possível, verificar o domínio.
+3. Render: criar a API pelo Blueprint e preencher os segredos.
+4. Vercel: criar o projeto do frontend apontando para a API.
+5. Voltar ao Render e conferir `CORS_ORIGINS` e `PUBLIC_APP_URL` com a URL final da Vercel.
+6. Criar o primeiro admin (seção própria) e testar o roteiro de verificação.
 
-O perfil Spring `prod` usa variáveis obrigatórias para conectar ao banco:
+## 1. Neon
 
-| Variável | Uso |
+1. Crie um projeto na região **AWS US East 1 (N. Virginia)**, a mesma família de região do Render (ADR26).
+2. Em **Connection Details**, escolha o endpoint **direto** (sem `-pooler` no host). O Flyway roda as migrações na inicialização e usa locks de sessão, que o pooler em modo transação não garante.
+3. Monte a JDBC URL a partir do host e do banco mostrados, **sem usuário e senha**:
+
+   ```text
+   jdbc:postgresql://<host-do-endpoint>.neon.tech/<banco>
+   ```
+
+4. Guarde usuário e senha da role para o Render (`DB_USERNAME`, `DB_PASSWORD`).
+
+Não acrescente `sslmode` na URL. O perfil `prod` já força `sslmode=verify-full` e `sslfactory=org.postgresql.ssl.DefaultJavaSSLFactory`: a conexão exige TLS e confere certificado e hostname usando o trust store da JVM, que já reconhece a autoridade do Neon. Esse caminho foi testado com um Postgres TLS local: certificado não confiável é recusado; certificado confiável sobe a API e aplica V1–V13.
+
+O plano free suspende o compute ocioso; a primeira conexão depois de uma pausa leva alguns segundos (o pool espera até 30 s). As fotos ficam no próprio banco (ADR21), então acompanhe o limite de armazenamento do plano.
+
+## 2. Resend
+
+1. Crie uma API key com permissão de envio (`RESEND_API_KEY`).
+2. Para enviar a qualquer destinatário, verifique um domínio próprio em **Domains** e use um remetente desse domínio, por exemplo `FreeLanceNow <no-reply@seu-dominio>` (`RESEND_FROM_EMAIL`).
+3. Sem domínio verificado, o padrão do perfil `prod` é `onboarding@resend.dev`, que o Resend só entrega para o e-mail dono da conta Resend. Serve para teste, não para usuários reais.
+
+A API envia dois e-mails: confirmação de cadastro (`/verificar-email`, 24 h, ADR25) e redefinição de senha (`/redefinir-senha`, 30 min). Os dois usam `PUBLIC_APP_URL`. Sem `RESEND_API_KEY`, a API sobe, registra um aviso e não envia nada.
+
+## 3. Render (API)
+
+1. No Render, **New → Blueprint** e selecione este repositório. O `render.yaml` cria o serviço `freelancenow-api` com Docker (`rootDir: api`), health check em `/actuator/health`, deploy automático só quando `api/**` muda e `JWT_SECRET` gerado pelo próprio Render.
+2. Preencha os valores pedidos (marcados `sync: false`):
+
+| Variável | Valor |
 |---|---|
-| `DB_URL` | JDBC URL `jdbc:postgresql://<host-Neon>/<database>`; não inclua usuário ou senha nela. |
-| `DB_USERNAME` | Nome da role PostgreSQL criada para a API/migrações. |
-| `DB_PASSWORD` | Senha dessa role, guardada como secret na hospedagem da API. |
+| `DB_URL` | JDBC URL do Neon (passo 1) |
+| `DB_USERNAME`, `DB_PASSWORD` | Role do Neon |
+| `CORS_ORIGINS` | Origem da Vercel, ex. `https://freelancenow.vercel.app`. Várias origens separadas por vírgula, sem espaço e sem barra final |
+| `PUBLIC_APP_URL` | A mesma origem da Vercel; vira a base dos links dos e-mails. Obrigatória no `prod` |
+| `RESEND_API_KEY` | Chave do passo 2 |
+| `RESEND_FROM_EMAIL` | Remetente do domínio verificado; vazio usa `onboarding@resend.dev` |
 
-Obtenha host, database, role e senha no painel Neon e monte a JDBC URL a partir do endpoint mostrado. O perfil `prod` força `sslmode=verify-full` no driver PostgreSQL: a conexão exige TLS e verifica certificado e hostname. Isso é mais estrito que apenas criptografar o tráfego. A aplicação local continua usando a URL local definida em `application.yml`.
+3. Já definidas no Blueprint: `SPRING_PROFILES_ACTIVE=prod`, `JAVA_TOOL_OPTIONS` ajustado para 512 MB, `ADMIN_BOOTSTRAP_ENABLED=false`. O Render injeta `PORT`, que a API já lê.
+4. Depois do deploy, `https://<servico>.onrender.com/actuator/health` deve responder `{"status":"UP"}`.
 
-Flyway permanece habilitado e executa V1–V11 na inicialização. Hibernate continua com `ddl-auto: validate`: depois das migrações, confere se o mapeamento Java corresponde ao schema, sem criar nem atualizar tabelas. Use primeiro uma branch/banco vazio de teste; não aponte a API para um banco com dados importantes durante a validação inicial. O papel configurado precisa ter permissões para as migrações e para as operações normais da API.
+Medido localmente com o perfil `prod`, 512 MB e as mesmas opções de JVM: inicialização em cerca de 4 s e uso perto de 270 MB. No Render free a primeira inicialização é mais lenta.
 
-O datasource Spring é compartilhado pelo Hibernate e Flyway, então ambos recebem as mesmas opções TLS e credenciais. Prefira inicialmente o endpoint direto do Neon; antes de usar o endpoint pooled, valide a inicialização concorrente de múltiplas instâncias e as necessidades de lock do Flyway. Ajuste limites do pool de conexões somente após escolher a hospedagem e conhecer os limites do compute Neon.
+**Hibernação.** O plano free dorme após 15 minutos sem tráfego. O primeiro acesso depois disso pode levar até um minuto. A verificação de prazos (cancelar pendentes após 48 h, confirmar conclusão após 5 dias) só roda com a instância acordada; ao acordar, ela processa tudo o que venceu, porque compara datas em vez de depender do horário exato. Para uma demonstração sem espera, abra o health check alguns minutos antes ou use um plano pago.
 
-## API: ambiente de produção
+Nunca habilite `SEED_DEMO` em produção: o seed cria contas com senha conhecida.
 
-O Dockerfile da API passa a usar `prod` como perfil padrão da imagem. O `compose.yml` existente seleciona explicitamente `dev`, portanto preserva o uso local, seed e banco Docker. Em uma hospedagem que não use essa imagem, defina explicitamente `SPRING_PROFILES_ACTIVE=prod`.
+## 4. Vercel (frontend)
 
-Variáveis necessárias ou relevantes para iniciar a API em produção:
+1. **Add New → Project**, importe o repositório e defina **Root Directory** como `web`. O `web/vercel.json` já define framework Vite, `npm ci`, `npm run build`, saída `dist`, rewrite de SPA, cache longo para `/assets` e cabeçalhos básicos de segurança.
+2. Variáveis de ambiente (Production e, se usar, Preview):
 
-| Variável | Necessidade |
+| Variável | Valor |
 |---|---|
-| `SPRING_PROFILES_ACTIVE` | `prod`; padrão da imagem Docker. |
-| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Obrigatórias pelo perfil `prod`; veja seção Neon. |
-| `JWT_SECRET` | Obrigatória; use um segredo aleatório forte com pelo menos 32 bytes, guardado no secret manager. O validador rejeita o segredo local e alguns padrões conhecidos em `prod`. |
-| `CORS_ORIGINS` | Obrigatória; origens HTTPS do frontend, sem curingas. |
-| `PORT` | Opcional; porta HTTP fornecida pela hospedagem; o padrão local é 8081. |
-| `SEED_DEMO` | Não habilite em produção. O perfil `prod` define o seed como desativado. |
-| `ADMIN_BOOTSTRAP_ENABLED` | Deixe desativado; habilite apenas num procedimento de provisionamento controlado e retire as credenciais depois. |
+| `VITE_DATA_MODE` | `api` |
+| `VITE_API_BASE_URL` | `https://<servico>.onrender.com/api/v1` |
+| `VITE_SUPPORT_EMAIL` | Opcional; contato exibido em Ajuda, Termos e Privacidade |
 
-Não inclua valores de segredos neste arquivo nem em exemplos versionados. Configure-os no ambiente/secrets da hospedagem escolhida. A hospedagem ainda precisa oferecer runtime Java 21 ou executar o Dockerfile, health check para `/actuator/health`, porta HTTP dinâmica e rede de saída para o Neon.
+Variáveis `VITE_*` entram no bundle e ficam visíveis no navegador. Nunca coloque nelas `JWT_SECRET`, credenciais do Neon ou chaves do Resend.
 
-## Stripe: somente preparação
+3. Depois do primeiro deploy, copie a URL de produção para `CORS_ORIGINS` e `PUBLIC_APP_URL` no Render. Previews da Vercel têm outra origem: inclua-a em `CORS_ORIGINS` só se for usar o Preview contra esta API.
 
-O `application.yml` já declara `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET`; `PUBLIC_APP_URL` já é usado nos links de redefinição de senha e será reaproveitado nos redirecionamentos do checkout. A dependência oficial `stripe-java` foi adicionada ao Maven para a etapa de integração. Nenhum código atual consome essas propriedades ou a biblioteca.
+## 5. Primeiro administrador
 
-As tabelas `payment` e `ledger_entry` já estão mapeadas na migração `V10__payments.sql`, mas ainda não existem endpoint de criação de checkout, entidades/serviços de pagamento na API, endpoint receptor de webhook, validação da assinatura do webhook, política de idempotência ou reconciliação de estados. Portanto:
+Não existe admin padrão (ADR16). Para criar o primeiro:
 
-- Não cadastre uma URL de webhook Stripe ainda: não há endpoint implementado para receber eventos.
-- Não configure `STRIPE_SECRET_KEY` ou `STRIPE_WEBHOOK_SECRET` como se isso ativasse pagamentos. `PUBLIC_APP_URL` deve apontar para o frontend publicado, porque os e-mails de recuperação usam esse endereço.
-- A interface atual continua simulando pagamentos e não deve ser apresentada como apta a cobrar ou confirmar transações reais.
+1. No Render, defina temporariamente `ADMIN_BOOTSTRAP_ENABLED=true`, `ADMIN_BOOTSTRAP_EMAIL`, `ADMIN_BOOTSTRAP_PASSWORD` (senha forte) e, se quiser, `ADMIN_BOOTSTRAP_NAME`.
+2. Faça o deploy e entre com essa conta.
+3. Volte `ADMIN_BOOTSTRAP_ENABLED` para `false` e **apague** `ADMIN_BOOTSTRAP_PASSWORD`. Reinícios não recriam nem alteram a conta.
 
-Quando a implementação for aprovada, obtenha as chaves do ambiente de teste em **Stripe Dashboard → Developers → API keys**. O segredo de assinatura é específico de cada webhook e fica em **Developers → Webhooks**, não é a chave da API. Configure credenciais de teste e produção separadamente nos ambientes da hospedagem; mantenha qualquer chave secreta somente no backend. O frontend não precisa de chave publicável enquanto não integrar Stripe.js/Elements.
+## 6. Verificação depois do deploy
 
-A biblioteca cliente está pronta para uso futuro, mas a escolha de Checkout, Payment Intents, Connect/repasse, eventos de webhook e estados financeiros exige decisão de produto e implementação/testes próprios antes de ativar credenciais.
+- Abrir uma rota profunda direto (ex. `/servicos`) e recarregar: a SPA deve responder sem 404.
+- Cadastrar um cliente: o e-mail de confirmação chega, o link abre `/verificar-email` e o aviso do topo some.
+- Pedir redefinição de senha e concluir pelo link do e-mail.
+- Publicar um anúncio com foto como profissional, solicitar como cliente, aceitar, iniciar, concluir, confirmar e avaliar.
+- Entrar como admin: usuários, moderação, relatórios e auditoria.
+- No console do navegador, nenhum erro de CORS.
 
-## Sequência futura de publicação
+## Variáveis por ambiente
 
-1. Escolher e provisionar Neon; testar migrations numa branch vazia e conferir acesso TLS.
-2. Escolher hospedagem da API, configurar perfil `prod`, secrets, CORS, health check e conectividade ao Neon; validar o modo de inicialização único/múltiplas instâncias e o job agendado de prazos.
-3. Criar o projeto Vercel com root `web`, configurar variáveis públicas e publicar primeiro um Preview apontando para uma API de teste.
-4. Verificar rotas profundas da SPA, autenticação, CORS e fluxos não financeiros; pagamentos permanecem simulados.
-5. Só depois de implementar e testar o fluxo de pagamento/webhook, configurar Stripe em ambiente de teste. Ativação do modo real requer validação operacional e de negócio separada.
-6. Promover os ambientes Production somente após revisão, backups, observabilidade, limites de conexão, política de dados e roteiro de rollback.
+| Variável | Onde | Obrigatória no `prod` |
+|---|---|---|
+| `SPRING_PROFILES_ACTIVE` | Render | Sim (`prod`, já no Blueprint e no Dockerfile) |
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Render | Sim |
+| `JWT_SECRET` | Render | Sim (gerado; pelo menos 32 bytes; o validador recusa os valores de exemplo) |
+| `CORS_ORIGINS`, `PUBLIC_APP_URL` | Render | Sim |
+| `RESEND_API_KEY` | Render | Não, mas sem ela nenhum e-mail sai |
+| `RESEND_FROM_EMAIL` | Render | Não (padrão `onboarding@resend.dev`) |
+| `DB_POOL_SIZE` | Render | Não (padrão 5) |
+| `JWT_REFRESH_TTL_SECONDS` | Render | Não (padrão 30 dias) |
+| `ADMIN_BOOTSTRAP_*` | Render | Só no provisionamento do primeiro admin |
+| `VITE_DATA_MODE`, `VITE_API_BASE_URL` | Vercel | Sim |
+| `VITE_SUPPORT_EMAIL` | Vercel | Não |
+
+Valores de exemplo ficam em `.env.example` e `web/.env.example`. Segredos reais ficam só nos painéis do Render e da Vercel.
+
+## Pagamentos (F09, depois)
+
+No modo API, as telas de carteira, pagamento, saque e transações mostram "Em breve" e saem do menu (ADR27). As tabelas `payment` e `ledger_entry` (V10) e a dependência `stripe-java` já existem, mas não há checkout, webhook nem reconciliação. Não configure `STRIPE_SECRET_KEY` nem cadastre webhook antes dessa implementação.
 
 ## Referências oficiais
 
-- [Vite na Vercel: SPA e deep links](https://vercel.com/docs/frameworks/frontend/vite) e [configuração de build/root directory](https://vercel.com/docs/builds/configure-a-build).
-- [Conexão Neon de aplicações e SSL](https://neon.tech/docs/connect/connect-from-any-app) e [segurança com `verify-full`](https://neon.tech/docs/connect/connect-securely).
-- [Biblioteca oficial Stripe Java](https://github.com/stripe/stripe-java) e [chaves, webhooks e separação de teste/produção](https://docs.stripe.com/keys).
+- [Render Blueprints](https://render.com/docs/blueprint-spec), [Docker no Render](https://render.com/docs/docker) e [plano free](https://render.com/docs/free).
+- [Neon: conexão de aplicações](https://neon.tech/docs/connect/connect-from-any-app) e [conexão segura](https://neon.tech/docs/connect/connect-securely).
+- [Resend: domínios](https://resend.com/docs/dashboard/domains/introduction) e [API de envio](https://resend.com/docs/api-reference/emails/send-email).
+- [Vite na Vercel](https://vercel.com/docs/frameworks/frontend/vite) e [configuração de build](https://vercel.com/docs/builds/configure-a-build).

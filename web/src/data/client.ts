@@ -244,6 +244,17 @@ export const client = {
     if (isMock) return
     await request('/auth/password/forgot', { method: 'POST', body: JSON.stringify({ email }) })
   },
+  async verifyEmail(verifyToken: string): Promise<void> {
+    if (isMock) throw new Error('A confirmação por e-mail só funciona com a API ligada.')
+    await request('/auth/email/verify', {
+      method: 'POST',
+      body: JSON.stringify({ token: verifyToken }),
+    })
+  },
+  async resendVerification(): Promise<void> {
+    if (isMock) return
+    await request('/users/me/email-verification', { method: 'POST' })
+  },
   async resetPassword(resetToken: string, password: string): Promise<void> {
     if (isMock) throw new Error('A redefinição por e-mail só funciona com a API ligada.')
     await request('/auth/password/reset', {

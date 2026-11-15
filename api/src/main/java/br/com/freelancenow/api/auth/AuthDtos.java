@@ -43,6 +43,8 @@ public final class AuthDtos {
                     @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_MESSAGE)
                     String newPassword) {}
 
+    public record VerifyEmail(@NotBlank @Size(max = 4096) String token) {}
+
     public record Session(
             String accessToken,
             String tokenType,

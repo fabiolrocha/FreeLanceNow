@@ -107,6 +107,7 @@ test('publicação real persiste entre contas, falha mantém texto e moderação
   }
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/inicio')
-  await expect(page.getByLabel('Compartilhe seu trabalho')).toBeVisible()
+  // Still signed in as the client, whose composer is labelled for a general post.
+  await expect(page.getByLabel('Escreva uma publicação')).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })

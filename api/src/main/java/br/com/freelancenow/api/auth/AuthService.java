@@ -28,6 +28,8 @@ public class AuthService {
     private static final String INVALID_REFRESH = "Sua sessão terminou. Entre novamente.";
     private static final String INVALID_RESET =
             "Este link de redefinição é inválido ou expirou. Peça um novo link.";
+    private static final String INVALID_VERIFY =
+            "Este link de confirmação é inválido ou expirou. Entre na sua conta e peça um novo.";
 
     private final UserRepository users;
     private final PasswordEncoder passwords;
@@ -37,6 +39,7 @@ public class AuthService {
     private final String webBaseUrl;
     private final String dummyHash;
     private final Map<String, Instant> lastResetRequest = new ConcurrentHashMap<>();
+    private final Map<UUID, Instant> lastVerifyRequest = new ConcurrentHashMap<>();
     // Mail goes out in the background so the response time does not reveal whether an
     // account exists for the requested address.
     private final ExecutorService mailExecutor = Executors.newVirtualThreadPerTaskExecutor();
@@ -76,7 +79,40 @@ public class AuthService {
                                 passwords.encode(r.password()),
                                 r.phone(),
                                 r.role()));
+        mailExecutor.execute(() -> mail.send(verificationMail(u)));
         return session(u);
+    }
+
+    /** Confirms the address the link was sent to. Using a link twice is harmless. */
+    @Transactional
+    public void verifyEmail(AuthDtos.VerifyEmail r) {
+        var jwt =
+                tokens.decode(
+                        r.token(),
+                        TokenService.EMAIL_VERIFY,
+                        HttpStatus.BAD_REQUEST,
+                        INVALID_VERIFY);
+        var u =
+                users.lockById(UUID.fromString(jwt.getSubject()))
+                        .filter(User::isActive)
+                        .filter(x -> tokens.matchesEmail(jwt, x))
+                        .orElseThrow(
+                                () -> new ApiException(HttpStatus.BAD_REQUEST, INVALID_VERIFY));
+        u.markEmailVerified(clock.instant());
+    }
+
+    /** Sends a new confirmation link, at most once a minute per account. */
+    public void resendVerification(User u) {
+        if (u.isEmailVerified()) return;
+        var now = clock.instant();
+        var previous = lastVerifyRequest.get(u.getId());
+        if (previous != null && previous.plus(RESET_COOLDOWN).isAfter(now))
+            throw new ApiException(
+                    HttpStatus.TOO_MANY_REQUESTS,
+                    "Enviamos um link há menos de um minuto. Confira sua caixa de entrada e o spam.");
+        lastVerifyRequest.put(u.getId(), now);
+        lastVerifyRequest.values().removeIf(at -> at.plus(RESET_COOLDOWN).isBefore(now));
+        mailExecutor.execute(() -> mail.send(verificationMail(u)));
     }
 
     @Transactional(readOnly = true)
@@ -165,6 +201,34 @@ public class AuthService {
         u.changePassword(passwords.encode(r.newPassword()));
         users.flush();
         return session(u);
+    }
+
+    private MailSender.Mail verificationMail(User u) {
+        var link =
+                webBaseUrl
+                        + "/verificar-email?token="
+                        + URLEncoder.encode(tokens.emailVerification(u), StandardCharsets.UTF_8);
+        long hours = tokens.verifyTtl() / 3600;
+        var text =
+                "Olá, "
+                        + u.getName()
+                        + ".\n\nBoas-vindas ao FreeLanceNow! Confirme seu e-mail pelo link abaixo"
+                        + " em até "
+                        + hours
+                        + " horas:\n\n"
+                        + link
+                        + "\n\nSe você não criou esta conta, ignore este e-mail.";
+        var html =
+                "<p>Olá, "
+                        + escape(u.getName())
+                        + ".</p><p>Boas-vindas ao FreeLanceNow! Confirme seu e-mail para receber"
+                        + " os avisos das suas contratações. O link vale por "
+                        + hours
+                        + " horas.</p><p><a href=\""
+                        + escape(link)
+                        + "\">Confirmar e-mail</a></p><p>Se você não criou esta conta, ignore"
+                        + " este e-mail.</p>";
+        return new MailSender.Mail(u.getEmail(), "Confirme seu e-mail — FreeLanceNow", text, html);
     }
 
     private MailSender.Mail resetMail(User u) {

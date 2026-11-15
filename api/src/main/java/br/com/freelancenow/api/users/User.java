@@ -54,6 +54,9 @@ public class User {
     @Column(name = "deleted_at")
     private Instant deletedAt;
 
+    @Column(name = "email_verified_at")
+    private Instant emailVerifiedAt;
+
     protected User() {}
 
     public User(String name, String email, String passwordHash, String phone, Role role) {
@@ -65,7 +68,7 @@ public class User {
         this.role = role;
         this.createdAt = Instant.now();
         this.termsAcceptedAt = createdAt;
-        this.termsVersion = "academic-v1";
+        this.termsVersion = "2026-11";
     }
 
     public void updateProfile(
@@ -157,5 +160,14 @@ public class User {
 
     public boolean isDeleted() {
         return deletedAt != null;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerifiedAt != null;
+    }
+
+    /** Keeps the first confirmation time; confirming twice changes nothing. */
+    public void markEmailVerified(Instant now) {
+        if (emailVerifiedAt == null) emailVerifiedAt = now;
     }
 }

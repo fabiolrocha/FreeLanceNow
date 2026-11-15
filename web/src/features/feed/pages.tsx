@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { Avatar, CategoryIcon, Empty, ErrorMessage } from '../../components/ui'
+import { avatarUrl } from '../../data/client'
 import { feedApi } from '../../data/feed'
 import type { FeedItem, FeedPage } from '../../data/feed'
 import { money } from '../../domain/rules'
@@ -161,12 +162,14 @@ export function Feed() {
       <aside className="feed-left" aria-label="Perfil e categorias">
         <section className="feed-profile feed-surface">
           <div className="feed-profile-cover" />
-          <Avatar name={user.name} large />
+          <Avatar name={user.name} large src={avatarUrl(user.id, user.avatarVersion)} />
           <h2>{user.name}</h2>
           <p>
             {user.role === 'FREELANCER'
-              ? 'Profissional independente'
-              : 'Conectando ideias e pessoas'}
+              ? 'Profissional'
+              : user.role === 'CLIENT'
+                ? 'Cliente'
+                : 'Administração'}
           </p>
           {user.city && (
             <small>
@@ -214,7 +217,9 @@ export function Feed() {
           ))}
         </section>
         <p className="feed-footnote">
-          Seu trabalho encontra novas possibilidades.
+          {user.role === 'FREELANCER'
+            ? 'Seu trabalho encontra novas possibilidades.'
+            : 'Quem resolve o que você precisa, perto de você.'}
           <br />
           <Link to="/ajuda">Ajuda</Link> · <Link to="/privacidade">Privacidade</Link>
         </p>
@@ -229,9 +234,13 @@ export function Feed() {
           <section className="feed-surface feed-composer">
             <form onSubmit={(e) => void publish(e)}>
               <div className="feed-compose-input">
-                <Avatar name={user.name} />
+                <Avatar name={user.name} src={avatarUrl(user.id, user.avatarVersion)} />
                 <label className="field">
-                  <span className="sr-only">Compartilhe seu trabalho</span>
+                  <span className="sr-only">
+                    {user.role === 'FREELANCER'
+                      ? 'Compartilhe seu trabalho'
+                      : 'Escreva uma publicação'}
+                  </span>
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
@@ -244,7 +253,7 @@ export function Feed() {
               </div>
               <div className="feed-compose-options">
                 <label className="field">
-                  <span>Área do trabalho</span>
+                  <span>Categoria</span>
                   <select
                     value={postCategory}
                     disabled={!!serviceId}
@@ -347,7 +356,13 @@ export function Feed() {
             {!data?.items.length && (
               <div className="feed-surface">
                 <Empty title="Ainda não há publicações aqui">
-                  <p>Compartilhe seu trabalho ou explore outra categoria.</p>
+                  <p>
+                    {user.role === 'FREELANCER'
+                      ? 'Compartilhe seu trabalho ou explore outra categoria.'
+                      : user.role === 'CLIENT'
+                        ? 'Publique uma demanda ou explore outra categoria.'
+                        : 'Explore outra categoria ou outro tipo de conteúdo.'}
+                  </p>
                   <button
                     className="text-button"
                     onClick={() => {
@@ -536,7 +551,7 @@ export function Feed() {
               .slice(0, 3)
               .map((p) => (
                 <Link className="feed-professional" key={p.id} to={`/profissionais/${p.id}`}>
-                  <Avatar name={p.name} />
+                  <Avatar name={p.name} src={avatarUrl(p.id, p.avatarVersion)} />
                   <span>
                     <strong>{p.name}</strong>
                     <small>{p.city || 'Ver perfil profissional'}</small>

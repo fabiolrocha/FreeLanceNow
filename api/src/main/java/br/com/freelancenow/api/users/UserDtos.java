@@ -19,6 +19,7 @@ public final class UserDtos {
             String bio,
             String serviceArea,
             Long avatarVersion,
+            boolean emailVerified,
             Instant createdAt) {
         public static Me from(User u) {
             return new Me(
@@ -31,6 +32,7 @@ public final class UserDtos {
                     u.getBio(),
                     u.getServiceArea(),
                     u.getAvatarVersion(),
+                    u.isEmailVerified(),
                     u.getCreatedAt());
         }
     }

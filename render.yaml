@@ -1,0 +1,41 @@
+# Render Blueprint for the API (Docker). Secrets use sync: false and are typed in the dashboard
+# when the Blueprint is created; nothing secret lives in this file. See docs/deploy.md.
+services:
+  - type: web
+    name: freelancenow-api
+    runtime: docker
+    plan: free
+    # Same AWS region family as the Neon project (aws-us-east-1) to keep database latency low.
+    region: virginia
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - api/**
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Fits the JVM in the free instance's 512 MB.
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=75 -XX:+UseSerialGC -Xss512k -XX:TieredStopAtLevel=1
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PUBLIC_APP_URL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+      - key: ADMIN_BOOTSTRAP_ENABLED
+        value: "false"

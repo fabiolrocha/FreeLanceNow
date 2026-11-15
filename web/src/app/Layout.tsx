@@ -22,7 +22,7 @@ import {
 } from 'lucide-react'
 import { useApp } from './store'
 import { useUnreadCount } from './useUnread'
-import { avatarUrl, isMock } from '../data/client'
+import { avatarUrl, client, isMock } from '../data/client'
 import { Avatar } from '../components/ui'
 import '../features/feed/feed.css'
 
@@ -62,30 +62,33 @@ export function Layout() {
           ['/admin/categorias', 'Categorias', BriefcaseBusiness],
           ['/admin/moderacao', 'Moderação', Shield],
           ['/admin/relatorios', 'Relatórios', ClipboardList],
-          ['/admin/transacoes', 'Transações', Wallet],
+          ...(isMock ? ([['/admin/transacoes', 'Transações', Wallet]] as const) : []),
           ['/perfil/editar', 'Minha conta', Settings],
         ] as const)
       : ([
           ['/inicio', 'Início', Home],
-          ['/servicos', 'Buscar serviços', Search],
-          ['/profissionais', 'Profissionais', Users],
-          [
-            '/demandas',
-            user?.role === 'FREELANCER' ? 'Demandas abertas' : 'Minhas demandas',
-            ClipboardList,
-          ],
-          ['/contratacoes', 'Contratações', BriefcaseBusiness],
           ...(user?.role === 'FREELANCER'
             ? ([
+                ['/painel', 'Meu painel', Home],
+                ['/solicitacoes', 'Solicitações', ClipboardList],
+                ['/contratacoes', 'Contratações', BriefcaseBusiness],
+                ['/demandas', 'Demandas abertas', ClipboardList],
                 ['/propostas', 'Minhas propostas', Send],
                 ['/meus-servicos', 'Meus serviços', Plus],
-                ['/solicitacoes', 'Solicitações', ClipboardList],
-                ['/painel', 'Meu painel', Home],
               ] as const)
-            : []),
+            : ([
+                ['/servicos', 'Buscar serviços', Search],
+                ['/profissionais', 'Profissionais', Users],
+                ['/demandas', 'Minhas demandas', ClipboardList],
+                ['/contratacoes', 'Contratações', BriefcaseBusiness],
+              ] as const)),
           ['/mensagens', 'Mensagens', MessageSquare],
           ['/notificacoes', 'Notificações', Bell],
-          ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
+          ...(isMock
+            ? ([
+                ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
+              ] as const)
+            : []),
           ['/denuncias', 'Minhas denúncias', Flag],
           ['/perfil', 'Meu perfil', UserRound],
           ['/perfil/editar', 'Configurações da conta', Settings],
@@ -96,11 +99,12 @@ export function Layout() {
       <a className="skip-link" href="#conteudo">
         Pular para o conteúdo
       </a>
-      <div className="demo-banner">
-        {isMock
-          ? 'Demonstração acadêmica · dados fictícios · nenhum pagamento real'
-          : 'Ambiente acadêmico · contas, serviços, contratações, mensagens e avisos conectados à API'}
-      </div>
+      {isMock && (
+        <div className="demo-banner">
+          Demonstração acadêmica · dados fictícios · nenhum pagamento real
+        </div>
+      )}
+      {user && user.emailVerified === false && <VerifyEmailBanner email={user.email} />}
       <header className={`topbar ${social ? 'social-header' : ''}`}>
         <Brand />
         <nav className="public-links" aria-label="Menu principal">
@@ -237,5 +241,34 @@ export function Layout() {
         </footer>
       )}
     </>
+  )
+}
+/** Shown until the address is confirmed; the link arrives by e-mail right after registration. */
+function VerifyEmailBanner({ email }: { email: string }) {
+  const [state, setState] = useState<'idle' | 'busy' | 'sent'>('idle'),
+    [error, setError] = useState('')
+  async function resend() {
+    setState('busy')
+    setError('')
+    try {
+      await client.resendVerification()
+      setState('sent')
+    } catch (e) {
+      setError((e as Error).message)
+      setState('idle')
+    }
+  }
+  return (
+    <div className="demo-banner verify-banner" role="status">
+      {state === 'sent'
+        ? `Enviamos um novo link para ${email}. Confira também a caixa de spam.`
+        : `Confirme seu e-mail: enviamos um link para ${email}.`}{' '}
+      {state !== 'sent' && (
+        <button className="text-button" disabled={state === 'busy'} onClick={() => void resend()}>
+          {state === 'busy' ? 'Enviando…' : 'Reenviar link'}
+        </button>
+      )}
+      {error && <span> {error}</span>}
+    </div>
   )
 }

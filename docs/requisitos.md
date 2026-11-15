@@ -7,7 +7,7 @@ Revisado em **09/11/2026**, conforme a base integrada. Referência principal: `o
 | RN01 / UC01 | E-mail obrigatório e único, nome até 100, telefone brasileiro | API normaliza e-mail; constraint única; DTO validado | Verificação de e-mail e recuperação real |
 | RN02 / UC01 | Senha com pelo menos 8 caracteres, letras e números | API bcrypt; limite técnico de 72 bytes; frontend valida | Política de tentativas/rate limit e 2FA |
 | RN03 / UC01 | Perfis cliente/freelancer; administrador não é cadastro público | API rejeita `ADMIN`; rotas React por perfil | Provisionamento administrativo controlado |
-| RN04 / UC01 | Aceite explícito de termos e tratamento de dados | API guarda versão `academic-v1` e data; checkbox obrigatório | Texto definitivo e mecanismo de direitos do titular |
+| RN04 / UC01 | Aceite explícito de termos e tratamento de dados | API guarda versão (`2026-11` para novos cadastros; `academic-v1` nos anteriores) e data; checkbox obrigatório; Termos e Privacidade com texto de produção; exclusão de conta pelo titular (ADR24) | Revisão jurídica do texto |
 | RN05 / UC02 | Anúncio: título até 80, descrição até 500, preço positivo, prazo positivo, categoria ativa | API e frontend; precisão monetária 2 casas, prazo técnico 1–365 | Refinar limite de prazo com o grupo |
 | RN06 / UC02 | Até 20 anúncios ativos por freelancer | API com bloqueio do usuário na transação; mock valida limite | Teste de concorrência e carga |
 | RN07 / UC02 | Rascunho, ativo e inativo; edição pelo dono | API preserva registros e restringe proprietário; público vê ativos | Histórico/auditoria de alterações |

@@ -12,6 +12,7 @@ import {
   disputeOf,
   futureDate,
   money,
+  nextStepHint,
   statusLabel,
   today,
 } from '../../domain/rules'
@@ -429,8 +430,11 @@ export function ContractDetail() {
             </Link>
           )}
           <p>
-            O início depende do aceite do profissional. Pagamentos em sandbox serão integrados na
-            etapa financeira.
+            {nextStepHint(
+              c.status,
+              user?.role,
+              user?.id === c.clientId ? c.freelancerName : c.clientName,
+            )}
           </p>
           {user?.role === 'CLIENT' && (isMock || c.serviceId) && (
             <Link
