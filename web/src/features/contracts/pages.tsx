@@ -3,8 +3,16 @@ import type { FormEvent } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { CheckCircle2, Clock, MessageSquare, Star } from 'lucide-react'
 import { useApp } from '../../app/store'
-import { isMock } from '../../data/client'
-import { ConfirmButton, Empty, ErrorMessage, Field, PageTitle, Stars } from '../../components/ui'
+import { avatarUrl, isMock } from '../../data/client'
+import {
+  Avatar,
+  ConfirmButton,
+  Empty,
+  ErrorMessage,
+  Field,
+  PageTitle,
+  Stars,
+} from '../../components/ui'
 import {
   canReview,
   contractDeadline,
@@ -15,6 +23,7 @@ import {
   nextStepHint,
   statusLabel,
   today,
+  statusTone,
 } from '../../domain/rules'
 import type { Contract, ContractStatus, Role } from '../../domain/types'
 
@@ -152,7 +161,7 @@ const contractFilters: [string, string, Contract['status'][] | null][] = [
   ['closed', 'Recusadas/canceladas', ['RECUSADO', 'CANCELADO']],
 ]
 export function ContractList({ requests = false }: { requests?: boolean }) {
-  const { contracts, user } = useApp(),
+  const { contracts, user, professionals } = useApp(),
     [filter, setFilter] = useState('all'),
     [q, setQ] = useState('')
   useFreshContracts()
@@ -208,6 +217,17 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
         <div className="stack">
           {own.map((c) => (
             <Link className="panel contract-row" key={c.id} to={`/contratacoes/${c.id}`}>
+              {user?.role === 'CLIENT' ? (
+                <Avatar
+                  name={c.freelancerName}
+                  src={avatarUrl(
+                    c.freelancerId,
+                    professionals.find((p) => p.id === c.freelancerId)?.avatarVersion,
+                  )}
+                />
+              ) : (
+                <Avatar name={c.clientName} />
+              )}
               <div>
                 <h2>{c.title}</h2>
                 <p>
@@ -220,9 +240,7 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
                   </small>
                 )}
               </div>
-              <span
-                className={`badge ${c.status === 'CONCLUIDO' ? 'green' : c.status === 'EM_DISPUTA' ? 'red' : ''}`}
-              >
+              <span className={`badge status ${statusTone(c.status)}`}>
                 {statusLabel[c.status]}
               </span>
               <strong>{money(c.price)}</strong>
@@ -288,7 +306,7 @@ export function ContractDetail() {
       <ErrorMessage message={error} />
       <div className="detail-grid">
         <section className="panel">
-          <span className="badge">{statusLabel[c.status]}</span>
+          <span className={`badge status ${statusTone(c.status)}`}>{statusLabel[c.status]}</span>
           {deadline && (
             <p className="deadline" role="status">
               <Clock size={18} aria-hidden />

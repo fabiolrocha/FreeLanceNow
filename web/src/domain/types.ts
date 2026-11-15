@@ -21,6 +21,8 @@ export interface User extends Profile {
   phone: string
   /** False until the link sent at registration is opened; absent (treated as confirmed) in mock mode. */
   emailVerified?: boolean
+  /** E-mail copies of important notices; on by default (API only). */
+  emailNotifications?: boolean
   createdAt?: string
 }
 export interface Session {

@@ -193,6 +193,28 @@ export function checkNewPassword(d: FormData) {
   if (password !== String(d.get('confirm'))) return 'As senhas não conferem.'
   return ''
 }
+/** Colour family of a status badge, shared by contracts, demands, proposals and reports. */
+export type Tone = 'amber' | 'blue' | 'green' | 'red' | 'gray'
+const tones: Record<string, Tone> = {
+  PENDENTE: 'amber',
+  ACEITO: 'blue',
+  EM_ANDAMENTO: 'blue',
+  AGUARDANDO_CONFIRMACAO: 'amber',
+  CONCLUIDO: 'green',
+  EM_DISPUTA: 'red',
+  RECUSADO: 'gray',
+  CANCELADO: 'gray',
+  OPEN: 'green',
+  CLOSED: 'gray',
+  CANCELLED: 'gray',
+  PENDING: 'amber',
+  ACCEPTED: 'green',
+  REJECTED: 'gray',
+  WITHDRAWN: 'gray',
+  KEPT: 'gray',
+  REMOVED: 'green',
+}
+export const statusTone = (status: string): Tone => tones[status] || 'gray'
 export const roleLabel: Record<Role, string> = {
   CLIENT: 'Cliente',
   FREELANCER: 'Profissional',

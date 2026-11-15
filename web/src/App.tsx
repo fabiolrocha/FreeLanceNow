@@ -123,12 +123,57 @@ function Home() {
   const { user } = useApp()
   return user?.role === 'ADMIN' ? <Navigate to="/admin/usuarios" replace /> : <Feed />
 }
+const DEFAULT_TITLE = 'FreeLanceNow · Serviços gerais'
+function NotFound() {
+  const { user } = useApp()
+  const home = user ? (user.role === 'ADMIN' ? '/admin' : '/inicio') : '/'
+  return (
+    <section className="empty not-found">
+      <span className="badge">Erro 404</span>
+      <h1>Página não encontrada</h1>
+      <p>O endereço pode ter mudado, ou o conteúdo saiu do ar.</p>
+      <div className="not-found-actions">
+        <Link className="button" to={home}>
+          Voltar ao início
+        </Link>
+        {user?.role !== 'ADMIN' && (
+          <Link className="button secondary" to="/servicos">
+            Buscar serviços
+          </Link>
+        )}
+        <Link className="subtle-link" to="/ajuda">
+          Ver a ajuda
+        </Link>
+      </div>
+    </section>
+  )
+}
 function ScrollReset() {
   const { pathname } = useLocation()
   useEffect(() => {
     window.scrollTo(0, 0)
-    document.title = 'FreeLanceNow · Serviços gerais'
   }, [pathname])
+  // The tab shows the page's own heading (lazy pages and loaded data included), so history,
+  // bookmarks and screen readers can tell pages apart.
+  useEffect(() => {
+    let frame = 0
+    const sync = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        const heading = document.querySelector('main h1')?.textContent?.trim()
+        const title =
+          heading && window.location.pathname !== '/' ? `${heading} · FreeLanceNow` : DEFAULT_TITLE
+        if (document.title !== title) document.title = title
+      })
+    }
+    const observer = new MutationObserver(sync)
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true })
+    sync()
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(frame)
+    }
+  }, [])
   return null
 }
 export default function App() {
@@ -215,17 +260,7 @@ export default function App() {
                 <Route path="admin/relatorios" element={<Reports />} />
                 <Route path="admin/transacoes" element={money(<Transactions />)} />
               </Route>
-              <Route
-                path="*"
-                element={
-                  <section className="empty">
-                    <h1>Página não encontrada</h1>
-                    <Link className="button" to="/">
-                      Voltar ao início
-                    </Link>
-                  </section>
-                }
-              />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </Suspense>

@@ -16,9 +16,23 @@ import { money, ratingLabel } from '../../domain/rules'
 import { avatarUrl, isMock, serviceImageUrl } from '../../data/client'
 import type { Profile, Service } from '../../domain/types'
 
+/** Best first impression: listings with reviews and photos come before brand-new ones. */
+function featuredServices(services: Service[]) {
+  const score = (s: Service) =>
+    (s.freelancer.averageRating ?? 0) * 10 +
+    Math.min(s.freelancer.reviewCount ?? 0, 20) +
+    (s.images?.length ? 15 : 0)
+  const ranked = [...services].sort((a, b) => score(b) - score(a))
+  // One listing per professional first, so the showcase shows different people.
+  const seen = new Set<string>()
+  const variety = ranked.filter((s) => !seen.has(s.freelancer.id) && seen.add(s.freelancer.id))
+  return [...variety, ...ranked.filter((s) => !variety.includes(s))]
+}
 export function Landing() {
   const { categories, services, user } = useApp()
   if (user) return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/inicio'} replace />
+  const featured = featuredServices(services)
+  const spotlight = featured[0]
   return (
     <>
       <section className="hero">
@@ -55,24 +69,57 @@ export function Landing() {
             <span className="board-dot" />
             Pessoas que fazem acontecer
           </div>
-          <div className="hero-service">
-            <div className="tool-tile">
-              <Wrench size={65} strokeWidth={1.3} />
+          {spotlight ? (
+            <>
+              <Link className="hero-service" to={`/servicos/${spotlight.id}`}>
+                <div className="tool-tile">
+                  {spotlight.images?.[0] ? (
+                    <img src={serviceImageUrl(spotlight.id, spotlight.images[0].id)} alt="" />
+                  ) : (
+                    <CategoryIcon slug={spotlight.category.slug} size={65} />
+                  )}
+                </div>
+                <div>
+                  <span>Serviço em destaque</span>
+                  <h2>{spotlight.title}</h2>
+                  <p>
+                    {spotlight.category.name} · {money(spotlight.price)}
+                  </p>
+                </div>
+              </Link>
+              <div className="board-person">
+                <Avatar
+                  name={spotlight.freelancer.name}
+                  large
+                  src={avatarUrl(spotlight.freelancer.id, spotlight.freelancer.avatarVersion)}
+                />
+                <div>
+                  <strong>{spotlight.freelancer.name}</strong>
+                  <p>
+                    {[
+                      spotlight.freelancer.city,
+                      typeof spotlight.freelancer.averageRating === 'number' &&
+                        `★ ${ratingLabel(spotlight.freelancer.averageRating)}`,
+                    ]
+                      .filter(Boolean)
+                      .join(' · ') || 'Novo na plataforma'}
+                  </p>
+                </div>
+                {isMock && <span className="badge">Demonstração</span>}
+              </div>
+            </>
+          ) : (
+            <div className="hero-service">
+              <div className="tool-tile">
+                <Wrench size={65} strokeWidth={1.3} />
+              </div>
+              <div>
+                <span>Comece por aqui</span>
+                <h2>Os primeiros anúncios aparecem em breve</h2>
+                <p>Profissionais já podem publicar seus serviços.</p>
+              </div>
             </div>
-            <div>
-              <span>Serviço em destaque</span>
-              <h2>Instalação de chuveiro elétrico</h2>
-              <p>Elétrica residencial</p>
-            </div>
-          </div>
-          <div className="board-person">
-            <Avatar name="Marcos Vieira" large />
-            <div>
-              <strong>Marcos Vieira</strong>
-              <p>Eletricista · Taguatinga, DF</p>
-            </div>
-            {isMock && <span className="badge">Demonstração</span>}
-          </div>
+          )}
           <div className="board-footer">
             <span>
               Uma necessidade.
@@ -108,7 +155,7 @@ export function Landing() {
           description="Conheça os anúncios disponíveis na plataforma."
           action={<Link to="/servicos">Ver todos os serviços</Link>}
         />
-        <ServiceGrid services={services.slice(0, 3)} />
+        <ServiceGrid services={featured.slice(0, 3)} />
       </section>
       <section className="how-section">
         <h2>Da busca ao serviço concluído</h2>
