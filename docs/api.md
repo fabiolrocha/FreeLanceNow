@@ -1,6 +1,6 @@
 # Contrato da API
 
-Revisado em **14/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha por e-mail, renovação de sessão e troca de senha estão em [Cadastro e login](#cadastro-e-login); financeiro permanece pendente; mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
+Revisado em **14/11/2026**, conforme controllers, DTOs e serviços da base integrada. Base local: `http://localhost:8081/api/v1`. JSON com chaves em inglês; textos da interface e mensagens de negócio em português. Autenticação: `Authorization: Bearer <accessToken>`. A API expõe os endpoints abaixo. Recuperação de senha por e-mail, renovação de sessão e troca de senha estão em [Cadastro e login](#cadastro-e-login); pagamentos (F09) estão em [Pagamentos](#pagamentos-f09); mensagens por contratação e avisos internos estão abaixo. F04/F05 acrescentam os endpoints administrativos e denúncias abaixo; ADMIN é provisionado exclusivamente por configuração explícita de inicialização, sem cadastro público.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
@@ -192,7 +192,7 @@ PATCH `/contracts/{id}/status` recebe `status` e `comment` opcional de até 500 
 
 Regra de saída (ADR23): qualquer parte cancela com motivo até o serviço começar; depois de `EM_ANDAMENTO`, só por disputa decidida pela administração. Contestação/disputa e cancelamento de contratação aceita exigem motivo não vazio de até 300 caracteres em `comment`; a decisão do admin exige justificativa de até 500 caracteres. Os três casos retornam 400 sem o texto. Participante incorreto recebe 403; transição incompatível com estado/perfil recebe 409. Não há transições manuais a partir de estados finais.
 
-O job cancela `PENDENTE` após 48 horas sem resposta e confirma `AGUARDANDO_CONFIRMACAO` após 5 dias corridos. A checagem periódica usa `CONTRACT_DEADLINE_CHECK_MS`, padrão 60000 ms, e registra eventos idempotentes. Não depende do navegador aberto, mas exige API em execução. Não dispara pagamentos ou e-mails.
+O job cancela `PENDENTE` após 48 horas sem resposta e confirma `AGUARDANDO_CONFIRMACAO` após 5 dias corridos. A checagem periódica usa `CONTRACT_DEADLINE_CHECK_MS`, padrão 60000 ms, e registra eventos idempotentes. Não depende do navegador aberto, mas exige API em execução. A confirmação automática libera o pagamento em custódia (F09); o job não envia e-mails próprios.
 
 `ContractView` inclui IDs dos participantes, nomes, `serviceId` (pode ser nulo em contratação por proposta), título/preço, `date`, descrição/endereço, `status`, `history: [{status,at,comment,actorRole}]`, `completedAt`, `rating`, `review`, `reviewReply`, `reviewedAt`, `dispute` e `observations`. Campos opcionais podem ser nulos. Cada item de `history` traz o comentário do evento (motivo, observação ou justificativa) e o papel de quem agiu (`CLIENT`, `FREELANCER`, `ADMIN`, ou nulo para o job de prazos); o nome do administrador não é exposto. Decisões de disputa por ADMIN também são registradas em `audit_event`; a interface solicita justificativa.
 
@@ -258,6 +258,22 @@ A resposta/fila inclui autor, tipo/ID do alvo, `targetTitle`, `targetContent` (c
 PATCH `/admin/reports/{id}` recebe `{"status":"REMOVED","note":"Motivo fundamentado da decisão"}` ou estado `KEPT`. A justificativa é obrigatória, até 1000 caracteres. `PENDING` como decisão retorna 400; segunda decisão retorna 409. A remoção mantém registros e vínculos: anúncio fica `INACTIVE`/`moderated=true` e seu dono não pode editar/republicar; avaliação fica `hidden=true`, saindo de listas públicas, médias e busca por nota. O histórico privado da contratação e a unicidade da avaliação permanecem preservados.
 
 Decisões são transacionais e usam locks para serializar alterações concorrentes no alvo. Não há operação de desfazer remoção nesta entrega. E-mail dos envolvidos pertence a F07; arquivos de evidência dependem de F06.
+
+## Pagamentos (F09)
+
+Stripe Checkout em modo de teste (ADR33). Sem `STRIPE_SECRET_KEY` os pagamentos ficam desligados (`enabled: false`) e as contratações seguem sem cobrança. Com a chave, o cliente paga depois do aceite; o valor fica em custódia até a conclusão e só então vira saldo do profissional, já sem a comissão (`PLATFORM_FEE_PERCENT`, padrão 10%). Valores em reais.
+
+| Método | Caminho | Acesso | Resultado |
+|---|---|---|---|
+| GET | `/contracts/{id}/payment` | Participante ou ADMIN | 200 `{enabled, methods, feePercent, payment}`; `payment` é o mais recente ou `null` |
+| POST | `/contracts/{id}/payment` | Cliente da contratação | Body `{method: CARD\|PIX\|BOLETO}`; 201 `{paymentId, checkoutUrl}`. Só em `ACEITO`. Reaproveita o checkout aberto do mesmo método; trocar de método encerra o anterior. 409 se já pago, em compensação ou com pagamentos desligados; 502 se o Stripe recusar |
+| GET | `/payments/{id}` | Participante ou ADMIN | 200 `{payment, entries}` com os lançamentos do livro; 404 para terceiros |
+| GET | `/users/me/wallet` | Cliente ou freelancer | 200 com saldos (`held`, `available`, `released`, `withdrawn` para profissional; `paid`, `held`, `refunded` para cliente), pagamentos e saques |
+| POST | `/users/me/withdrawals` | Freelancer | Body `{amount}`; 201. Saque **simulado**: reduz o saldo, não transfere dinheiro. 409 acima do disponível |
+| GET | `/admin/payments` | ADMIN | 200 com totais (recebido, comissões, custódia, liberado, reembolsado, sacado) e até 500 pagamentos |
+| POST | `/payments/webhook` | Stripe (assinatura `Stripe-Signature`) | 200; 400 com assinatura ausente ou inválida. Eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`; cada `event.id` é processado uma vez |
+
+Efeitos no ciclo da contratação: `ACEITO → EM_ANDAMENTO` exige pagamento `PAID` (409 caso contrário); `CONCLUIDO`, inclusive pela confirmação automática de 5 dias ou decisão de disputa, libera o valor (`RELEASED`); `CANCELADO` reembolsa o que já foi pago (`REFUNDED`) e encerra checkouts abertos. Dinheiro que chega depois que a contratação deixou de esperá-lo (boleto pago após cancelamento, checkout antigo pago) é reembolsado automaticamente.
 
 ## Erros e verificação manual
 

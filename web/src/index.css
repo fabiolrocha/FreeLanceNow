@@ -1789,3 +1789,8 @@ p a:not(.button),
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+
+/* Money in tables stays on one line. */
+td.nowrap {
+  white-space: nowrap;
+}

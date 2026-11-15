@@ -62,6 +62,12 @@ const Help = feature(extra, 'Help'),
   Transaction = feature(extra, 'Transaction'),
   Withdraw = feature(extra, 'Withdraw'),
   Report = feature(extra, 'Report')
+const payments = () => import('./features/payments/pages')
+const WalletApi = feature(payments, 'WalletPage'),
+  PaymentApi = feature(payments, 'PaymentPage'),
+  TransactionApi = feature(payments, 'TransactionPage'),
+  WithdrawApi = feature(payments, 'WithdrawPage'),
+  TransactionsApi = feature(payments, 'AdminTransactionsPage')
 const Users = feature(admin, 'AdminUsers'),
   Categories = feature(admin, 'AdminCategories'),
   Moderation = feature(admin, 'AdminModeration'),
@@ -95,30 +101,8 @@ function Guard({ roles }: { roles?: Role[] }) {
     <Outlet />
   )
 }
-/**
- * Payments are the last integration. Until then the API build shows what is coming instead of
- * simulated balances; the mock build keeps the full demonstration.
- */
-function PaymentsSoon() {
-  const { user } = useApp()
-  return (
-    <section className="panel">
-      <span className="badge">Em breve</span>
-      <h1>Pagamentos pela plataforma</h1>
-      <p>
-        {user?.role === 'FREELANCER'
-          ? 'Em breve você vai receber pelos serviços concluídos e acompanhar saques por aqui. Por enquanto, combine o pagamento diretamente com o cliente pelas mensagens da contratação.'
-          : user?.role === 'ADMIN'
-            ? 'O acompanhamento de transações e repasses chega junto com a integração de pagamentos.'
-            : 'Em breve você vai pagar com segurança pela plataforma, com o valor liberado ao profissional só depois da sua confirmação. Por enquanto, combine o pagamento diretamente com o profissional pelas mensagens da contratação.'}
-      </p>
-      <Link to={user?.role === 'ADMIN' ? '/admin' : '/contratacoes'}>
-        {user?.role === 'ADMIN' ? 'Voltar ao painel' : 'Ver minhas contratações'}
-      </Link>
-    </section>
-  )
-}
-const money = (element: ReactElement) => (isMock ? element : <PaymentsSoon />)
+/** The mock build keeps the simulated finance screens; the API build uses Stripe (F09). */
+const money = (mock: ReactElement, api: ReactElement) => (isMock ? mock : api)
 /** The feed is for clients and freelancers; the team starts on its own panel. */
 function Home() {
   const { user } = useApp()
@@ -217,14 +201,15 @@ export default function App() {
                 ))}
                 <Route path="demandas/:id" element={<DemandDetail />} />
                 <Route path="notificacoes" element={<Notifications />} />
+                {/* Receipts: both parties of the contract and the team. */}
+                <Route path="transacao" element={money(<Transaction />, <TransactionApi />)} />
               </Route>
               {/* Marketplace areas: the team works from its own panel. */}
               <Route element={<Guard roles={['CLIENT', 'FREELANCER']} />}>
                 <Route path="contratacoes" element={<ContractList />} />
                 <Route path="demandas" element={<Demands />} />
                 <Route path="mensagens" element={<Messages />} />
-                <Route path="carteira" element={money(<Wallet />)} />
-                <Route path="transacao" element={money(<Transaction />)} />
+                <Route path="carteira" element={money(<Wallet />, <WalletApi />)} />
                 <Route path="denunciar" element={<Report />} />
                 <Route path="denunciar/enviada" element={<Report />} />
                 <Route path="denuncias" element={<MyReports />} />
@@ -235,8 +220,8 @@ export default function App() {
                 <Route path="demandas/nova" element={<DemandForm />} />
                 <Route path="demandas/:id/editar" element={<DemandForm />} />
                 <Route path="demandas/:id/propostas/:pid/aceitar" element={<AcceptProposal />} />
-                <Route path="pagamento" element={money(<Payment />)} />
-                <Route path="pagamento/confirmado" element={money(<Payment />)} />
+                <Route path="pagamento" element={money(<Payment />, <PaymentApi />)} />
+                <Route path="pagamento/confirmado" element={money(<Payment />, <PaymentApi />)} />
                 {['confirmar', 'avaliar'].map((p) => (
                   <Route key={p} path={`contratacoes/:id/${p}`} element={<ContractAction />} />
                 ))}
@@ -251,8 +236,8 @@ export default function App() {
                 <Route path="contratacoes/:id/concluir" element={<ContractAction />} />
                 <Route path="demandas/:id/proposta" element={<ProposalForm />} />
                 <Route path="demandas/:id/proposta/enviada" element={<ProposalForm />} />
-                <Route path="saque" element={money(<Withdraw />)} />
-                <Route path="saque/enviado" element={money(<Withdraw />)} />
+                <Route path="saque" element={money(<Withdraw />, <WithdrawApi />)} />
+                <Route path="saque/enviado" element={money(<Withdraw />, <WithdrawApi />)} />
               </Route>
               <Route element={<Guard roles={['ADMIN']} />}>
                 <Route path="admin" element={<Navigate to="/admin/usuarios" replace />} />
@@ -260,7 +245,10 @@ export default function App() {
                 <Route path="admin/categorias" element={<Categories />} />
                 <Route path="admin/moderacao" element={<Moderation />} />
                 <Route path="admin/relatorios" element={<Reports />} />
-                <Route path="admin/transacoes" element={money(<Transactions />)} />
+                <Route
+                  path="admin/transacoes"
+                  element={money(<Transactions />, <TransactionsApi />)}
+                />
               </Route>
               <Route path="*" element={<NotFound />} />
             </Route>

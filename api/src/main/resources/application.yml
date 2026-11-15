@@ -51,6 +51,8 @@ app:
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
     platform-fee-percent: ${PLATFORM_FEE_PERCENT:10}
+    # Formas oferecidas no Checkout. Pix e boleto exigem conta Stripe brasileira com o método ativo.
+    methods: ${STRIPE_PAYMENT_METHODS:CARD,PIX,BOLETO}
     public-base-url: ${PUBLIC_APP_URL:}
   resend:
     api-key: ${RESEND_API_KEY:}

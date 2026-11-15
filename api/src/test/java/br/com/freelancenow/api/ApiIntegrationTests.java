@@ -48,6 +48,7 @@ class ApiIntegrationTests {
     @Autowired FeedPostRepository feedPosts;
     @Autowired ContractService contractService;
     @Autowired PasswordEncoder passwords;
+    @Autowired br.com.freelancenow.api.payments.PaymentService paymentService;
     private final String prefix = UUID.randomUUID().toString();
     private String freelancerToken, clientToken, otherToken, serviceId;
     private static final String CATEGORY = "10000000-0000-0000-0000-000000000001";
@@ -1267,7 +1268,7 @@ class ApiIntegrationTests {
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                15,
+                16,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var withoutPassword =
@@ -1283,6 +1284,7 @@ class ApiIntegrationTests {
                         reviewRepository,
                         feedPosts,
                         passwords,
+                        paymentService,
                         "");
         withoutPassword.run();
         assertEquals(
@@ -1303,9 +1305,23 @@ class ApiIntegrationTests {
                         reviewRepository,
                         feedPosts,
                         passwords,
+                        paymentService,
                         "Demo12345");
         seed.run();
         seed.run();
+        // Contracts that started get simulated escrow history once: 9 released, 2 in escrow.
+        assertEquals(
+                9,
+                db.queryForObject(
+                        "select count(*) from payment where provider = 'SIMULATED'"
+                                + " and status = 'RELEASED'",
+                        Integer.class));
+        assertEquals(
+                2,
+                db.queryForObject(
+                        "select count(*) from payment where provider = 'SIMULATED'"
+                                + " and status = 'PAID'",
+                        Integer.class));
         assertEquals(
                 8,
                 db.queryForObject(

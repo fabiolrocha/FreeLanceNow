@@ -52,8 +52,9 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD | Testes web | Credenciais explícitas para incluir o fluxo browser administrativo em modo API |
 | CORS_ORIGINS | API | Origens permitidas, separadas por vírgula |
 | CONTRACT_DEADLINE_CHECK_MS | API | Intervalo do job de prazos, lido em `app.contracts.deadline-check-ms` (padrão `60000` ms) |
-| STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API (reservadas) | Propriedades declaradas; checkout/webhooks ainda não implementados (`F09`) |
-| PLATFORM_FEE_PERCENT | API (reservada) | Propriedade de comissão planejada, padrão `10`; não aplicada a pagamentos atuais |
+| STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET | API | Stripe em modo de teste (F09). Sem chave, pagamentos desligados; `sk_live_` é recusada na inicialização |
+| STRIPE_PAYMENT_METHODS | API | Formas oferecidas no Checkout, padrão `CARD,PIX,BOLETO` |
+| PLATFORM_FEE_PERCENT | API | Comissão descontada do profissional, padrão `10` |
 | RESEND_API_KEY / RESEND_FROM_EMAIL | API/Compose | Envio de e-mail (recuperação de senha) pela API HTTP do Resend; sem chave real, o perfil dev registra o e-mail no log |
 | PUBLIC_APP_URL | API/Compose | URL pública do frontend usada nos links de e-mail; Compose usa `http://127.0.0.1:${WEB_PORT}` |
 | JWT_REFRESH_TTL_SECONDS | API | Validade do refresh token, padrão `2592000` (30 dias) |
@@ -62,7 +63,7 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | API_PROXY_TARGET | Vite | Destino de `/api` e `/actuator` em dev |
 | E2E_DATA_MODE | Testes web | `api` seleciona teste com backend real |
 
-A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e as credenciais Stripe, CORS e intervalo do job não são repassadas por ele atualmente. `RESEND_API_KEY`, `RESEND_FROM_EMAIL` e `PUBLIC_APP_URL` são repassadas. Uma futura implantação precisa configurar esse repasse e validar as integrações.
+A tabela distingue variáveis consumidas pela aplicação das propriedades reservadas para integrações futuras. `VITE_STRIPE_PUBLIC_KEY` não é consumida pelo frontend atual. O Compose só injeta as variáveis declaradas em `compose.yml`: alterar `DB_URL` na `.env` da raiz não troca seu banco interno, e CORS e intervalo do job não são repassados por ele. As variáveis Stripe são repassadas (vazias por padrão). `RESEND_API_KEY`, `RESEND_FROM_EMAIL` e `PUBLIC_APP_URL` são repassadas. Uma futura implantação precisa configurar esse repasse e validar as integrações.
 
 As credenciais de exemplo são públicas e locais. `.env`/`.env.local` são ignorados por Git. Não usar `VITE_*` para segredos.
 

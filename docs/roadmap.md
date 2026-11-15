@@ -37,7 +37,7 @@ As próximas janelas devem acomodar F11, depois F06/F07 e F09/F10. Atualizar cal
 
 ## Provedores e dependências
 
-Stripe Sandbox, Neon PostgreSQL e Resend foram escolhidos no Passo 0. O código atual contém parâmetros de Stripe/Resend, mas não implementa checkout ou webhooks. O envio de e-mail pelo Resend já atende à recuperação de senha. O Compose usa PostgreSQL local; a escolha do Neon não comprova ambiente remoto implantado. Storage de imagens ainda precisa ser definido.
+Stripe Sandbox, Neon PostgreSQL e Resend foram escolhidos no Passo 0. Checkout e webhooks do Stripe (modo de teste) estão implementados (F09, ADR33). O envio de e-mail pelo Resend já atende à recuperação de senha. O Compose usa PostgreSQL local; a escolha do Neon não comprova ambiente remoto implantado. Storage de imagens ainda precisa ser definido.
 
 - F04/F05 dependem de autorização administrativa e do ciclo de contratação já persistente.
 - F06 inclui paginação da interface; a paginação do endpoint de busca já existe.
