@@ -19,6 +19,7 @@ import {
   Flag,
   CircleHelp,
   UserRound,
+  Heart,
 } from 'lucide-react'
 import { useApp } from './store'
 import { useUnreadCount } from './useUnread'
@@ -79,6 +80,7 @@ export function Layout() {
             : ([
                 ['/servicos', 'Buscar serviços', Search],
                 ['/profissionais', 'Profissionais', Users],
+                ['/salvos', 'Serviços salvos', Heart],
                 ['/demandas', 'Minhas demandas', ClipboardList],
                 ['/contratacoes', 'Contratações', BriefcaseBusiness],
               ] as const)),

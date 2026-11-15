@@ -14,7 +14,8 @@ import {
 } from 'lucide-react'
 import type { Review, Service } from '../domain/types'
 import { dateLabel, initials, money, ratingLabel } from '../domain/rules'
-import { isMock, serviceImageUrl } from '../data/client'
+import { avatarUrl, isMock, serviceImageUrl } from '../data/client'
+import { FavoriteButton } from './FavoriteButton'
 import './extras.css'
 
 export function CategoryIcon({ slug, size = 24 }: { slug: string; size?: number }) {
@@ -211,6 +212,7 @@ export function ServiceCard({ service: s }: { service: Service }) {
   return (
     <article className="service-card">
       <div className={`service-visual ${s.category.slug}`}>
+        <FavoriteButton service={s} />
         {s.images?.[0] ? (
           <img
             src={serviceImageUrl(s.id, s.images[0].id)}
@@ -230,7 +232,10 @@ export function ServiceCard({ service: s }: { service: Service }) {
           <Link to={`/servicos/${s.id}`}>{s.title}</Link>
         </h3>
         <div className="person">
-          <Avatar name={s.freelancer.name} />
+          <Avatar
+            name={s.freelancer.name}
+            src={avatarUrl(s.freelancer.id, s.freelancer.avatarVersion)}
+          />
           <div>
             <span>
               {s.freelancer.name}

@@ -12,6 +12,7 @@ import {
   ReviewList,
   ServiceGrid,
 } from '../../components/ui'
+import { FavoriteButton } from '../../components/FavoriteButton'
 import { money, ratingLabel } from '../../domain/rules'
 import { avatarUrl, isMock, serviceImageUrl } from '../../data/client'
 import type { Profile, Service } from '../../domain/types'
@@ -420,6 +421,7 @@ export function ServiceDetail() {
               <Link className="button full" to={`/servicos/${s.id}/solicitar`}>
                 Solicitar serviço
               </Link>
+              <FavoriteButton service={s} wide />
               <small>O profissional tem até 48 horas para responder.</small>
             </>
           )}

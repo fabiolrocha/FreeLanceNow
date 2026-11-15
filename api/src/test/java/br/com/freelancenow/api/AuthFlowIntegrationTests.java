@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClient;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -307,6 +308,52 @@ class AuthFlowIntegrationTests {
         send("POST", "/api/v1/users/me/email-verification", null, access);
         var again = CapturingMail.SENT.poll(1, TimeUnit.SECONDS);
         assertTrue(again == null || !again.to().equals(email));
+    }
+
+    @Test
+    void favoritesAreSavedOncePerUserAndHideInactiveListings() {
+        var freelaToken = registerAs("ffav", "FREELANCER").get("accessToken").toString();
+        var first = serviceFor(freelaToken, "Favorito um " + prefix);
+        var second = serviceFor(freelaToken, "Favorito dois " + prefix);
+        var clientToken = registerAs("cfav", "CLIENT").get("accessToken").toString();
+        var otherToken = registerAs("cfav2", "CLIENT").get("accessToken").toString();
+
+        send("PUT", "/api/v1/services/" + first + "/favorite", null, clientToken);
+        send("PUT", "/api/v1/services/" + second + "/favorite", null, clientToken);
+        // Saving twice is harmless.
+        send("PUT", "/api/v1/services/" + first + "/favorite", null, clientToken);
+        assertEquals(
+                List.of(second, first),
+                send("GET", "/api/v1/users/me/favorites", null, clientToken).get("serviceIds"));
+        assertEquals(
+                List.of(),
+                send("GET", "/api/v1/users/me/favorites", null, otherToken).get("serviceIds"));
+
+        send(
+                "PATCH",
+                "/api/v1/services/" + second + "/status",
+                Map.of("status", "INACTIVE"),
+                freelaToken);
+        assertEquals(
+                List.of(first),
+                send("GET", "/api/v1/users/me/favorites", null, clientToken).get("serviceIds"));
+        assertEquals(
+                404,
+                status(
+                        () ->
+                                send(
+                                        "PUT",
+                                        "/api/v1/services/" + second + "/favorite",
+                                        null,
+                                        otherToken)));
+
+        send("DELETE", "/api/v1/services/" + first + "/favorite", null, clientToken);
+        assertEquals(
+                List.of(),
+                send("GET", "/api/v1/users/me/favorites", null, clientToken).get("serviceIds"));
+        assertEquals(
+                401,
+                status(() -> send("PUT", "/api/v1/services/" + first + "/favorite", null, null)));
     }
 
     private Map<String, Object> registerAs(String name, String role) {
