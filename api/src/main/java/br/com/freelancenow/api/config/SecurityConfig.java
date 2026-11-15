@@ -83,6 +83,9 @@ public class SecurityConfig {
                         a ->
                                 a.requestMatchers("/api/v1/auth/**", "/actuator/health", "/error")
                                         .permitAll()
+                                        // Stripe signs the body; PaymentController checks it.
+                                        .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook")
+                                        .permitAll()
                                         .requestMatchers(HttpMethod.OPTIONS, "/**")
                                         .permitAll()
                                         .requestMatchers(

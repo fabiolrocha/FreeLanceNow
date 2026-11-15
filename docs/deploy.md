@@ -1,6 +1,6 @@
 # Deploy: Vercel, Render, Neon e Resend
 
-Revisado em **14/11/2026**. O repositório está pronto para publicar. Nenhuma conta externa foi conectada e nenhum deploy foi feito: os passos abaixo dependem das contas da equipe. Pagamentos (Stripe, F09) ficam para a última etapa e não fazem parte deste roteiro.
+Revisado em **14/11/2026**. O repositório está pronto para publicar. Nenhuma conta externa foi conectada e nenhum deploy foi feito: os passos abaixo dependem das contas da equipe. Pagamentos (Stripe em modo de teste, F09) têm seção própria no fim.
 
 ## Arquitetura
 
@@ -141,22 +141,25 @@ Os endereços `.test` são reservados (RFC 2606) e nunca recebem e-mail, por iss
 | `JWT_REFRESH_TTL_SECONDS` | Render | Não (padrão 30 dias) |
 | `ADMIN_BOOTSTRAP_*` | Render | Só no provisionamento do primeiro admin |
 | `SEED_DEMO`, `SEED_DEMO_PASSWORD` | Render | Não (só para apresentações; seção 5.1) |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Render | Não (sem elas, pagamentos desligados; seção Pagamentos) |
+| `STRIPE_PAYMENT_METHODS`, `PLATFORM_FEE_PERCENT` | Render | Não (padrões `CARD,PIX,BOLETO` e `10`) |
 | `VITE_DATA_MODE`, `VITE_API_BASE_URL` | Vercel | Sim |
 | `VITE_SUPPORT_EMAIL` | Vercel | Não |
 
 Valores de exemplo ficam em `.env.example` e `web/.env.example`. Segredos reais ficam só nos painéis do Render e da Vercel.
 
-## Pagamentos (F09, depois)
+## Pagamentos (F09)
 
-No modo API, as telas de carteira, pagamento, saque e transações mostram "Em breve" e saem do menu (ADR27). As tabelas `payment` e `ledger_entry` (V10) e a dependência `stripe-java` já existem, mas não há checkout, webhook nem reconciliação. Não configure `STRIPE_SECRET_KEY` nem cadastre webhook antes dessa implementação.
+Os pagamentos rodam no **modo de teste do Stripe** (ADR33). Sem `STRIPE_SECRET_KEY`, a API segue sem cobrança: contratações funcionam como antes e carteira e transações mostram só o histórico de demonstração. Chaves `sk_live_` são recusadas na inicialização.
 
-O que pode ser preparado desde já, sem tocar no deploy:
+1. Criar a conta Stripe com país **Brasil** e ficar no modo de teste. Nenhum dado bancário é necessário.
+2. Em **Settings → Payment methods**, ativar Pix e Boleto (cartão já vem ativo). Se algum não estiver disponível na conta, definir `STRIPE_PAYMENT_METHODS` só com os ativos (ex.: `CARD`).
+3. Em **Developers → API keys**, copiar a chave secreta de teste (`sk_test_...`).
+4. Em **Developers → Webhooks → Add endpoint**, cadastrar `https://freelancenow-api.onrender.com/api/v1/payments/webhook` com os eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`. Copiar o **Signing secret** (`whsec_...`).
+5. No Render, preencher `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` (declaradas com `sync: false` no Blueprint) e, se preciso, `STRIPE_PAYMENT_METHODS` e `PLATFORM_FEE_PERCENT`. Salvar reinicia a API.
+6. Testar: conta cliente solicita um serviço, profissional aceita, cliente clica em **Pagar** na contratação e usa o cartão `4242 4242 4242 4242` (validade futura, qualquer CVC). Em **Developers → Webhooks**, o evento deve aparecer com resposta 200 e a contratação passa a "Pago · em custódia".
 
-1. Criar a conta Stripe e ficar no **modo de teste** (sandbox). Nenhum dado bancário é necessário para testar.
-2. Em **Developers → API keys**, anotar a chave secreta de teste (`sk_test_...`) num gerenciador de senhas. Ela só vai para o Render quando o F09 existir, como `STRIPE_SECRET_KEY`.
-3. Instalar a Stripe CLI para testar webhooks localmente (`stripe listen --forward-to localhost:8081/...`) quando o endpoint existir.
-
-Quando o F09 estiver pronto, o roteiro de deploy ganha: `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` no Render (`sync: false` no Blueprint), um webhook em **Developers → Webhooks** apontando para a URL pública da API e o teste de um pagamento com o cartão de teste `4242 4242 4242 4242`. Chaves `sk_live_` só depois da ativação da conta e de uma revisão do fluxo.
+Com o plano free, a API pode estar hibernando quando o Stripe envia o evento. O Stripe tenta de novo por até três dias, e a tela de confirmação continua consultando o status por cerca de um minuto; abrir o site antes da demonstração evita a espera.
 
 ## Referências oficiais
 

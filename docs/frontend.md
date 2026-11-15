@@ -45,12 +45,12 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Demandas/propostas | `/demandas`, `/demandas/nova`, `/demandas/:id`, `/demandas/:id/proposta`, `/demandas/:id/proposta/enviada` | Cliente/freelancer (detalhe também admin) | Mock ou API (`F08`): filtros por categoria e cidade, "Mostrar mais", marcação de demanda já respondida |
 | Editar/aceitar | `/demandas/:id/editar`, `/demandas/:id/propostas/:pid/aceitar` | Cliente dono | Edição só sem propostas; cancelamento no detalhe; aceite escolhe data e endereço da contratação |
 | Avisos/chat | `/notificacoes`, `/mensagens?contratacao=:id` | Avisos: autenticado; chat: cliente/freelancer participante | Mock ou API: avisos persistentes com lido/não lido e contador no cabeçalho; conversa por contratação. Sem e-mail (`F07`) |
-| Carteira/transação | `/carteira`, `/transacao` | Cliente/freelancer | Mock: simulação financeira. API: tela "Em breve" e item fora do menu até `F09` (ADR27) |
-| Pagamento | `/pagamento`, `/pagamento/confirmado` | Cliente | Mock: simulação. API: "Em breve" (ADR27) |
-| Saque | `/saque`, `/saque/enviado` | Freelancer | Mock: simulação. API: "Em breve" (ADR27) |
+| Carteira/comprovante | `/carteira`, `/transacao?id=` | Cliente/freelancer (comprovante também ADMIN) | Mock: simulação. API: saldos, histórico, lançamentos do livro e exportação CSV (F09, ADR33) |
+| Pagamento | `/pagamento?contratacao=`, `/pagamento/confirmado` | Cliente | Mock: simulação. API: escolha do método e redirecionamento ao Stripe Checkout; na volta, consulta o status até o webhook confirmar |
+| Saque | `/saque`, `/saque/enviado` | Freelancer | Mock: simulação. API: saque simulado do saldo disponível, sem transferência (ADR33) |
 | Denúncia | `/denunciar`, `/denunciar/enviada` | Cliente/freelancer | Mock ou API: aberta pelo link "Denunciar" do anúncio, avaliação ou publicação, com motivos por tipo; sem conteúdo escolhido, a tela orienta onde denunciar (`F05`). O dono e o admin não veem o link no próprio anúncio |
 | Gestão e relatórios | `/admin/usuarios`, `/admin/categorias`, `/admin/relatorios` | Admin | Mock ou API: usuários/categorias, filtros, métricas por período, CSV e auditoria (`F04`). Perfis e status traduzidos; conta excluída aparece como "Excluída", sem ação; auditoria mostra ação, alvo e valores em português |
-| Transações administrativas | `/admin/transacoes` | Admin | Mock: simulação. API: "Em breve" e item fora do menu (ADR27) |
+| Transações administrativas | `/admin/transacoes` | Admin | Mock: simulação. API: totais (recebido, comissões, custódia, liberado, reembolsado, sacado) e lista com comprovantes (ADR33) |
 | Moderação | `/admin/moderacao` | Admin ativo | Mock ou API: denúncias/decisões persistentes, remoção lógica e disputas auditadas (`F05`) |
 | Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Textos de produção (versão 2026-11, LGPD); no mock, aviso de dados fictícios. Contato opcional via `VITE_SUPPORT_EMAIL` |
 | URL desconhecida | Qualquer rota não encontrada | Público | Tela 404 com retorno ao início |
@@ -61,7 +61,7 @@ Guards React protegem os grupos de rotas por role e explicam a restrição pelo 
 
 ## Telas demonstrativas e componentes reutilizados
 
-Financeiro continua simulado (F09). Recuperação de senha usa a API e o e-mail do Resend. Avisos e chat por contratação usam a API desde o PR #45. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
+Financeiro usa Stripe Checkout em modo de teste no modo API (F09, ADR33): pagamento na página da contratação, custódia até a conclusão, carteira, saque simulado e painel de transações; sem chave Stripe, as telas mostram só o histórico de demonstração. Recuperação de senha usa a API e o e-mail do Resend. Avisos e chat por contratação usam a API desde o PR #45. Gestão e moderação agora usam a API em F04/F05, incluindo denúncia de avaliações pelo perfil público, remoção lógica e auditoria. O modo mock mantém a demonstração anterior. ADMIN real depende de bootstrap explícito; não há credenciais padrão. Não foram classificados como abandonados apenas por serem simulados.
 
 | Rotas/estados | Reutilização atual |
 |---|---|

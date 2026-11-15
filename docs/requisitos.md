@@ -17,13 +17,13 @@ Revisado em **09/11/2026**, conforme a base integrada. Referência principal: `o
 | RN11 / UC03 | Freelancer responde em até 48 horas; cancela automaticamente após prazo | Job idempotente na API com `Clock` injetável e testes de relógio | Aviso interno de cancelamento já existe; e-mail (`F07`) |
 | RN12 / UC06 | `PENDENTE → ACEITO → EM_ANDAMENTO → AGUARDANDO_CONFIRMACAO → CONCLUIDO` | API transacional (`contract` + `contract_event`), snapshots de título/preço e React integrado | — |
 | RN13 / UC06 | Freelancer sinaliza; cliente confirma ou contesta; disputa administrada | API/React persistem motivo e decisão administrativa auditada; ADMIN provisionado por opt-in (`F04`/`F05`) | Arquivos de evidência (`F06`) e avisos (`F07`) |
-| RN14 / UC06 | Confirmação automática após 5 dias | Job idempotente na API (`AGUARDANDO_CONFIRMACAO → CONCLUIDO`) com testes de relógio | Repasse automático no gateway (`F09`) |
+| RN14 / UC06 | Confirmação automática após 5 dias | Job idempotente na API (`AGUARDANDO_CONFIRMACAO → CONCLUIDO`) com testes de relógio | Liberação automática da custódia na conclusão (F09, ADR33); repasse real fora do escopo |
 | RN15 / UC04 | Avaliação de 1 a 5, concluída, única, imutável, em até 7 dias; comentário até 500 | API e frontend persistentes (`review`), média com 1 decimal e resposta única do profissional até 200 caracteres | — |
 | RN16 / UC05 | Admin gerencia categorias/usuários; suspensão preserva histórico | API/React gerenciam usuários/categorias; suspensão bloqueia token/login e preserva histórico; alterações auditadas (`F04`) | Avisos externos (`F07`); exclusão definitiva fora desta entrega |
 | RN17 / UC05 | Denúncias, moderação e exportação CSV | API/React persistem denúncias de serviços/avaliações, relato/cópia textual, decisão fundamentada e auditoria; CSV local deriva de dados reais (`F05`) | Anexos (`F06`) e avisos externos (`F07`) |
 | RN18 / protótipo | Demandas, propostas e aceite | API e frontend persistentes (`demand` + `proposal`), unicidade de proposta pendente e aceite gerando `contract` em `ACEITO` (`F08`) | — |
 | RN19 / protótipo | Mensagens e notificações | API/React: chat por contratação entre participantes e avisos internos persistentes com lido/não lido; mock local no modo demonstração | Envio por e-mail e tempo real (`F07`) |
-| RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | DDL `V10` (`payment` e `ledger_entry`) e `stripe-java` prontos; telas continuam simuladas com valores fictícios | Checkout sandbox, webhooks idempotentes, repasse/reembolso e conciliação (`F09`) |
+| RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Stripe Checkout em modo de teste (cartão, Pix, boleto), webhook idempotente, custódia, liberação, reembolso, carteira, saque simulado e painel de transações (`V10`, `V17`, ADR33) | Repasse real ao profissional (Stripe Connect) |
 
 ## Mudança de escopo — feed (F11)
 

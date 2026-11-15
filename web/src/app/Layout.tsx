@@ -63,7 +63,7 @@ export function Layout() {
           ['/admin/categorias', 'Categorias', BriefcaseBusiness],
           ['/admin/moderacao', 'Moderação', Shield],
           ['/admin/relatorios', 'Relatórios', ClipboardList],
-          ...(isMock ? ([['/admin/transacoes', 'Transações', Wallet]] as const) : []),
+          ['/admin/transacoes', 'Transações', Wallet],
           ['/perfil/editar', 'Minha conta', Settings],
         ] as const)
       : ([
@@ -86,11 +86,7 @@ export function Layout() {
               ] as const)),
           ['/mensagens', 'Mensagens', MessageSquare],
           ['/notificacoes', 'Notificações', Bell],
-          ...(isMock
-            ? ([
-                ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
-              ] as const)
-            : []),
+          ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
           ['/perfil', 'Meu perfil', UserRound],
           ['/ajuda', 'Ajuda', CircleHelp],
         ] as const)

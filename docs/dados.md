@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql`, `V14__email_notifications.sql`, `V15__favorite_services.sql` e `V16__feed_posts_by_freelancers.sql`.
+Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql`, `V14__email_notifications.sql`, `V15__favorite_services.sql`, `V16__feed_posts_by_freelancers.sql` e `V17__payment_flow.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V16, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V17, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -185,10 +185,13 @@ As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do rest
 
 | Tabela | Persistência e invariantes |
 |---|---|
-| `payment` | UUID; contratação, cliente e freelancer FK; provedor (`STRIPE`, `SIMULATED`); método (`PIX`, `CARD`, `BOLETO`); status (`PENDING`, `AUTHORIZED`, `PAID`, `RELEASED`, `REFUNDED`, `FAILED`, `CANCELED`); valores bruto, taxa e líquido (`gross_amount = fee_amount + net_amount`); referência externa única opcional e timestamps |
+| `payment` | UUID; contratação, cliente e freelancer FK; provedor (`STRIPE`, `SIMULATED`); método (`PIX`, `CARD`, `BOLETO`); status (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`, `REFUNDED`, `FAILED`, `CANCELED`; V17 trocou `AUTHORIZED`, nunca usado, por `PROCESSING`); valores bruto, taxa e líquido (`gross_amount = fee_amount + net_amount`); `external_reference` guarda o id da Checkout Session; V17 acrescenta `checkout_url`, `checkout_expires_at` e `provider_payment_id` (PaymentIntent, usado no reembolso). Índice único parcial `uq_payment_live`: no máximo um pagamento vivo (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`) por contratação |
 | `ledger_entry` | UUID; pagamento e contratação FK; usuário opcional FK; tipo (`CHARGE`, `PLATFORM_FEE`, `ESCROW_HOLD`, `PAYOUT_RELEASE`, `REFUND`); valor positivo; ID único de evento externo para idempotência; descrição e data |
 
-O mapeamento DDL prepara o banco para F09; os endpoints, webhooks e reconciliação com o Stripe serão integrados na próxima etapa.
+| `payment_webhook_event` (V17) | `event_id` do Stripe como chave primária, tipo e data. Inserido antes de processar: um evento repetido não gera lançamentos de novo |
+| `withdrawal` (V17) | UUID, profissional FK, valor positivo, status `SIMULATED` e data. Não guarda dados bancários nem chave Pix |
+
+Saldo do profissional = soma de `PAYOUT_RELEASE` menos a soma de `withdrawal`. Em custódia = `net_amount` dos pagamentos `PAID`. Cada pagamento confirmado gera `CHARGE` (cliente, bruto), `PLATFORM_FEE` (sem usuário) e `ESCROW_HOLD` (profissional, líquido); a conclusão gera `PAYOUT_RELEASE`; o reembolso gera `REFUND` (cliente, bruto). `PaymentService` usa SQL direto, como os salvos (ADR31, ADR33). O seed de demonstração cria pagamentos `SIMULATED` para as contratações que já começaram.
 
 O feed não duplica serviços ou demandas: uma consulta `UNION ALL` combina as três fontes e filtra autores ativos, conteúdo visível, tipo/categoria e acesso às demandas antes de contar/paginar. Índices de criação/ID apoiam a listagem de oportunidades. Ordenação é cronológica e determinística; não existe algoritmo de relevância. A consulta retorna DTO seguro e não serializa entidades/contatos privados.
 

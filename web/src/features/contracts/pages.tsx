@@ -26,6 +26,8 @@ import {
   statusTone,
 } from '../../domain/rules'
 import type { Contract, ContractStatus, Role } from '../../domain/types'
+import { useContractPayment } from '../../data/payments'
+import { ContractPaymentBox } from '../payments/pages'
 
 const actorLabel: Record<Role, string> = {
   CLIENT: 'cliente',
@@ -279,6 +281,12 @@ export function ContractDetail() {
       c.id === id &&
       (user?.role === 'ADMIN' || c.clientId === user?.id || c.freelancerId === user?.id),
   )
+  // API mode: with payments on, the freelancer starts only after the money is in escrow (F09).
+  const payment = useContractPayment(c?.id, c?.status),
+    awaitingPayment =
+      !isMock &&
+      (!payment ||
+        (payment.enabled && !['PAID', 'RELEASED'].includes(payment.payment?.status || '')))
   if (!c)
     return <Empty title={syncing ? 'Carregando contratação…' : 'Contratação não encontrada'} />
   const deadline = contractDeadline(c),
@@ -417,7 +425,8 @@ export function ContractDetail() {
               onConfirm={() => void action('CANCELADO')}
             />
           )}
-          {user?.role === 'FREELANCER' && c.status === 'ACEITO' && (
+          {!isMock && <ContractPaymentBox contract={c} state={payment} role={user?.role} />}
+          {user?.role === 'FREELANCER' && c.status === 'ACEITO' && !awaitingPayment && (
             <ConfirmButton
               className="button full"
               disabled={busy}

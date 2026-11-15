@@ -7,6 +7,7 @@ import br.com.freelancenow.api.catalog.ServiceRepository;
 import br.com.freelancenow.api.catalog.ServiceStatus;
 import br.com.freelancenow.api.common.ApiException;
 import br.com.freelancenow.api.notifications.NotificationService;
+import br.com.freelancenow.api.payments.PaymentService;
 import br.com.freelancenow.api.reviews.ReviewRepository;
 import br.com.freelancenow.api.users.Role;
 import br.com.freelancenow.api.users.User;
@@ -79,6 +80,7 @@ public class ContractService {
     private final Clock clock;
     private final AuditService audit;
     private final NotificationService notifications;
+    private final PaymentService payments;
 
     public ContractService(
             ContractRepository contracts,
@@ -89,7 +91,8 @@ public class ContractService {
             CurrentUser current,
             Clock clock,
             AuditService audit,
-            NotificationService notifications) {
+            NotificationService notifications,
+            PaymentService payments) {
         this.contracts = contracts;
         this.events = events;
         this.reviews = reviews;
@@ -99,6 +102,7 @@ public class ContractService {
         this.clock = clock;
         this.audit = audit;
         this.notifications = notifications;
+        this.payments = payments;
     }
 
     public List<ContractDtos.ContractView> list(Jwt jwt) {
@@ -200,8 +204,13 @@ public class ContractService {
                     HttpStatus.BAD_REQUEST,
                     "Informe a justificativa da decisão (até 500 caracteres).");
         var previous = c.getStatus();
+        if (previous == ContractStatus.ACEITO && r.status() == ContractStatus.EM_ANDAMENTO)
+            payments.requirePaidToStart(c);
         var now = Instant.now(clock);
         c.transitionTo(r.status(), r.comment(), now);
+        // Escrow follows the contract: concluded releases it, canceled refunds it (ADR33).
+        if (r.status() == ContractStatus.CONCLUIDO) payments.onCompleted(c, now);
+        if (r.status() == ContractStatus.CANCELADO) payments.onCanceled(c, now);
         if (u.getRole() == Role.ADMIN)
             audit.record(
                     u,
@@ -276,6 +285,7 @@ public class ContractService {
                         ContractStatus.AGUARDANDO_CONFIRMACAO, confirmCutoff);
         for (var c : expiredConfirm) {
             c.transitionTo(ContractStatus.CONCLUIDO, null, now);
+            payments.onCompleted(c, now);
             events.save(
                     new ContractEvent(
                             c,

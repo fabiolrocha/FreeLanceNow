@@ -4,6 +4,7 @@ import br.com.freelancenow.api.catalog.*;
 import br.com.freelancenow.api.contracts.*;
 import br.com.freelancenow.api.demands.*;
 import br.com.freelancenow.api.feed.*;
+import br.com.freelancenow.api.payments.PaymentService;
 import br.com.freelancenow.api.reviews.*;
 import br.com.freelancenow.api.users.*;
 
@@ -50,6 +51,7 @@ public class DemoData implements CommandLineRunner {
     private final ReviewRepository reviews;
     private final FeedPostRepository posts;
     private final PasswordEncoder passwords;
+    private final PaymentService payments;
     private final String password;
 
     public DemoData(
@@ -64,6 +66,7 @@ public class DemoData implements CommandLineRunner {
             ReviewRepository reviews,
             FeedPostRepository posts,
             PasswordEncoder passwords,
+            PaymentService payments,
             @Value("${app.seed-demo-password:}") String password) {
         this.users = users;
         this.categories = categories;
@@ -76,6 +79,7 @@ public class DemoData implements CommandLineRunner {
         this.reviews = reviews;
         this.posts = posts;
         this.passwords = passwords;
+        this.payments = payments;
         this.password = password == null ? "" : password;
     }
 
@@ -139,6 +143,34 @@ public class DemoData implements CommandLineRunner {
                 "5");
         seedDemands();
         if (freshActivity) seedActivity();
+        seedPayments();
+    }
+
+    /**
+     * Escrow history for contracts that already started, recorded as SIMULATED payments (no
+     * Stripe). Runs on every start and skips contracts that already have one, so databases
+     * seeded before F09 also get it.
+     */
+    private void seedPayments() {
+        for (var handle : List.of("ana", "pedro", "lucia")) {
+            for (var c : contracts.findByClientIdOrderByCreatedAtDesc(user(handle).getId())) {
+                // Paid between the acceptance and the start, as the real flow requires.
+                var paidAt =
+                        events.findByContractIdOrderByCreatedAtAsc(c.getId()).stream()
+                                .filter(e -> e.getStatus() == ContractStatus.EM_ANDAMENTO)
+                                .map(ContractEvent::getCreatedAt)
+                                .findFirst()
+                                .orElse(c.getCreatedAt())
+                                .minus(Duration.ofHours(2));
+                switch (c.getStatus()) {
+                    case CONCLUIDO ->
+                            payments.recordSimulated(c, true, paidAt, c.getCompletedAt());
+                    case EM_ANDAMENTO, AGUARDANDO_CONFIRMACAO ->
+                            payments.recordSimulated(c, false, paidAt, null);
+                    default -> {}
+                }
+            }
+        }
     }
 
     private User user(String handle) {
