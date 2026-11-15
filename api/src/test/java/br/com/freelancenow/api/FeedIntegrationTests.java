@@ -157,9 +157,29 @@ class FeedIntegrationTests {
         expect(403, () -> call(HttpMethod.PATCH, "/feed/posts/" + id + "/hide", null, client));
         call(HttpMethod.PATCH, "/feed/posts/" + id + "/hide", null, freelancer);
         assertFalse(items("?type=UPDATE", client).stream().anyMatch(x -> id.equals(x.get("id"))));
-        expect(400, () -> post("   ", client));
-        expect(400, () -> post("x".repeat(501), client));
-        assertNotNull(post("x".repeat(500), client).get("id"));
+        expect(400, () -> post("   ", freelancer));
+        expect(400, () -> post("x".repeat(501), freelancer));
+        assertNotNull(post("x".repeat(500), freelancer).get("id"));
+    }
+
+    @Test
+    void onlyFreelancersPublishAndClientsAreSentToDemands() {
+        var e =
+                assertThrows(
+                        HttpClientErrorException.class,
+                        () -> post("Preciso de um eletricista", client));
+        assertEquals(403, e.getStatusCode().value());
+        assertTrue(e.getResponseBodyAsString().contains("demanda"));
+        expect(403, () -> post("Aviso da equipe", admin));
+        // Posts written by clients before this rule are no longer shown.
+        db.update(
+                "INSERT INTO feed_post (id,author_id,text,created_at) VALUES"
+                        + " (?::uuid,?::uuid,'Texto antigo de cliente',now())",
+                UUID.randomUUID().toString(),
+                userId);
+        assertFalse(
+                items("?type=UPDATE", freelancer).stream()
+                        .anyMatch(x -> "Texto antigo de cliente".equals(x.get("text"))));
     }
 
     @Test
@@ -206,7 +226,9 @@ class FeedIntegrationTests {
                                 HttpMethod.POST,
                                 "/feed/posts",
                                 Map.of("text", "Não é meu", "serviceId", s.get("id")),
-                                client));
+                                register("Outro freelancer", "FREELANCER")
+                                        .get("accessToken")
+                                        .toString()));
         var p =
                 call(
                         HttpMethod.POST,
@@ -270,7 +292,8 @@ class FeedIntegrationTests {
         assertFalse(
                 items("?type=DEMAND", other).stream()
                         .anyMatch(x -> d.get("id").equals(x.get("id"))));
-        assertTrue(
+        // The author follows the demand in /demandas; the feed does not repeat it.
+        assertFalse(
                 items("?type=DEMAND", client).stream()
                         .anyMatch(x -> d.get("id").equals(x.get("id"))));
         var prop =
@@ -279,6 +302,10 @@ class FeedIntegrationTests {
                         "/demands/" + d.get("id") + "/proposals",
                         Map.of("price", 200, "days", 2, "message", "Posso fazer"),
                         freelancer);
+        // The demand reads like a project listing: who asked and how many answered.
+        var listed = call(HttpMethod.GET, "/demands/" + d.get("id"), null, freelancer);
+        assertEquals(1, ((Number) listed.get("proposalCount")).intValue());
+        assertEquals("Cliente " + prefix, listed.get("clientName"));
         call(HttpMethod.POST, "/proposals/" + prop.get("id") + "/accept", null, client);
         assertFalse(
                 items("?type=DEMAND", freelancer).stream()

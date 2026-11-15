@@ -354,6 +354,18 @@ class AuthFlowIntegrationTests {
         assertEquals(
                 401,
                 status(() -> send("PUT", "/api/v1/services/" + first + "/favorite", null, null)));
+        // Saving services belongs to hiring: freelancers get no list.
+        assertEquals(
+                403,
+                status(
+                        () ->
+                                send(
+                                        "PUT",
+                                        "/api/v1/services/" + first + "/favorite",
+                                        null,
+                                        freelaToken)));
+        assertEquals(
+                403, status(() -> send("GET", "/api/v1/users/me/favorites", null, freelaToken)));
     }
 
     private Map<String, Object> registerAs(String name, String role) {

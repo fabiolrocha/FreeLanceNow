@@ -8,6 +8,7 @@ import {
   MapPin,
   PenLine,
   Plus,
+  Search,
   ShieldCheck,
 } from 'lucide-react'
 import { useApp } from '../../app/store'
@@ -15,7 +16,7 @@ import { Avatar, CategoryIcon, Empty, ErrorMessage } from '../../components/ui'
 import { avatarUrl } from '../../data/client'
 import { feedApi } from '../../data/feed'
 import type { FeedItem, FeedPage } from '../../data/feed'
-import { money } from '../../domain/rules'
+import { money, pendingActions } from '../../domain/rules'
 import './feed.css'
 const labels = {
   UPDATE: 'Publicação',
@@ -31,15 +32,15 @@ const dates = new Intl.DateTimeFormat('pt-BR', {
 })
 // Each role opens on what it acts on: clients look for services, freelancers for open demands.
 const views = {
+  // Clients read services and professionals' posts; they state needs as demands, not posts.
   CLIENT: {
     tabs: [
+      ['', 'Tudo'],
       ['SERVICE', 'Serviços'],
       ['UPDATE', 'Publicações'],
-      ['DEMAND', 'Minhas demandas'],
-      ['', 'Tudo'],
     ],
-    subtitle: 'Encontre profissionais e acompanhe o que você precisa resolver.',
-    placeholder: 'Conte o que você precisa ou como foi um serviço…',
+    subtitle: 'Veja serviços e o trabalho dos profissionais perto de você.',
+    placeholder: '',
   },
   FREELANCER: {
     tabs: [
@@ -62,7 +63,8 @@ const views = {
   },
 }
 export function Feed() {
-  const { user, services, demands, categories, contracts, professionals, notify } = useApp()
+  const { user, services, demands, categories, contracts, professionals, proposals, notify } =
+    useApp()
   const view = views[user?.role ?? 'CLIENT']
   const [data, setData] = useState<FeedPage | null>(null),
     [type, setType] = useState(view.tabs[0][0]),
@@ -111,11 +113,11 @@ export function Feed() {
   )
   const freelancer = user.role === 'FREELANCER'
   const mine = contracts.filter((c) => c.clientId === user.id || c.freelancerId === user.id)
-  const requests = mine.filter((c) => c.freelancerId === user.id && c.status === 'PENDENTE')
+  const actions = pendingActions(user, contracts, demands, proposals)
   const pending = mine.filter((c) =>
     (freelancer
-      ? ['ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
-      : ['PENDENTE', 'ACEITO', 'EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
+      ? ['EM_ANDAMENTO', 'AGUARDANDO_CONFIRMACAO']
+      : ['PENDENTE', 'ACEITO', 'EM_ANDAMENTO']
     ).includes(c.status),
   )
   function reload() {
@@ -230,17 +232,37 @@ export function Feed() {
           <h1>Feed de trabalho</h1>
           <p>{view.subtitle}</p>
         </div>
-        {user.role !== 'ADMIN' && (
+        {user.role === 'CLIENT' && (
+          <section className="feed-surface feed-composer feed-client-cta">
+            <div className="feed-compose-input">
+              <Avatar name={user.name} src={avatarUrl(user.id, user.avatarVersion)} />
+              <div>
+                <h2>Do que você precisa?</h2>
+                <p>
+                  Descreva o serviço em uma demanda: profissionais da categoria enviam propostas e
+                  você escolhe a melhor.
+                </p>
+              </div>
+            </div>
+            <div className="feed-intents">
+              <Link className="button" to="/demandas/nova">
+                <Plus size={16} />
+                Publicar demanda
+              </Link>
+              <Link to="/servicos">
+                <Search size={16} />
+                Buscar serviços
+              </Link>
+            </div>
+          </section>
+        )}
+        {freelancer && (
           <section className="feed-surface feed-composer">
             <form onSubmit={(e) => void publish(e)}>
               <div className="feed-compose-input">
                 <Avatar name={user.name} src={avatarUrl(user.id, user.avatarVersion)} />
                 <label className="field">
-                  <span className="sr-only">
-                    {user.role === 'FREELANCER'
-                      ? 'Compartilhe seu trabalho'
-                      : 'Escreva uma publicação'}
-                  </span>
+                  <span className="sr-only">Compartilhe seu trabalho</span>
                   <textarea
                     value={text}
                     onChange={(e) => setText(e.target.value)}
@@ -290,18 +312,11 @@ export function Feed() {
               </div>
             </form>
             <div className="feed-intents">
-              <span>Tem uma oportunidade?</span>
-              {user.role === 'FREELANCER' ? (
-                <Link to="/meus-servicos/novo">
-                  <Plus size={16} />
-                  Oferecer serviço
-                </Link>
-              ) : (
-                <Link to="/demandas/nova">
-                  <Plus size={16} />
-                  Publicar demanda
-                </Link>
-              )}
+              <span>Quer ser contratado por algo novo?</span>
+              <Link to="/meus-servicos/novo">
+                <Plus size={16} />
+                Oferecer serviço
+              </Link>
             </div>
           </section>
         )}
@@ -321,7 +336,6 @@ export function Feed() {
               </button>
             ))}
           </div>
-          <span>Mais recentes</span>
         </div>
         <label className="field feed-mobile-category">
           <span>Filtrar por categoria</span>
@@ -360,7 +374,7 @@ export function Feed() {
                     {user.role === 'FREELANCER'
                       ? 'Compartilhe seu trabalho ou explore outra categoria.'
                       : user.role === 'CLIENT'
-                        ? 'Publique uma demanda ou explore outra categoria.'
+                        ? 'Explore outra categoria ou publique uma demanda para receber propostas.'
                         : 'Explore outra categoria ou outro tipo de conteúdo.'}
                   </p>
                   <button
@@ -379,7 +393,17 @@ export function Feed() {
             {data?.items.map((item) => (
               <article className="feed-surface feed-card" key={`${item.type}-${item.id}`}>
                 <header>
-                  <Avatar name={item.author.name} />
+                  <Avatar
+                    name={item.author.name}
+                    src={
+                      item.author.role === 'FREELANCER'
+                        ? avatarUrl(
+                            item.author.id,
+                            professionals.find((p) => p.id === item.author.id)?.avatarVersion,
+                          )
+                        : undefined
+                    }
+                  />
                   <div className="feed-author">
                     {item.author.role === 'FREELANCER' ? (
                       <Link to={`/profissionais/${item.author.id}`}>{item.author.name}</Link>
@@ -398,7 +422,9 @@ export function Feed() {
                   </span>
                 </header>
                 {item.type !== 'UPDATE' && <h2>{item.title}</h2>}
-                <p className="feed-text">{item.text}</p>
+                <p className={item.type === 'UPDATE' ? 'feed-text' : 'feed-text clamp'}>
+                  {item.text}
+                </p>
                 {item.category && <span className="feed-category-tag">{item.category.name}</span>}
                 {item.price != null && (
                   <div className="feed-opportunity">
@@ -484,26 +510,30 @@ export function Feed() {
         )}
       </section>
       <aside className="feed-right" aria-label="Acompanhamento e profissionais">
-        {freelancer && (
+        {user.role !== 'ADMIN' && (
           <section className="feed-surface">
             <div className="feed-section-title">
               <BriefcaseBusiness size={18} />
-              <h2>Solicitações pendentes</h2>
+              <h2>{freelancer ? 'Solicitações pendentes' : 'Precisa da sua ação'}</h2>
             </div>
-            {requests.length ? (
-              requests.slice(0, 3).map((c) => (
-                <Link key={c.id} className="feed-contract" to={`/contratacoes/${c.id}`}>
-                  <strong>{c.title}</strong>
+            {actions.length ? (
+              actions.slice(0, 3).map((a) => (
+                <Link key={a.key} className="feed-contract" to={a.to}>
+                  <strong>{a.title}</strong>
                   <small>
-                    Responder em até 48 horas <ArrowRight size={13} />
+                    {a.label} <ArrowRight size={13} />
                   </small>
                 </Link>
               ))
             ) : (
-              <p className="feed-help-text">Nenhuma solicitação aguardando sua resposta.</p>
+              <p className="feed-help-text">
+                {freelancer
+                  ? 'Nenhuma solicitação aguardando sua resposta.'
+                  : 'Nada aguardando você agora.'}
+              </p>
             )}
-            <Link className="feed-all-link" to="/solicitacoes">
-              Ver solicitações <ArrowRight size={14} />
+            <Link className="feed-all-link" to="/painel">
+              Ver meu painel <ArrowRight size={14} />
             </Link>
           </section>
         )}
@@ -517,13 +547,19 @@ export function Feed() {
               <Link key={c.id} className="feed-contract" to={`/contratacoes/${c.id}`}>
                 <strong>{c.title}</strong>
                 <small>
-                  {c.status === 'PENDENTE' ? 'Aguardando resposta' : 'Acompanhar contratação'}{' '}
+                  {c.status === 'PENDENTE'
+                    ? 'Aguardando resposta do profissional'
+                    : 'Acompanhar contratação'}{' '}
                   <ArrowRight size={13} />
                 </small>
               </Link>
             ))
           ) : (
-            <p className="feed-help-text">Suas próximas contratações aparecerão aqui.</p>
+            <p className="feed-help-text">
+              {freelancer
+                ? 'Serviços em execução aparecerão aqui.'
+                : 'Seus pedidos em andamento aparecerão aqui.'}
+            </p>
           )}
           <Link className="feed-all-link" to="/contratacoes">
             Ver contratações <ArrowRight size={14} />

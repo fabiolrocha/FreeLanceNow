@@ -45,19 +45,22 @@ public class FeedService {
     }
 
     // Visibility is applied before pagination, so counts and cards use the same authorization.
+    // Publications come only from freelancers. Open demands are opportunities for freelancers;
+    // clients follow their own demands in /demandas, so the feed does not repeat them.
     private static final String SOURCE =
             """
             FROM (
               SELECT p.id, 'UPDATE' AS type,p.author_id, 'Publicação profissional' AS title,p.text,p.created_at,
                      p.category_id,p.service_id,NULL::numeric AS price,NULL::integer AS days,NULL::varchar AS city
-              FROM feed_post p LEFT JOIN service_listing linked ON linked.id=p.service_id
+              FROM feed_post p JOIN app_user pa ON pa.id=p.author_id AND pa.role='FREELANCER'
+              LEFT JOIN service_listing linked ON linked.id=p.service_id
               WHERE NOT p.hidden AND (p.service_id IS NULL OR (linked.status='ACTIVE' AND NOT linked.moderated))
               UNION ALL
               SELECT s.id,'SERVICE',s.freelancer_id,s.title,s.description,s.created_at,s.category_id,s.id,s.price,s.delivery_days,NULL::varchar
               FROM service_listing s WHERE s.status='ACTIVE' AND NOT s.moderated
               UNION ALL
               SELECT d.id,'DEMAND',d.client_id,d.title,d.description,d.created_at,d.category_id,NULL::uuid,d.budget,d.days,d.city
-              FROM demand d WHERE d.status='OPEN' AND (:role <> 'CLIENT' OR d.client_id=:viewer)
+              FROM demand d WHERE d.status='OPEN' AND :role <> 'CLIENT'
             ) f JOIN app_user u ON u.id=f.author_id AND u.active
             LEFT JOIN category c ON c.id=f.category_id
             WHERE (:kind='' OR f.type=:kind) AND (:category='' OR f.category_id::text=:category)
@@ -112,9 +115,13 @@ public class FeedService {
     @Transactional
     public FeedDtos.Item create(Jwt jwt, FeedDtos.Create r) {
         var u = current.require(jwt);
-        if (u.getRole() == Role.ADMIN)
+        // Publications show a professional's work. Clients state what they need as a demand.
+        if (u.getRole() != Role.FREELANCER)
             throw new ApiException(
-                    HttpStatus.FORBIDDEN, "Use uma conta de cliente ou freelancer para publicar.");
+                    HttpStatus.FORBIDDEN,
+                    u.getRole() == Role.CLIENT
+                            ? "Clientes publicam o que precisam como demanda."
+                            : "Use uma conta de freelancer para publicar.");
         if (r.text().trim().isEmpty())
             throw new ApiException(HttpStatus.BAD_REQUEST, "Escreva sua publicação.");
         ServiceListing service = null;

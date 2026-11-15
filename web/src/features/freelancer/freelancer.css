@@ -1,0 +1,273 @@
+/* Freelancer listings: "Meus serviços" and the listing form. */
+
+/* Summary */
+.ms-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  flex-wrap: wrap;
+  padding: 1.1rem 1.5rem;
+}
+.ms-quota {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+.ms-quota p {
+  margin: 0 0 0.4rem;
+  font-size: 0.92rem;
+}
+.ms-quota small {
+  display: block;
+  margin-top: 0.4rem;
+}
+.ms-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: #e6eee8;
+  overflow: hidden;
+}
+.ms-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+}
+.ms-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+.ms-counts strong {
+  color: #233b32;
+}
+
+/* Listing rows */
+.ms-list {
+  display: grid;
+  gap: 1rem;
+}
+.ms-list > .panel {
+  margin: 0;
+}
+.ms-item {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr) auto;
+  gap: 1.25rem;
+  align-items: center;
+}
+.ms-item.moderated {
+  border-color: #f3cfc2;
+  background: #fffcfb;
+}
+.ms-cover {
+  width: 112px;
+  height: 84px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Zero specificity so the category colours (.eletrica, .pintura…) win. */
+:where(.ms-cover, .sf-card-visual) {
+  background: #edf5ed;
+  color: #4a8b5e;
+}
+.ms-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.ms-status {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.35rem;
+}
+.ms-body h2 {
+  font-size: 1.05rem;
+  margin: 0 0 0.2rem;
+}
+.ms-meta {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.ms-meta strong {
+  color: #233b32;
+}
+.ms-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  max-width: 640px;
+}
+.ms-item.moderated .ms-hint {
+  color: #8c3a22;
+}
+.ms-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* Listing form */
+.sf-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 720px) 300px;
+  gap: 1.5rem;
+  justify-content: center;
+  align-items: start;
+}
+.sf-layout .form-panel {
+  margin: 0;
+  max-width: none;
+}
+.sf-section + .sf-section {
+  border-top: 1px solid var(--border);
+  padding-top: 1.4rem;
+  margin-top: 0.4rem;
+}
+.sf-section > h2 {
+  font-size: 1.05rem;
+  margin-bottom: 1rem;
+}
+.sf-counter {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.sf-counter span:last-child {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+.sf-note {
+  margin: 0 0 1.15rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.sf-buttons {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+  justify-content: flex-end;
+}
+.sf-preview {
+  position: sticky;
+  top: 1.5rem;
+}
+.sf-preview > h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 0.6rem;
+}
+.sf-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.sf-card-visual {
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.sf-card-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sf-card-body {
+  padding: 0.9rem 1rem 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.sf-card-body .category-text {
+  font-size: 0.74rem;
+}
+.sf-card-title {
+  font-size: 0.98rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.sf-card-body .person > div > span {
+  display: block;
+  font-size: 0.84rem;
+}
+.sf-card-price {
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+}
+.sf-card-price strong {
+  display: block;
+  font-size: 1.1rem;
+}
+.sf-card-price small {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.sf-tips {
+  margin: 1rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  display: grid;
+  gap: 0.3rem;
+}
+
+@media (max-width: 1000px) {
+  .sf-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sf-preview {
+    position: static;
+    max-width: 360px;
+  }
+}
+@media (max-width: 760px) {
+  .ms-summary {
+    padding: 1rem 1.2rem;
+  }
+  .ms-item {
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: start;
+  }
+  .ms-cover {
+    width: 72px;
+    height: 72px;
+  }
+  .ms-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    border-top: 1px solid var(--border);
+    padding-top: 0.75rem;
+  }
+  .sf-buttons {
+    justify-content: stretch;
+  }
+  .sf-buttons > * {
+    flex: 1 1 100%;
+  }
+  .sf-preview {
+    max-width: none;
+  }
+}

@@ -25,6 +25,7 @@ import {
   money,
   reportStatusLabel,
   statusLabel,
+  pendingActions,
   ratingLabel,
   statusTone,
 } from '../../domain/rules'
@@ -445,30 +446,36 @@ export function OwnProfile() {
         <Avatar name={user.name} large src={avatarUrl(user.id, user.avatarVersion)} />
         <div>
           <h1>{user.name}</h1>
+          <p className="profile-role">
+            {user.role === 'CLIENT'
+              ? 'Cliente · contrata serviços e publica demandas'
+              : user.role === 'FREELANCER'
+                ? `Profissional${user.specialties?.length ? ` · ${user.specialties.join(', ')}` : ''}`
+                : 'Administração'}
+          </p>
           <p>{user.city || 'Localização não informada'}</p>
           {user.role === 'FREELANCER' && user.serviceArea && (
             <p className="meta">Atende em {user.serviceArea}</p>
           )}
         </div>
-        <Link className="button secondary" to="/perfil/editar">
-          Editar perfil
-        </Link>
+        <div className="row">
+          {user.role === 'FREELANCER' && (
+            <Link className="button secondary" to={`/profissionais/${user.id}`}>
+              Ver perfil público
+            </Link>
+          )}
+          <Link className="button secondary" to="/perfil/editar">
+            Editar perfil
+          </Link>
+        </div>
       </div>
       <section className="panel">
         <h2>Sobre você</h2>
-        <p>{user.bio || 'Complete seu perfil para contar um pouco sobre você.'}</p>
-        {user.role === 'FREELANCER' && (
-          <p>
-            <Link to={`/profissionais/${user.id}`}>Ver como os clientes veem seu perfil</Link>
-          </p>
-        )}
         <p>
-          Tipo de conta:{' '}
-          {user.role === 'CLIENT'
-            ? 'Cliente'
-            : user.role === 'FREELANCER'
-              ? 'Freelancer'
-              : 'Administrador'}
+          {user.bio ||
+            (user.role === 'FREELANCER'
+              ? 'Conte sua experiência e o que você faz: é o que os clientes leem antes de contratar.'
+              : 'Complete seu perfil para contar um pouco sobre você.')}
         </p>
       </section>
       {user.role !== 'ADMIN' && (
@@ -527,6 +534,15 @@ export function OwnProfile() {
           ))}
         </section>
       )}
+      {user.role !== 'ADMIN' && (
+        <section className="panel">
+          <h2>Conta</h2>
+          <div className="row">
+            <Link to="/perfil/editar">Configurações da conta</Link>
+            <Link to="/denuncias">Minhas denúncias</Link>
+          </div>
+        </section>
+      )}
     </>
   )
 }
@@ -545,6 +561,7 @@ export function Dashboard() {
   const own = contracts.filter((c) =>
     user.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user.id,
   )
+  const actions = pendingActions(user, contracts, demands, proposals)
   return (
     <>
       <PageTitle
@@ -601,6 +618,29 @@ export function Dashboard() {
           </div>
         )}
       </div>
+      <section className="panel">
+        <h2>Precisa da sua ação</h2>
+        {actions.length ? (
+          actions.slice(0, 6).map((a) => (
+            <div className="activity-row" key={a.key}>
+              <span className="activity-dot" />
+              <div>
+                <strong>{a.title}</strong>
+                <small>{a.label}</small>
+              </div>
+              <Link to={a.to} className="badge">
+                Abrir <ArrowRight size={13} />
+              </Link>
+            </div>
+          ))
+        ) : (
+          <p className="meta">
+            {user.role === 'CLIENT'
+              ? 'Nada aguardando você. Confirmações, avaliações e novas propostas aparecem aqui.'
+              : 'Nada aguardando você. Novas solicitações de clientes aparecem aqui.'}
+          </p>
+        )}
+      </section>
       <div className="dashboard-grid">
         <section className="panel">
           <div className="row between">
@@ -621,11 +661,17 @@ export function Dashboard() {
               </Link>
             </div>
           ))}
-          {!own.length && (
-            <Empty title="Seu próximo serviço começa aqui">
-              <Link to="/servicos">Encontrar um profissional</Link>
-            </Empty>
-          )}
+          {!own.length &&
+            (user.role === 'CLIENT' ? (
+              <Empty title="Seu próximo serviço começa aqui">
+                <Link to="/servicos">Encontrar um profissional</Link>
+              </Empty>
+            ) : (
+              <Empty title="Nenhuma contratação ainda">
+                <p>Publique serviços e envie propostas para as demandas abertas.</p>
+                <Link to="/demandas">Ver demandas abertas</Link>
+              </Empty>
+            ))}
         </section>
         <aside className="panel tip-panel">
           <CheckCircle2 size={28} />

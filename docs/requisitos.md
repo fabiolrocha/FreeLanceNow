@@ -23,7 +23,7 @@ Revisado em **09/11/2026**, conforme a base integrada. Referência principal: `o
 | RN17 / UC05 | Denúncias, moderação e exportação CSV | API/React persistem denúncias de serviços/avaliações, relato/cópia textual, decisão fundamentada e auditoria; CSV local deriva de dados reais (`F05`) | Anexos (`F06`) e avisos externos (`F07`) |
 | RN18 / protótipo | Demandas, propostas e aceite | API e frontend persistentes (`demand` + `proposal`), unicidade de proposta pendente e aceite gerando `contract` em `ACEITO` (`F08`) | — |
 | RN19 / protótipo | Mensagens e notificações | API/React: chat por contratação entre participantes e avisos internos persistentes com lido/não lido; mock local no modo demonstração | Envio por e-mail e tempo real (`F07`) |
-| RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Stripe Checkout em modo de teste (cartão, Pix, boleto), webhook idempotente, custódia, liberação, reembolso, carteira, saque simulado e painel de transações (`V10`, `V16`, ADR33) | Repasse real ao profissional (Stripe Connect) |
+| RN20 / pitch/HTML | Pix/cartão/boleto, carteira, custódia e saque | Stripe Checkout em modo de teste (cartão, Pix, boleto), webhook idempotente, custódia, liberação, reembolso, carteira, saque simulado e painel de transações (`V10`, `V17`, ADR33) | Repasse real ao profissional (Stripe Connect) |
 
 ## Mudança de escopo — feed (F11)
 

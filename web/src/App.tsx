@@ -214,6 +214,9 @@ export default function App() {
                 <Route path="denunciar/enviada" element={<Report />} />
                 <Route path="denuncias" element={<MyReports />} />
               </Route>
+              <Route element={<Guard roles={['CLIENT', 'FREELANCER']} />}>
+                <Route path="painel" element={<Dashboard />} />
+              </Route>
               <Route element={<Guard roles={['CLIENT']} />}>
                 <Route path="salvos" element={<SavedServices />} />
                 <Route path="servicos/:id/solicitar" element={<Request />} />
@@ -227,12 +230,15 @@ export default function App() {
                 ))}
               </Route>
               <Route element={<Guard roles={['FREELANCER']} />}>
-                <Route path="painel" element={<Dashboard />} />
                 <Route path="propostas" element={<MyProposals />} />
                 <Route path="meus-servicos" element={<MyServices />} />
                 <Route path="meus-servicos/novo" element={<ServiceForm />} />
                 <Route path="meus-servicos/:id/editar" element={<ServiceForm />} />
-                <Route path="solicitacoes" element={<ContractList requests />} />
+                {/* Requests are the "Pendentes" stage of the contract list. */}
+                <Route
+                  path="solicitacoes"
+                  element={<Navigate to="/contratacoes?filtro=pending" replace />}
+                />
                 <Route path="contratacoes/:id/concluir" element={<ContractAction />} />
                 <Route path="demandas/:id/proposta" element={<ProposalForm />} />
                 <Route path="demandas/:id/proposta/enviada" element={<ProposalForm />} />

@@ -72,14 +72,18 @@ public class DemandService {
                     case CLIENT -> demands.findByClientIdOrderByCreatedAtDesc(u.getId());
                     case FREELANCER, ADMIN -> demands.findAllByOrderByCreatedAtDesc();
                 };
-        return items.stream().map(DemandDtos.DemandView::from).toList();
+        var counts = new java.util.HashMap<UUID, Long>();
+        for (var row : proposals.countActiveByDemand()) counts.put((UUID) row[0], (Long) row[1]);
+        return items.stream()
+                .map(d -> DemandDtos.DemandView.from(d, counts.getOrDefault(d.getId(), 0L)))
+                .toList();
     }
 
     public DemandDtos.DemandView getDemand(Jwt jwt, UUID id) {
         var u = current.require(jwt);
         var d = demands.findWithDetailsById(id).orElseThrow(this::demandNotFound);
         ensureCanViewDemand(u, d);
-        return DemandDtos.DemandView.from(d);
+        return DemandDtos.DemandView.from(d, proposals.countActive(d.getId()));
     }
 
     @Transactional
@@ -101,7 +105,7 @@ public class DemandService {
                                 r.days(),
                                 r.city(),
                                 now));
-        return DemandDtos.DemandView.from(saved);
+        return DemandDtos.DemandView.from(saved, 0);
     }
 
     /** The owner edits an open demand only before anyone has answered it. */
@@ -121,7 +125,7 @@ public class DemandService {
                 r.budget(),
                 r.days(),
                 r.city());
-        return DemandDtos.DemandView.from(d);
+        return DemandDtos.DemandView.from(d, proposals.countActive(d.getId()));
     }
 
     /** Cancels an open demand and declines its pending proposals. */
@@ -141,7 +145,7 @@ public class DemandService {
                     "/propostas");
         }
         d.cancel(now);
-        return DemandDtos.DemandView.from(d);
+        return DemandDtos.DemandView.from(d, proposals.countActive(d.getId()));
     }
 
     /** The freelancer takes back a proposal the client has not decided yet. */
@@ -272,7 +276,7 @@ public class DemandService {
                 "A contratação foi criada e já está aceita.",
                 "/contratacoes/" + contract.getId());
         return new DemandDtos.ProposalAcceptance(
-                DemandDtos.DemandView.from(d),
+                DemandDtos.DemandView.from(d, proposals.countActive(d.getId())),
                 DemandDtos.ProposalView.from(p),
                 ContractDtos.ContractView.from(contract, List.of(event)));
     }

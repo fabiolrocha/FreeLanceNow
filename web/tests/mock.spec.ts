@@ -107,11 +107,9 @@ test('demanda recebe proposta, aceite gera contratação e demanda encerrada rec
   await page.getByLabel('Mensagem ao cliente').fill('Levo as tomadas novas e testo cada ponto.')
   await page.getByRole('button', { name: 'Enviar proposta' }).click()
   await expect(page.getByRole('heading', { name: 'Proposta enviada' })).toBeVisible()
+  // A pending proposal replaces the form: no second proposal for the same demand.
   await page.goto(`${demandUrl}/proposta`)
-  await page.getByLabel('Valor da proposta').fill('250')
-  await page.getByLabel('Prazo de execução').fill('2')
-  await page.getByLabel('Mensagem ao cliente').fill('Segunda proposta não deve ser aceita.')
-  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByLabel('Valor da proposta')).toHaveCount(0)
   await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
   await logout(page)
 

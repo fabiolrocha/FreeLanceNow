@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { CheckCircle2, Clock, MessageSquare, Star } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { avatarUrl, isMock } from '../../data/client'
@@ -162,15 +162,18 @@ const contractFilters: [string, string, Contract['status'][] | null][] = [
   ['dispute', 'Em disputa', ['EM_DISPUTA']],
   ['closed', 'Recusadas/canceladas', ['RECUSADO', 'CANCELADO']],
 ]
-export function ContractList({ requests = false }: { requests?: boolean }) {
+export function ContractList() {
   const { contracts, user, professionals } = useApp(),
-    [filter, setFilter] = useState('all'),
+    [params, setParams] = useSearchParams(),
+    filter = contractFilters.some(([v]) => v === params.get('filtro'))
+      ? params.get('filtro')!
+      : 'all',
     [q, setQ] = useState('')
+  const setFilter = (v: string) => setParams(v === 'all' ? {} : { filtro: v }, { replace: true })
   useFreshContracts()
-  const mine = contracts.filter(
-    (c) =>
-      (user?.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user?.id) &&
-      (!requests || c.status === 'PENDENTE'),
+  const freelancer = user?.role === 'FREELANCER'
+  const mine = contracts.filter((c) =>
+    user?.role === 'CLIENT' ? c.clientId === user.id : c.freelancerId === user?.id,
   )
   const term = q.trim().toLocaleLowerCase('pt-BR')
   const statuses = contractFilters.find(([v]) => v === filter)?.[2]
@@ -183,27 +186,26 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
   return (
     <>
       <PageTitle
-        title={requests ? 'Solicitações recebidas' : 'Minhas contratações'}
+        title="Minhas contratações"
         description={
-          requests
-            ? 'Você tem até 48 horas para responder.'
+          freelancer
+            ? 'Solicitações recebidas ficam em "Pendentes": responda em até 48 horas.'
             : 'Acompanhe cada etapa do serviço, do pedido à avaliação.'
         }
       />
-      {!requests && (
-        <div className="tabs" role="group" aria-label="Filtrar contratações">
-          {contractFilters.map(([v, label, st]) => (
-            <button
-              key={v}
-              aria-pressed={filter === v}
-              className={filter === v ? 'active' : ''}
-              onClick={() => setFilter(v)}
-            >
-              {label} ({st ? mine.filter((c) => st.includes(c.status)).length : mine.length})
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="tabs" role="group" aria-label="Filtrar contratações">
+        {contractFilters.map(([v, label, st]) => (
+          <button
+            key={v}
+            aria-pressed={filter === v}
+            className={filter === v ? 'active' : ''}
+            onClick={() => setFilter(v)}
+          >
+            {v === 'pending' && freelancer ? 'Solicitações' : label} (
+            {st ? mine.filter((c) => st.includes(c.status)).length : mine.length})
+          </button>
+        ))}
+      </div>
       {mine.length > 3 && (
         <label className="search-input">
           <span className="sr-only">Buscar contratação</span>
@@ -252,8 +254,17 @@ export function ContractList({ requests = false }: { requests?: boolean }) {
         </div>
       ) : (
         <Empty title="Nenhuma contratação nesta lista">
-          <p>Novas solicitações aparecem aqui.</p>
-          <Link to="/servicos">Explorar serviços</Link>
+          {freelancer ? (
+            <>
+              <p>Pedidos de clientes para seus serviços aparecem aqui.</p>
+              <Link to="/demandas">Ver demandas abertas</Link>
+            </>
+          ) : (
+            <>
+              <p>Ao solicitar um serviço ou aceitar uma proposta, a contratação aparece aqui.</p>
+              <Link to="/servicos">Explorar serviços</Link>
+            </>
+          )}
         </Empty>
       )}
     </>
