@@ -114,7 +114,11 @@ async function send<T>(path: string, options: RequestInit, bearer: string): Prom
   if (!res.ok) {
     const problem = await res.json().catch(() => ({}))
     const fields = Object.keys(problem.errors || {}).map((k) => fieldLabels[k] || k)
-    const detail = problem.detail || `Não foi possível concluir (${res.status}).`
+    // Server errors carry the request id so support can find the log line.
+    const requestId = res.status >= 500 ? res.headers.get('X-Request-Id') : null
+    const detail =
+      (problem.detail || `Não foi possível concluir (${res.status}).`) +
+      (requestId ? ` Código do erro: ${requestId.slice(0, 8)}.` : '')
     throw Object.assign(
       new Error(fields.length ? `${detail} Campos: ${fields.join(', ')}.` : detail),
       { status: res.status },

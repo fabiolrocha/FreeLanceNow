@@ -68,4 +68,30 @@ class AuthRateLimitIntegrationTests {
                         .exchange((req, res) -> res.getStatusCode());
         assertEquals(HttpStatusCode.valueOf(200), categories);
     }
+
+    @Test
+    void everyApiResponseCarriesARequestId() {
+        var http = RestClient.create("http://localhost:" + port);
+        var reused =
+                http.get()
+                        .uri("/api/v1/categories")
+                        .header("X-Request-Id", "render-abc12345")
+                        .exchange((req, res) -> res.getHeaders().getFirst("X-Request-Id"));
+        assertEquals("render-abc12345", reused);
+        var replaced =
+                http.get()
+                        .uri("/api/v1/categories")
+                        .header("X-Request-Id", "id com espaço")
+                        .exchange((req, res) -> res.getHeaders().getFirst("X-Request-Id"));
+        assertNotNull(replaced);
+        assertTrue(replaced.matches("[0-9a-f-]{36}"), replaced);
+        var exposed =
+                http.get()
+                        .uri("/api/v1/categories")
+                        .header("Origin", "http://localhost:5173")
+                        .exchange(
+                                (req, res) ->
+                                        res.getHeaders().getAccessControlExposeHeaders());
+        assertTrue(exposed.contains("X-Request-Id"), exposed.toString());
+    }
 }
