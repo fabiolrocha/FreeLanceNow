@@ -4,9 +4,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import br.com.freelancenow.api.catalog.*;
 import br.com.freelancenow.api.config.DemoData;
+import br.com.freelancenow.api.contracts.ContractEventRepository;
+import br.com.freelancenow.api.contracts.ContractMessageRepository;
+import br.com.freelancenow.api.contracts.ContractRepository;
 import br.com.freelancenow.api.contracts.ContractService;
 import br.com.freelancenow.api.demands.DemandRepository;
 import br.com.freelancenow.api.demands.ProposalRepository;
+import br.com.freelancenow.api.feed.FeedPostRepository;
+import br.com.freelancenow.api.reviews.ReviewRepository;
 import br.com.freelancenow.api.users.UserRepository;
 
 import org.junit.jupiter.api.*;
@@ -36,6 +41,11 @@ class ApiIntegrationTests {
     @Autowired ServiceRepository services;
     @Autowired DemandRepository demands;
     @Autowired ProposalRepository proposals;
+    @Autowired ContractRepository contractRepository;
+    @Autowired ContractEventRepository contractEvents;
+    @Autowired ContractMessageRepository contractMessages;
+    @Autowired ReviewRepository reviewRepository;
+    @Autowired FeedPostRepository feedPosts;
     @Autowired ContractService contractService;
     @Autowired PasswordEncoder passwords;
     private final String prefix = UUID.randomUUID().toString();
@@ -1257,22 +1267,47 @@ class ApiIntegrationTests {
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                14,
+                15,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
-        var seed = new DemoData(users, categories, services, demands, proposals, passwords);
+        var seed =
+                new DemoData(
+                        users,
+                        categories,
+                        services,
+                        demands,
+                        proposals,
+                        contractRepository,
+                        contractEvents,
+                        contractMessages,
+                        reviewRepository,
+                        feedPosts,
+                        passwords);
         seed.run();
         seed.run();
         assertEquals(
-                5,
+                8,
                 db.queryForObject(
                         "select count(*) from app_user where email like '%@demo.freelancenow.test'",
                         Integer.class));
         assertEquals(
-                8,
+                10,
                 db.queryForObject(
                         "select count(*) from service_listing s join app_user u on u.id ="
                                 + " s.freelancer_id where u.email like '%@demo.freelancenow.test'",
                         Integer.class));
+        assertEquals(
+                9,
+                db.queryForObject(
+                        "select count(*) from review r join app_user u on u.id = r.freelancer_id"
+                                + " where u.email like '%@demo.freelancenow.test'",
+                        Integer.class));
+        assertEquals(
+                "EM_ANDAMENTO",
+                db.queryForObject(
+                        "select c.status from contract c join app_user u on u.id = c.freelancer_id"
+                                + " where u.email = 'camila@demo.freelancenow.test' and c.status <>"
+                                + " 'CONCLUIDO'",
+                        String.class));
     }
 }
