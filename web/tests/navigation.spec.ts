@@ -52,6 +52,7 @@ test('telas por perfil renderizam em celular sem erros de execução', async ({ 
       user: 'ana' as const,
       paths: [
         ...shared,
+        '/painel',
         '/servicos/12/solicitar',
         '/demandas/nova',
         '/demandas/d1/propostas/p1/aceitar',

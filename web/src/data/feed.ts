@@ -36,9 +36,53 @@ export interface FeedSource {
 interface MockPost extends FeedItem {
   hidden?: boolean
 }
+// Same spirit as the API demo seed: professionals talking about their work.
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3600000).toISOString()
+const seedPosts = (): MockPost[] => [
+  {
+    id: 'post-rafael',
+    type: 'UPDATE',
+    author: { id: 'rafael', name: 'Rafael Andrade', role: 'FREELANCER', city: 'Ceilândia, DF' },
+    title: 'Publicação profissional',
+    text: 'Achei um vazamento atrás do azulejo usando o geofone, sem quebrar a parede inteira. Conta de água alta sem motivo aparente costuma ser isso.',
+    createdAt: hoursAgo(3),
+    category: { id: '10000000-0000-0000-0000-000000000002', name: 'Encanamento' },
+    serviceId: '15',
+    price: null,
+    days: null,
+    city: null,
+  },
+  {
+    id: 'post-juliana',
+    type: 'UPDATE',
+    author: { id: 'juliana', name: 'Juliana Prado', role: 'FREELANCER', city: 'Águas Claras, DF' },
+    title: 'Publicação profissional',
+    text: 'Agenda de dezembro aberta para limpeza pós-obra. Levo os produtos e o aspirador de pó fino.',
+    createdAt: hoursAgo(9),
+    category: { id: '10000000-0000-0000-0000-000000000003', name: 'Limpeza / diarista' },
+    serviceId: '13',
+    price: null,
+    days: null,
+    city: null,
+  },
+  {
+    id: 'post-marcos',
+    type: 'UPDATE',
+    author: { id: 'marcos', name: 'Marcos Vieira', role: 'FREELANCER', city: 'Taguatinga, DF' },
+    title: 'Publicação profissional',
+    text: 'Dica de segurança: disjuntor que desarma sempre não é defeito, é aviso. Antes de trocar, vale medir a carga do circuito.',
+    createdAt: hoursAgo(26),
+    category: { id: '10000000-0000-0000-0000-000000000001', name: 'Elétrica' },
+    serviceId: null,
+    price: null,
+    days: null,
+    city: null,
+  },
+]
 function readPosts(): MockPost[] {
   try {
-    return JSON.parse(sessionStorage.getItem('fln-feed-posts') || '[]')
+    const stored = sessionStorage.getItem('fln-feed-posts')
+    return stored ? JSON.parse(stored) : seedPosts()
   } catch {
     return []
   }
@@ -65,8 +109,12 @@ export const feedApi = {
     // Dates on legacy fixtures are deliberately fixed in this explicitly fictitious mode.
     const date = '2026-09-30T12:00:00Z'
     const items: FeedItem[] = [
+      // Same rules as the API: posts come from freelancers, open demands reach freelancers.
       ...readPosts().filter(
-        (p) => !p.hidden && (!p.serviceId || visibleServices.some((s) => s.id === p.serviceId)),
+        (p) =>
+          !p.hidden &&
+          p.author.role === 'FREELANCER' &&
+          (!p.serviceId || visibleServices.some((s) => s.id === p.serviceId)),
       ),
       ...visibleServices.map((s) => ({
         id: s.id,
@@ -82,7 +130,7 @@ export const feedApi = {
         city: s.freelancer.city,
       })),
       ...demands
-        .filter((d) => d.status === 'OPEN' && (user.role !== 'CLIENT' || d.clientId === user.id))
+        .filter((d) => d.status === 'OPEN' && user.role !== 'CLIENT')
         .map((d) => ({
           id: d.id,
           type: 'DEMAND' as const,
@@ -121,6 +169,12 @@ export const feedApi = {
   },
   async create(source: FeedSource, r: CreatePost): Promise<FeedItem> {
     if (!isMock) return request('/feed/posts', { method: 'POST', body: JSON.stringify(r) })
+    if (source.user.role !== 'FREELANCER')
+      throw new Error(
+        source.user.role === 'CLIENT'
+          ? 'Clientes publicam o que precisam como demanda.'
+          : 'Use uma conta de freelancer para publicar.',
+      )
     if (!r.text.trim() || r.text.length > 500) throw new Error('Escreva entre 1 e 500 caracteres.')
     const service = r.serviceId
       ? source.services.find(

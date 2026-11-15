@@ -180,7 +180,7 @@
 .feed-heading > span {
   color: #5e7869;
   letter-spacing: 1.3px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 .feed-heading h1 {
@@ -235,7 +235,7 @@
   margin: 0;
 }
 .feed-compose-options .field > span {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .feed-compose-options select {
@@ -263,6 +263,23 @@
 }
 .feed-intents > span {
   color: var(--muted);
+}
+/* Clients do not post: the composer becomes the way to describe a need as a demand. */
+.feed-client-cta h2 {
+  font-size: 15px;
+  margin: 2px 0 4px;
+}
+.feed-client-cta p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 12px;
+}
+.feed-client-cta .feed-intents {
+  justify-content: flex-start;
+  gap: 16px;
+}
+.feed-client-cta .feed-intents .button {
+  color: white;
 }
 .feed-intents a {
   display: flex;
@@ -335,17 +352,17 @@
 .feed-author > a,
 .feed-author > strong {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: #233b32;
 }
 .feed-author small {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
   margin-top: 3px;
 }
 .feed-kind {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 600;
   border-radius: 999px;
   padding: 4px 9px;
@@ -371,19 +388,27 @@
   line-height: 1.45;
 }
 .feed-text {
-  color: #4a5b52;
-  font-size: 13px;
-  line-height: 1.8;
+  color: #3f5047;
+  font-size: 14px;
+  line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  margin: 0 0 16px;
+  margin: 0 0 14px;
+}
+/* Listings and demands open in their own page; the card only teases the description. */
+.feed-text.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
 }
 .feed-category-tag {
   display: inline-block;
-  color: #587060;
+  color: #4d6456;
   background: #f4f7f5;
   border: 1px solid #e6ede8;
-  font-size: 10px;
+  font-size: 11px;
   padding: 3px 8px;
   border-radius: 4px;
   margin-bottom: 14px;
@@ -396,20 +421,20 @@
   background: #f5faf6;
   border: 1px solid #d7e7dc;
   border-radius: 10px;
-  padding: 12px 14px;
-  margin: 12px 0;
+  padding: 9px 14px;
+  margin: 4px 0 14px;
 }
 .feed-opportunity small {
   display: block;
-  font-size: 9px;
+  font-size: 11px;
 }
 .feed-opportunity strong {
-  font-size: 18px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
   color: #1c6541;
 }
 .feed-opportunity > span {
-  font-size: 10px;
+  font-size: 12px;
   color: var(--muted);
 }
 .feed-card footer {
@@ -492,7 +517,7 @@
   font-size: 12px;
 }
 .feed-contract small {
-  font-size: 10px;
+  font-size: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -536,7 +561,7 @@
   display: block;
 }
 .feed-professional small {
-  font-size: 10px;
+  font-size: 12px;
   display: block;
 }
 .feed-trust {
@@ -628,6 +653,6 @@
     font-size: 13px;
   }
   .feed-author small {
-    font-size: 9px;
+    font-size: 11px;
   }
 }

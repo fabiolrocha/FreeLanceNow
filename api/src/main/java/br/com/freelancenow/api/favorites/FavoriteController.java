@@ -2,6 +2,8 @@ package br.com.freelancenow.api.favorites;
 
 import br.com.freelancenow.api.auth.CurrentUser;
 import br.com.freelancenow.api.common.ApiException;
+import br.com.freelancenow.api.users.Role;
+import br.com.freelancenow.api.users.User;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +37,19 @@ public class FavoriteController {
         this.clock = clock;
     }
 
+    /** Saving services is part of hiring, so only clients keep a list. */
+    private User client(Jwt jwt) {
+        var user = current.require(jwt);
+        if (user.getRole() != Role.CLIENT)
+            throw new ApiException(
+                    HttpStatus.FORBIDDEN, "Somente clientes salvam serviços para contratar.");
+        return user;
+    }
+
     /** Newest first. Listings that are no longer active stay saved but are left out. */
     @GetMapping("/users/me/favorites")
     public Favorites list(@AuthenticationPrincipal Jwt jwt) {
-        var user = current.require(jwt);
+        var user = client(jwt);
         return new Favorites(
                 db.queryForList(
                         "select f.service_id from favorite_service f join service_listing s on s.id"
@@ -51,7 +62,7 @@ public class FavoriteController {
     @PutMapping("/services/{id}/favorite")
     @Transactional
     public ResponseEntity<Void> save(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
-        var user = current.require(jwt);
+        var user = client(jwt);
         Integer active =
                 db.queryForObject(
                         "select count(*) from service_listing where id = ? and status = 'ACTIVE'",
@@ -81,7 +92,7 @@ public class FavoriteController {
     public ResponseEntity<Void> remove(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
         db.update(
                 "delete from favorite_service where user_id = ? and service_id = ?",
-                current.require(jwt).getId(),
+                client(jwt).getId(),
                 id);
         return ResponseEntity.noContent().build();
     }

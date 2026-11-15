@@ -126,13 +126,26 @@ export function Messages() {
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     reload = useRef(reloadContracts)
-  const own = contracts.filter((c) => c.clientId === user?.id || c.freelancerId === user?.id),
+  // Ongoing work first: those are the conversations people come here for.
+  const own = contracts
+      .filter((c) => c.clientId === user?.id || c.freelancerId === user?.id)
+      .sort(
+        (a, b) =>
+          Number(['RECUSADO', 'CANCELADO', 'CONCLUIDO'].includes(a.status)) -
+          Number(['RECUSADO', 'CANCELADO', 'CONCLUIDO'].includes(b.status)),
+      ),
     selected = own.find((c) => c.id === params.get('contratacao')) || null,
     closed = !!selected && ['RECUSADO', 'CANCELADO'].includes(selected.status),
     selectedId = selected?.id
   useEffect(() => {
     void reload.current()
   }, [])
+  // On wide screens the thread sits beside the list, so open the first one instead of a blank pane.
+  const firstId = own[0]?.id
+  useEffect(() => {
+    if (!params.get('contratacao') && firstId && window.matchMedia('(min-width: 900px)').matches)
+      setParams({ contratacao: firstId }, { replace: true })
+  }, [params, firstId, setParams])
   useEffect(() => {
     if (!selectedId) return
     let active = true
@@ -196,7 +209,11 @@ export function Messages() {
           {!own.length && (
             <Empty title="Nenhuma conversa">
               <p>As conversas começam a partir de uma contratação.</p>
-              <Link to="/servicos">Encontrar um serviço</Link>
+              {user?.role === 'FREELANCER' ? (
+                <Link to="/demandas">Ver demandas abertas</Link>
+              ) : (
+                <Link to="/servicos">Encontrar um serviço</Link>
+              )}
             </Empty>
           )}
         </nav>
@@ -577,12 +594,15 @@ export function Help({ kind = 'help' }: { kind?: string }) {
             Busque um serviço, veja o perfil do profissional e envie uma solicitação com uma data
             futura. Você também pode publicar uma demanda e escolher entre as propostas recebidas.
             Depois do aceite e da execução, confirme ou conteste a entrega e avalie o profissional.
+            No feed, você acompanha serviços e o trabalho dos profissionais; o que você precisa vira
+            uma demanda, não uma publicação.
           </p>
           <h2>Para profissionais</h2>
           <p>
             Publique até 20 serviços ativos e responda às demandas da sua região. Aceite ou recuse
             solicitações em até 48 horas. Quando terminar, marque a conclusão e aguarde a
-            confirmação do cliente.
+            confirmação do cliente. No feed, publique sobre seu trabalho e encontre demandas abertas
+            da sua área.
           </p>
           <h2>Prazos</h2>
           <p>

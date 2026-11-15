@@ -32,9 +32,15 @@ public final class DemandDtos {
      */
     public record AcceptProposal(LocalDate date, @Size(max = 200) String address) {}
 
+    /**
+     * A demand as a project listing: who asked, and how many proposals it already has, so
+     * freelancers can judge the competition and clients can see the response.
+     */
     public record DemandView(
             UUID id,
             UUID clientId,
+            String clientName,
+            long proposalCount,
             String title,
             String description,
             UUID categoryId,
@@ -45,10 +51,12 @@ public final class DemandDtos {
             DemandStatus status,
             Instant createdAt,
             Instant closedAt) {
-        public static DemandView from(Demand d) {
+        public static DemandView from(Demand d, long proposalCount) {
             return new DemandView(
                     d.getId(),
                     d.getClient().getId(),
+                    d.getClient().getName(),
+                    proposalCount,
                     d.getTitle(),
                     d.getDescription(),
                     d.getCategory().getId(),

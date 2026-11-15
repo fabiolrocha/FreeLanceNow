@@ -7,6 +7,7 @@ import type {
   ProposalStatus,
   ReportStatus,
   Role,
+  User,
 } from './types'
 export const nowIso = () => new Date().toISOString()
 
@@ -298,4 +299,71 @@ export function compatibleDemands(
   return demands
     .filter((d) => d.status === 'OPEN' && !answered.has(d.id))
     .sort((a, b) => score(b) - score(a) || (b.createdAt || '').localeCompare(a.createdAt || ''))
+}
+export interface PendingAction {
+  key: string
+  to: string
+  title: string
+  label: string
+}
+/**
+ * What waits on this person, by role. Clients confirm, review and pick proposals; freelancers
+ * answer requests and start accepted work. Each item opens the screen where the action happens.
+ */
+export function pendingActions(
+  user: Pick<User, 'id' | 'role'>,
+  contracts: Contract[],
+  demands: Demand[],
+  proposals: Proposal[],
+  now = Date.now(),
+): PendingAction[] {
+  if (user.role === 'CLIENT') {
+    const own = contracts.filter((c) => c.clientId === user.id)
+    return [
+      ...own
+        .filter((c) => c.status === 'AGUARDANDO_CONFIRMACAO')
+        .map((c) => ({
+          key: `confirm-${c.id}`,
+          to: `/contratacoes/${c.id}`,
+          title: c.title,
+          label: 'Confirme a conclusão do serviço',
+        })),
+      ...own
+        .filter((c) => typeof c.rating !== 'number' && canReview(c.status, c.completedAt, now))
+        .map((c) => ({
+          key: `review-${c.id}`,
+          to: `/contratacoes/${c.id}/avaliar`,
+          title: c.title,
+          label: 'Avalie o profissional',
+        })),
+      ...demands
+        .filter((d) => d.clientId === user.id && d.status === 'OPEN')
+        .map((d) => ({
+          d,
+          n: proposals.filter((p) => p.demandId === d.id && p.status === 'PENDING').length,
+        }))
+        .filter(({ n }) => n > 0)
+        .map(({ d, n }) => ({
+          key: `demand-${d.id}`,
+          to: `/demandas/${d.id}`,
+          title: d.title,
+          label: n === 1 ? '1 proposta para analisar' : `${n} propostas para analisar`,
+        })),
+    ]
+  }
+  if (user.role === 'FREELANCER')
+    return contracts
+      .filter(
+        (c) => c.freelancerId === user.id && (c.status === 'PENDENTE' || c.status === 'ACEITO'),
+      )
+      .map((c) => ({
+        key: `${c.status}-${c.id}`,
+        to: `/contratacoes/${c.id}`,
+        title: c.title,
+        label:
+          c.status === 'PENDENTE'
+            ? 'Aceite ou recuse em até 48 horas'
+            : 'Inicie o serviço na data combinada',
+      }))
+  return []
 }

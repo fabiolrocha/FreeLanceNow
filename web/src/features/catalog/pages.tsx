@@ -1,6 +1,16 @@
 import { useState } from 'react'
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
-import { ArrowRight, Search, MapPin, Check, Wrench } from 'lucide-react'
+import { Link, Navigate, useLocation, useParams, useSearchParams } from 'react-router-dom'
+import {
+  ArrowRight,
+  Search,
+  MapPin,
+  Check,
+  Wrench,
+  Flag,
+  CalendarDays,
+  Clock,
+  BadgeCheck,
+} from 'lucide-react'
 import { useApp } from '../../app/store'
 import { useReviews } from '../../app/useReviews'
 import {
@@ -11,11 +21,13 @@ import {
   PageTitle,
   ReviewList,
   ServiceGrid,
+  Stars,
 } from '../../components/ui'
 import { FavoriteButton } from '../../components/FavoriteButton'
 import { money, ratingLabel } from '../../domain/rules'
 import { avatarUrl, isMock, serviceImageUrl } from '../../data/client'
 import type { Profile, Service } from '../../domain/types'
+import './catalog.css'
 
 /** Best first impression: listings with reviews and photos come before brand-new ones. */
 function featuredServices(services: Service[]) {
@@ -29,6 +41,30 @@ function featuredServices(services: Service[]) {
   const variety = ranked.filter((s) => !seen.has(s.freelancer.id) && seen.add(s.freelancer.id))
   return [...variety, ...ranked.filter((s) => !variety.includes(s))]
 }
+const days = (n: number) => `${n} ${n === 1 ? 'dia' : 'dias'}`
+const reviewsLabel = (n = 0) => `${n} ${n === 1 ? 'avaliação' : 'avaliações'}`
+/** "nov. 2026" */
+const monthYear = (iso: string) =>
+  new Date(iso)
+    .toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' })
+    .replace(' de ', ' ')
+/** Short professional line built from what the person actually offers. */
+const headline = (tags: string[]) =>
+  tags.length ? tags.join(' · ') : 'Profissional de serviços gerais'
+
+/** Stars, average and count, or a plain note while there are no reviews. */
+function RatingSummary({ rating, count }: { rating?: number | null; count?: number }) {
+  if (typeof rating !== 'number' || !count)
+    return <span className="rating-summary is-empty">Ainda sem avaliações</span>
+  return (
+    <span className="rating-summary">
+      <Stars rating={rating} />
+      <strong>{ratingLabel(rating)}</strong>
+      <span>({reviewsLabel(count)})</span>
+    </span>
+  )
+}
+
 export function Landing() {
   const { categories, services, user } = useApp()
   if (user) return <Navigate to={user.role === 'ADMIN' ? '/admin' : '/inicio'} replace />
@@ -62,7 +98,7 @@ export function Landing() {
           </div>
           <p className="hero-note">
             <Check size={16} />
-            Uma plataforma feita para clientes e profissionais.
+            Não achou o serviço? Publique uma demanda e receba propostas de profissionais.
           </p>
         </div>
         <div className="hero-board">
@@ -159,18 +195,59 @@ export function Landing() {
         <ServiceGrid services={featured.slice(0, 3)} />
       </section>
       <section className="how-section">
-        <h2>Da busca ao serviço concluído</h2>
-        <div className="how-grid">
+        <h2>Como funciona</h2>
+        <div className="audience-grid">
           {[
-            ['Encontre', 'Busque por categoria, preço ou região.'],
-            ['Solicite', 'Descreva o que precisa e combine uma data.'],
-            ['Acompanhe', 'Veja o andamento e confirme a entrega.'],
-            ['Avalie', 'Conte como foi a experiência depois da conclusão.'],
-          ].map(([t, p], i) => (
-            <div key={t}>
-              <span>{i + 1}</span>
-              <h3>{t}</h3>
-              <p>{p}</p>
+            {
+              title: 'Para quem precisa de um serviço',
+              lead: 'Contrate um anúncio pronto ou descreva o que precisa.',
+              steps: [
+                ['Encontre', 'Busque por categoria, preço ou região e compare perfis.'],
+                [
+                  'Solicite ou publique uma demanda',
+                  'Peça o serviço direto ao profissional ou receba propostas.',
+                ],
+                ['Acompanhe e avalie', 'Confirme a entrega e conte como foi a experiência.'],
+              ],
+              cta: (
+                <Link className="button" to="/servicos">
+                  Encontrar serviços
+                </Link>
+              ),
+            },
+            {
+              title: 'Para quem oferece serviços',
+              lead: 'Mostre seu trabalho para quem está perto de você.',
+              steps: [
+                ['Crie seu perfil', 'Apresente sua experiência e a região onde atende.'],
+                [
+                  'Ofereça seus serviços',
+                  'Publique anúncios e envie propostas para demandas abertas.',
+                ],
+                ['Execute e seja avaliado', 'Cada trabalho concluído fortalece sua reputação.'],
+              ],
+              cta: (
+                <Link className="button secondary" to="/cadastro?tipo=freelancer">
+                  Oferecer meus serviços
+                </Link>
+              ),
+            },
+          ].map((a) => (
+            <div className="audience-card" key={a.title}>
+              <h3>{a.title}</h3>
+              <p>{a.lead}</p>
+              <ol>
+                {a.steps.map(([t, d], i) => (
+                  <li key={t}>
+                    <span aria-hidden="true">{i + 1}</span>
+                    <div>
+                      <strong>{t}</strong>
+                      <p>{d}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+              {a.cta}
             </div>
           ))}
         </div>
@@ -189,7 +266,7 @@ export function Landing() {
 }
 const PAGE_SIZE = 12
 export function SearchServices() {
-  const { services, categories } = useApp(),
+  const { services, categories, user } = useApp(),
     [params, setParams] = useSearchParams()
   const [maxPrice, setMaxPrice] = useState(''),
     [minRating, setMinRating] = useState(''),
@@ -234,6 +311,25 @@ export function SearchServices() {
       change('pagina', '')
     }
   }
+  function clear() {
+    setParams({})
+    setCity('')
+    setMaxPrice('')
+    setMinRating('')
+  }
+  // Clients (and visitors, after signing up) can describe the job instead of picking a listing.
+  const demandCta =
+    !user || user.role === 'CLIENT' ? (
+      <div className="demand-cta">
+        <div>
+          <strong>Não encontrou o que precisa?</strong>
+          <p>Publique uma demanda e receba propostas de profissionais da sua região.</p>
+        </div>
+        <Link className="button secondary" to={user ? '/demandas/nova' : '/cadastro'}>
+          Publicar uma demanda
+        </Link>
+      </div>
+    ) : null
   return (
     <>
       <PageTitle
@@ -244,15 +340,7 @@ export function SearchServices() {
         <aside className="filter-panel">
           <div className="row between">
             <h2>Filtros</h2>
-            <button
-              className="text-button"
-              onClick={() => {
-                setParams({})
-                setCity('')
-                setMaxPrice('')
-                setMinRating('')
-              }}
-            >
+            <button className="text-button" onClick={clear}>
               Limpar
             </button>
           </div>
@@ -347,22 +435,18 @@ export function SearchServices() {
                   </button>
                 </nav>
               )}
+              {demandCta}
             </>
           ) : (
-            <Empty title="Nenhum serviço encontrado">
-              <p>Amplie a faixa de preço, tente outro termo ou limpe os filtros.</p>
-              <button
-                className="button secondary"
-                onClick={() => {
-                  setParams({})
-                  setCity('')
-                  setMaxPrice('')
-                  setMinRating('')
-                }}
-              >
-                Limpar filtros
-              </button>
-            </Empty>
+            <>
+              <Empty title="Nenhum serviço encontrado">
+                <p>Amplie a faixa de preço, tente outro termo ou limpe os filtros.</p>
+                <button className="button secondary" onClick={clear}>
+                  Limpar filtros
+                </button>
+              </Empty>
+              {demandCta}
+            </>
           )}
         </div>
       </div>
@@ -373,6 +457,7 @@ export function ServiceDetail() {
   const { id } = useParams(),
     { services, user } = useApp(),
     reviews = useReviews('service', id),
+    specialties = useSpecialties(),
     s = services.find((x) => x.id === id)
   if (!s)
     return (
@@ -380,6 +465,12 @@ export function ServiceDetail() {
         <Link to="/servicos">Voltar à busca</Link>
       </Empty>
     )
+  const seller = s.freelancer,
+    own = user?.id === seller.id,
+    canHire = !user || user.role === 'CLIENT',
+    tags = specialties(seller),
+    others = services.filter((x) => x.freelancer.id === seller.id && x.id !== s.id).slice(0, 3),
+    firstName = seller.name.split(' ')[0]
   return (
     <>
       <p className="breadcrumb">
@@ -397,9 +488,14 @@ export function ServiceDetail() {
           )}
           <small className="category-text">{s.category.name}</small>
           <h1>{s.title}</h1>
-          <p>
-            <MapPin size={16} /> {s.freelancer.city}
-          </p>
+          <ul className="detail-facts">
+            <li>
+              <MapPin size={16} aria-hidden="true" /> {seller.city || 'Localização não informada'}
+            </li>
+            <li>
+              <Clock size={16} aria-hidden="true" /> {days(s.deliveryDays)} para execução
+            </li>
+          </ul>
           <h2>Sobre o serviço</h2>
           <p>{s.description}</p>
           <h2>Antes de contratar</h2>
@@ -411,55 +507,80 @@ export function ServiceDetail() {
           </h2>
           <ReviewList reviews={reviews} showService={false} />
         </article>
-        <aside className="panel booking-panel">
-          <strong className="big-price">{money(s.price)}</strong>
-          <p>
-            Valor estimado · {s.deliveryDays} {s.deliveryDays === 1 ? 'dia' : 'dias'} para execução
-          </p>
-          {(!user || user.role === 'CLIENT') && (
-            <>
-              <Link className="button full" to={`/servicos/${s.id}/solicitar`}>
-                Solicitar serviço
-              </Link>
-              <FavoriteButton service={s} wide />
-              <small>O profissional tem até 48 horas para responder.</small>
-            </>
-          )}
-          {user?.id === s.freelancer.id && (
-            <Link className="button secondary full" to={`/meus-servicos/${s.id}/editar`}>
-              Editar meu anúncio
-            </Link>
-          )}
-          <hr />
-          <div className="person">
-            <Avatar
-              name={s.freelancer.name}
-              src={avatarUrl(s.freelancer.id, s.freelancer.avatarVersion)}
-            />
-            <div>
-              <strong>{s.freelancer.name}</strong>
-              <p>
-                {[
-                  s.freelancer.city,
-                  typeof s.freelancer.averageRating === 'number' &&
-                    `★ ${ratingLabel(s.freelancer.averageRating)} (${s.freelancer.reviewCount})`,
-                ]
-                  .filter(Boolean)
-                  .join(' · ')}
-              </p>
+        <aside className="detail-aside">
+          <section className="panel booking-panel" aria-label="Contratação">
+            <span className="booking-label">Valor estimado</span>
+            <strong className="big-price">{money(s.price)}</strong>
+            <p>
+              {days(s.deliveryDays)} para execução · o valor final é combinado com o profissional
+            </p>
+            {canHire && (
+              <>
+                <Link className="button full" to={`/servicos/${s.id}/solicitar`}>
+                  Solicitar serviço
+                </Link>
+                <FavoriteButton service={s} wide />
+                <small>O profissional tem até 48 horas para responder.</small>
+              </>
+            )}
+            {own && (
+              <>
+                <Link className="button secondary full" to={`/meus-servicos/${s.id}/editar`}>
+                  Editar meu anúncio
+                </Link>
+                <small>É assim que os clientes veem seu anúncio.</small>
+              </>
+            )}
+            {!canHire && !own && <small>Somente clientes solicitam e salvam serviços.</small>}
+          </section>
+          <section className="panel seller-card" aria-labelledby="seller-title">
+            <h2 id="seller-title">Quem faz o serviço</h2>
+            <div className="seller-head">
+              <Avatar name={seller.name} large src={avatarUrl(seller.id, seller.avatarVersion)} />
+              <div>
+                <Link className="seller-name" to={`/profissionais/${seller.id}`}>
+                  {seller.name}
+                </Link>
+                <span className="seller-city">
+                  <MapPin size={13} aria-hidden="true" />
+                  {seller.city || 'Localização não informada'}
+                </span>
+                <RatingSummary rating={seller.averageRating} count={seller.reviewCount} />
+              </div>
             </div>
-          </div>
-          <Link to={`/profissionais/${s.freelancer.id}`}>Ver perfil completo</Link>
-          {user && user.id !== s.freelancer.id && user.role !== 'ADMIN' && (
+            {tags.length > 0 && (
+              <ul className="chips" aria-label={`Especialidades de ${firstName}`}>
+                {tags.map((t) => (
+                  <li className="badge" key={t}>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link className="button secondary full" to={`/profissionais/${seller.id}`}>
+              Ver perfil completo
+            </Link>
+          </section>
+          {user && !own && user.role !== 'ADMIN' && (
             <Link
-              className="subtle-link"
+              className="subtle-link report-link"
               to={`/denunciar?type=SERVICE&id=${s.id}&alvo=${encodeURIComponent(s.title)}`}
             >
+              <Flag size={14} aria-hidden="true" />
               Denunciar anúncio
             </Link>
           )}
         </aside>
       </div>
+      {others.length > 0 && (
+        <section className="related-services">
+          <div className="section-head">
+            <h2>Outros serviços de {firstName}</h2>
+            <Link to={`/profissionais/${seller.id}`}>Ver todos no perfil</Link>
+          </div>
+          <ServiceGrid services={others} />
+        </section>
+      )}
     </>
   )
 }
@@ -474,7 +595,7 @@ function useSpecialties() {
     ].sort()
 }
 export function Professionals() {
-  const { professionals, categories } = useApp(),
+  const { professionals, categories, services } = useApp(),
     specialties = useSpecialties(),
     [q, setQ] = useState(''),
     [city, setCity] = useState(''),
@@ -484,7 +605,15 @@ export function Professionals() {
   const term = q.trim().toLowerCase(),
     town = city.trim().toLowerCase()
   const list = professionals
-    .map((p) => ({ ...p, specialties: specialties(p) }))
+    .map((p) => {
+      const offers = services.filter((s) => s.freelancer.id === p.id)
+      return {
+        ...p,
+        specialties: specialties(p),
+        offers: offers.length,
+        from: offers.length ? Math.min(...offers.map((s) => s.price)) : null,
+      }
+    })
     .filter((p) => `${p.name} ${p.bio} ${p.specialties.join(' ')}`.toLowerCase().includes(term))
     .filter((p) => !town || `${p.city} ${p.serviceArea || ''}`.toLowerCase().includes(town))
     .filter((p) => !category || p.specialties.includes(category))
@@ -498,80 +627,90 @@ export function Professionals() {
     <>
       <PageTitle
         title="Pessoas que fazem acontecer"
-        description="Conheça quem está por trás de cada serviço."
+        description="Conheça quem está por trás de cada serviço e veja onde cada profissional atende."
       />
-      <label className="search-input">
-        <Search size={20} />
-        <input
-          aria-label="Buscar profissionais"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Nome ou especialidade"
-        />
-      </label>
-      <div className="filters">
-        <Field
-          label="Cidade ou bairro"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="Taguatinga"
-        />
-        <label className="field">
-          <span>Especialidade</span>
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
-            <option value="">Todas</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+      <div className="panel pro-filters">
+        <label className="search-input">
+          <Search size={20} />
+          <input
+            aria-label="Buscar profissionais"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Nome ou especialidade"
+          />
         </label>
-        <label className="field">
-          <span>Ordenar por</span>
-          <select value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="rating">Melhor avaliados</option>
-            <option value="name">Nome</option>
-          </select>
-        </label>
+        <div className="filters">
+          <Field
+            label="Cidade ou bairro"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+            placeholder="Taguatinga"
+          />
+          <label className="field">
+            <span>Especialidade</span>
+            <select value={category} onChange={(e) => setCategory(e.target.value)}>
+              <option value="">Todas</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span>Ordenar por</span>
+            <select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <option value="rating">Melhor avaliados</option>
+              <option value="name">Nome</option>
+            </select>
+          </label>
+        </div>
       </div>
       <p className="meta" role="status">
         {list.length} {list.length === 1 ? 'profissional' : 'profissionais'}
       </p>
-      <div className="professional-list">
+      <div className="pro-directory">
         {list.slice(0, shown).map((p) => (
-          <article className="panel professional-row" key={p.id}>
-            <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
-            <div>
-              <h2>{p.name}</h2>
-              {p.specialties.length > 0 && (
-                <ul className="chips" aria-label="Especialidades">
-                  {p.specialties.map((s) => (
-                    <li className="badge" key={s}>
-                      {s}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <p>{p.bio}</p>
-              <small>
-                <MapPin size={14} />{' '}
-                {[
-                  p.serviceArea || p.city || 'Localização não informada',
-                  typeof p.averageRating === 'number'
-                    ? `★ ${ratingLabel(p.averageRating)} (${p.reviewCount})`
-                    : 'Novo na plataforma',
-                ].join(' · ')}
-              </small>
+          <article className="panel pro-card" key={p.id}>
+            <div className="pro-card-head">
+              <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
+              <div>
+                <h2>{p.name}</h2>
+                <p className="pro-card-headline">{headline(p.specialties)}</p>
+                <span className="pro-card-city">
+                  <MapPin size={13} aria-hidden="true" />
+                  {p.serviceArea
+                    ? `Atende em ${p.serviceArea}`
+                    : p.city || 'Localização não informada'}
+                </span>
+              </div>
             </div>
-            <Link className="button secondary" to={`/profissionais/${p.id}`}>
-              Ver perfil
-            </Link>
+            {p.bio && <p className="pro-card-bio">{p.bio}</p>}
+            <div className="pro-card-foot">
+              <div className="pro-card-numbers">
+                <RatingSummary rating={p.averageRating} count={p.reviewCount} />
+                <span>
+                  {p.offers
+                    ? `${p.offers} ${p.offers === 1 ? 'serviço' : 'serviços'}${p.from !== null ? ` · a partir de ${money(p.from)}` : ''}`
+                    : 'Nenhum serviço ativo'}
+                </span>
+              </div>
+              <Link
+                className="button secondary"
+                to={`/profissionais/${p.id}`}
+                aria-label={`Ver perfil de ${p.name}`}
+              >
+                Ver perfil
+              </Link>
+            </div>
           </article>
         ))}
       </div>
       {list.length > shown && (
-        <button className="button secondary" onClick={() => setShown(shown + PROFESSIONALS_PAGE)}>
+        <button
+          className="button secondary pro-more"
+          onClick={() => setShown(shown + PROFESSIONALS_PAGE)}
+        >
           Mostrar mais
         </button>
       )}
@@ -581,6 +720,7 @@ export function Professionals() {
 }
 export function ProfileDetail() {
   const { id } = useParams(),
+    { pathname } = useLocation(),
     { professionals, services, contracts, user } = useApp(),
     specialties = useSpecialties(),
     reviews = useReviews('freelancer', id),
@@ -592,65 +732,220 @@ export function ProfileDetail() {
         !['RECUSADO', 'CANCELADO'].includes(c.status),
     )
   if (!p) return <Empty title="Profissional não encontrado" />
-  const tags = specialties(p)
-  return (
-    <>
-      <div className="panel profile-cover">
-        <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
-        <div>
-          <h1>{p.name}</h1>
-          <p>
-            {typeof p.averageRating === 'number'
-              ? `★ ${ratingLabel(p.averageRating)} · ${p.reviewCount} ${p.reviewCount === 1 ? 'avaliação' : 'avaliações'}`
-              : 'Ainda sem avaliações'}
-          </p>
-          <p>
-            <MapPin size={16} /> {p.city}
-            {p.serviceArea && ` · atende em ${p.serviceArea}`}
-          </p>
-          {p.memberSince && (
-            <p className="meta">
-              Na plataforma desde{' '}
-              {new Date(p.memberSince).toLocaleDateString('pt-BR', {
-                month: 'long',
-                year: 'numeric',
-              })}
-            </p>
-          )}
-        </div>
-        {conversation ? (
-          <Link className="button secondary" to={`/mensagens?contratacao=${conversation.id}`}>
-            Enviar mensagem
+  const tags = specialties(p),
+    offers = services.filter((s) => s.freelancer.id === p.id),
+    from = offers.length ? Math.min(...offers.map((s) => s.price)) : null,
+    own = user?.id === p.id,
+    firstName = p.name.split(' ')[0],
+    hasRating = typeof p.averageRating === 'number' && !!p.reviewCount
+  const message = conversation && (
+    <Link className="button secondary" to={`/mensagens?contratacao=${conversation.id}`}>
+      Enviar mensagem
+    </Link>
+  )
+  // What the viewer can do here depends on who is looking.
+  let actions = null
+  if (!user)
+    actions = (
+      <Link className="button" to="/login" state={{ from: pathname }}>
+        Entrar para solicitar
+      </Link>
+    )
+  else if (own)
+    actions = (
+      <>
+        <Link className="button" to="/perfil/editar">
+          Editar perfil
+        </Link>
+        <Link className="button secondary" to="/meus-servicos">
+          Gerenciar serviços
+        </Link>
+      </>
+    )
+  else if (user.role === 'CLIENT')
+    actions = (
+      <>
+        {offers.length === 1 ? (
+          <Link className="button" to={`/servicos/${offers[0].id}/solicitar`}>
+            Solicitar serviço
           </Link>
         ) : (
-          user?.role === 'CLIENT' && (
-            <a className="button secondary" href="#servicos-oferecidos">
-              Solicite um serviço para conversar
+          offers.length > 1 && (
+            <a className="button" href="#servicos-oferecidos">
+              Solicitar serviço
             </a>
           )
         )}
-      </div>
-      <section className="panel">
-        <h2>Sobre o profissional</h2>
-        <p>{p.bio || 'O profissional ainda não escreveu sua apresentação.'}</p>
-        {tags.length > 0 && (
-          <ul className="chips" aria-label="Especialidades">
-            {tags.map((s) => (
-              <li className="badge" key={s}>
-                {s}
+        {message ||
+          (offers.length > 0 && (
+            <a className="button secondary" href="#servicos-oferecidos">
+              Ver serviços
+            </a>
+          ))}
+      </>
+    )
+  return (
+    <>
+      <section className="panel pro-header" aria-labelledby="pro-name">
+        <div className="pro-cover" aria-hidden="true" />
+        <div className="pro-header-body">
+          <Avatar name={p.name} large src={avatarUrl(p.id, p.avatarVersion)} />
+          <div className="pro-identity">
+            <h1 id="pro-name">{p.name}</h1>
+            <p className="pro-headline">{headline(tags)}</p>
+            <p className="pro-place">
+              <MapPin size={15} aria-hidden="true" />
+              {p.city || 'Localização não informada'}
+              {p.serviceArea && <span> · Atende em {p.serviceArea}</span>}
+            </p>
+          </div>
+          {actions && <div className="pro-actions">{actions}</div>}
+        </div>
+        <dl className="pro-stats">
+          <div>
+            <dt>Serviços ativos</dt>
+            <dd>{offers.length}</dd>
+          </div>
+          <div>
+            <dt>Avaliações</dt>
+            <dd>{p.reviewCount ?? 0}</dd>
+          </div>
+          <div>
+            <dt>Nota média</dt>
+            <dd>
+              {hasRating ? (
+                <>
+                  {ratingLabel(p.averageRating as number)}{' '}
+                  <Stars rating={p.averageRating as number} />
+                </>
+              ) : (
+                <span className="pro-stat-empty">Ainda sem avaliações</span>
+              )}
+            </dd>
+          </div>
+        </dl>
+      </section>
+      <div className="pro-layout">
+        <div className="pro-main">
+          <section className="panel">
+            <h2>Sobre o profissional</h2>
+            <p className="pro-bio">
+              {p.bio || 'O profissional ainda não escreveu sua apresentação.'}
+            </p>
+            {tags.length > 0 && (
+              <>
+                <h3>Especialidades</h3>
+                <ul className="chips" aria-label="Especialidades">
+                  {tags.map((s) => (
+                    <li className="badge green" key={s}>
+                      {s}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </section>
+          <section id="servicos-oferecidos" className="pro-services">
+            <div className="section-head">
+              <h2>Serviços oferecidos</h2>
+              {offers.length > 0 && (
+                <span className="meta">
+                  {offers.length} {offers.length === 1 ? 'anúncio ativo' : 'anúncios ativos'}
+                </span>
+              )}
+            </div>
+            {offers.length ? (
+              <ServiceGrid services={offers} />
+            ) : (
+              <p className="panel pro-none">
+                {own
+                  ? 'Você não tem anúncios ativos. Publique um serviço para aparecer aqui.'
+                  : `${firstName} não tem serviços ativos no momento.`}
+              </p>
+            )}
+          </section>
+          <section className="panel">
+            <div className="section-head">
+              <h2>Avaliações</h2>
+              {hasRating && <RatingSummary rating={p.averageRating} count={p.reviewCount} />}
+            </div>
+            <ReviewList reviews={reviews} />
+          </section>
+        </div>
+        <aside className="pro-aside">
+          <section className="panel" aria-labelledby="pro-hire">
+            {own ? (
+              <>
+                <h2 id="pro-hire">Seu perfil público</h2>
+                <p>
+                  É assim que os clientes veem você. Uma boa apresentação e anúncios com fotos
+                  ajudam na escolha.
+                </p>
+                <Link to="/meus-servicos/novo">Publicar um novo serviço</Link>
+              </>
+            ) : user && user.role !== 'CLIENT' ? (
+              <>
+                <h2 id="pro-hire">Contratação</h2>
+                <p>Somente clientes solicitam serviços aos profissionais.</p>
+              </>
+            ) : (
+              <>
+                <h2 id="pro-hire">Como contratar {firstName}</h2>
+                <ol className="pro-hire-steps">
+                  <li>Escolha um dos serviços oferecidos.</li>
+                  <li>Descreva o que precisa e sugira uma data.</li>
+                  <li>O profissional responde em até 48 horas.</li>
+                </ol>
+                {user && (
+                  <p className="pro-hire-alt">
+                    Precisa de algo diferente? <Link to="/demandas/nova">Publique uma demanda</Link>{' '}
+                    e receba propostas.
+                  </p>
+                )}
+              </>
+            )}
+          </section>
+          <section className="panel" aria-labelledby="pro-facts">
+            <h2 id="pro-facts">Informações</h2>
+            <ul className="pro-facts">
+              <li>
+                <MapPin size={16} aria-hidden="true" />
+                <span>
+                  <small>Cidade</small>
+                  {p.city || 'Não informada'}
+                </span>
               </li>
-            ))}
-          </ul>
-        )}
-      </section>
-      <div id="servicos-oferecidos">
-        <PageTitle title="Serviços oferecidos" />
+              {p.serviceArea && (
+                <li>
+                  <BadgeCheck size={16} aria-hidden="true" />
+                  <span>
+                    <small>Atende em</small>
+                    {p.serviceArea}
+                  </span>
+                </li>
+              )}
+              {from !== null && (
+                <li>
+                  <Wrench size={16} aria-hidden="true" />
+                  <span>
+                    <small>Serviços a partir de</small>
+                    {money(from)}
+                  </span>
+                </li>
+              )}
+              {p.memberSince && (
+                <li>
+                  <CalendarDays size={16} aria-hidden="true" />
+                  <span>
+                    <small>Na plataforma desde</small>
+                    {monthYear(p.memberSince)}
+                  </span>
+                </li>
+              )}
+            </ul>
+          </section>
+        </aside>
       </div>
-      <ServiceGrid services={services.filter((s) => s.freelancer.id === p.id)} />
-      <section className="panel">
-        <h2>Avaliações</h2>
-        <ReviewList reviews={reviews} />
-      </section>
     </>
   )
 }

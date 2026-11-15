@@ -368,6 +368,7 @@ export function Provider({ children }: { children: ReactNode }) {
       createdAt: new Date().toISOString(),
       id: crypto.randomUUID(),
       clientId: u.id,
+      clientName: u.name,
       title: r.title,
       description: r.description,
       categoryId: r.categoryId,
@@ -405,6 +406,7 @@ export function Provider({ children }: { children: ReactNode }) {
       days: r.days,
       message: r.message,
       status: 'PENDING',
+      createdAt: new Date().toISOString(),
     }
     setProposals((ps) => [...ps, created])
     return created

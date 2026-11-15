@@ -1,7 +1,6 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import {
-  Home,
   Search,
   Users,
   ClipboardList,
@@ -14,12 +13,13 @@ import {
   Settings,
   Shield,
   X,
-  Plus,
   Send,
-  Flag,
   CircleHelp,
   UserRound,
   Heart,
+  Newspaper,
+  LayoutDashboard,
+  Store,
 } from 'lucide-react'
 import { useApp } from './store'
 import { useUnreadCount } from './useUnread'
@@ -67,15 +67,15 @@ export function Layout() {
           ['/perfil/editar', 'Minha conta', Settings],
         ] as const)
       : ([
-          ['/inicio', 'Início', Home],
+          // One entry per destination. Account settings and own reports live in "Meu perfil".
+          ['/inicio', 'Feed', Newspaper],
+          ['/painel', 'Meu painel', LayoutDashboard],
           ...(user?.role === 'FREELANCER'
             ? ([
-                ['/painel', 'Meu painel', Home],
-                ['/solicitacoes', 'Solicitações', ClipboardList],
                 ['/contratacoes', 'Contratações', BriefcaseBusiness],
                 ['/demandas', 'Demandas abertas', ClipboardList],
                 ['/propostas', 'Minhas propostas', Send],
-                ['/meus-servicos', 'Meus serviços', Plus],
+                ['/meus-servicos', 'Meus serviços', Store],
               ] as const)
             : ([
                 ['/servicos', 'Buscar serviços', Search],
@@ -91,9 +91,7 @@ export function Layout() {
                 ['/carteira', user?.role === 'FREELANCER' ? 'Carteira' : 'Pagamentos', Wallet],
               ] as const)
             : []),
-          ['/denuncias', 'Minhas denúncias', Flag],
           ['/perfil', 'Meu perfil', UserRound],
-          ['/perfil/editar', 'Configurações da conta', Settings],
           ['/ajuda', 'Ajuda', CircleHelp],
         ] as const)
   return (
@@ -113,18 +111,18 @@ export function Layout() {
           {social && (
             <>
               <NavLink to="/inicio">Feed</NavLink>
+              <NavLink to="/painel">Painel</NavLink>
               {user.role === 'FREELANCER' ? (
                 <>
                   <NavLink to="/demandas">Demandas abertas</NavLink>
-                  <NavLink to="/propostas">Minhas propostas</NavLink>
+                  <NavLink to="/contratacoes">Contratações</NavLink>
                   <NavLink to="/meus-servicos">Meus serviços</NavLink>
-                  <NavLink to="/solicitacoes">Solicitações</NavLink>
                 </>
               ) : (
                 <>
                   <NavLink to="/servicos">Serviços</NavLink>
-                  <NavLink to="/profissionais">Profissionais</NavLink>
                   <NavLink to="/demandas">Minhas demandas</NavLink>
+                  <NavLink to="/contratacoes">Contratações</NavLink>
                 </>
               )}
             </>
@@ -223,7 +221,7 @@ export function Layout() {
           )}
           {loading ? (
             <p role="status" className="loading">
-              Carregando serviços…
+              Carregando…
             </p>
           ) : (
             <Outlet />

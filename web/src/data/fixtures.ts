@@ -111,6 +111,8 @@ export const demands: Demand[] = [
   {
     id: 'd1',
     clientId: 'ana',
+    clientName: 'Ana Lopes',
+    proposalCount: 1,
     title: 'Quadro de distribuição vive desarmando',
     description: 'Preciso de avaliação do quadro e troca dos disjuntores se necessário.',
     categoryId: categories[0].id,
@@ -118,6 +120,36 @@ export const demands: Demand[] = [
     days: 2,
     city: 'Taguatinga, DF',
     status: 'OPEN',
+    createdAt: new Date(Date.now() - 5 * 3600000).toISOString(),
+  },
+  {
+    id: 'd2',
+    clientId: 'pedro',
+    clientName: 'Pedro Martins',
+    proposalCount: 0,
+    title: 'Instalar ventiladores de teto em três quartos',
+    description:
+      'Já tenho os ventiladores. Preciso da instalação com interruptor separado para a luz e o motor.',
+    categoryId: categories[0].id,
+    budget: 450,
+    days: 1,
+    city: 'Taguatinga, DF',
+    status: 'OPEN',
+    createdAt: new Date(Date.now() - 26 * 3600000).toISOString(),
+  },
+  {
+    id: 'd3',
+    clientId: 'lucia',
+    clientName: 'Lúcia Ferreira',
+    proposalCount: 0,
+    title: 'Vazamento embaixo da pia da cozinha',
+    description: 'Goteira constante no sifão e no registro. Quero orçamento com troca das peças.',
+    categoryId: categories[1].id,
+    budget: 200,
+    days: 1,
+    city: 'Ceilândia, DF',
+    status: 'OPEN',
+    createdAt: new Date(Date.now() - 50 * 3600000).toISOString(),
   },
 ]
 export const proposals: Proposal[] = [
@@ -130,5 +162,6 @@ export const proposals: Proposal[] = [
     days: 2,
     message: 'Avalio o quadro na mesma visita. Material será orçado separadamente.',
     status: 'PENDING',
+    createdAt: new Date(Date.now() - 2 * 3600000).toISOString(),
   },
 ]

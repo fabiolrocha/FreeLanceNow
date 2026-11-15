@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql`, `V14__email_notifications.sql` e `V15__favorite_services.sql`.
+Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql`, `V14__email_notifications.sql`, `V15__favorite_services.sql` e `V16__feed_posts_by_freelancers.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V15, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V16, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -191,3 +191,7 @@ As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do rest
 O mapeamento DDL prepara o banco para F09; os endpoints, webhooks e reconciliação com o Stripe serão integrados na próxima etapa.
 
 O feed não duplica serviços ou demandas: uma consulta `UNION ALL` combina as três fontes e filtra autores ativos, conteúdo visível, tipo/categoria e acesso às demandas antes de contar/paginar. Índices de criação/ID apoiam a listagem de oportunidades. Ordenação é cronológica e determinística; não existe algoritmo de relevância. A consulta retorna DTO seguro e não serializa entidades/contatos privados.
+
+## Publicações do feed só de freelancers (V16)
+
+Publicações do feed mostram o trabalho de profissionais. Clientes descrevem o que precisam como demanda. A API recusa `POST /feed/posts` de cliente e administrador (403), e a listagem considera apenas publicações de autores `FREELANCER`. `V16` marca como ocultas as publicações antigas de clientes, sem apagá-las, para preservar o histórico de denúncias. Serviços salvos (`/users/me/favorites` e `/services/{id}/favorite`) também passam a ser exclusivos de clientes.

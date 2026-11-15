@@ -7,6 +7,7 @@ import {
   contractDeadline,
   imageSelectionError,
   MAX_IMAGE_BYTES,
+  pendingActions,
   safeRedirect,
   validPassword,
 } from './rules'
@@ -148,5 +149,30 @@ describe('Gestão de demandas (cliente e freelancer)', () => {
     expect(
       compatibleDemands(demands, proposals, 'f', ['e'], 'Taguatinga, DF').map((d) => d.id),
     ).toEqual(['b', 'e', 'a'])
+  })
+})
+
+describe('Ações pendentes por papel', () => {
+  it('cliente confirma, avalia e analisa propostas; freelancer responde e inicia', async () => {
+    const { contracts, demands, proposals } = await import('../data/fixtures')
+    const client = pendingActions({ id: 'ana', role: 'CLIENT' }, contracts, demands, proposals)
+    expect(client.map((a) => a.to)).toEqual([
+      '/contratacoes/103',
+      '/contratacoes/104/avaliar',
+      '/demandas/d1',
+    ])
+    expect(client[2].label).toBe('1 proposta para analisar')
+    const freela = pendingActions(
+      { id: 'marcos', role: 'FREELANCER' },
+      contracts,
+      demands,
+      proposals,
+    )
+    expect(freela.map((a) => a.to)).toEqual(['/contratacoes/101'])
+    expect(pendingActions({ id: 'x', role: 'ADMIN' }, contracts, demands, proposals)).toEqual([])
+    // Another person's contracts and demands never become someone else's task.
+    expect(pendingActions({ id: 'bruno', role: 'CLIENT' }, contracts, demands, proposals)).toEqual(
+      [],
+    )
   })
 })

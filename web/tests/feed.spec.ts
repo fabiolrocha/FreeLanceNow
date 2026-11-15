@@ -25,12 +25,16 @@ test('feed publica entre contas, filtra oportunidades e permite retirar apenas o
   await page.getByRole('button', { name: 'Sair da conta' }).click()
   await page.goto('/login')
   await loginAs(page, 'ana')
-  await expect(page.getByRole('button', { name: 'Serviços', exact: true })).toHaveAttribute(
+  await expect(page.getByRole('button', { name: 'Tudo', exact: true })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
   await expect(page.getByRole('heading', { name: 'Conheça profissionais' })).toBeVisible()
   await expect(page.getByRole('heading', { name: 'Solicitações pendentes' })).toHaveCount(0)
+  // Clients describe needs as demands: no free-text composer, no own demands repeated here.
+  await expect(page.getByLabel('Compartilhe seu trabalho')).toHaveCount(0)
+  await expect(page.getByRole('button', { name: 'Minhas demandas', exact: true })).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Precisa da sua ação' })).toBeVisible()
   await page.getByRole('button', { name: 'Publicações', exact: true }).click()
   await expect(card).toBeVisible()
   await expect(card.getByRole('button', { name: 'Retirar publicação' })).toHaveCount(0)

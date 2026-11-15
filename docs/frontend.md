@@ -30,14 +30,14 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Recuperação de acesso | `/recuperar-senha`, `/redefinir-senha?token=` | Público | API: pede o link por e-mail e define nova senha; mock apenas registra o pedido |
 | Confirmação de e-mail | `/verificar-email?token=` | Público | API: confirma o e-mail do link do cadastro. Enquanto não confirmado, um aviso no topo oferece "Reenviar link" (ADR25) |
 | Perfil/edição/complemento | `/perfil`, `/perfil/editar`, `/perfil/completar` | Autenticado | Mock ou API. Edição traz foto (só API), área de atendimento (freelancer), troca de senha e exclusão de conta com senha |
-| Minhas denúncias | `/denuncias` | Autenticado | Mock ou API: estado da análise e nota da moderação |
+| Minhas denúncias | `/denuncias` (atalho em Meu perfil) | Autenticado | Mock ou API: estado da análise e nota da moderação |
 | Feed | `/inicio` | Cliente/freelancer (admin vai para `/admin/usuarios`) | Mock ou API: publicações, serviços e demandas autorizadas, filtros e paginação. Rótulos do compositor e textos laterais mudam por perfil |
-| Dashboard de gestão | `/painel` | Freelancer | Mock ou API: métricas reais, propostas pendentes e demandas abertas compatíveis (categorias dos anúncios e cidade primeiro) |
+| Painel | `/painel` | Cliente/freelancer | Mock ou API: "Precisa da sua ação" por papel (cliente confirma, avalia e analisa propostas; freelancer responde e inicia), métricas, contratações e, para o freelancer, demandas compatíveis |
 | Minhas propostas | `/propostas` | Freelancer | Mock ou API: filtro por situação, retirada de pendentes e link para a contratação gerada |
 | Gestão de serviços | `/meus-servicos`, `/meus-servicos/novo`, `/meus-servicos/:id/editar` | Freelancer | Mock ou API; rascunho ou inativo nunca contratado pode ser excluído |
 | Solicitação | `/servicos/:id/solicitar` | Cliente | Mock ou API (`F01`) |
 | Solicitação enviada | `/contratacoes/:id/enviada` | Autenticado | Confirmação visual do envio, com link para o detalhe da contratação (`F01`) |
-| Lista/detalhe | `/contratacoes`, `/contratacoes/:id`, `/solicitacoes` (freelancer) | Lista: cliente/freelancer; detalhe: participantes e admin | Mock ou API (`F01`). O detalhe mostra o próximo passo conforme status e perfil (`nextStepHint`) |
+| Lista/detalhe | `/contratacoes` (filtro `?filtro=pending` = solicitações do freelancer; `/solicitacoes` redireciona), `/contratacoes/:id` | Lista: cliente/freelancer; detalhe: participantes e admin | Mock ou API (`F01`). O detalhe mostra o próximo passo conforme status e perfil (`nextStepHint`) |
 | Conclusão/confirmar/contestar | `/contratacoes/:id/concluir`, `/contratacoes/:id/confirmar`, `/contratacoes/:id/contestar` | Freelancer conclui; cliente confirma/contesta | Mock ou API (`F01`) |
 | Avaliação e resposta | `/contratacoes/:id/avaliar`, `/contratacoes/:id/avaliacao-publicada`; resposta no detalhe | Cliente avalia; freelancer responde | Mock ou API (`F03`) |
 | Disputa | `/contratacoes/:id/disputa` | Participantes | Motivo, quem abriu e decisão da administração lidos do histórico; sem disputa, a tela informa isso |
@@ -65,9 +65,9 @@ Financeiro continua simulado (F09). Recuperação de senha usa a API e o e-mail 
 
 | Rotas/estados | Reutilização atual |
 |---|---|
-| `/inicio` e `/painel` | `Feed` e `Dashboard` separados; `/painel` exige freelancer |
+| `/inicio` e `/painel` | `Feed` e `Dashboard` separados; ambos para cliente e freelancer. Só freelancer publica no feed; o cliente recebe atalho para publicar demanda |
 | `/perfil/editar` e `/perfil/completar` | Mesmo `EditProfile`, com título contextual |
-| `/contratacoes` e `/solicitacoes` | `ContractList` com contexto de solicitações para freelancer |
+| `/contratacoes` e `/solicitacoes` | `ContractList` única; a aba "Pendentes" aparece como "Solicitações" para o freelancer |
 | Ações de contratação e `/contratacoes/:id/disputa` | `ContractAction` varia conforme URL e estado |
 | Proposta/enviada, pagamento/confirmado, saque/enviado e denúncia/enviada | Estados de confirmação no mesmo componente do respectivo fluxo |
 | `/ajuda`, `/termos`, `/privacidade` | `Help` com textos/contextos diferentes |
@@ -110,3 +110,22 @@ Inputs têm rótulo, formulários validação básica, feedback com `role=alert/
 A identidade oficial foi consolidada em `web/public/images/logo.svg` e `web/public/favicon.svg`. No modo API, o formulário de serviço envia até 5 fotos JPG/PNG (prévia local, validação de tipo/tamanho/quantidade e remoção); a primeira vira capa no card e a galeria aparece no detalhe. No modo mock, o envio fica desativado e o ícone da categoria continua. Ver [imagens.md](imagens.md).
 
 No painel do freelancer, anúncios removidos pela moderação exibem esse estado e não oferecem edição/republicação. Relatórios administrativos exportam dados reais filtrados; a auditoria mostra até 200 eventos recentes sem filtro de período. Filtros de período dos totais usam a data de criação dos registros, não a data de cada transição.
+
+## Papéis na navegação (revisão de 15/11/2026)
+
+Cada papel vê apenas o que faz sentido para ele, com uma entrada por destino.
+
+- **Cliente** (solicita serviços): Feed, Meu painel, Buscar serviços, Profissionais, Serviços salvos, Minhas demandas, Contratações, Mensagens, Notificações, Meu perfil e Ajuda. No feed, lê serviços e publicações de profissionais; não publica texto livre. O espaço de publicação vira o atalho "Publicar demanda". O feed não repete as demandas do próprio cliente, que ficam em Minhas demandas.
+- **Freelancer** (oferece e executa serviços): Feed, Meu painel, Contratações (com a aba Solicitações), Demandas abertas, Minhas propostas, Meus serviços, Mensagens, Notificações, Meu perfil e Ajuda. Só o freelancer publica no feed, com vínculo opcional a um serviço próprio.
+- **Configurações da conta** e **Minhas denúncias** saem do menu principal e ficam em Meu perfil, que já levava à edição.
+
+## Repaginação por papel (15/11/2026)
+
+Referências como LinkedIn e plataformas de freelas serviram só de inspiração; o produto mantém a identidade de serviços gerais e pessoas próximas.
+
+- **Demandas como projetos:** cartões com orçamento, prazo, local, tempo desde a publicação, nome do cliente e número de propostas (`clientName` e `proposalCount` em `DemandView`). O detalhe tem coluna lateral por papel. O cliente compara propostas com ordenação (valor, prazo, avaliação, recência) e diferença em relação ao orçamento. O freelancer com proposta pendente vê a proposta enviada em vez de um novo formulário.
+- **Perfil profissional público:** cabeçalho com especialidades, cidade e números reais (serviços ativos, avaliações, nota), ação de contratar só para cliente, serviços, avaliações e informações.
+- **Anúncio:** cartão de contratação e cartão de quem faz o serviço separados; "Outros serviços" do mesmo profissional.
+- **Meus serviços e formulário:** resumo de limite de anúncios ativos, estado explicado por anúncio e prévia do cartão na busca.
+- **Feed:** cliente abre em "Tudo" (publicações de profissionais e serviços), com atalho para publicar demanda; descrições de serviço e demanda resumidas no cartão.
+- **Mensagens:** em telas largas, a primeira conversa abre automaticamente; conversas em andamento aparecem primeiro.

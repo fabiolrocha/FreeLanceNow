@@ -1359,6 +1359,29 @@ a.hero-service:hover h2 {
 .profile-cover .button {
   margin-left: auto;
 }
+.profile-cover > .row {
+  margin-left: auto;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.profile-cover > .row .button {
+  margin-left: 0;
+}
+.profile-cover .profile-role {
+  color: var(--green);
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+@media (max-width: 640px) {
+  .profile-cover {
+    flex-wrap: wrap;
+  }
+  .profile-cover > .row {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
 .category-thumb {
   width: 65px;
   height: 65px;

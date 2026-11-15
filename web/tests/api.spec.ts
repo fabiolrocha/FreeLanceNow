@@ -190,11 +190,9 @@ test('demanda publicada recebe proposta, aceite gera contratação no PostgreSQL
   await page.getByRole('button', { name: 'Enviar proposta' }).click()
   await expect(page.getByRole('heading', { name: 'Proposta enviada' })).toBeVisible()
 
+  // A pending proposal replaces the form: no second proposal for the same demand.
   await page.goto(`${demandUrl}/proposta`)
-  await page.getByLabel('Valor da proposta').fill('260')
-  await page.getByLabel('Prazo de execução').fill('2')
-  await page.getByLabel('Mensagem ao cliente').fill('Segunda proposta duplicada.')
-  await page.getByRole('button', { name: 'Enviar proposta' }).click()
+  await expect(page.getByLabel('Valor da proposta')).toHaveCount(0)
   await expect(page.getByText('Você já enviou uma proposta para esta demanda.')).toBeVisible()
   await page.getByRole('button', { name: 'Sair da conta' }).click()
 

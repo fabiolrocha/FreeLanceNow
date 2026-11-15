@@ -135,6 +135,10 @@ export interface Demand {
   createdAt?: string
   id: string
   clientId: string
+  /** Who published it; shown on the project card like a job board. */
+  clientName?: string
+  /** Proposals sent so far (withdrawn ones excluded). */
+  proposalCount?: number
   title: string
   description: string
   categoryId: string

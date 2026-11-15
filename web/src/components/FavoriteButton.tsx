@@ -11,7 +11,7 @@ import type { Service } from '../domain/types'
 export function FavoriteButton({ service, wide = false }: { service: Service; wide?: boolean }) {
   const { user, notify } = useApp(),
     { pathname } = useLocation(),
-    { ids, toggle } = useFavorites(user?.id)
+    { ids, toggle } = useFavorites(user?.role === 'CLIENT' ? user.id : undefined)
   const className = `favorite-button ${wide ? 'wide' : ''}`
   if (!user)
     return (

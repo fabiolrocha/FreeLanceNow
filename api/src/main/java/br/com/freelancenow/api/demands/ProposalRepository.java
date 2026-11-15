@@ -19,6 +19,17 @@ public interface ProposalRepository extends JpaRepository<Proposal, UUID> {
 
     boolean existsByDemandId(UUID demandId);
 
+    /** Proposals still in play or decided; withdrawn ones do not count. */
+    @Query(
+            "select count(p) from Proposal p where p.demand.id = :demandId"
+                    + " and p.status <> br.com.freelancenow.api.demands.ProposalStatus.WITHDRAWN")
+    long countActive(UUID demandId);
+
+    @Query(
+            "select p.demand.id, count(p) from Proposal p where p.status <>"
+                    + " br.com.freelancenow.api.demands.ProposalStatus.WITHDRAWN group by p.demand.id")
+    List<Object[]> countActiveByDemand();
+
     @EntityGraph(attributePaths = {"demand", "freelancer"})
     List<Proposal> findByDemandIdOrderByCreatedAtAsc(UUID demandId);
 
