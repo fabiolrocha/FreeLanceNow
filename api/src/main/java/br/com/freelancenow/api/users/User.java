@@ -57,6 +57,9 @@ public class User {
     @Column(name = "email_verified_at")
     private Instant emailVerifiedAt;
 
+    @Column(name = "email_notifications", nullable = false)
+    private boolean emailNotifications = true;
+
     protected User() {}
 
     public User(String name, String email, String passwordHash, String phone, Role role) {
@@ -164,6 +167,14 @@ public class User {
 
     public boolean isEmailVerified() {
         return emailVerifiedAt != null;
+    }
+
+    public boolean isEmailNotifications() {
+        return emailNotifications;
+    }
+
+    public void setEmailNotifications(boolean emailNotifications) {
+        this.emailNotifications = emailNotifications;
     }
 
     /** Keeps the first confirmation time; confirming twice changes nothing. */

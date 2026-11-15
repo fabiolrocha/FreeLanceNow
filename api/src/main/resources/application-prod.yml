@@ -28,6 +28,9 @@ app:
   # Links in e-mails must point to the published frontend; no localhost fallback in production.
   web-base-url: ${PUBLIC_APP_URL}
   seed-demo: false
+  rate-limit:
+    # POSTs per minute and client address on /api/v1/auth/** (login, cadastro, links de e-mail).
+    auth-per-minute: ${AUTH_RATE_LIMIT_PER_MINUTE:20}
   resend:
     # Without a verified domain, Resend only delivers from onboarding@resend.dev to the account owner.
     from-email: ${RESEND_FROM_EMAIL:FreeLanceNow <onboarding@resend.dev>}

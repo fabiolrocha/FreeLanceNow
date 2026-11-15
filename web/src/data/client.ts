@@ -251,6 +251,12 @@ export const client = {
       body: JSON.stringify({ token: verifyToken }),
     })
   },
+  async notificationSettings(emailNotifications: boolean): Promise<User> {
+    return request('/users/me/notification-settings', {
+      method: 'PUT',
+      body: JSON.stringify({ emailNotifications }),
+    })
+  },
   async resendVerification(): Promise<void> {
     if (isMock) return
     await request('/users/me/email-verification', { method: 'POST' })

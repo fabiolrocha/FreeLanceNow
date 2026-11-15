@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.oauth2.server.resource.authentication.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.*;
+import org.springframework.web.filter.CorsFilter;
 
 import java.time.Clock;
 import java.util.Arrays;
@@ -66,7 +67,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain security(HttpSecurity http) throws Exception {
+    SecurityFilterChain security(HttpSecurity http, AuthRateLimitFilter rateLimit)
+            throws Exception {
         var converter = new JwtAuthenticationConverter();
         var roles = new JwtGrantedAuthoritiesConverter();
         roles.setAuthoritiesClaimName("role");
@@ -74,6 +76,7 @@ public class SecurityConfig {
         converter.setJwtGrantedAuthoritiesConverter(roles);
         return http.csrf(csrf -> csrf.disable())
                 .cors(cors -> {})
+                .addFilterAfter(rateLimit, CorsFilter.class)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         a ->
@@ -123,8 +126,13 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * The method name matters: Spring Security's {@code cors()} looks the source up by the bean
+     * name {@code corsConfigurationSource}. Under any other name no CORS headers are sent, which
+     * the Vite proxy hides locally but breaks a frontend on another origin (Vercel).
+     */
     @Bean
-    CorsConfigurationSource cors(@Value("${app.cors-origins}") String origins) {
+    CorsConfigurationSource corsConfigurationSource(@Value("${app.cors-origins}") String origins) {
         var config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList(origins.split(",")));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));

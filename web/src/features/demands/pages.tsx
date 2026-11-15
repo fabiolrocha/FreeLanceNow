@@ -12,6 +12,7 @@ import {
   money,
   proposalStatusLabel,
   ratingLabel,
+  statusTone,
 } from '../../domain/rules'
 import type { Demand, Proposal } from '../../domain/types'
 
@@ -28,9 +29,7 @@ function useDemandMeta() {
 }
 function StatusBadge({ d }: { d: Demand }) {
   return (
-    <span className={`badge ${d.status === 'OPEN' ? 'green' : ''}`}>
-      {demandStatusLabel[d.status]}
-    </span>
+    <span className={`badge status ${statusTone(d.status)}`}>{demandStatusLabel[d.status]}</span>
   )
 }
 
@@ -306,7 +305,7 @@ function ProposalCard({
         {p.createdAt && ` · enviada em ${dateLabel(p.createdAt)}`}
       </p>
       <p>{p.message}</p>
-      <span className={`badge ${p.status === 'ACCEPTED' ? 'green' : ''}`}>
+      <span className={`badge status ${statusTone(p.status)}`}>
         {proposalStatusLabel[p.status]}
       </span>
       {p.status === 'ACCEPTED' && p.contractId && (
@@ -565,7 +564,7 @@ export function MyProposals() {
           const demandStatus = p.demandStatus || d?.status
           return (
             <article className="panel" key={p.id}>
-              <span className={`badge ${p.status === 'ACCEPTED' ? 'green' : ''}`}>
+              <span className={`badge status ${statusTone(p.status)}`}>
                 {proposalStatusLabel[p.status]}
               </span>
               <h2>

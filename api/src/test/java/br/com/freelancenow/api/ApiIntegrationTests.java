@@ -1257,7 +1257,7 @@ class ApiIntegrationTests {
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                13,
+                14,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var seed = new DemoData(users, categories, services, demands, proposals, passwords);

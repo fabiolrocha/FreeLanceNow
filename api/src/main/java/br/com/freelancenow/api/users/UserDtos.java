@@ -20,6 +20,7 @@ public final class UserDtos {
             String serviceArea,
             Long avatarVersion,
             boolean emailVerified,
+            boolean emailNotifications,
             Instant createdAt) {
         public static Me from(User u) {
             return new Me(
@@ -33,6 +34,7 @@ public final class UserDtos {
                     u.getServiceArea(),
                     u.getAvatarVersion(),
                     u.isEmailVerified(),
+                    u.isEmailNotifications(),
                     u.getCreatedAt());
         }
     }
@@ -41,6 +43,8 @@ public final class UserDtos {
      * What anyone can see about a freelancer. {@code specialties} are the categories of the
      * freelancer's active services; it is empty where it is not computed (e.g. inside a service).
      */
+    public record NotificationSettings(@NotNull Boolean emailNotifications) {}
+
     public record PublicProfile(
             UUID id,
             String name,

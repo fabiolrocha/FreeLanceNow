@@ -25,6 +25,7 @@ import {
   reportStatusLabel,
   statusLabel,
   ratingLabel,
+  statusTone,
 } from '../../domain/rules'
 import type { OwnReport, Service } from '../../domain/types'
 
@@ -132,6 +133,7 @@ export function EditProfile() {
       </form>
       {!pathname.endsWith('completar') && (
         <>
+          {!isMock && user.role !== 'ADMIN' && <EmailNotices />}
           <ChangePassword />
           {user.role !== 'ADMIN' && <DeleteAccount />}
         </>
@@ -287,7 +289,7 @@ export function MyReports() {
       <div className="stack">
         {items?.map((r) => (
           <article className="panel" key={r.id}>
-            <span className={`badge ${r.status === 'REMOVED' ? 'green' : ''}`}>
+            <span className={`badge status ${statusTone(r.status)}`}>
               {reportStatusLabel[r.status]}
             </span>
             <h2>{r.targetTitle}</h2>
@@ -317,6 +319,42 @@ export function MyReports() {
         </Empty>
       )}
     </>
+  )
+}
+/** Turns the e-mail copies of important notices on or off; chat messages stay in the app. */
+function EmailNotices() {
+  const { user, updateUser, notify } = useApp()
+  const [busy, setBusy] = useState(false),
+    [error, setError] = useState('')
+  if (!user) return null
+  const on = user.emailNotifications !== false
+  async function toggle() {
+    setBusy(true)
+    setError('')
+    try {
+      updateUser(await client.notificationSettings(!on))
+      notify(on ? 'Avisos por e-mail desligados.' : 'Avisos por e-mail ligados.')
+    } catch (err) {
+      setError((err as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <section className="form-panel" aria-labelledby="notices-title">
+      <h2 id="notices-title">Avisos por e-mail</h2>
+      <p>
+        Receba por e-mail as novas solicitações, propostas, mudanças nas contratações, prazos e
+        avaliações. As mensagens do chat ficam só no aplicativo.
+        {user.emailVerified === false &&
+          ' Os e-mails começam depois que você confirmar seu endereço.'}
+      </p>
+      <label className="check">
+        <input type="checkbox" checked={on} disabled={busy} onChange={() => void toggle()} />
+        <span>Enviar avisos para {user.email}</span>
+      </label>
+      <ErrorMessage message={error} />
+    </section>
   )
 }
 function ChangePassword() {
@@ -553,7 +591,7 @@ export function Dashboard() {
                   {user.role === 'CLIENT' ? c.freelancerName : c.clientName} · {money(c.price)}
                 </small>
               </div>
-              <Link to={`/contratacoes/${c.id}`} className="badge">
+              <Link to={`/contratacoes/${c.id}`} className={`badge status ${statusTone(c.status)}`}>
                 {statusLabel[c.status]} <ArrowRight size={13} />
               </Link>
             </div>

@@ -10,6 +10,7 @@ Revisado em **14/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/auth/password/forgot` | Público | 202 sempre; envia link de redefinição se a conta existir e estiver ativa |
 | POST | `/auth/password/reset` | Público (token do e-mail) | 204; define nova senha |
 | POST | `/auth/email/verify` | Público (token do e-mail) | 204; confirma o e-mail da conta (ADR25); link inválido ou expirado retorna 400 |
+| PUT | `/users/me/notification-settings` | Autenticado | Body `{emailNotifications}`; 200 + perfil. Liga/desliga a cópia por e-mail dos avisos (ADR28) |
 | POST | `/users/me/email-verification` | Autenticado | 202; reenvia o link de confirmação; 429 se pedido há menos de 60 s; nada faz se já confirmado |
 | GET | `/users/me` | Autenticado | Perfil privado |
 | PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade, bio e área de atendimento (`serviceArea`, até 150, opcional) |
@@ -108,6 +109,12 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 **Recuperação de senha.** `POST /auth/password/forgot` recebe `{email}` e sempre responde 202, sem revelar se a conta existe. Pedidos repetidos para o mesmo e-mail em menos de 60 s são ignorados. A conta ativa recebe um link `PUBLIC_APP_URL/redefinir-senha?token=...` válido por 30 minutos. `POST /auth/password/reset` recebe `{token, password}`, aplica a regra de senha forte e responde 204; link inválido, expirado ou já usado retorna 400.
 
 **Confirmação de e-mail.** O cadastro envia, em segundo plano, um link `PUBLIC_APP_URL/verificar-email?token=...` válido por 24 horas (`app.jwt.verify-ttl-seconds`). O token tem propósito `email-verify` e carrega o e-mail de destino, então não confirma outro endereço. `POST /auth/email/verify` recebe `{token}` e responde 204, também quando o e-mail já estava confirmado. `GET /users/me` e a sessão trazem `emailVerified`. A confirmação não bloqueia o uso da conta (ADR25).
+
+**Avisos por e-mail.** Cada aviso interno, exceto mensagem de chat, também vai por e-mail depois do commit da ação, em segundo plano, para contas ativas com e-mail confirmado e `emailNotifications` ligado (padrão). O e-mail traz o texto do aviso e o link para a tela. Falha no envio não desfaz a ação nem o aviso interno (ADR28).
+
+**Limite de tentativas.** Com `app.rate-limit.auth-per-minute` maior que zero (perfil `prod`: 20), cada endereço de origem pode fazer esse número de POSTs por minuto em `/auth/**`. Acima disso a API responde 429 com `Retry-After: 60` e a mensagem "Muitas tentativas em pouco tempo..." (ADR29).
+
+**CORS.** Só as origens de `CORS_ORIGINS` recebem `Access-Control-Allow-Origin`; outra origem recebe 403. O bean precisa se chamar `corsConfigurationSource` para o Spring Security usá-lo.
 
 **Troca de senha.** `PUT /users/me/password` recebe `{currentPassword, newPassword}`. Senha atual errada ou nova senha igual à atual retornam 400. A resposta é uma sessão nova.
 

@@ -16,6 +16,7 @@ import org.springframework.web.client.RestClient;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
@@ -306,6 +307,105 @@ class AuthFlowIntegrationTests {
         send("POST", "/api/v1/users/me/email-verification", null, access);
         var again = CapturingMail.SENT.poll(1, TimeUnit.SECONDS);
         assertTrue(again == null || !again.to().equals(email));
+    }
+
+    private Map<String, Object> registerAs(String name, String role) {
+        return send(
+                "POST",
+                "/api/v1/auth/register",
+                Map.of(
+                        "name", name,
+                        "email", prefix + name + "@example.test",
+                        "password", "Strong12345",
+                        "phone", "61999990000",
+                        "role", role,
+                        "acceptedTerms", true),
+                null);
+    }
+
+    /** Waits for an e-mail copy of a notice to this address; null when none arrives. */
+    private MailSender.Mail noticeFor(String email, int seconds) throws InterruptedException {
+        var deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(seconds);
+        while (System.nanoTime() < deadline) {
+            var sent = CapturingMail.SENT.poll(200, TimeUnit.MILLISECONDS);
+            if (sent != null
+                    && sent.to().equals(email)
+                    && sent.text().contains("Abra no FreeLanceNow")) return sent;
+        }
+        return null;
+    }
+
+    private String serviceFor(String token, String title) {
+        return send(
+                        "POST",
+                        "/api/v1/services",
+                        Map.of(
+                                "title", title,
+                                "description", "Serviço para testar avisos por e-mail.",
+                                "categoryId", "10000000-0000-0000-0000-000000000001",
+                                "price", 150,
+                                "deliveryDays", 1,
+                                "status", "ACTIVE"),
+                        token)
+                .get("id")
+                .toString();
+    }
+
+    private String request(String serviceId, String token) {
+        return send(
+                        "POST",
+                        "/api/v1/contracts",
+                        Map.of(
+                                "serviceId", serviceId,
+                                "date", LocalDate.now().plusDays(3).toString(),
+                                "description", "Pedido para testar avisos por e-mail.",
+                                "address", "Asa Sul"),
+                        token)
+                .get("id")
+                .toString();
+    }
+
+    @Test
+    void importantNoticesAreEmailedOnlyToConfirmedAddressesThatKeepThemOn()
+            throws InterruptedException {
+        var freela = registerAs("fnotice", "FREELANCER");
+        var freelaToken = freela.get("accessToken").toString();
+        var freelaEmail = prefix + "fnotice@example.test";
+        send(
+                "POST",
+                "/api/v1/auth/email/verify",
+                Map.of("token", verifyTokenFor(freelaEmail)),
+                null);
+        var first = serviceFor(freelaToken, "Aviso por e-mail " + prefix);
+        var second = serviceFor(freelaToken, "Aviso desligado " + prefix);
+        var clientToken = registerAs("cnotice", "CLIENT").get("accessToken").toString();
+        var clientEmail = prefix + "cnotice@example.test";
+
+        // Confirmed freelancer with notices on: the request arrives by e-mail with a link to it.
+        var contractId = request(first, clientToken);
+        var notice = noticeFor(freelaEmail, 5);
+        assertNotNull(notice, "request notice was not e-mailed");
+        assertTrue(notice.subject().startsWith("Nova solicitação"));
+        assertTrue(notice.text().contains("/contratacoes/" + contractId));
+
+        // Unconfirmed client: the acceptance is only an in-app notice.
+        send(
+                "PATCH",
+                "/api/v1/contracts/" + contractId + "/status",
+                Map.of("status", "ACEITO"),
+                freelaToken);
+        assertNull(noticeFor(clientEmail, 1));
+
+        // With notices turned off, the freelancer stops receiving copies.
+        var me =
+                send(
+                        "PUT",
+                        "/api/v1/users/me/notification-settings",
+                        Map.of("emailNotifications", false),
+                        freelaToken);
+        assertEquals(false, me.get("emailNotifications"));
+        request(second, clientToken);
+        assertNull(noticeFor(freelaEmail, 1));
     }
 
     @Test

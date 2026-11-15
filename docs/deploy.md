@@ -52,7 +52,7 @@ O plano free suspende o compute ocioso; a primeira conexão depois de uma pausa 
 2. Para enviar a qualquer destinatário, verifique um domínio próprio em **Domains** e use um remetente desse domínio, por exemplo `FreeLanceNow <no-reply@seu-dominio>` (`RESEND_FROM_EMAIL`).
 3. Sem domínio verificado, o padrão do perfil `prod` é `onboarding@resend.dev`, que o Resend só entrega para o e-mail dono da conta Resend. Serve para teste, não para usuários reais.
 
-A API envia dois e-mails: confirmação de cadastro (`/verificar-email`, 24 h, ADR25) e redefinição de senha (`/redefinir-senha`, 30 min). Os dois usam `PUBLIC_APP_URL`. Sem `RESEND_API_KEY`, a API sobe, registra um aviso e não envia nada.
+A API envia confirmação de cadastro (`/verificar-email`, 24 h, ADR25), redefinição de senha (`/redefinir-senha`, 30 min) e cópias dos avisos importantes (ADR28), todos com links baseados em `PUBLIC_APP_URL`. No plano gratuito do Resend, acompanhe a cota diária de envios. Sem `RESEND_API_KEY`, a API sobe, registra um aviso e não envia nada.
 
 ## 3. Render (API)
 
@@ -92,6 +92,10 @@ Variáveis `VITE_*` entram no bundle e ficam visíveis no navegador. Nunca coloq
 
 3. Depois do primeiro deploy, copie a URL de produção para `CORS_ORIGINS` e `PUBLIC_APP_URL` no Render. Previews da Vercel têm outra origem: inclua-a em `CORS_ORIGINS` só se for usar o Preview contra esta API.
 
+### Backup e restauração
+
+O Neon guarda histórico para restauração em um ponto no tempo (a janela depende do plano). Antes de uma demonstração ou mudança grande, crie uma **branch** do banco no painel: ela é uma cópia instantânea que pode virar o banco da API se algo der errado (troque `DB_URL` para o host da branch). Para uma cópia fora do Neon, use `pg_dump` com a URL de conexão direta. Teste a restauração numa branch, nunca sobre o banco em uso.
+
 ## 5. Primeiro administrador
 
 Não existe admin padrão (ADR16). Para criar o primeiro:
@@ -107,7 +111,8 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 - Pedir redefinição de senha e concluir pelo link do e-mail.
 - Publicar um anúncio com foto como profissional, solicitar como cliente, aceitar, iniciar, concluir, confirmar e avaliar.
 - Entrar como admin: usuários, moderação, relatórios e auditoria.
-- No console do navegador, nenhum erro de CORS.
+- No console do navegador, nenhum erro de CORS. Até a correção do bean `corsConfigurationSource` (15/11) a API não enviava cabeçalhos CORS; o proxy do Vite escondia isso localmente.
+- Errar a senha mais de 20 vezes em um minuto retorna "Muitas tentativas".
 
 ## Variáveis por ambiente
 
@@ -120,6 +125,7 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 | `RESEND_API_KEY` | Render | Não, mas sem ela nenhum e-mail sai |
 | `RESEND_FROM_EMAIL` | Render | Não (padrão `onboarding@resend.dev`) |
 | `DB_POOL_SIZE` | Render | Não (padrão 5) |
+| `AUTH_RATE_LIMIT_PER_MINUTE` | Render | Não (padrão 20 no `prod`; 0 desliga) |
 | `JWT_REFRESH_TTL_SECONDS` | Render | Não (padrão 30 dias) |
 | `ADMIN_BOOTSTRAP_*` | Render | Só no provisionamento do primeiro admin |
 | `VITE_DATA_MODE`, `VITE_API_BASE_URL` | Vercel | Sim |
