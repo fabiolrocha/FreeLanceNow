@@ -11,6 +11,9 @@ Revisado em **14/11/2026**, conforme controllers, DTOs e serviços da base integ
 | POST | `/auth/password/reset` | Público (token do e-mail) | 204; define nova senha |
 | POST | `/auth/email/verify` | Público (token do e-mail) | 204; confirma o e-mail da conta (ADR25); link inválido ou expirado retorna 400 |
 | PUT | `/users/me/notification-settings` | Autenticado | Body `{emailNotifications}`; 200 + perfil. Liga/desliga a cópia por e-mail dos avisos (ADR28) |
+| GET | `/users/me/favorites` | Autenticado | 200 `{serviceIds}`, mais recentes primeiro; anúncios inativos ficam de fora |
+| PUT | `/services/{id}/favorite` | Autenticado | 204; salvar de novo não duplica. 404 se o anúncio não existe ou não está ativo; 409 acima de 200 salvos |
+| DELETE | `/services/{id}/favorite` | Autenticado | 204, mesmo se o anúncio não estava salvo |
 | POST | `/users/me/email-verification` | Autenticado | 202; reenvia o link de confirmação; 429 se pedido há menos de 60 s; nada faz se já confirmado |
 | GET | `/users/me` | Autenticado | Perfil privado |
 | PUT | `/users/me` | Autenticado | Atualiza nome, telefone, cidade, bio e área de atendimento (`serviceArea`, até 150, opcional) |
@@ -115,6 +118,8 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 **Limite de tentativas.** Com `app.rate-limit.auth-per-minute` maior que zero (perfil `prod`: 20), cada endereço de origem pode fazer esse número de POSTs por minuto em `/auth/**`. Acima disso a API responde 429 com `Retry-After: 60` e a mensagem "Muitas tentativas em pouco tempo..." (ADR29).
 
 **CORS.** Só as origens de `CORS_ORIGINS` recebem `Access-Control-Allow-Origin`; outra origem recebe 403. O bean precisa se chamar `corsConfigurationSource` para o Spring Security usá-lo.
+
+**Id da requisição.** Toda resposta em `/api/**` traz `X-Request-Id`: o valor recebido no mesmo cabeçalho, quando tem de 8 a 64 caracteres seguros (o Render envia um), ou um UUID novo. O id entra em todas as linhas de log da requisição e o CORS o expõe ao navegador; em erro 5xx o frontend mostra os 8 primeiros caracteres como "Código do erro" (ADR30).
 
 **Troca de senha.** `PUT /users/me/password` recebe `{currentPassword, newPassword}`. Senha atual errada ou nova senha igual à atual retornam 400. A resposta é uma sessão nova.
 

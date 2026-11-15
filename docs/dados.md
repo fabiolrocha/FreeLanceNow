@@ -1,6 +1,6 @@
 # Modelo de dados
 
-Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql` e `V14__email_notifications.sql`.
+Revisado em **14/11/2026**. Esquema implementado nas migrações `V1__initial_schema.sql`, `V2__categories.sql`, `V3__contracts.sql`, `V4__reviews.sql`, `V5__demands_and_proposals.sql`, `V6__administration_and_moderation.sql`, `V7__content_reports.sql`, `V8__feed.sql`, `V9__messages_and_notifications.sql`, `V10__payments.sql`, `V11__service_images.sql`, `V12__profiles_and_demand_management.sql`, `V13__email_verification.sql`, `V14__email_notifications.sql` e `V15__favorite_services.sql`.
 
 ```mermaid
 erDiagram
@@ -108,7 +108,7 @@ Valores monetários trafegam como número JSON e são `BigDecimal` no Java; o ba
 
 ## Próximas migrações propostas
 
-Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V14, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
+Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A equipe combina a próxima numeração livre após V15, sem pessoa fixa para migrações ou revisão. Não alterar arquivos já aplicados. A disputa atual fica em `contract` e suas transições em `contract_event`; os eventos administrativos também são registrados em `audit_event`. Uma entidade separada de disputa permanece como possível evolução.
 
 | Entidade futura | Vínculos e invariantes |
 |---|---|
@@ -174,6 +174,12 @@ As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do rest
 | Tabela/coluna | Persistência e invariantes |
 |---|---|
 | `app_user.email_notifications` | Booleano, padrão verdadeiro. Desligado, a conta continua recebendo avisos internos, mas não as cópias por e-mail (ADR28) |
+
+## Serviços salvos (V15)
+
+| Tabela/coluna | Persistência e invariantes |
+|---|---|
+| `favorite_service` | Par `user_id` + `service_id` como chave primária, com `created_at`. Os dois lados apagam em cascata; a exclusão de conta também remove os salvos do titular. Sem entidade JPA: o controller usa SQL direto (ADR31) |
 
 ## Pagamentos e livro financeiro (V10)
 
