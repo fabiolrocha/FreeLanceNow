@@ -8,8 +8,10 @@ import br.com.freelancenow.api.reviews.*;
 import br.com.freelancenow.api.users.*;
 
 import org.springframework.boot.CommandLineRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,17 +25,19 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Demo data for local development and presentations. Every account uses the password listed in
- * docs/contas-desenvolvimento.md. Accounts are created once. Contract history, reviews and feed
- * posts are created only when the demo client Pedro does not exist yet, so restarts never
- * duplicate them.
+ * Demo data for local development and presentations, enabled with SEED_DEMO=true. Locally every
+ * account uses the password listed in docs/contas-desenvolvimento.md; the prod profile has no
+ * default and seeds nothing until SEED_DEMO_PASSWORD is set, so a published database never gets
+ * accounts with a password that is in the repository. Accounts are created once. Contract history,
+ * reviews and feed posts are created only when the demo client Pedro does not exist yet, so
+ * restarts never duplicate them.
  */
 @Component
-@Profile("dev")
 @ConditionalOnProperty(name = "app.seed-demo", havingValue = "true")
 public class DemoData implements CommandLineRunner {
     private static final String DOMAIN = "@demo.freelancenow.test";
     private static final ZoneId BRAZIL = ZoneId.of("America/Sao_Paulo");
+    private static final Logger log = LoggerFactory.getLogger(DemoData.class);
 
     private final UserRepository users;
     private final CategoryRepository categories;
@@ -46,6 +50,7 @@ public class DemoData implements CommandLineRunner {
     private final ReviewRepository reviews;
     private final FeedPostRepository posts;
     private final PasswordEncoder passwords;
+    private final String password;
 
     public DemoData(
             UserRepository users,
@@ -58,7 +63,8 @@ public class DemoData implements CommandLineRunner {
             ContractMessageRepository messages,
             ReviewRepository reviews,
             FeedPostRepository posts,
-            PasswordEncoder passwords) {
+            PasswordEncoder passwords,
+            @Value("${app.seed-demo-password:}") String password) {
         this.users = users;
         this.categories = categories;
         this.services = services;
@@ -70,11 +76,16 @@ public class DemoData implements CommandLineRunner {
         this.reviews = reviews;
         this.posts = posts;
         this.passwords = passwords;
+        this.password = password == null ? "" : password;
     }
 
     @Override
     @Transactional
     public void run(String... args) {
+        if (password.length() < 8) {
+            log.warn("SEED_DEMO ligado sem SEED_DEMO_PASSWORD (mín. 8 caracteres): seed ignorado.");
+            return;
+        }
         boolean freshActivity = !users.existsByEmail("pedro" + DOMAIN);
         seed("Ana Lopes", "ana", Role.CLIENT, "Taguatinga, DF", "Cliente da demonstração.", null);
         seed(
@@ -402,7 +413,7 @@ public class DemoData implements CommandLineRunner {
     private void seed(String name, String handle, Role role, String city, String bio, String cat) {
         String email = handle + DOMAIN;
         if (users.existsByEmail(email)) return;
-        var user = new User(name, email, passwords.encode("Demo12345"), "61999990000", role);
+        var user = new User(name, email, passwords.encode(password), "61999990000", role);
         user.updateProfile(
                 name, user.getPhone(), city, bio, role == Role.FREELANCER ? city + " e região" : "");
         user.markEmailVerified(user.getCreatedAt());

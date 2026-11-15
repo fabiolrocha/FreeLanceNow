@@ -26,6 +26,12 @@ public class ResendMailSender implements MailSender {
 
     @Override
     public void send(Mail mail) {
+        if (reservedTestAddress(mail.to())) {
+            // RFC 2606 reserves .test: such addresses (demo accounts) can never receive mail, and
+            // sending would only produce bounces that hurt the sender's reputation.
+            log.info("E-mail \"{}\" não enviado: endereço de teste.", mail.subject());
+            return;
+        }
         var body =
                 "{\"from\":"
                         + json(from)
@@ -56,6 +62,12 @@ public class ResendMailSender implements MailSender {
             if (e instanceof InterruptedException) Thread.currentThread().interrupt();
             log.warn("Falha ao enviar e-mail \"{}\": {}", mail.subject(), e.toString());
         }
+    }
+
+    static boolean reservedTestAddress(String to) {
+        if (to == null) return true;
+        String address = to.trim().toLowerCase(java.util.Locale.ROOT);
+        return address.endsWith(".test") || address.endsWith(".test>");
     }
 
     static String json(String value) {

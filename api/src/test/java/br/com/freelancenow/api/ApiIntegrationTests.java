@@ -1270,6 +1270,26 @@ class ApiIntegrationTests {
                 15,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
+        var withoutPassword =
+                new DemoData(
+                        users,
+                        categories,
+                        services,
+                        demands,
+                        proposals,
+                        contractRepository,
+                        contractEvents,
+                        contractMessages,
+                        reviewRepository,
+                        feedPosts,
+                        passwords,
+                        "");
+        withoutPassword.run();
+        assertEquals(
+                0,
+                db.queryForObject(
+                        "select count(*) from app_user where email like '%@demo.freelancenow.test'",
+                        Integer.class));
         var seed =
                 new DemoData(
                         users,
@@ -1282,7 +1302,8 @@ class ApiIntegrationTests {
                         contractMessages,
                         reviewRepository,
                         feedPosts,
-                        passwords);
+                        passwords,
+                        "Demo12345");
         seed.run();
         seed.run();
         assertEquals(

@@ -17,6 +17,8 @@ Use a `main` atualizada como ponto de partida. Ela já contém o marco inicial, 
 
 Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --build` para reconstruir `api` e `web` juntos. `docker compose up -d` sem `--build` reaproveita imagens antigas; `--build api` ou `--build web` atualizam só um serviço. Branches antigas de fase não são a base padrão de novas contribuições.
 
+A `web` só sobe quando o healthcheck da `api` (`/actuator/health`, o mesmo do Render) responde `UP`; a primeira inicialização com migrações pode levar alguns segundos. O Nginx local usa os mesmos cabeçalhos de segurança e o mesmo cache de `/assets` do `web/vercel.json`, com gzip, e repassa `X-Forwarded-For` para a API.
+
 ## Java fora do Docker
 
 Com JDK 21 e banco local ligado:
@@ -44,7 +46,7 @@ O Spring não carrega `.env` da raiz automaticamente quando iniciado por Maven. 
 | JWT_SECRET | API | Chave HS256 com pelo menos 32 bytes |
 | PORT / API_PORT | API / Compose | Porta interna 8081 / publicação |
 | DB_PORT / WEB_PORT | Compose | Portas host 5435 / 5173 |
-| SPRING_PROFILES_ACTIVE / SEED_DEMO | API | Seed somente no perfil dev habilitado |
+| SPRING_PROFILES_ACTIVE / SEED_DEMO / SEED_DEMO_PASSWORD | API | Seed só com `SEED_DEMO=true`; senha padrão `Demo12345` fora do `prod` |
 | ADMIN_BOOTSTRAP_ENABLED | API/Compose | Opt-in de criação inicial do ADMIN; padrão `false` |
 | ADMIN_BOOTSTRAP_EMAIL / ADMIN_BOOTSTRAP_PASSWORD / ADMIN_BOOTSTRAP_NAME | API/Compose | Credenciais privadas de criação inicial; nome padrão `Administrador`, sem e-mail/senha padrão |
 | E2E_ADMIN_EMAIL / E2E_ADMIN_PASSWORD | Testes web | Credenciais explícitas para incluir o fluxo browser administrativo em modo API |
