@@ -5,10 +5,10 @@
   font-synthesis: none;
   font-weight: 400;
   line-height: 1.6;
-  --green: #16854c;
+  --green: #137a45;
   --dark: #174b35;
   --border: #dce5de;
-  --muted: #65776b;
+  --muted: #56685c;
   --surface: #fff;
 }
 * {
@@ -477,7 +477,7 @@ hr {
 .service-visual {
   height: 150px;
   background: #e4eee4;
-  color: #44845a;
+  color: #346b48;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -489,23 +489,23 @@ hr {
 }
 .eletrica {
   background: #f0eddb;
-  color: #8b742a;
+  color: #6e5a1c;
 }
 .encanamento {
   background: #e1edf0;
-  color: #4d8190;
+  color: #3a6874;
 }
 .limpeza {
   background: #e8edf6;
-  color: #677dab;
+  color: #4c6291;
 }
 .ti {
   background: #ebe9f3;
-  color: #7d70a0;
+  color: #625686;
 }
 .pintura {
   background: #f1e5dc;
-  color: #a47c5f;
+  color: #80593d;
 }
 .service-body {
   padding: 1.15rem;
@@ -553,7 +553,7 @@ hr {
   color: #214a33;
 }
 .hero p {
-  color: #647460;
+  color: #4f604c;
   font-size: 1rem;
 }
 .hero-search {
@@ -630,7 +630,7 @@ hr {
 }
 .hero-service span {
   font-size: 0.7rem;
-  color: #78836e;
+  color: #5c6652;
 }
 .hero-service h2 {
   font-size: 1.15rem;
@@ -809,7 +809,7 @@ a.hero-service:hover h2 {
   margin-top: 2rem;
 }
 .auth-story p {
-  color: #58785e;
+  color: #476b51;
 }
 .auth-story-bottom {
   margin-top: auto;
@@ -1328,9 +1328,17 @@ td {
   .brand-icon {
     font-size: 1.35rem;
   }
-  .public-links,
-  .user-top > span:not(.avatar) {
+  .public-links {
     display: none;
+  }
+  /* The name stays as the profile link's accessible name. */
+  .user-top > span:not(.avatar) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
   .top-actions {
     margin-left: auto;
@@ -1729,4 +1737,55 @@ td {
   justify-content: center;
   align-items: center;
   margin-top: 1.25rem;
+}
+
+/* Saved services */
+.service-visual {
+  position: relative;
+}
+.favorite-button {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #3f5b47;
+  cursor: pointer;
+  transition:
+    color 0.15s,
+    border-color 0.15s;
+}
+.favorite-button:hover {
+  color: #b42318;
+  border-color: #e7b4ae;
+}
+.favorite-button.saved {
+  color: #b42318;
+}
+.favorite-button.wide {
+  position: static;
+  width: 100%;
+  height: auto;
+  margin-top: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-radius: 8px;
+  background: white;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* Links inside running text are underlined, so they do not depend on color alone (WCAG 1.4.1). */
+p a:not(.button),
+.breadcrumb a,
+.auth-switch a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

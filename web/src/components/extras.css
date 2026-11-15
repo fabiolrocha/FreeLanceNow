@@ -11,7 +11,7 @@
 .review-reply {
   border-left: 3px solid #bed4c3;
   padding-left: 0.75rem;
-  color: var(--muted, #65776b);
+  color: var(--muted, #56685c);
 }
 .deadline {
   display: flex;
@@ -43,7 +43,7 @@
   font-size: 1.4rem;
 }
 .profile-stats span {
-  color: var(--muted, #65776b);
+  color: var(--muted, #56685c);
   font-size: 0.85rem;
 }
 .pager {
@@ -58,11 +58,11 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--green, #16854c);
+  background: var(--green, #137a45);
   margin-right: 0.4rem;
 }
 .notification-row.unread {
-  border-left: 4px solid var(--green, #16854c);
+  border-left: 4px solid var(--green, #137a45);
 }
 .badge-count {
   position: absolute;
@@ -96,11 +96,11 @@
 }
 .conversation-list a.active,
 .conversation-list a:hover {
-  border-color: var(--green, #16854c);
+  border-color: var(--green, #137a45);
 }
 .conversation-list small {
   display: block;
-  color: var(--muted, #65776b);
+  color: var(--muted, #56685c);
 }
 .chat-messages .bubble small {
   display: block;
@@ -166,7 +166,7 @@
   line-height: 0;
 }
 .gallery-thumbs button[aria-pressed='true'] {
-  border-color: #16854c;
+  border-color: #137a45;
 }
 .gallery-thumbs img {
   width: 72px;
@@ -233,7 +233,7 @@
   cursor: pointer;
 }
 .image-pick:focus-within {
-  outline: 2px solid #16854c;
+  outline: 2px solid #137a45;
   outline-offset: 2px;
 }
 @media (max-width: 600px) {

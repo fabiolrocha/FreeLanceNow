@@ -385,8 +385,8 @@
 }
 .feed-report,
 .feed-card footer .text-button {
-  color: #718078;
-  font-size: 10px;
+  color: #56685c;
+  font-size: 11px;
 }
 .feed-pagination {
   display: flex;
@@ -488,8 +488,14 @@
   .social-header .public-links a {
     font-size: 12px;
   }
+  /* Hidden visually but kept as the link's accessible name. */
   .social-header .user-top > span:last-child {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }
 @media (max-width: 760px) {
