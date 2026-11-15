@@ -35,6 +35,7 @@ Decisões iniciais registradas em 30/09/2026; revisão em **14/11/2026**. A tabe
 | ADR29 | Limite de tentativas nas rotas públicas de autenticação, em memória (15/11) | 20 POSTs por minuto e endereço em `/auth/**` no `prod`, 429 com `Retry-After`. Janela fixa na própria instância: suficiente para uma instância no Render; várias instâncias exigiriam armazenamento compartilhado (ex.: Redis). Desligado em dev e testes |
 | ADR30 | Logs estruturados com id de requisição (15/11) | No `prod`, logs em JSON no formato ECS. `RequestLogFilter` registra método, caminho, status e duração de cada chamada em `/api/**`, sem query string nem corpo (podem ter dados pessoais), e propaga `X-Request-Id`. Métricas do Actuator continuam fechadas; só `health` e `info` são públicos |
 | ADR31 | Serviços salvos como tabela de pares, sem entidade (15/11) | `favorite_service` guarda só ids e data; `FavoriteController` usa `JdbcTemplate`. Limite de 200 por conta. Só anúncios ativos aparecem; o vínculo continua se o anúncio voltar a ser publicado |
+| ADR32 | Seed de demonstração opcional em produção (15/11) | Para a apresentação do TCC, `SEED_DEMO=true` também vale no `prod`, mas só com `SEED_DEMO_PASSWORD` definido no Render (sem padrão nesse perfil), para que nenhuma conta publicada use a senha do repositório. E-mails para domínios `.test` são descartados antes do Resend |
 
 ## Proveniência do scaffold
 

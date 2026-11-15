@@ -33,7 +33,10 @@ app:
   cors-origins: ${CORS_ORIGINS}
   # Links in e-mails must point to the published frontend; no localhost fallback in production.
   web-base-url: ${PUBLIC_APP_URL}
-  seed-demo: false
+  # Demo accounts for presentations. Off by default; when on, the password must come from the
+  # SEED_DEMO_PASSWORD secret, never from the repository (see docs/deploy.md).
+  seed-demo: ${SEED_DEMO:false}
+  seed-demo-password: ${SEED_DEMO_PASSWORD:}
   rate-limit:
     # POSTs per minute and client address on /api/v1/auth/** (login, cadastro, links de e-mail).
     auth-per-minute: ${AUTH_RATE_LIMIT_PER_MINUTE:20}

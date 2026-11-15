@@ -75,7 +75,7 @@ Medido localmente com o perfil `prod`, 512 MB e as mesmas opções de JVM: inici
 
 **Hibernação.** O plano free dorme após 15 minutos sem tráfego. O primeiro acesso depois disso pode levar até um minuto. A verificação de prazos (cancelar pendentes após 48 h, confirmar conclusão após 5 dias) só roda com a instância acordada; ao acordar, ela processa tudo o que venceu, porque compara datas em vez de depender do horário exato. Para uma demonstração sem espera, abra o health check alguns minutos antes ou use um plano pago.
 
-Nunca habilite `SEED_DEMO` em produção: o seed cria contas com senha conhecida.
+O seed de demonstração fica desligado em produção. Para ligá-lo numa apresentação, veja a seção 5.1.
 
 ## 4. Vercel (frontend)
 
@@ -104,6 +104,17 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 2. Faça o deploy e entre com essa conta.
 3. Volte `ADMIN_BOOTSTRAP_ENABLED` para `false` e **apague** `ADMIN_BOOTSTRAP_PASSWORD`. Reinícios não recriam nem alteram a conta.
 
+## 5.1 Dados de demonstração (opcional)
+
+Para apresentar o projeto com conteúdo, a API pode criar as mesmas contas e atividades do ambiente local (8 contas em `demo.freelancenow.test`, 10 anúncios, demandas, contratações com avaliações, um chat e posts no feed; lista em `docs/contas-desenvolvimento.md`).
+
+1. No Render, defina `SEED_DEMO=true` e `SEED_DEMO_PASSWORD` com uma senha nova, de pelo menos 8 caracteres. No `prod` não existe senha padrão: sem `SEED_DEMO_PASSWORD` o seed não roda e registra um aviso no log. Não use `Demo12345`, que está no repositório.
+2. Salve e espere o novo deploy. As contas são criadas na inicialização; reinícios não duplicam nada nem trocam a senha de contas que já existem.
+3. Entre com `ana@demo.freelancenow.test` ou `marcos@demo.freelancenow.test` e a senha escolhida.
+4. Depois da apresentação, volte `SEED_DEMO` para `false` e apague `SEED_DEMO_PASSWORD`. Para tirar as contas do ar, desative-as pelo painel de administração.
+
+Os endereços `.test` são reservados (RFC 2606) e nunca recebem e-mail, por isso `ResendMailSender` descarta mensagens para eles em vez de chamar o Resend. Avisos dentro do app continuam normais.
+
 ## 6. Verificação depois do deploy
 
 - Abrir uma rota profunda direto (ex. `/servicos`) e recarregar: a SPA deve responder sem 404.
@@ -129,6 +140,7 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 | `AUTH_RATE_LIMIT_PER_MINUTE` | Render | Não (padrão 20 no `prod`; 0 desliga) |
 | `JWT_REFRESH_TTL_SECONDS` | Render | Não (padrão 30 dias) |
 | `ADMIN_BOOTSTRAP_*` | Render | Só no provisionamento do primeiro admin |
+| `SEED_DEMO`, `SEED_DEMO_PASSWORD` | Render | Não (só para apresentações; seção 5.1) |
 | `VITE_DATA_MODE`, `VITE_API_BASE_URL` | Vercel | Sim |
 | `VITE_SUPPORT_EMAIL` | Vercel | Não |
 
@@ -137,6 +149,14 @@ Valores de exemplo ficam em `.env.example` e `web/.env.example`. Segredos reais 
 ## Pagamentos (F09, depois)
 
 No modo API, as telas de carteira, pagamento, saque e transações mostram "Em breve" e saem do menu (ADR27). As tabelas `payment` e `ledger_entry` (V10) e a dependência `stripe-java` já existem, mas não há checkout, webhook nem reconciliação. Não configure `STRIPE_SECRET_KEY` nem cadastre webhook antes dessa implementação.
+
+O que pode ser preparado desde já, sem tocar no deploy:
+
+1. Criar a conta Stripe e ficar no **modo de teste** (sandbox). Nenhum dado bancário é necessário para testar.
+2. Em **Developers → API keys**, anotar a chave secreta de teste (`sk_test_...`) num gerenciador de senhas. Ela só vai para o Render quando o F09 existir, como `STRIPE_SECRET_KEY`.
+3. Instalar a Stripe CLI para testar webhooks localmente (`stripe listen --forward-to localhost:8081/...`) quando o endpoint existir.
+
+Quando o F09 estiver pronto, o roteiro de deploy ganha: `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` no Render (`sync: false` no Blueprint), um webhook em **Developers → Webhooks** apontando para a URL pública da API e o teste de um pagamento com o cartão de teste `4242 4242 4242 4242`. Chaves `sk_live_` só depois da ativação da conta e de uma revisão do fluxo.
 
 ## Referências oficiais
 
