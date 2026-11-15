@@ -19,6 +19,12 @@ spring:
   flyway:
     enabled: true
 
+logging:
+  structured:
+    # One JSON object per line (Elastic Common Schema), including the requestId from the MDC.
+    format:
+      console: ecs
+
 server:
   # Render terminates TLS and forwards X-Forwarded-* headers.
   forward-headers-strategy: framework

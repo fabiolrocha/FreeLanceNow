@@ -93,7 +93,12 @@ export function Notifications() {
             <Bell size={20} />
             <div>
               <h2>
-                {!n.readAt && <span className="unread-dot" aria-label="Não lido" />}
+                {!n.readAt && (
+                  <>
+                    <span className="unread-dot" aria-hidden="true" />
+                    <span className="sr-only">Não lido</span>
+                  </>
+                )}
                 {n.title}
               </h2>
               {n.body && <p>{n.body}</p>}

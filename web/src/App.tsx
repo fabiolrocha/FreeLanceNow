@@ -38,7 +38,8 @@ const Feed = feature(() => import('./features/feed/pages'), 'Feed')
 const Dashboard = feature(account, 'Dashboard'),
   OwnProfile = feature(account, 'OwnProfile'),
   EditProfile = feature(account, 'EditProfile'),
-  MyReports = feature(account, 'MyReports')
+  MyReports = feature(account, 'MyReports'),
+  SavedServices = feature(account, 'SavedServices')
 const MyServices = feature(freelancer, 'MyServices'),
   ServiceForm = feature(freelancer, 'ServiceForm')
 const ContractList = feature(contracts, 'ContractList'),
@@ -229,6 +230,7 @@ export default function App() {
                 <Route path="denuncias" element={<MyReports />} />
               </Route>
               <Route element={<Guard roles={['CLIENT']} />}>
+                <Route path="salvos" element={<SavedServices />} />
                 <Route path="servicos/:id/solicitar" element={<Request />} />
                 <Route path="demandas/nova" element={<DemandForm />} />
                 <Route path="demandas/:id/editar" element={<DemandForm />} />

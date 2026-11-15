@@ -86,16 +86,22 @@ Esses endereços não equivalem a implementações independentes. A remoção de
 
 ## Direção visual e acessibilidade
 
+**Auditoria de 15/11/2026.** `tests/a11y.spec.ts` roda o axe-core (regras WCAG 2.1 A e AA) em 26 telas, de visitante, cliente, profissional e admin, em 1280 px e 390 px, e falha com qualquer violação. A primeira rodada achou contraste insuficiente no texto secundário, no verde sobre o fundo e nas etiquetas de categoria; links dentro de texto só diferenciados pela cor; o link do perfil sem nome no celular; e `aria-label` proibido no ponto de "não lido". Tudo foi corrigido: cores escurecidas (tabela abaixo e etiquetas de categoria), links de texto sublinhados, nome do perfil escondido só visualmente e texto "Não lido" para leitores de tela. O foco visível usa `:focus-visible` global.
+
+**Serviços salvos.** Clientes salvam anúncios pelo coração no card ou pelo botão "Salvar serviço" no detalhe, e encontram tudo em `/salvos` (menu "Serviços salvos"). Visitantes que tocam no coração vão para o login; profissionais e admins não veem o botão. A lista vive em `data/favorites.ts`, compartilhada entre os cards, e atualiza a tela antes da resposta da API, desfazendo se ela falhar. No modo mock fica no `sessionStorage`.
+
+**Erros do servidor.** Em respostas 5xx, a mensagem termina com "Código do erro" e os 8 primeiros caracteres do `X-Request-Id`, para localizar a linha no log.
+
 Preservar o verde, Public Sans, cards e ícones de serviço do HTML original. Hero com busca e um anúncio ilustrativo destaca a finalidade do produto. Não usar fotografias do carômetro ou números de reputação inventados.
 
 | Token | Valor |
 |---|---|
-| Verde principal | `#16854c` |
+| Verde principal | `#137a45` (antes `#16854c`; escurecido para contraste AA sobre o fundo) |
 | Texto principal | `#233b32` |
 | Fundo | `#f6f8f6` |
 | Superfície | `#ffffff` |
 | Bordas | `#dce5de` |
-| Texto secundário | `#65776b` |
+| Texto secundário | `#56685c` (antes `#65776b`) |
 | Raios | 8 px controles, 12 px cards, 18 px hero |
 | Layout | Shell com sidebar desktop; menu expansível no celular |
 

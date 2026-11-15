@@ -20,6 +20,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import java.time.Clock;
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -137,6 +138,8 @@ public class SecurityConfig {
         config.setAllowedOrigins(Arrays.asList(origins.split(",")));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        // Lets the frontend show the request id next to server errors.
+        config.setExposedHeaders(List.of(RequestLogFilter.HEADER, "Retry-After"));
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;

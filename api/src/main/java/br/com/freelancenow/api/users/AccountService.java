@@ -14,6 +14,7 @@ import br.com.freelancenow.api.demands.ProposalStatus;
 import br.com.freelancenow.api.notifications.NotificationService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +48,7 @@ public class AccountService {
     private final AuditService audit;
     private final PasswordEncoder passwords;
     private final Clock clock;
+    private final JdbcTemplate db;
 
     public AccountService(
             UserRepository users,
@@ -58,7 +60,8 @@ public class AccountService {
             NotificationService notifications,
             AuditService audit,
             PasswordEncoder passwords,
-            Clock clock) {
+            Clock clock,
+            JdbcTemplate db) {
         this.users = users;
         this.avatars = avatars;
         this.contracts = contracts;
@@ -69,6 +72,7 @@ public class AccountService {
         this.audit = audit;
         this.passwords = passwords;
         this.clock = clock;
+        this.db = db;
     }
 
     @Transactional
@@ -163,6 +167,7 @@ public class AccountService {
             }
         }
         avatars.deleteById(u.getId());
+        db.update("delete from favorite_service where user_id = ?", u.getId());
         audit.record(u, "ACCOUNT_DELETED", "USER", u.getId(), "true", "false", "Pedido do titular");
         u.anonymize(passwords.encode(UUID.randomUUID().toString()), now);
     }

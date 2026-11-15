@@ -33,6 +33,8 @@ Decisões iniciais registradas em 30/09/2026; revisão em **14/11/2026**. A tabe
 | ADR27 | Telas financeiras simuladas só no modo mock; no modo API, "Em breve" até F09 (14/11) | Produção não exibe saldos ou pagamentos fictícios como se fossem reais. Itens de carteira e transações saem do menu; as rotas mostram orientação por perfil. O mock mantém a demonstração completa |
 | ADR28 | Avisos importantes também por e-mail, com opção de desligar (15/11) | Envio depois do commit e em segundo plano, só para contas ativas com e-mail confirmado. Mensagens de chat ficam só no app para não virar uma enxurrada de e-mails. Falha no Resend não desfaz a ação; o aviso interno continua sendo a fonte da verdade |
 | ADR29 | Limite de tentativas nas rotas públicas de autenticação, em memória (15/11) | 20 POSTs por minuto e endereço em `/auth/**` no `prod`, 429 com `Retry-After`. Janela fixa na própria instância: suficiente para uma instância no Render; várias instâncias exigiriam armazenamento compartilhado (ex.: Redis). Desligado em dev e testes |
+| ADR30 | Logs estruturados com id de requisição (15/11) | No `prod`, logs em JSON no formato ECS. `RequestLogFilter` registra método, caminho, status e duração de cada chamada em `/api/**`, sem query string nem corpo (podem ter dados pessoais), e propaga `X-Request-Id`. Métricas do Actuator continuam fechadas; só `health` e `info` são públicos |
+| ADR31 | Serviços salvos como tabela de pares, sem entidade (15/11) | `favorite_service` guarda só ids e data; `FavoriteController` usa `JdbcTemplate`. Limite de 200 por conta. Só anúncios ativos aparecem; o vínculo continua se o anúncio voltar a ser publicado |
 
 ## Proveniência do scaffold
 

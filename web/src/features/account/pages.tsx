@@ -5,6 +5,7 @@ import { CheckCircle2, Plus, ArrowRight } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { avatarUrl, client, isMock } from '../../data/client'
 import { useReviews } from '../../app/useReviews'
+import { useFavorites } from '../../data/favorites'
 import {
   Avatar,
   ConfirmButton,
@@ -261,6 +262,30 @@ function DeleteAccount() {
         onConfirm={() => void remove()}
       />
     </section>
+  )
+}
+/** Listings the client saved, newest first. Listings taken down disappear from the list. */
+export function SavedServices() {
+  const { user, services } = useApp(),
+    { ids } = useFavorites(user?.id)
+  const saved = ids.flatMap((id) => services.filter((s) => s.id === id))
+  return (
+    <>
+      <PageTitle
+        title="Serviços salvos"
+        description="Os anúncios que você salvou para comparar ou contratar depois."
+      />
+      {saved.length ? (
+        <ServiceGrid services={saved} />
+      ) : (
+        <Empty title="Nenhum serviço salvo">
+          <p>Toque no coração de um anúncio para guardá-lo aqui.</p>
+          <Link className="button" to="/servicos">
+            Buscar serviços
+          </Link>
+        </Empty>
+      )}
+    </>
   )
 }
 export function MyReports() {

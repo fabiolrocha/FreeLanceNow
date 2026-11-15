@@ -11,6 +11,7 @@ Revisado em **09/11/2026**. Os comandos abaixo descrevem a cobertura existente. 
 | Tipos/build React | `cd web && npm run build` | TypeScript e bundle de produção |
 | Lint | `cd web && npm run lint` | Regras React/TypeScript |
 | Regras unitárias | `cd web && npm test` | 6 testes: permissões de transição, prazos de 48h/5d/7d, senha 72 bytes e limites de fotos (quantidade, tipo e 5 MB) |
+| Acessibilidade | `cd web && npx playwright test tests/a11y.spec.ts` | axe-core com WCAG 2.1 A/AA em 26 telas dos quatro perfis, em 1280 px e 390 px; falha com qualquer violação |
 | Browser mock | `cd web && npm run test:e2e` | Contratação completa, contestação com decisão do admin, demanda/proposta/aceite, denúncia na fila com CSV, draft/publicação, mobile, role e sessão expirada |
 | API+PostgreSQL | `docker compose --profile test run --rm api-test` | 51 testes Java (44 de integração com PostgreSQL + 7 unitários de `JwtSecretValidatorTests`): contexto+migrações (`V1`–`V11`), fotos dos anúncios (envio/listagem/remoção, limite de 5, JPG/PNG pela assinatura, arquivo corrompido, 5 MB, dono, moderação), avisos e chat por contratação (autorização, encerramento, prazos), feed misto autenticado, publicação/retirada/moderação, vínculo próprio, filtros/paginação e demandas autorizadas; bootstrap administrativo, permissões, suspensão/reativação, categorias/auditoria, denúncias e remoção lógica/reputação, métricas por período e concorrência de perfil/resposta; também cadastro/login, termos, duplicidade com e-mail normalizado, admin, edição e perfil público sem contato, dono do anúncio, limite 20, filtros/paginação da busca (`minRating`), drafts/inativos ocultos, suspensão, ciclo de contratação (`UC03`/`UC06`), snapshots, jobs de 48h/5 dias, avaliações (`UC04`), média com 1 decimal, janela de 7 dias, resposta do profissional, demandas/propostas (`F08`, unicidade pendente e aceite gerando contratação) e seed idempotente |
 | Browser API | `cd web && E2E_DATA_MODE=api npm run test:e2e` | Sete fluxos completos quando `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` são fornecidos: (1) cadastro, perfil, anúncio persistente/reload, desativação e republicação; (2) ciclo completo de contratação entre duas contas, confirmação, avaliação 5 estrelas, resposta do profissional e persistência após reload; (3) demanda publicada, proposta única, aceite gerando contratação `ACEITO` no PostgreSQL e bloqueio de novas propostas em demanda encerrada; (4) admin gerencia categoria/usuário e decide denúncia com auditoria após reload; (5) publicação de texto no feed com serviço vinculado, falha preservando texto, persistência entre contas e moderação; (6) solicitação gerando aviso, prazo visível e chat persistente entre contas; (7) envio de fotos do anúncio com GIF recusado, capa na busca, galeria no detalhe e remoção persistente após reload |
@@ -101,6 +102,19 @@ Capturas: [desktop](evidencias/f11/feed-desktop.png) e [celular](evidencias/f11/
 ## Melhorias de telas, avisos/chat, DDL financeiro e preparação de deploy (PRs #43, #44 e #45)
 
 Integrados à `main` em 09/11/2026: 46 testes Java (39 testes de integração com PostgreSQL cobrindo `V1`–`V10`, avisos e chat, mais 7 testes unitários em `JwtSecretValidatorTests`), 4 unitários web (prazos), 11 cenários browser mock e 6 cenários browser API (incluindo aviso da solicitação, prazo visível, conversa persistente entre duas contas e moderação com admin explícito). Build, lint, formatação e CI (`api` e `web`) passaram. Os 48 endpoints documentados conferem com os controllers.
+
+## Teste de carga (F10)
+
+Roteiro em `loadtest/k6.js`, com dois cenários. `browse` sobe a 40 visitantes que abrem categorias, busca, detalhe, avaliações e profissionais. `signedIn` mantém 10 clientes logados consultando perfil, contratações, avisos, salvos e feed. Limites: menos de 1% de erros, p95 abaixo de 500 ms na navegação e de 800 ms logado.
+
+```sh
+docker compose up -d db api
+docker run --rm -i -e API_URL=http://host.docker.internal:8081 \
+  -e LOGIN_EMAIL=ana@demo.freelancenow.test -e LOGIN_PASSWORD=Demo12345 \
+  -v "$PWD/loadtest:/scripts" grafana/k6 run /scripts/k6.js
+```
+
+Resultado de 15/11/2026, API do Compose limitada a 512 MB como no Render free (`docker update --memory 512m`), 1 min 45 s: 11.761 requisições (109 por segundo), **0 erros**, p95 de 4,6 ms na navegação e 7,9 ms logado, máximo de 216 ms. A memória do container ficou em até 362 MB. Os números valem para um Mac local; o Render free tem uma fração de CPU, então espere latências maiores, e o primeiro acesso depois da hibernação leva até um minuto. Não rode o roteiro contra produção com usuários reais. O limite de 20 logins por minuto vale por endereço, então não afeta usuários diferentes.
 
 ## Upload de fotos dos anúncios (F06)
 

@@ -113,6 +113,7 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 - Entrar como admin: usuários, moderação, relatórios e auditoria.
 - No console do navegador, nenhum erro de CORS. Até a correção do bean `corsConfigurationSource` (15/11) a API não enviava cabeçalhos CORS; o proxy do Vite escondia isso localmente.
 - Errar a senha mais de 20 vezes em um minuto retorna "Muitas tentativas".
+- Nos logs do Render, cada linha é um JSON com `requestId`. Para investigar um erro relatado com "Código do erro", busque esses 8 caracteres nos logs.
 
 ## Variáveis por ambiente
 

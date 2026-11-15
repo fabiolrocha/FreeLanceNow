@@ -12,6 +12,8 @@ Abra [o login local](http://127.0.0.1:5175/login). Depois de entrar, cliente/fre
 | Freelancer | Marcos Vieira | `marcos@demo.freelancenow.test` | `Demo12345` | Feed, publicação de serviços, propostas, solicitações e painel |
 | Administrador | Admin local de teste | `admin-e2e@example.test` | `Strong12345` | Usuários, categorias, moderação, relatórios e auditoria |
 
+O seed também cria os clientes Pedro Santos (`pedro@…`) e Lúcia Martins (`lucia@…`) e os profissionais Juliana Prado, Rafael Andrade, Camila Rocha e Bruno Teles (`juliana@`, `rafael@`, `camila@`, `bruno@`), todos em `demo.freelancenow.test` e com a mesma senha. Em um banco novo vêm junto 9 contratações concluídas com avaliações, uma em andamento com chat, uma pendente, uma aguardando confirmação, três demandas abertas e três posts no feed. Para recomeçar do zero, apague o volume do banco (`docker compose down -v`), que também remove os dados criados pelos testes de navegador.
+
 As três contas existem no PostgreSQL local atual. Ana e Marcos são criados pelo seed quando a API usa o perfil `dev` com `SEED_DEMO=true` (configuração do Compose local). O administrador foi provisionado explicitamente neste ambiente; **não é criado automaticamente em um banco novo**. O cadastro público não permite escolher ADMIN.
 
 O endereço `5175` corresponde ao Vite desta sessão. Para iniciar o frontend nesse mesmo endereço, com banco/API ligados, execute a partir da raiz:
