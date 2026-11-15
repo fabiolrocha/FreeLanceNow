@@ -67,6 +67,17 @@ public class UserController {
         return UserDtos.Me.from(u);
     }
 
+    /** Turns the e-mail copies of important notices on or off (ADR28). */
+    @PutMapping("/users/me/notification-settings")
+    @Transactional
+    public UserDtos.Me notificationSettings(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody UserDtos.NotificationSettings r) {
+        var u = current.require(jwt);
+        u.setEmailNotifications(r.emailNotifications());
+        return UserDtos.Me.from(u);
+    }
+
     @PutMapping(value = "/users/me/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserDtos.Me uploadAvatar(
             @AuthenticationPrincipal Jwt jwt, @RequestPart("file") MultipartFile file) {
