@@ -55,6 +55,8 @@ A separação é de apresentação: a visibilidade dos itens continua aplicada p
 | Ajuda/termos/privacidade | `/ajuda`, `/termos`, `/privacidade` | Público | Textos de produção (versão 2026-11, LGPD); no mock, aviso de dados fictícios. Contato opcional via `VITE_SUPPORT_EMAIL` |
 | URL desconhecida | Qualquer rota não encontrada | Público | Tela 404 com retorno ao início |
 
+Status de contratação, demanda, proposta e denúncia usam selos coloridos com ponto (`statusTone`): âmbar aguarda alguém, azul em execução, verde concluído/aberto, vermelho disputa, cinza encerrado. A aba do navegador mostra o título da página (lido do `h1`). A página 404 oferece início, busca e ajuda. A landing destaca anúncios reais, priorizando avaliações e fotos e variando os profissionais. A lista de contratações mostra a foto ou as iniciais da outra parte. Em Configurações da conta, "Avisos por e-mail" liga/desliga as cópias por e-mail (só API).
+
 Guards React protegem os grupos de rotas por role e explicam a restrição pelo perfil exigido ("Esta área é para contas de cliente", "...de profissional", "...exclusiva da administração"). O menu lateral do freelancer prioriza o trabalho (painel, solicitações, contratações, demandas, propostas, serviços); o do cliente prioriza busca, profissionais, demandas e contratações. Status de contratação usam o feminino ("Aceita", "Concluída", "Recusada", "Cancelada") e notas usam vírgula decimal (`ratingLabel`). Participação, estado e proprietário são verificados nos fluxos e, nas funcionalidades reais, pelo backend. O prefixo `/admin` redireciona para `/admin/usuarios`; não é outra tela de gestão.
 
 ## Telas demonstrativas e componentes reutilizados
