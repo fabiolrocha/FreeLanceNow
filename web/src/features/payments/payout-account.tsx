@@ -129,6 +129,25 @@ const statusIcon = (s: PayoutAccount['status']) =>
     <Landmark aria-hidden />
   )
 
+/** While Stripe reviews the data the freelancer has nothing to fill, so there is no form. */
+const IN_REVIEW_TEXT =
+  'O Stripe está conferindo os seus dados. Você não precisa fazer nada agora: volte mais tarde para ver a situação. Os valores liberados ficam guardados até a conta ficar pronta.'
+
+/** Link to the receiving account page, or none while Stripe reviews the data. */
+function AccountLink({ status }: { status: PayoutAccount['status'] }) {
+  if (status === 'IN_REVIEW') return null
+  const ready = status === 'READY'
+  return (
+    <Link className={ready ? 'button secondary' : 'button'} to="/conta-recebimento">
+      {status === 'NOT_STARTED'
+        ? 'Cadastrar conta'
+        : ready
+          ? 'Gerenciar conta'
+          : 'Continuar cadastro'}
+    </Link>
+  )
+}
+
 /** Short card for the wallet: where the freelancer's money goes and what is missing. */
 export function PayoutAccountCard() {
   const { state } = usePayoutAccount()
@@ -145,16 +164,12 @@ export function PayoutAccountCard() {
         <p>
           {ready
             ? 'Os valores liberados vão para esta conta, e o Stripe deposita na sua conta bancária automaticamente.'
-            : 'Cadastre onde quer receber. Valores liberados antes disso ficam guardados e são transferidos assim que a conta estiver pronta.'}
+            : state.status === 'IN_REVIEW'
+              ? IN_REVIEW_TEXT
+              : 'Cadastre onde quer receber. Valores liberados antes disso ficam guardados e são transferidos assim que a conta estiver pronta.'}
         </p>
       </div>
-      <Link className={ready ? 'button secondary' : 'button'} to="/conta-recebimento">
-        {state.status === 'NOT_STARTED'
-          ? 'Cadastrar conta'
-          : ready
-            ? 'Gerenciar conta'
-            : 'Continuar cadastro'}
-      </Link>
+      <AccountLink status={state.status} />
     </section>
   )
 }
@@ -176,13 +191,12 @@ export function StripePayouts() {
         <div>
           <strong>Conta de recebimento: {payoutAccountLabel[state.status]}</strong>
           <p>
-            Para sacar, termine o cadastro da conta de recebimento. Os valores liberados ficam
-            guardados até lá.
+            {state.status === 'IN_REVIEW'
+              ? IN_REVIEW_TEXT
+              : 'Para sacar, termine o cadastro da conta de recebimento. Os valores liberados ficam guardados até lá.'}
           </p>
         </div>
-        <Link className="button" to="/conta-recebimento">
-          {state.status === 'NOT_STARTED' ? 'Cadastrar conta' : 'Continuar cadastro'}
-        </Link>
+        <AccountLink status={state.status} />
       </section>
     )
   return (
@@ -199,10 +213,15 @@ export function StripePayouts() {
   )
 }
 
-/** Receiving account page: Stripe's onboarding (or account management) inside the app. */
+/**
+ * Receiving account page: Stripe's onboarding (or account management) inside the app. Only one
+ * Stripe form is shown at a time: the notification banner opens its own copy of the onboarding,
+ * so it appears only once the account is ready. While Stripe reviews the data there is no form.
+ */
 export function PayoutAccountPage() {
   const { state, error, reload } = usePayoutAccount()
-  const enabled = !isMock && !!state?.enabled
+  const inReview = state?.status === 'IN_REVIEW'
+  const enabled = !isMock && !!state?.enabled && !inReview
   const { instance, error: sessionError } = useConnectInstance(enabled)
   const ready = state?.status === 'READY'
   const title = useMemo(
@@ -242,11 +261,12 @@ export function PayoutAccountPage() {
       <p className={`notice payout-status${ready ? ' ok' : ''}`} role="status">
         {statusIcon(state.status)} Situação: <strong>{payoutAccountLabel[state.status]}</strong>
       </p>
+      {inReview && <p>{IN_REVIEW_TEXT}</p>}
       {sessionError && <ErrorMessage message={sessionError} />}
-      {!instance && !sessionError && <Empty title="Abrindo o cadastro do Stripe…" />}
-      {instance && (
+      {enabled && !instance && !sessionError && <Empty title="Abrindo o cadastro do Stripe…" />}
+      {enabled && instance && (
         <ConnectComponentsProvider connectInstance={instance}>
-          <ConnectNotificationBanner />
+          {ready && <ConnectNotificationBanner />}
           <ConnectFrame
             label="Carregando o formulário do Stripe…"
             render={(p) =>

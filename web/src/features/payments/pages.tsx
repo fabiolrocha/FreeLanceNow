@@ -628,7 +628,7 @@ export function WithdrawPage() {
         title={sent ? 'Saque registrado' : 'Saque'}
         description={
           stripe
-            ? 'O valor dos serviços vai para a sua conta de recebimento, e o Stripe deposita na sua conta bancária automaticamente, no calendário que você escolher.'
+            ? 'O valor dos serviços vai para a sua conta de recebimento, e o Stripe deposita na sua conta bancária automaticamente, todo dia útil, o saldo que já estiver disponível. No Brasil não existe saque manual: não há botão de sacar.'
             : 'Saque simulado: o saldo diminui, mas nenhum valor é transferido para banco ou Pix.'
         }
       />
