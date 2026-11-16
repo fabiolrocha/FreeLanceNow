@@ -109,6 +109,17 @@ class ApiIntegrationTests {
         assertTrue(e.getResponseBodyAsString().contains("status"));
     }
 
+    /** Render's health check calls this without a token; a 401 there would fail every deploy. */
+    @Test
+    @Order(0)
+    void livenessProbeIsPublic() {
+        var body =
+                http().get().uri("/actuator/health/liveness").retrieve().body(String.class);
+        assertTrue(body.contains("\"status\":\"UP\""));
+        var full = http().get().uri("/actuator/health").retrieve().body(String.class);
+        assertTrue(full.contains("\"status\":\"UP\""));
+    }
+
     @Test
     @Order(1)
     void registrationCreatesHashedPasswordAndSession() {

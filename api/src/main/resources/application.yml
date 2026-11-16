@@ -9,6 +9,11 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        # Lazy associations (freelancer, category, client...) load in one IN query per batch
+        # instead of one query per row. Without it, a page of 50 listings ran up to 100 queries.
+        default_batch_fetch_size: 50
   flyway:
     enabled: true
   servlet:
@@ -30,6 +35,10 @@ management:
   endpoint:
     health:
       show-details: never
+      # /actuator/health/liveness answers without touching the database. Render's health check
+      # uses it so that its periodic checks do not keep Neon's compute awake.
+      probes:
+        enabled: true
 app:
   jwt:
     secret: ${JWT_SECRET}

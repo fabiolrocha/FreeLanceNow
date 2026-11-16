@@ -100,17 +100,57 @@ export function renewSession(): Promise<Session | null> {
   })()
   return renewing
 }
-async function send<T>(path: string, options: RequestInit, bearer: string): Promise<T> {
-  const res = await fetch(`${baseUrl}${path}`, {
-    ...options,
-    headers: {
-      // FormData sets its own multipart boundary.
-      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
-      ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
-      ...options.headers,
-    },
-    signal: AbortSignal.timeout(15000),
-  })
+/**
+ * The free API instance sleeps after 15 minutes without traffic and can take up to a minute to
+ * wake, so one attempt may wait that long before it gives up.
+ */
+const ATTEMPT_TIMEOUT_MS = 60000
+/** Pauses between attempts of a read that hit a sleeping or restarting server. */
+const RETRY_DELAYS_MS = [1500, 4000]
+/** Gateway answers while the instance starts or redeploys; the request never reached the API. */
+const RETRYABLE_STATUS = new Set([502, 503, 504])
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** Turns browser-level failures (no answer at all) into messages a person can act on. */
+function networkError(e: unknown): Error {
+  const name = (e as { name?: string })?.name
+  if (name === 'TimeoutError')
+    return Object.assign(
+      new Error(
+        'O servidor demorou para responder. Ele pode estar iniciando; aguarde alguns segundos e tente de novo.',
+        { cause: e },
+      ),
+      { retryable: true },
+    )
+  if (name === 'AbortError') return e as Error
+  return Object.assign(
+    new Error('Sem conexão com o servidor. Verifique sua internet e tente de novo.', { cause: e }),
+    { retryable: true },
+  )
+}
+
+async function attempt<T>(path: string, options: RequestInit, bearer: string): Promise<T> {
+  const timeout = AbortSignal.timeout(ATTEMPT_TIMEOUT_MS)
+  let res: Response
+  try {
+    res = await fetch(`${baseUrl}${path}`, {
+      ...options,
+      headers: {
+        // FormData sets its own multipart boundary.
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+        ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
+        ...options.headers,
+      },
+      signal: options.signal ? AbortSignal.any([options.signal, timeout]) : timeout,
+    })
+  } catch (e) {
+    throw networkError(e)
+  }
+  if (RETRYABLE_STATUS.has(res.status))
+    throw Object.assign(
+      new Error('O servidor está iniciando. Aguarde alguns segundos e tente de novo.'),
+      { status: res.status, retryable: true },
+    )
   if (!res.ok) {
     const problem = await res.json().catch(() => ({}))
     const fields = Object.keys(problem.errors || {}).map((k) => fieldLabels[k] || k)
@@ -126,6 +166,24 @@ async function send<T>(path: string, options: RequestInit, bearer: string): Prom
   }
   if (res.status === 204 || res.status === 202) return undefined as T
   return res.json() as Promise<T>
+}
+
+/**
+ * Reads are retried when the server did not answer or the gateway said it was starting, which is
+ * what a cold start looks like. Writes are sent once: a lost answer does not prove that the API
+ * skipped the change, and repeating it could create a second contract or payment.
+ */
+async function send<T>(path: string, options: RequestInit, bearer: string): Promise<T> {
+  const method = (options.method || 'GET').toUpperCase()
+  const retries = method === 'GET' || method === 'HEAD' ? RETRY_DELAYS_MS : []
+  for (let i = 0; ; i++) {
+    try {
+      return await attempt<T>(path, options, bearer)
+    } catch (e) {
+      if (i >= retries.length || !(e as { retryable?: boolean }).retryable) throw e
+      await sleep(retries[i])
+    }
+  }
 }
 export async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   try {

@@ -10,7 +10,8 @@ services:
     rootDir: api
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    healthCheckPath: /actuator/health
+    # Liveness does not query the database, so Render's checks do not keep Neon awake.
+    healthCheckPath: /actuator/health/liveness
     autoDeploy: true
     buildFilter:
       paths:

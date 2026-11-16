@@ -56,7 +56,7 @@ A API envia confirmação de cadastro (`/verificar-email`, 24 h, ADR25), redefin
 
 ## 3. Render (API)
 
-1. No Render, **New → Blueprint** e selecione este repositório. O `render.yaml` cria o serviço `freelancenow-api` com Docker (`rootDir: api`), health check em `/actuator/health`, deploy automático só quando `api/**` muda e `JWT_SECRET` gerado pelo próprio Render.
+1. No Render, **New → Blueprint** e selecione este repositório. O `render.yaml` cria o serviço `freelancenow-api` com Docker (`rootDir: api`), health check em `/actuator/health/liveness` (não consulta o banco, então as verificações do Render não mantêm o Neon acordado), deploy automático só quando `api/**` muda e `JWT_SECRET` gerado pelo próprio Render.
 2. Preencha os valores pedidos (marcados `sync: false`):
 
 | Variável | Valor |
@@ -73,7 +73,7 @@ A API envia confirmação de cadastro (`/verificar-email`, 24 h, ADR25), redefin
 
 Medido localmente com o perfil `prod`, 512 MB e as mesmas opções de JVM: inicialização em cerca de 4 s e uso perto de 270 MB. No Render free a primeira inicialização é mais lenta.
 
-**Hibernação.** O plano free dorme após 15 minutos sem tráfego. O primeiro acesso depois disso pode levar até um minuto. A verificação de prazos (cancelar pendentes após 48 h, confirmar conclusão após 5 dias) só roda com a instância acordada; ao acordar, ela processa tudo o que venceu, porque compara datas em vez de depender do horário exato. Para uma demonstração sem espera, abra o health check alguns minutos antes ou use um plano pago.
+**Hibernação.** O plano free dorme após 15 minutos sem tráfego. O primeiro acesso depois disso pode levar até um minuto. A verificação de prazos (cancelar pendentes após 48 h, confirmar conclusão após 5 dias) só roda com a instância acordada; ao acordar, ela processa tudo o que venceu, porque compara datas em vez de depender do horário exato. Para encurtar essa espera, a imagem Docker traz um arquivo CDS (Class Data Sharing) gerado no build, que reduz o tempo de inicialização da JVM pela metade, e o frontend espera até um minuto por resposta, repete leituras quando o servidor ainda está iniciando e avisa a pessoa em vez de mostrar erro. Para uma demonstração sem espera, abra o health check alguns minutos antes ou use um plano pago.
 
 O seed de demonstração fica desligado em produção. Para ligá-lo numa apresentação, veja a seção 5.1.
 
