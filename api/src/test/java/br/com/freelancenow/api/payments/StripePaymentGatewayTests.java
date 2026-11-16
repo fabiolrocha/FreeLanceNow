@@ -53,7 +53,7 @@ class StripePaymentGatewayTests {
 
     @Test
     void validSignatureYieldsTheCheckoutSessionFields() throws Exception {
-        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET);
+        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET, "");
         var payload = sessionEvent("checkout.session.completed", "paid");
 
         var event = gateway.parseWebhook(payload, sign(payload, SECRET));
@@ -68,7 +68,7 @@ class StripePaymentGatewayTests {
 
     @Test
     void wrongSecretTamperedBodyOrMissingHeaderAreRejected() throws Exception {
-        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET);
+        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET, "");
         var payload = sessionEvent("checkout.session.completed", "paid");
 
         assertThrows(
@@ -79,15 +79,76 @@ class StripePaymentGatewayTests {
                 PaymentGateway.InvalidWebhook.class,
                 () -> gateway.parseWebhook(payload.replace("paid", "unpaid"), header));
         assertThrows(PaymentGateway.InvalidWebhook.class, () -> gateway.parseWebhook(payload, ""));
-        var noSecret = new StripePaymentGateway("sk_test_dummy", "");
+        var noSecret = new StripePaymentGateway("sk_test_dummy", "", "");
         assertThrows(
                 PaymentGateway.InvalidWebhook.class,
                 () -> noSecret.parseWebhook(payload, header));
     }
 
     @Test
+    void connectSecretVerifiesPayoutEventsOfConnectedAccounts() throws Exception {
+        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET, "whsec_connect_only");
+        var payload =
+                """
+                {"id":"evt_3","object":"event","api_version":"%s","type":"payout.failed",
+                 "account":"acct_test_1",
+                 "data":{"object":{"id":"po_1","object":"payout","amount":8100,
+                  "failure_message":"Conta bancária fechada."}}}
+                """
+                        .formatted(Stripe.API_VERSION);
+        var event = gateway.parseWebhook(payload, sign(payload, "whsec_connect_only"));
+        assertEquals("payout.failed", event.type());
+        assertEquals("acct_test_1", event.account());
+        assertEquals("po_1", event.objectId());
+        assertEquals(new java.math.BigDecimal("81.00"), event.amount());
+        assertEquals("Conta bancária fechada.", event.detail());
+        assertThrows(
+                PaymentGateway.InvalidWebhook.class,
+                () -> gateway.parseWebhook(payload, sign(payload, "whsec_other")));
+    }
+
+    @Test
+    void chargeRefundAndDisputeEventsCarryPaymentIntentAndAmounts() {
+        var refunded =
+                StripePaymentGateway.chargeEvent(
+                        "evt_4",
+                        "charge.refunded",
+                        """
+                        {"data":{"object":{"id":"ch_1","object":"charge","payment_intent":"pi_1",
+                         "amount":9000,"amount_refunded":3000}}}
+                        """);
+        assertEquals("pi_1", refunded.providerPaymentId());
+        assertEquals("ch_1", refunded.chargeId());
+        assertEquals(new java.math.BigDecimal("30.00"), refunded.amount());
+
+        var dispute =
+                StripePaymentGateway.chargeEvent(
+                        "evt_5",
+                        "charge.dispute.closed",
+                        """
+                        {"data":{"object":{"id":"dp_1","object":"dispute","charge":"ch_1",
+                         "payment_intent":"pi_1","amount":9000,"status":"lost"}}}
+                        """);
+        assertEquals("dp_1", dispute.objectId());
+        assertEquals("ch_1", dispute.chargeId());
+        assertEquals("lost", dispute.detail());
+        assertEquals(new java.math.BigDecimal("90.00"), dispute.amount());
+
+        var failed =
+                StripePaymentGateway.chargeEvent(
+                        "evt_6",
+                        "refund.failed",
+                        """
+                        {"data":{"object":{"id":"re_1","object":"refund","charge":"ch_1",
+                         "payment_intent":"pi_1","amount":9000,"failure_reason":"lost_or_stolen_card"}}}
+                        """);
+        assertEquals("re_1", failed.objectId());
+        assertEquals("lost_or_stolen_card", failed.detail());
+    }
+
+    @Test
     void otherEventTypesCarryNoSession() throws Exception {
-        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET);
+        var gateway = new StripePaymentGateway("sk_test_dummy", SECRET, "");
         var payload =
                 """
                 {"id":"evt_2","object":"event","api_version":"%s","type":"charge.updated",
@@ -101,9 +162,45 @@ class StripePaymentGatewayTests {
 
     @Test
     void disabledWithoutKeyAndRefusesLiveKeys() {
-        assertFalse(new StripePaymentGateway("", "").enabled());
-        assertTrue(new StripePaymentGateway("sk_test_dummy", "").enabled());
+        assertFalse(new StripePaymentGateway("", "", "").enabled());
+        assertTrue(new StripePaymentGateway("sk_test_dummy", "", "").enabled());
         assertThrows(
-                IllegalStateException.class, () -> new StripePaymentGateway("sk_live_x", ""));
+                IllegalStateException.class, () -> new StripePaymentGateway("sk_live_x", "", ""));
+    }
+
+    @Test
+    void readsReadinessFromAnAccountsV2Object() {
+        var pending =
+                com.google.gson.JsonParser.parseString(
+                                """
+                                {"id": "acct_1",
+                                 "configuration": {"recipient": {"capabilities": {"stripe_balance": {
+                                   "stripe_transfers": {"status": "restricted"},
+                                   "payouts": {"status": "restricted"}}}}},
+                                 "requirements": {"entries": [
+                                   {"awaiting_action_from": "user", "description": "identity.individual.id_numbers"},
+                                   {"awaiting_action_from": "stripe", "description": "identity.individual.verification"}]}}
+                                """)
+                        .getAsJsonObject();
+        var a = StripePaymentGateway.connectedAccount(pending);
+        assertEquals("acct_1", a.id());
+        assertFalse(a.transfersEnabled());
+        assertFalse(a.detailsSubmitted());
+        assertEquals(java.util.List.of("identity.individual.id_numbers"), a.currentlyDue());
+
+        var ready =
+                com.google.gson.JsonParser.parseString(
+                                """
+                                {"id": "acct_2",
+                                 "configuration": {"recipient": {"capabilities": {"stripe_balance": {
+                                   "stripe_transfers": {"status": "active"},
+                                   "payouts": {"status": "active"}}}}},
+                                 "requirements": {"entries": []}}
+                                """)
+                        .getAsJsonObject();
+        var b = StripePaymentGateway.connectedAccount(ready);
+        assertTrue(b.transfersEnabled());
+        assertTrue(b.payoutsEnabled());
+        assertTrue(b.detailsSubmitted());
     }
 }

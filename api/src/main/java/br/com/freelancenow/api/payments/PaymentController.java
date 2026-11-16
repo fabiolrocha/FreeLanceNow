@@ -18,10 +18,15 @@ public class PaymentController {
     private static final Logger log = LoggerFactory.getLogger(PaymentController.class);
 
     private final PaymentService payments;
+    private final PayoutAccountService payoutAccounts;
     private final PaymentGateway gateway;
 
-    public PaymentController(PaymentService payments, PaymentGateway gateway) {
+    public PaymentController(
+            PaymentService payments,
+            PayoutAccountService payoutAccounts,
+            PaymentGateway gateway) {
         this.payments = payments;
+        this.payoutAccounts = payoutAccounts;
         this.gateway = gateway;
     }
 
@@ -57,6 +62,30 @@ public class PaymentController {
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody PaymentDtos.RequestWithdrawal r) {
         return payments.withdraw(jwt, r);
+    }
+
+    @GetMapping("/users/me/payout-account")
+    public PaymentDtos.PayoutAccountView payoutAccount(@AuthenticationPrincipal Jwt jwt) {
+        return payoutAccounts.status(jwt);
+    }
+
+    @PostMapping("/users/me/payout-account/session")
+    public PaymentDtos.AccountSessionStarted payoutAccountSession(
+            @AuthenticationPrincipal Jwt jwt) {
+        return payoutAccounts.session(jwt);
+    }
+
+    @PostMapping("/admin/payments/{id}/transfer")
+    public PaymentDtos.PaymentView retryTransfer(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
+        return payments.retryTransfer(jwt, id);
+    }
+
+    @PostMapping("/admin/payments/{id}/reversal-resolved")
+    public ResponseEntity<Void> resolveReversal(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
+        payments.resolveReversal(jwt, id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/admin/payments")

@@ -69,7 +69,7 @@ Dados de contratação e denúncia no modo mock são compartilhados entre contas
 
 A validação e a revisão podem ser feitas por qualquer integrante disponível, sem nome ou par fixo. Em mudanças apenas documentais, conferir links locais, consistência com código/configuração, preservação das fontes e higiene do diff; não relatar execução das suítes da aplicação sem rodá-las.
 
-Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, anexos de evidência em disputas/denúncias, repasse real ao profissional (o saque é simulado) e teste de carga (`F10`). F04/F05 preservam relato/cópia textual, removem conteúdo de forma lógica e auditam decisões. Não há exclusão definitiva de usuários, operação de desfazer remoção ou credenciais ADMIN padrão. A auditoria é transacional no banco, sem endpoint de alteração/exclusão; controles operacionais/retenção de produção pertencem a F10. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.
+Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, anexos de evidência em disputas/denúncias, repasse real só em modo de teste (Stripe Connect, ADR34) e teste de carga (`F10`). F04/F05 preservam relato/cópia textual, removem conteúdo de forma lógica e auditam decisões. Não há exclusão definitiva de usuários, operação de desfazer remoção ou credenciais ADMIN padrão. A auditoria é transacional no banco, sem endpoint de alteração/exclusão; controles operacionais/retenção de produção pertencem a F10. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.
 
 ## Ensaio administrativo em modo API
 
@@ -122,15 +122,18 @@ Executado em 14/11/2026 na branch `codex/f06-upload-imagens`: 51 testes Java (`d
 
 ## Pagamentos em sandbox (F09)
 
-Automatizados: `PaymentIntegrationTests` (custódia, liberação, reembolso, boleto pago após cancelamento, checkout antigo pago, webhook repetido, assinatura inválida, saque acima do saldo e acesso por perfil) usa um gateway em memória; `StripePaymentGatewayTests` confere a assinatura real do webhook sem rede. `tests/payments-api.spec.ts` percorre carteira, comprovante, saque e painel de transações no modo API, com auditoria axe em 1280 e 390 px.
+Automatizados: `PaymentIntegrationTests` (custódia, liberação, reembolso, boleto pago após cancelamento, checkout antigo pago, webhook repetido, assinatura inválida, saque simulado só do saldo de demonstração, acesso por perfil; conta de recebimento, repasse com e sem conta pronta, falha e nova tentativa, avisos de saque, reembolso total e parcial pelo painel antes e depois do repasse, `refund.failed`, chargeback aberto, ganho e perdido, estorno recusado e pendências do admin) usa um gateway em memória; `StripePaymentGatewayTests` confere a assinatura real do webhook (dois segredos) e a leitura dos eventos sem rede. `tests/payments-api.spec.ts` percorre carteira, comprovante, saque e painel de transações no modo API sem Stripe, com auditoria axe em 1280 e 390 px.
 
-Roteiro manual com Stripe em modo de teste (chave `sk_test_` no `.env` e `stripe listen --forward-to localhost:8081/api/v1/payments/webhook`, cujo `whsec_` vai em `STRIPE_WEBHOOK_SECRET`):
+Roteiro manual com Stripe em modo de teste (chaves `sk_test_` e `pk_test_` no `.env` e `stripe listen --forward-to localhost:8081/api/v1/payments/webhook --forward-connect-to localhost:8081/api/v1/payments/webhook`, cujo `whsec_` vai em `STRIPE_WEBHOOK_SECRET`):
 
 1. Cliente solicita um serviço; profissional aceita. O botão "Iniciar serviço" não aparece e a API recusa o início.
 2. Cliente abre a contratação, clica em **Pagar**, escolhe Cartão e paga com `4242 4242 4242 4242`, validade futura e qualquer CVC.
 3. Na volta, `/pagamento/confirmado` mostra "Pagamento confirmado". Os dois recebem aviso; o profissional inicia, conclui, e o cliente confirma.
-4. A carteira do profissional mostra o valor líquido disponível; o comprovante lista cobrança, comissão, custódia e liberação.
-5. Saque de parte do saldo: o disponível diminui; nada é transferido.
+4. Sem conta de recebimento, a carteira do profissional mostra o valor em "Aguardando conta". Em **Carteira → Cadastrar conta**, o profissional preenche o formulário do Stripe com os dados de teste que ele oferece. Ao fechar, a situação vira "pronta para receber" e o valor passa para "Na conta de recebimento"; o comprovante lista cobrança, comissão, custódia, liberação e transferência.
+5. `/saque` mostra saldo, próximos depósitos e calendário no componente do Stripe. Para ter saldo disponível na hora, pague com `4000 0000 0000 0077`. O depósito gera aviso "Saque depositado".
 6. Em outra contratação, pague e cancele antes do início: o pagamento fica "Reembolsado" e aparece no painel do Stripe.
-7. Boleto e Pix, se ativos na conta: o boleto fica "Em compensação" até o Stripe confirmar (no modo de teste, alguns segundos).
+7. Reembolso pelo painel: em um pagamento já transferido, reembolse parte no painel do Stripe. O pagamento mostra "reembolso parcial", o comprovante ganha "Reembolso" e "Estorno de transferência" proporcional.
+8. Chargeback: pague com `4000 0000 0000 0259`. A contratação mostra "contestação aberta no banco", o admin vê a pendência em **Transações** e a transferência espera. No painel do Stripe, envie evidência vencedora (`winning_evidence`) para ganhar ou `losing_evidence` para perder.
+9. Admin em **Transações**: pendências (aguardando conta, transferência recusada, reembolso recusado, estorno não feito, chargeback aberto) e botão "Tentar transferir".
+10. Boleto e Pix, se ativos na conta: o boleto fica "Em compensação" até o Stripe confirmar (no modo de teste, alguns segundos).
 

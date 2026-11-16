@@ -1268,7 +1268,7 @@ class ApiIntegrationTests {
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                17,
+                18,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var withoutPassword =
@@ -1310,17 +1310,20 @@ class ApiIntegrationTests {
         seed.run();
         seed.run();
         // Contracts that started get simulated escrow history once: 9 released, 2 in escrow.
+        // Counts only demo accounts: other test classes share this database.
         assertEquals(
                 9,
                 db.queryForObject(
-                        "select count(*) from payment where provider = 'SIMULATED'"
-                                + " and status = 'RELEASED'",
+                        "select count(*) from payment p join app_user u on u.id = p.freelancer_id"
+                                + " where p.provider = 'SIMULATED' and p.status = 'RELEASED'"
+                                + " and u.email like '%@demo.freelancenow.test'",
                         Integer.class));
         assertEquals(
                 2,
                 db.queryForObject(
-                        "select count(*) from payment where provider = 'SIMULATED'"
-                                + " and status = 'PAID'",
+                        "select count(*) from payment p join app_user u on u.id = p.freelancer_id"
+                                + " where p.provider = 'SIMULATED' and p.status = 'PAID'"
+                                + " and u.email like '%@demo.freelancenow.test'",
                         Integer.class));
         assertEquals(
                 8,

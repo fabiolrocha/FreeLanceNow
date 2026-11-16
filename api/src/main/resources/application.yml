@@ -49,7 +49,11 @@ app:
     deadline-check-ms: ${CONTRACT_DEADLINE_CHECK_MS:60000}
   stripe:
     secret-key: ${STRIPE_SECRET_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    connect-webhook-secret: ${STRIPE_CONNECT_WEBHOOK_SECRET:}
+    # Rotina que tenta repasses pendentes e atualiza contas de recebimento ainda não prontas.
+    transfer-check-ms: ${STRIPE_TRANSFER_CHECK_MS:300000}
     platform-fee-percent: ${PLATFORM_FEE_PERCENT:10}
     # Formas oferecidas no Checkout. Pix e boleto exigem conta Stripe brasileira com o método ativo.
     methods: ${STRIPE_PAYMENT_METHODS:CARD,PIX,BOLETO}

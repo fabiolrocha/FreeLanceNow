@@ -40,7 +40,11 @@ services:
       # Stripe sandbox (F09). Without STRIPE_SECRET_KEY contracts work without payment.
       - key: STRIPE_SECRET_KEY
         sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
       - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_CONNECT_WEBHOOK_SECRET
         sync: false
       - key: ADMIN_BOOTSTRAP_ENABLED
         value: "false"

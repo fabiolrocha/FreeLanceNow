@@ -67,7 +67,8 @@ const WalletApi = feature(payments, 'WalletPage'),
   PaymentApi = feature(payments, 'PaymentPage'),
   TransactionApi = feature(payments, 'TransactionPage'),
   WithdrawApi = feature(payments, 'WithdrawPage'),
-  TransactionsApi = feature(payments, 'AdminTransactionsPage')
+  TransactionsApi = feature(payments, 'AdminTransactionsPage'),
+  PayoutAccount = feature(() => import('./features/payments/payout-account'), 'PayoutAccountPage')
 const Users = feature(admin, 'AdminUsers'),
   Categories = feature(admin, 'AdminCategories'),
   Moderation = feature(admin, 'AdminModeration'),
@@ -243,6 +244,7 @@ export default function App() {
                 <Route path="demandas/:id/proposta" element={<ProposalForm />} />
                 <Route path="demandas/:id/proposta/enviada" element={<ProposalForm />} />
                 <Route path="saque" element={money(<Withdraw />, <WithdrawApi />)} />
+                <Route path="conta-recebimento" element={<PayoutAccount />} />
                 <Route path="saque/enviado" element={money(<Withdraw />, <WithdrawApi />)} />
               </Route>
               <Route element={<Guard roles={['ADMIN']} />}>
