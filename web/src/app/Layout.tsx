@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Users,
@@ -26,6 +26,26 @@ import { useUnreadCount } from './useUnread'
 import { avatarUrl, client, isMock } from '../data/client'
 import { Avatar } from '../components/ui'
 import '../features/feed/feed.css'
+
+/**
+ * The free API instance sleeps when idle and takes up to a minute to wake. After a few seconds of
+ * waiting, say so, so the person does not reload the page and start the wait again.
+ */
+function Loading() {
+  const [slow, setSlow] = useState(false)
+  useEffect(() => {
+    if (isMock) return
+    const timer = setTimeout(() => setSlow(true), 5000)
+    return () => clearTimeout(timer)
+  }, [])
+  return (
+    <p role="status" className="loading">
+      {slow
+        ? 'Carregando… O servidor estava em repouso e está iniciando. Isso pode levar até um minuto; não é preciso recarregar a página.'
+        : 'Carregando…'}
+    </p>
+  )
+}
 
 export function Brand() {
   const { user } = useApp()
@@ -215,13 +235,7 @@ export function Layout() {
               <button onClick={() => void refresh()}>Tentar novamente</button>
             </div>
           )}
-          {loading ? (
-            <p role="status" className="loading">
-              Carregando…
-            </p>
-          ) : (
-            <Outlet />
-          )}
+          {loading ? <Loading /> : <Outlet />}
         </main>
       </div>
       {!user && (

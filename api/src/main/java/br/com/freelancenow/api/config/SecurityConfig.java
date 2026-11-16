@@ -81,7 +81,12 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         a ->
-                                a.requestMatchers("/api/v1/auth/**", "/actuator/health", "/error")
+                                a.requestMatchers(
+                                                "/api/v1/auth/**",
+                                                "/actuator/health",
+                                                // Render's health check; answers without the database.
+                                                "/actuator/health/liveness",
+                                                "/error")
                                         .permitAll()
                                         // Stripe signs the body; PaymentController checks it.
                                         .requestMatchers(HttpMethod.POST, "/api/v1/payments/webhook")
