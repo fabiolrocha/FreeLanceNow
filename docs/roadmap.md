@@ -15,7 +15,7 @@ Revisado em **09/11/2026**. Prazo final: **18/11/2026, quarta-feira**, horário 
 | Melhorias, avisos e chat (F06/F07 parciais) | Integrados à `main` (PR #45): avisos internos e chat por contratação (`V9`), paginação da busca no React, abas de contratação e avaliações no serviço |
 | DDL financeiro e preparação de deploy (F09/F10 parciais) | Integrados à `main` (PR #43 e PR #44): migração `V10__payments.sql` (`payment` e `ledger_entry`), SDK `stripe-java`, perfil `prod`, TLS Neon, `JwtSecretValidator`, `vercel.json` e `docs/deploy.md` |
 
-F04/F05 têm implementação no PR #40 e verificações descritas em [testes e demonstração](testes-e-demonstracao.md). O estado detalhado do que falta em F06, F07, F09 e F10 fica no [backlog](backlog.md).
+F04/F05 têm implementação no PR #40 e verificações descritas em [testes e demonstração](testes-e-demonstracao.md). F09 foi concluída em modo de teste (PR #55, ADR33); repasse e saque com Stripe Connect, reembolso pelo painel e chargeback vieram em 16/11 (ADR34). O estado detalhado do que falta em F06, F07 e F10 fica no [backlog](backlog.md).
 
 ## Prioridade concluída: feed (F11) e comunicação interna (F07 parcial)
 
@@ -28,7 +28,7 @@ O início do aplicativo funciona como o feed previsto no HTML de base, com publi
 | Até 21/10 — concluído | F01, F02, F03, F04, F05, F08, F11 | Marcos 1, 2 e 3 fechados; feed misto integrado à `main` |
 | 09/11 — integrado à `main` | PR #45 (F06/F07 parciais), PR #43 (`V10`) e PR #44 (deploy prep) | Avisos e chat por contratação, paginação da busca, DDL de pagamentos e configuração Vercel/Neon/Stripe integrados |
 | 10–12/11 | Concluir F06 (upload de imagens) e F07 (e-mail Resend / recuperação de senha) | Upload de até 5 imagens JPG/PNG (5 MB) validado; envio de e-mail e recuperação de senha testados |
-| 10–13/11 | Concluir F09 (fluxo Stripe Sandbox) e F10 (operação) | Checkout sandbox, webhook idempotente, comissão 10%, liberação/reembolso, conciliação, rate limit, backup/restauração e teste de carga |
+| 10–13/11 (F09 concluída em 15/11) | Concluir F09 (fluxo Stripe Sandbox, PR #55) e F10 (operação) | Checkout sandbox, webhook idempotente, comissão 10%, liberação/reembolso, conciliação, rate limit, backup/restauração e teste de carga |
 | 12–16/11 | E01 — Regressão, correções e documentação (Issue #32) | Sem bloqueios de entrega; documentação corresponde à versão; congelamento sugerido em 16/11 |
 | 17/11 | E02 — Ensaio e conferência dos materiais (Issue #33) | Roteiro executado do início ao fim; versão e instruções conferidas |
 | **18/11** | **E02 — Entrega final (Issue #33)** | **Código, sistema web, documentação, evidências e apresentação entregues** |

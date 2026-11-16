@@ -51,6 +51,7 @@ public class PaymentService {
                     + " p.gross_amount, p.fee_amount, p.net_amount, p.external_reference,"
                     + " p.checkout_url, p.checkout_expires_at, p.provider_payment_id,"
                     + " p.created_at, p.paid_at, p.released_at, p.refunded_at,"
+                    + " p.transfer_id, p.transferred_at, p.refunded_amount, p.dispute_status,"
                     + " c.title, cu.name as client_name, fu.name as freelancer_name";
     private static final String FROM =
             " from payment p join contract c on c.id = p.contract_id"
@@ -63,6 +64,10 @@ public class PaymentService {
     private final UserRepository users;
     private final CurrentUser current;
     private final NotificationService notifications;
+    private final PayoutTransferService transfers;
+    private final PayoutAccountStore payoutAccountStore;
+    private final PayoutAccountService payoutAccounts;
+    private final PaymentIncidentService incidents;
     private final Clock clock;
     private final BigDecimal feePercent;
     private final List<PaymentMethod> methods;
@@ -75,6 +80,10 @@ public class PaymentService {
             UserRepository users,
             CurrentUser current,
             NotificationService notifications,
+            PayoutTransferService transfers,
+            PayoutAccountStore payoutAccountStore,
+            PayoutAccountService payoutAccounts,
+            PaymentIncidentService incidents,
             Clock clock,
             @Value("${app.stripe.platform-fee-percent:10}") BigDecimal feePercent,
             @Value("${app.stripe.methods:CARD,PIX,BOLETO}") String methods,
@@ -85,6 +94,10 @@ public class PaymentService {
         this.users = users;
         this.current = current;
         this.notifications = notifications;
+        this.transfers = transfers;
+        this.payoutAccountStore = payoutAccountStore;
+        this.payoutAccounts = payoutAccounts;
+        this.incidents = incidents;
         this.clock = clock;
         this.feePercent = feePercent;
         this.methods =
@@ -117,6 +130,10 @@ public class PaymentService {
             Instant paidAt,
             Instant releasedAt,
             Instant refundedAt,
+            String transferId,
+            Instant transferredAt,
+            BigDecimal refundedAmount,
+            String disputeStatus,
             String title,
             String clientName,
             String freelancerName) {
@@ -136,7 +153,14 @@ public class PaymentService {
                     createdAt,
                     paidAt,
                     releasedAt,
-                    refundedAt);
+                    refundedAt,
+                    transferredAt,
+                    // Released through Stripe but not sent to the freelancer's account yet.
+                    status.equals("RELEASED")
+                            && provider.equals("STRIPE")
+                            && transferId == null,
+                    refundedAmount,
+                    disputeStatus);
         }
     }
 
@@ -162,6 +186,10 @@ public class PaymentService {
                 instant(rs, "paid_at"),
                 instant(rs, "released_at"),
                 instant(rs, "refunded_at"),
+                rs.getString("transfer_id"),
+                instant(rs, "transferred_at"),
+                rs.getBigDecimal("refunded_amount"),
+                rs.getString("dispute_status"),
                 rs.getString("title"),
                 rs.getString("client_name"),
                 rs.getString("freelancer_name"));
@@ -299,7 +327,16 @@ public class PaymentService {
                         e.id(),
                         e.type(),
                         Timestamp.from(Instant.now(clock)));
-        if (fresh == 0 || e.paymentId() == null) return;
+        if (fresh == 0) return;
+        if (e.account() != null) {
+            payoutAccounts.onAccountEvent(e);
+            return;
+        }
+        if (e.type().startsWith("charge.") || e.type().startsWith("refund.")) {
+            incidents.handle(e);
+            return;
+        }
+        if (e.paymentId() == null) return;
         UUID paymentId;
         try {
             paymentId = UUID.fromString(e.paymentId());
@@ -419,8 +456,12 @@ public class PaymentService {
         var p = livePayment(c.getId());
         if (p == null) return;
         switch (p.status()) {
-            case "PAID" ->
-                    refund(c, p, "Reembolso: contratação cancelada", now);
+            case "PAID" -> {
+                // A disputed charge cannot be refunded: the chargeback result decides (won:
+                // refunded then; lost: the bank already gave the money back).
+                if (disputeOpen(p.id())) return;
+                refund(c, p, "Reembolso: contratação cancelada", now);
+            }
             case "PENDING" -> {
                 closeCheckout(p);
                 setStatus(p.id(), "CANCELED", now);
@@ -448,12 +489,30 @@ public class PaymentService {
                 p.net(),
                 "Valor liberado após a conclusão",
                 now);
+        if (!"STRIPE".equals(p.provider()) || !gateway.enabled()) {
+            notifications.notify(
+                    c.getFreelancer(),
+                    "PAYMENT_RELEASED",
+                    "Valor liberado: " + c.getTitle(),
+                    "O valor do serviço, já descontada a comissão, está disponível na sua"
+                            + " carteira.",
+                    "/carteira");
+            return;
+        }
+        boolean ready = payoutAccountStore.readyAccountId(c.getFreelancer().getId()) != null;
         notifications.notify(
                 c.getFreelancer(),
                 "PAYMENT_RELEASED",
                 "Valor liberado: " + c.getTitle(),
-                "O valor do serviço, já descontada a comissão, está disponível na sua carteira.",
-                "/carteira");
+                ready
+                        ? "O valor do serviço, já descontada a comissão, está sendo transferido"
+                                + " para a sua conta de recebimento."
+                        : "O valor do serviço, já descontada a comissão, está guardado. Cadastre"
+                                + " sua conta de recebimento para recebê-lo.",
+                ready ? "/carteira" : "/conta-recebimento");
+        // After the commit, so a Stripe failure never undoes the completion.
+        var paymentId = p.id();
+        PayoutTransferService.afterCommit(() -> transfers.transfer(paymentId, false));
     }
 
     private void refund(Contract c, Row p, String reason, Instant now) {
@@ -470,8 +529,8 @@ public class PaymentService {
             }
         }
         db.update(
-                "update payment set status = 'REFUNDED', refunded_at = ?, updated_at = ?"
-                        + " where id = ?",
+                "update payment set status = 'REFUNDED', refunded_amount = gross_amount,"
+                        + " refunded_at = ?, updated_at = ? where id = ?",
                 Timestamp.from(now),
                 Timestamp.from(now),
                 p.id());
@@ -506,17 +565,32 @@ public class PaymentService {
                             "select sum(net_amount) from payment where freelancer_id = ?"
                                     + " and status = 'PAID'",
                             u.getId());
-            var released = released(u.getId());
             var withdrawn = withdrawn(u.getId());
             return new PaymentDtos.Wallet(
                     gateway.enabled(),
                     feePercent,
                     held,
-                    released.subtract(withdrawn),
-                    released,
+                    released(u.getId()).subtract(withdrawn),
+                    sum(
+                            "select sum(amount) from ledger_entry where user_id = ?"
+                                    + " and entry_type = 'PAYOUT_RELEASE'",
+                            u.getId()),
                     withdrawn,
                     zero,
                     zero,
+                    // What really went out, minus what came back by reversals.
+                    sum(
+                            "select sum(case entry_type when 'TRANSFER' then amount"
+                                    + " else -amount end) from ledger_entry where user_id = ?"
+                                    + " and entry_type in ('TRANSFER','TRANSFER_REVERSAL')",
+                            u.getId()),
+                    // Same share the transfer will send: net minus the net part of refunds.
+                    sum(
+                            "select sum(net_amount - trunc(refunded_amount * net_amount"
+                                    + " / gross_amount, 2)) from payment where freelancer_id = ?"
+                                    + " and status = 'RELEASED' and provider = 'STRIPE'"
+                                    + " and transfer_id is null",
+                            u.getId()),
                     payments.stream().map(Row::view).toList(),
                     withdrawals(u.getId()));
         }
@@ -530,14 +604,17 @@ public class PaymentService {
                 zero,
                 zero,
                 zero,
+                // Partial refunds (Stripe dashboard) count on both sides.
                 sum(
-                        "select sum(gross_amount) from payment where client_id = ?"
-                                + " and status in ('PAID','RELEASED')",
+                        "select sum(gross_amount - refunded_amount) from payment"
+                                + " where client_id = ? and status in ('PAID','RELEASED')",
                         u.getId()),
                 sum(
-                        "select sum(gross_amount) from payment where client_id = ?"
-                                + " and status = 'REFUNDED'",
+                        "select sum(refunded_amount) from payment where client_id = ?"
+                                + " and status <> 'REFUND_FAILED'",
                         u.getId()),
+                zero,
+                zero,
                 payments.stream().map(Row::view).toList(),
                 List.of());
     }
@@ -604,9 +681,115 @@ public class PaymentService {
                 sum("select sum(fee_amount) from payment where status in ('PAID','RELEASED')"),
                 sum("select sum(gross_amount) from payment where status = 'PAID'"),
                 sum("select sum(net_amount) from payment where status = 'RELEASED'"),
-                sum("select sum(gross_amount) from payment where status = 'REFUNDED'"),
+                sum(
+                        "select sum(refunded_amount) from payment"
+                                + " where status <> 'REFUND_FAILED'"),
                 sum("select sum(amount) from withdrawal"),
+                sum("select sum(amount) from ledger_entry where entry_type = 'TRANSFER'"),
+                sum(
+                        "select sum(amount) from ledger_entry"
+                                + " where entry_type = 'TRANSFER_REVERSAL'"),
+                sum("select sum(gross_amount) from payment where dispute_status = 'OPEN'"),
+                issues(),
                 payments.stream().map(Row::view).toList());
+    }
+
+    private static final String ISSUE_KIND =
+            "case"
+                    + " when p.dispute_status = 'OPEN' then 'CHARGEBACK_OPEN'"
+                    + " when p.status = 'REFUND_FAILED' then 'REFUND_FAILED'"
+                    + " when p.transfer_error like 'Estorno%' then 'REVERSAL_FAILED'"
+                    + " when p.status = 'RELEASED' and p.transfer_id is null"
+                    + " and p.transfer_error is not null then 'TRANSFER_FAILED'"
+                    + " when p.status = 'RELEASED' and p.transfer_id is null"
+                    + " then 'AWAITING_ACCOUNT'"
+                    + " end";
+
+    /** Stripe payments that need the team, most urgent kinds first. */
+    private List<PaymentDtos.AdminIssue> issues() {
+        return db.query(
+                "select * from (select p.id, p.contract_id, c.title, fu.name as freelancer_name,"
+                        + " p.gross_amount, p.net_amount, p.refunded_amount, p.transfer_error,"
+                        + " p.updated_at, "
+                        + ISSUE_KIND
+                        + " as kind"
+                        + FROM
+                        + " where p.provider = 'STRIPE') i where kind is not null"
+                        + " order by case kind when 'CHARGEBACK_OPEN' then 1"
+                        + " when 'REFUND_FAILED' then 2 when 'REVERSAL_FAILED' then 3"
+                        + " when 'TRANSFER_FAILED' then 4 else 5 end, updated_at desc"
+                        + " limit 200",
+                (rs, n) -> {
+                    String kind = rs.getString("kind");
+                    boolean clientMoney =
+                            kind.equals("CHARGEBACK_OPEN") || kind.equals("REFUND_FAILED");
+                    var gross = rs.getBigDecimal("gross_amount");
+                    var net = rs.getBigDecimal("net_amount");
+                    // The freelancer's part shrinks with a partial refund (same rule as the transfer).
+                    var loss =
+                            PaymentIncidentService.freelancerLoss(
+                                    rs.getBigDecimal("refunded_amount"), gross, net);
+                    return new PaymentDtos.AdminIssue(
+                            rs.getObject("id", UUID.class),
+                            rs.getObject("contract_id", UUID.class),
+                            kind,
+                            rs.getString("title"),
+                            rs.getString("freelancer_name"),
+                            clientMoney ? gross : net.subtract(loss),
+                            rs.getString("transfer_error"),
+                            kind.equals("TRANSFER_FAILED") || kind.equals("AWAITING_ACCOUNT"));
+                });
+    }
+
+    /**
+     * Admin asks for the transfer of a released payment again (after a Stripe failure, or to
+     * check whether the freelancer's account is ready now). Read-write: it may refresh the
+     * stored account state.
+     */
+    @Transactional
+    public PaymentDtos.PaymentView retryTransfer(Jwt jwt, UUID paymentId) {
+        var u = current.require(jwt);
+        if (u.getRole() != Role.ADMIN)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Esta área é exclusiva da administração.");
+        var rows = db.query("select " + COLUMNS + FROM + " where p.id = ?", ROW, paymentId);
+        if (rows.isEmpty()) throw new ApiException(HttpStatus.NOT_FOUND, "Pagamento não encontrado.");
+        var p = rows.get(0);
+        if (!"RELEASED".equals(p.status()) || !"STRIPE".equals(p.provider()) || p.transferId() != null)
+            throw new ApiException(HttpStatus.CONFLICT, "Este pagamento não espera transferência.");
+        if ("OPEN".equals(p.disputeStatus()))
+            throw new ApiException(
+                    HttpStatus.CONFLICT, "Há uma contestação aberta: a transferência espera o resultado.");
+        payoutAccounts.refresh(p.freelancerId());
+        if (!transfers.transfer(paymentId, true)) {
+            String error =
+                    db.queryForObject(
+                            "select transfer_error from payment where id = ?", String.class, paymentId);
+            throw new ApiException(
+                    HttpStatus.CONFLICT,
+                    payoutAccountStore.readyAccountId(p.freelancerId()) == null
+                            ? "A conta de recebimento do profissional ainda não está pronta."
+                            : "O Stripe recusou de novo: " + (error == null ? "sem detalhe" : error));
+        }
+        return db.query("select " + COLUMNS + FROM + " where p.id = ?", ROW, paymentId).get(0).view();
+    }
+
+    /**
+     * Admin marks a failed reversal as settled (the platform covered the difference): the
+     * issue leaves the list. Only clears that kind of error.
+     */
+    @Transactional
+    public void resolveReversal(Jwt jwt, UUID paymentId) {
+        var u = current.require(jwt);
+        if (u.getRole() != Role.ADMIN)
+            throw new ApiException(HttpStatus.FORBIDDEN, "Esta área é exclusiva da administração.");
+        int changed =
+                db.update(
+                        "update payment set transfer_error = null, updated_at = ?"
+                                + " where id = ? and transfer_error like 'Estorno%'",
+                        Timestamp.from(Instant.now(clock)),
+                        paymentId);
+        if (changed == 0)
+            throw new ApiException(HttpStatus.CONFLICT, "Não há estorno pendente neste pagamento.");
     }
 
     // ---------------------------------------------------------------- demo data
@@ -718,10 +901,15 @@ public class PaymentService {
                 Timestamp.from(at));
     }
 
+    /**
+     * Released money the simulated withdrawal may spend: demo payments only. Money paid through
+     * Stripe goes to the freelancer's receiving account and leaves by Stripe's own payouts.
+     */
     private BigDecimal released(UUID userId) {
         return sum(
-                "select sum(amount) from ledger_entry where user_id = ?"
-                        + " and entry_type = 'PAYOUT_RELEASE'",
+                "select sum(l.amount) from ledger_entry l join payment p on p.id = l.payment_id"
+                        + " where l.user_id = ? and l.entry_type = 'PAYOUT_RELEASE'"
+                        + " and p.provider <> 'STRIPE'",
                 userId);
     }
 
@@ -756,6 +944,15 @@ public class PaymentService {
                 };
         if (!allowed)
             throw new ApiException(HttpStatus.FORBIDDEN, "Você não participa desta contratação.");
+    }
+
+    private boolean disputeOpen(UUID paymentId) {
+        return "OPEN"
+                .equals(
+                        db.queryForObject(
+                                "select dispute_status from payment where id = ?",
+                                String.class,
+                                paymentId));
     }
 
     private static String link(Contract c) {

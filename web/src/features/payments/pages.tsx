@@ -5,8 +5,17 @@ import { CheckCircle2, Clock, ShieldCheck } from 'lucide-react'
 import { useApp } from '../../app/store'
 import { Empty, ErrorMessage, Field, PageTitle } from '../../components/ui'
 import { exportCsv } from '../../data/exportCsv'
-import { ledgerLabel, methodLabel, paymentStatusLabel, paymentsApi } from '../../data/payments'
+import {
+  adminIssueHint,
+  adminIssueLabel,
+  freelancerShare,
+  ledgerLabel,
+  methodLabel,
+  paymentStatusText,
+  paymentsApi,
+} from '../../data/payments'
 import type {
+  AdminIssue,
   AdminPayments,
   ContractPayment,
   LedgerEntry,
@@ -15,9 +24,20 @@ import type {
   Wallet,
 } from '../../data/payments'
 import { money } from '../../domain/rules'
+import { PayoutAccountCard, StripePayouts } from './payout-account'
 import type { Contract, Role } from '../../domain/types'
 
 const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString('pt-BR') : '—')
+/** Date and time in a table cell: each part stays whole, the cell breaks only between them. */
+function WhenCell({ iso }: { iso?: string | null }) {
+  if (!iso) return <td>—</td>
+  const d = new Date(iso)
+  return (
+    <td className="when">
+      <span>{d.toLocaleDateString('pt-BR')}</span> <span>{d.toLocaleTimeString('pt-BR')}</span>
+    </td>
+  )
+}
 const simulated = (p: Payment) => (p.provider === 'SIMULATED' ? ' (demonstração)' : '')
 
 /** Payment block on the contract page (API mode). */
@@ -38,14 +58,26 @@ export function ContractPaymentBox({
     <div className="notice payment-box">
       <strong>
         <ShieldCheck size={16} aria-hidden /> Pagamento
-        {p ? `: ${paymentStatusLabel[p.status]}${simulated(p)}` : ''}
+        {p ? `: ${paymentStatusText(p)}${simulated(p)}` : ''}
       </strong>
       {p && (
         <p>
           {money(p.grossAmount)} via {methodLabel[p.method]}
           {p.status === 'PAID' && ` · profissional recebe ${money(p.netAmount)} após a conclusão`}
-          {p.status === 'RELEASED' && ` · ${money(p.netAmount)} liberados ao profissional`}
+          {p.status === 'RELEASED' && ` · ${money(freelancerShare(p))} liberados ao profissional`}
+          {(p.refundedAmount ?? 0) > 0 &&
+            p.status !== 'REFUNDED' &&
+            ` · ${money(p.refundedAmount ?? 0)} reembolsados ao cliente`}
         </p>
+      )}
+      {p?.disputeStatus === 'OPEN' && (
+        <p>
+          O cliente contestou este pagamento no banco. Enquanto o banco decide, o valor não é
+          transferido ao profissional.
+        </p>
+      )}
+      {p?.status === 'REFUND_FAILED' && (
+        <p>O banco recusou o reembolso. A equipe do FreeLanceNow vai resolver com o cliente.</p>
       )}
       {role === 'CLIENT' && c.status === 'ACEITO' && state.enabled && !paid && (
         <>
@@ -67,11 +99,12 @@ export function ContractPaymentBox({
       {role === 'FREELANCER' && c.status === 'ACEITO' && state.enabled && !paid && (
         <p>O serviço pode ser iniciado depois que o pagamento do cliente for confirmado.</p>
       )}
-      {p && ['PAID', 'RELEASED', 'REFUNDED'].includes(p.status) && (
-        <Link className="subtle-link" to={`/transacao?id=${p.id}`}>
-          Ver comprovante
-        </Link>
-      )}
+      {p &&
+        ['PAID', 'RELEASED', 'REFUNDED', 'REFUND_FAILED', 'CHARGED_BACK'].includes(p.status) && (
+          <Link className="subtle-link" to={`/transacao?id=${p.id}`}>
+            Ver comprovante
+          </Link>
+        )}
     </div>
   )
 }
@@ -252,7 +285,7 @@ export function PaymentPage() {
 function PaymentsTable({ items, role }: { items: Payment[]; role?: Role }) {
   if (!items.length) return <Empty title="Nenhum pagamento ainda" />
   return (
-    <div className="table-wrap">
+    <div className="table-wrap wide">
       <table>
         <thead>
           <tr>
@@ -278,14 +311,14 @@ function PaymentsTable({ items, role }: { items: Payment[]; role?: Role }) {
                     : `${p.clientName} → ${p.freelancerName}`}
               </td>
               <td className="nowrap">
-                {money(role === 'FREELANCER' ? p.netAmount : p.grossAmount)}
+                {money(role === 'FREELANCER' ? freelancerShare(p) : p.grossAmount)}
               </td>
               <td>
-                {paymentStatusLabel[p.status]}
+                {paymentStatusText(p)}
                 {simulated(p)}
               </td>
-              <td>{when(p.paidAt || p.createdAt)}</td>
-              <td>
+              <WhenCell iso={p.paidAt || p.createdAt} />
+              <td className="nowrap">
                 <Link to={`/transacao?id=${p.id}`}>Comprovante</Link>
               </td>
             </tr>
@@ -313,7 +346,7 @@ const csvRows = (items: Payment[]) => [
     p.clientName,
     p.freelancerName,
     methodLabel[p.method],
-    paymentStatusLabel[p.status] + simulated(p),
+    paymentStatusText(p) + simulated(p),
     p.grossAmount.toFixed(2),
     p.feeAmount.toFixed(2),
     p.netAmount.toFixed(2),
@@ -364,21 +397,48 @@ export function WalletPage() {
       <div className="stats">
         {freelancer ? (
           <>
-            <div>
-              <span>Disponível</span>
-              <strong>{money(data.available)}</strong>
-              <small>liberado e ainda não sacado</small>
-            </div>
+            {data.enabled && data.transferred !== undefined ? (
+              data.available > 0 && (
+                <div>
+                  <span>Saldo de demonstração</span>
+                  <strong>{money(data.available)}</strong>
+                  <small>pagamentos de exemplo</small>
+                </div>
+              )
+            ) : (
+              <div>
+                <span>Disponível</span>
+                <strong>{money(data.available)}</strong>
+                <small>liberado e ainda não sacado</small>
+              </div>
+            )}
             <div>
               <span>Em custódia</span>
               <strong>{money(data.held)}</strong>
               <small>libera na conclusão</small>
             </div>
-            <div>
-              <span>Sacado</span>
-              <strong>{money(data.withdrawn)}</strong>
-              <small>saques simulados</small>
-            </div>
+            {data.enabled && data.transferred !== undefined ? (
+              <>
+                <div>
+                  <span>Na conta de recebimento</span>
+                  <strong>{money(data.transferred)}</strong>
+                  <small>transferido pelo Stripe</small>
+                </div>
+                {(data.awaitingAccount ?? 0) > 0 && (
+                  <div>
+                    <span>Aguardando conta</span>
+                    <strong>{money(data.awaitingAccount ?? 0)}</strong>
+                    <small>cadastre a conta de recebimento</small>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div>
+                <span>Sacado</span>
+                <strong>{money(data.withdrawn)}</strong>
+                <small>saques simulados</small>
+              </div>
+            )}
           </>
         ) : (
           <>
@@ -400,10 +460,11 @@ export function WalletPage() {
           </>
         )}
       </div>
+      {freelancer && <PayoutAccountCard />}
       {freelancer && (
-        <div className="row">
+        <div className="row wallet-actions">
           <Link className="button" to="/saque">
-            Solicitar saque
+            {data.enabled ? 'Ver saques' : 'Solicitar saque'}
           </Link>
         </div>
       )}
@@ -424,7 +485,7 @@ export function WalletPage() {
               <tbody>
                 {data.withdrawals.map((w) => (
                   <tr key={w.id}>
-                    <td>{when(w.createdAt)}</td>
+                    <WhenCell iso={w.createdAt} />
                     <td className="nowrap">{money(w.amount)}</td>
                     <td>Simulado, sem transferência</td>
                   </tr>
@@ -470,7 +531,7 @@ export function TransactionPage() {
       />
       <section className="panel">
         <h2>
-          {money(p.grossAmount)} · {paymentStatusLabel[p.status]}
+          {money(p.grossAmount)} · {paymentStatusText(p)}
           {simulated(p)}
         </h2>
         <dl className="details">
@@ -513,7 +574,7 @@ export function TransactionPage() {
             <tbody>
               {data.entries.map((e, i) => (
                 <tr key={i}>
-                  <td>{when(e.at)}</td>
+                  <WhenCell iso={e.at} />
                   <td>{ledgerLabel[e.type]}</td>
                   <td>{e.description}</td>
                   <td className="nowrap">{money(e.amount)}</td>
@@ -558,61 +619,81 @@ export function WithdrawPage() {
       setBusy(false)
     }
   }
+  const stripe = !!wallet?.enabled
+  // With Stripe, the simulated form only spends demo money (payments created by the seed).
+  const showDemoWithdrawal = !stripe || (wallet?.available ?? 0) >= 1 || sent
   return (
     <>
       <PageTitle
-        title={sent ? 'Saque registrado' : 'Solicitar saque'}
-        description="Saque simulado: o saldo diminui, mas nenhum valor é transferido para banco ou Pix."
+        title={sent ? 'Saque registrado' : 'Saque'}
+        description={
+          stripe
+            ? 'O valor dos serviços vai para a sua conta de recebimento, e o Stripe deposita na sua conta bancária automaticamente, no calendário que você escolher.'
+            : 'Saque simulado: o saldo diminui, mas nenhum valor é transferido para banco ou Pix.'
+        }
       />
       <ErrorMessage message={error} />
-      <section className="form-panel">
-        {sent ? (
-          <div className="confirmation" role="status">
-            <CheckCircle2 size={44} />
-            <p>
-              Saque registrado. Saldo disponível agora: {wallet ? money(wallet.available) : '…'}.
-            </p>
-            <Link to="/carteira">Voltar à carteira</Link>
-          </div>
-        ) : !wallet ? (
-          <p>Carregando saldo…</p>
-        ) : wallet.available < 1 ? (
-          <>
-            <p>
-              Você ainda não tem saldo disponível. Ele aparece quando um cliente confirma a
-              conclusão.
-            </p>
-            <Link to="/carteira">Voltar à carteira</Link>
-          </>
-        ) : (
-          <form onSubmit={(e) => void submit(e)}>
-            <p>Disponível: {money(wallet.available)}</p>
-            <Field
-              label="Valor (R$)"
-              name="amount"
-              type="number"
-              min="1"
-              max={wallet.available.toFixed(2)}
-              step="0.01"
-              defaultValue={wallet.available.toFixed(2)}
-              required
-            />
-            <p className="notice">
-              Não informe dados bancários: esta versão não transfere dinheiro.
-            </p>
-            <button className="button" disabled={busy}>
-              {busy ? 'Registrando…' : 'Registrar saque simulado'}
-            </button>
-          </form>
-        )}
-      </section>
+      {stripe && !sent && <StripePayouts />}
+      {stripe && showDemoWithdrawal && !sent && (
+        <>
+          <h2>Saldo de demonstração</h2>
+          <p>
+            Pagamentos de exemplo, criados pelos dados de demonstração. O saque deles é simulado:
+            nenhum valor sai do Stripe.
+          </p>
+        </>
+      )}
+      {showDemoWithdrawal && (
+        <section className="form-panel">
+          {sent ? (
+            <div className="confirmation" role="status">
+              <CheckCircle2 size={44} />
+              <p>
+                Saque registrado. Saldo disponível agora: {wallet ? money(wallet.available) : '…'}.
+              </p>
+              <Link to="/carteira">Voltar à carteira</Link>
+            </div>
+          ) : !wallet ? (
+            <p>Carregando saldo…</p>
+          ) : wallet.available < 1 ? (
+            <>
+              <p>
+                Você ainda não tem saldo disponível. Ele aparece quando um cliente confirma a
+                conclusão.
+              </p>
+              <Link to="/carteira">Voltar à carteira</Link>
+            </>
+          ) : (
+            <form onSubmit={(e) => void submit(e)}>
+              <p>Disponível: {money(wallet.available)}</p>
+              <Field
+                label="Valor (R$)"
+                name="amount"
+                type="number"
+                min="1"
+                max={wallet.available.toFixed(2)}
+                step="0.01"
+                defaultValue={wallet.available.toFixed(2)}
+                required
+              />
+              <p className="notice">
+                Não informe dados bancários: esta versão não transfere dinheiro.
+              </p>
+              <button className="button" disabled={busy}>
+                {busy ? 'Registrando…' : 'Registrar saque simulado'}
+              </button>
+            </form>
+          )}
+        </section>
+      )}
     </>
   )
 }
 
 export function AdminTransactionsPage() {
   const [data, setData] = useState<AdminPayments | null>(null),
-    [error, setError] = useState('')
+    [error, setError] = useState(''),
+    [version, setVersion] = useState(0)
   useEffect(() => {
     let active = true
     paymentsApi
@@ -622,7 +703,7 @@ export function AdminTransactionsPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [version])
   if (!data) return <Empty title={error || 'Carregando transações…'} />
   return (
     <>
@@ -669,8 +750,121 @@ export function AdminTransactionsPage() {
           <strong>{money(data.withdrawn)}</strong>
           <small>saques simulados</small>
         </div>
+        {data.transferred !== undefined && (
+          <>
+            <div>
+              <span>Transferido</span>
+              <strong>{money(data.transferred)}</strong>
+              <small>às contas de recebimento</small>
+            </div>
+            <div>
+              <span>Estornado</span>
+              <strong>{money(data.reversed ?? 0)}</strong>
+              <small>de volta dos profissionais</small>
+            </div>
+            <div>
+              <span>Em contestação</span>
+              <strong>{money(data.inChargeback ?? 0)}</strong>
+              <small>chargebacks abertos</small>
+            </div>
+          </>
+        )}
       </div>
+      {data.issues && <AdminIssues items={data.issues} onChange={() => setVersion((v) => v + 1)} />}
+      <h2>Pagamentos</h2>
       <PaymentsTable items={data.payments} />
+    </>
+  )
+}
+
+/** Stripe payments that need the team, with a retry for transfers. */
+function AdminIssues({ items, onChange }: { items: AdminIssue[]; onChange: () => void }) {
+  const [busy, setBusy] = useState(''),
+    [message, setMessage] = useState('')
+  async function act(id: string, work: () => Promise<unknown>, done: string) {
+    setBusy(id)
+    setMessage('')
+    try {
+      await work()
+      setMessage(done)
+      onChange()
+    } catch (e) {
+      setMessage((e as Error).message)
+    } finally {
+      setBusy('')
+    }
+  }
+  return (
+    <>
+      <h2>Pendências</h2>
+      {message && (
+        <p className="notice" role="status">
+          {message}
+        </p>
+      )}
+      {items.length === 0 ? (
+        <p>Nenhuma pendência nos pagamentos pelo Stripe.</p>
+      ) : (
+        <div className="table-wrap wide">
+          <table>
+            <thead>
+              <tr>
+                <th>Situação</th>
+                <th>Contratação</th>
+                <th>Profissional</th>
+                <th>Valor</th>
+                <th>O que fazer</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((i) => (
+                <tr key={`${i.paymentId}-${i.kind}`}>
+                  <td>{adminIssueLabel[i.kind]}</td>
+                  <td>
+                    <Link to={`/contratacoes/${i.contractId}`}>{i.contractTitle}</Link>
+                  </td>
+                  <td>{i.freelancerName}</td>
+                  <td className="nowrap">{money(i.amount)}</td>
+                  <td>
+                    {adminIssueHint[i.kind]}
+                    {i.detail && <small className="block">{i.detail}</small>}
+                    {i.retryable && (
+                      <button
+                        className="button secondary"
+                        disabled={busy === i.paymentId}
+                        onClick={() =>
+                          void act(
+                            i.paymentId,
+                            () => paymentsApi.retryTransfer(i.paymentId),
+                            'Transferência feita.',
+                          )
+                        }
+                      >
+                        {busy === i.paymentId ? 'Tentando…' : 'Tentar transferir'}
+                      </button>
+                    )}
+                    {i.kind === 'REVERSAL_FAILED' && (
+                      <button
+                        className="button secondary"
+                        disabled={busy === i.paymentId}
+                        onClick={() =>
+                          void act(
+                            i.paymentId,
+                            () => paymentsApi.resolveReversal(i.paymentId),
+                            'Pendência encerrada.',
+                          )
+                        }
+                      >
+                        Marcar como resolvido
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </>
   )
 }

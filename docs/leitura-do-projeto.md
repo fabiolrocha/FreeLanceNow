@@ -30,7 +30,7 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 | Vue/admin separado em roadmap antigo | Uma aplicação React com administração mock/API por perfil; F04/F05 persistentes nesta branch | Escopo atual; evita um terceiro frontend |
 | Distribuição nominal proposta na organização inicial | Sem pessoas específicas por caso, área, arquivo ou revisão; antiga página de delegação substituída por guia de colaboração | Orientação do grupo em 21/10; ver `equipe.md` |
 | Usuário informou não haver repositório | Já existiam `.git`, `main` e remoto `fabiolrocha/FreeLanceNow` | Inspeção do workspace; histórico preservado |
-| Financeiro aparece como central no pitch/HTML e futuro em especificações | Telas financeiras simuladas agora; gateway, custódia e conciliação depois | Corte explícito da primeira entrega |
+| Financeiro aparece como central no pitch/HTML e futuro em especificações | Telas financeiras simuladas na primeira entrega; Stripe Checkout em modo de teste, custódia e reembolso entregues em F09 (ADR33) | Corte explícito da primeira entrega, fechado em 15/11 |
 | Java 21 / Boot 3 em planejamento antigo | Java 21 / Spring Boot 4.1.1; ADR05 registra a decisão histórica inicial de Java 21 | `api/pom.xml`, container e CI; `decisoes.md` preserva a proveniência do scaffold |
 | Prazos de 48h, 5 dias, 7 dias | API implementa jobs de 48h/5 dias e janela de avaliação de 7 dias | F01/F02/F03 e testes existentes; mock não equivale ao job agendado |
 | Fotos de pessoas nos materiais | Carômetro não vira imagem de usuários; marca SVG, iniciais e ícones disponíveis | Decisões de `imagens.md`; upload ainda pendente |
@@ -39,10 +39,10 @@ O HTML anuncia “42 telas”, mas contém variações e estados adicionais (con
 
 - Uso de outras páginas/telas: apenas a função de delegação nominal foi confirmada como descontinuada. As demais rotas existem; revisar o uso com o grupo antes de remover.
 - Storage e upload de fotos de serviço; marca SVG e avatares por iniciais já estão definidos em [imagens.md](imagens.md).
-- Categorias finais e política comercial: comissão planejada de 10% para Stripe Sandbox, ainda sem fluxo financeiro implementado.
+- Categorias finais e política comercial: comissão de 10% aplicada no fluxo Stripe em modo de teste (F09); repasse e saque ao profissional com Stripe Connect, também em modo de teste (ADR34).
 - Fonte e data dos números de mercado do pitch; não os apresentar como medição do projeto.
 - Termos, retenção/exclusão de dados e suporte para uma versão pública; os textos atuais são acadêmicos.
-- Implementação de upload/anexos, comunicação e financeiro; F04/F05 agora persistem gestão, denúncias/evidência textual e auditoria. Restante detalhado em F06/F07/F09/F10. OAuth/2FA permanecem como evolução futura, sem entrega confirmada.
-- Neon, Stripe e Resend são escolhas de provedores, não evidência de implantação nem de fluxos externos funcionando.
+- Implementação de upload/anexos e comunicação; F04/F05 agora persistem gestão, denúncias/evidência textual e auditoria. Restante detalhado em F06/F07/F10. OAuth/2FA permanecem como evolução futura, sem entrega confirmada.
+- Neon e Resend são escolhas de provedores, não evidência de implantação nem de fluxos externos funcionando. O fluxo Stripe está implementado (F09), mas ainda sem evidência em ambiente publicado.
 
 O [inventário](referencias/inventario.json) permite provar que a realocação não alterou nenhum dos 26 arquivos relevantes. Os artefatos de sistema, como `.DS_Store`, não fazem parte da documentação funcional.

@@ -67,6 +67,12 @@
 			<artifactId>stripe-java</artifactId>
 			<version>34.1.0</version>
 		</dependency>
+		<!-- Accounts v2 calls go through StripeClient.rawRequest; Gson reads their JSON. Version
+		     managed by Spring Boot; stripe-java already ships it at runtime. -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.postgresql</groupId>

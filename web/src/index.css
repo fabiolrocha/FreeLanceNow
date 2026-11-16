@@ -597,6 +597,48 @@ hr {
   color: #4c6455;
   border: 1px solid #d8e6dc;
 }
+/* Receiving account (Stripe Connect): card on the wallet and status line on its page. */
+.payout-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1rem 0;
+}
+.payout-card > div {
+  flex: 1;
+}
+.payout-card p {
+  margin: 0.2rem 0 0;
+}
+.payout-card > svg,
+.payout-status svg {
+  flex: none;
+  vertical-align: middle;
+  color: var(--green);
+}
+.payout-card.ok,
+.payout-status.ok {
+  background: var(--green-soft);
+}
+@media (max-width: 640px) {
+  .payout-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+.connect-frame {
+  margin: 1rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.connect-loading {
+  margin: 0;
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--muted);
+}
 .success {
   background: #e8f7ec;
   color: #147339;
@@ -2346,7 +2388,29 @@ p a:not(.button),
   text-underline-offset: 2px;
 }
 
+/* Space between the wallet's action button and the history heading. */
+.wallet-actions {
+  margin-bottom: 1.5rem;
+}
+
+/* Tables with many columns scroll sideways on phones instead of squeezing words. */
+.table-wrap.wide table {
+  min-width: 780px;
+}
+
+/* Dates in tables: the date and the time never split in the middle. */
+td.when span {
+  white-space: nowrap;
+}
+
 /* Money in tables stays on one line. */
 td.nowrap {
   white-space: nowrap;
+}
+
+.table-wrap small.block {
+  display: block;
+  margin: 0.25rem 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
 }

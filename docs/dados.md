@@ -116,7 +116,7 @@ Validar o contrato da respectiva funcionalidade antes de criar novas tabelas. A 
 
 Contratações originadas por proposta podem ter `service_id` nulo, inclusive na avaliação. O aceite guarda os vínculos de demanda/proposta e o preço acordado; a API pública da contratação ainda não expõe `demandId`/`proposalId`.
 
-O seed `DemoData` cria dados fictícios no perfil `dev` quando habilitado; não há seed financeiro nem credenciais ADMIN padrão. O bootstrap administrativo é separado, opt-in e idempotente. Testes de API geram identificadores/e-mails novos, sem assumir IDs dos usuários do seed.
+O seed `DemoData` cria dados fictícios quando habilitado (perfil `dev`, ou `prod` com `SEED_DEMO`, ADR32), inclusive pagamentos `SIMULATED` para as contratações de demonstração já iniciadas; não há credenciais ADMIN padrão. O bootstrap administrativo é separado, opt-in e idempotente. Testes de API geram identificadores/e-mails novos, sem assumir IDs dos usuários do seed.
 
 ## Administração e moderação (V6/V7)
 
@@ -185,13 +185,14 @@ As imagens ficam no próprio PostgreSQL (ADR21) e entram no mesmo backup do rest
 
 | Tabela | Persistência e invariantes |
 |---|---|
-| `payment` | UUID; contratação, cliente e freelancer FK; provedor (`STRIPE`, `SIMULATED`); método (`PIX`, `CARD`, `BOLETO`); status (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`, `REFUNDED`, `FAILED`, `CANCELED`; V17 trocou `AUTHORIZED`, nunca usado, por `PROCESSING`); valores bruto, taxa e líquido (`gross_amount = fee_amount + net_amount`); `external_reference` guarda o id da Checkout Session; V17 acrescenta `checkout_url`, `checkout_expires_at` e `provider_payment_id` (PaymentIntent, usado no reembolso). Índice único parcial `uq_payment_live`: no máximo um pagamento vivo (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`) por contratação |
-| `ledger_entry` | UUID; pagamento e contratação FK; usuário opcional FK; tipo (`CHARGE`, `PLATFORM_FEE`, `ESCROW_HOLD`, `PAYOUT_RELEASE`, `REFUND`); valor positivo; ID único de evento externo para idempotência; descrição e data |
+| `payment` | UUID; contratação, cliente e freelancer FK; provedor (`STRIPE`, `SIMULATED`); método (`PIX`, `CARD`, `BOLETO`); status (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`, `REFUNDED`, `FAILED`, `CANCELED`; V17 trocou `AUTHORIZED`, nunca usado, por `PROCESSING`); V18 acrescenta `REFUND_FAILED` e `CHARGED_BACK`; valores bruto, taxa e líquido (`gross_amount = fee_amount + net_amount`); `external_reference` guarda o id da Checkout Session; V17 acrescenta `checkout_url`, `checkout_expires_at` e `provider_payment_id` (PaymentIntent, usado no reembolso). V18 acrescenta `provider_charge_id`, `transfer_id`, `transferred_at`, `transfer_error`, `refunded_amount`, `reversed_amount`, `dispute_id` e `dispute_status` (`OPEN`, `WON`, `LOST`). Índice único parcial `uq_payment_live`: no máximo um pagamento vivo (`PENDING`, `PROCESSING`, `PAID`, `RELEASED`) por contratação |
+| `ledger_entry` | UUID; pagamento e contratação FK; usuário opcional FK; tipo (`CHARGE`, `PLATFORM_FEE`, `ESCROW_HOLD`, `PAYOUT_RELEASE`, `REFUND`; V18: `TRANSFER`, `TRANSFER_REVERSAL`, `CHARGEBACK`, `CHARGEBACK_REVERSAL`); valor positivo; ID único de evento externo para idempotência; descrição e data |
 
 | `payment_webhook_event` (V17) | `event_id` do Stripe como chave primária, tipo e data. Inserido antes de processar: um evento repetido não gera lançamentos de novo |
 | `withdrawal` (V17) | UUID, profissional FK, valor positivo, status `SIMULATED` e data. Não guarda dados bancários nem chave Pix |
+| `payout_account` (V18) | Profissional como chave (FK), id da conta conectada do Stripe (único), `details_submitted`, `transfers_enabled`, `payouts_enabled`, pendências (`currently_due`, texto) e datas. Documentos e dados bancários ficam no Stripe (ADR34) |
 
-Saldo do profissional = soma de `PAYOUT_RELEASE` menos a soma de `withdrawal`. Em custódia = `net_amount` dos pagamentos `PAID`. Cada pagamento confirmado gera `CHARGE` (cliente, bruto), `PLATFORM_FEE` (sem usuário) e `ESCROW_HOLD` (profissional, líquido); a conclusão gera `PAYOUT_RELEASE`; o reembolso gera `REFUND` (cliente, bruto). `PaymentService` usa SQL direto, como os salvos (ADR31, ADR33). O seed de demonstração cria pagamentos `SIMULATED` para as contratações que já começaram.
+Saldo de demonstração do profissional = soma de `PAYOUT_RELEASE` de pagamentos `SIMULATED` menos a soma de `withdrawal`. Transferido = `net_amount` dos pagamentos com `transfer_id`; aguardando conta = `RELEASED` do Stripe sem `transfer_id`. Em custódia = `net_amount` dos pagamentos `PAID`. Cada pagamento confirmado gera `CHARGE` (cliente, bruto), `PLATFORM_FEE` (sem usuário) e `ESCROW_HOLD` (profissional, líquido); a conclusão gera `PAYOUT_RELEASE`; o reembolso gera `REFUND` (cliente, bruto). `PaymentService` usa SQL direto, como os salvos (ADR31, ADR33). O seed de demonstração cria pagamentos `SIMULATED` para as contratações que já começaram.
 
 O feed não duplica serviços ou demandas: uma consulta `UNION ALL` combina as três fontes e filtra autores ativos, conteúdo visível, tipo/categoria e acesso às demandas antes de contar/paginar. Índices de criação/ID apoiam a listagem de oportunidades. Ordenação é cronológica e determinística; não existe algoritmo de relevância. A consulta retorna DTO seguro e não serializa entidades/contatos privados.
 

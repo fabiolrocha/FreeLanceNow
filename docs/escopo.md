@@ -16,7 +16,7 @@ F11 implementa o feed misto autenticado em `/inicio`, com publicação de texto,
 |---|---|---|
 | Navegação pública | Início, busca, profissionais, detalhe, cadastro, login e ajuda | Refinamentos e regressão de layout/acesso |
 | Cliente | Perfil, solicitações, acompanhamento, confirmação, contestação, avaliação e demandas/propostas integrados à API | Comunicação externa e anexos |
-| Freelancer | Perfil, anúncios com fotos, execução, resposta a avaliações e propostas integrados à API | Comunicação externa e repasse real (saque simulado) |
+| Freelancer | Perfil, anúncios com fotos, execução, resposta a avaliações e propostas integrados à API | Comunicação externa; repasse e saque reais só em modo de teste (Stripe Connect, ADR34) |
 | Administração | Bootstrap ADMIN, usuários/categorias, moderação de serviços/avaliações/disputas, métricas e auditoria integrados | Notificações externas (F07) e anexos (F06) |
 | API e banco | Auth JWT, perfis, catálogo, contratações, prazos de 48h/5 dias, avaliações, demandas/propostas; migrações V1–V17, confirmação de e-mail, fotos dos anúncios, feed/publicações, denúncias, auditoria, avisos, chat por contratação e pagamentos em sandbox | Integrações dos cards F06/F07/F09/F10 |
 | Organização | Documentação, CI e fluxo de branches/PRs | Manter critérios de aceite e evidências por entrega |
@@ -29,4 +29,4 @@ A matriz de [frontend](frontend.md) lista rotas existentes e seu estado. Telas d
 
 Até 18/11, o plano inclui administração/auditoria, moderação, upload e paginação no web, recuperação/verificação por e-mail, mensageria/notificações, financeiro em sandbox, operação, testes e apresentação. F01/F02/F03/F08 já compõem a base da main; F04/F05 foram integrados à `main` pelo PR #40. F11 (feed/publicações) foi revisada no PR #41 e integrada à `main`. Em 09/11, foram integrados avisos/chat por contratação e paginação da busca (PR #45), DDL de pagamentos `V10` (PR #43) e preparação de deploy (PR #44). F09 (pagamentos em sandbox) foi concluído em 15/11; o restante de F06, F07 e F10 segue conforme o [backlog](backlog.md).
 
-Stripe (modo de teste), Neon e Resend estão integrados. Não há movimentação financeira real: o Stripe roda em sandbox, chaves de produção são recusadas e o saque é simulado. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.
+Stripe (modo de teste), Neon e Resend estão integrados. Não há movimentação financeira real: o Stripe roda em sandbox, chaves de produção são recusadas e o repasse ao profissional (Stripe Connect) também roda só em modo de teste. Aplicativo móvel, lançamento comercial e comprovação de SLA de produção estão fora da entrega atual.

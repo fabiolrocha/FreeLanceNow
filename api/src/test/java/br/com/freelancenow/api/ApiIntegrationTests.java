@@ -1268,7 +1268,7 @@ class ApiIntegrationTests {
     @Order(30)
     void emptyDatabaseIsMigratedAndDemoSeedIsIdempotent() {
         assertEquals(
-                17,
+                18,
                 db.queryForObject(
                         "select count(*) from flyway_schema_history where success", Integer.class));
         var withoutPassword =

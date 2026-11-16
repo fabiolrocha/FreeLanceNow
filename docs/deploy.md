@@ -142,6 +142,7 @@ Os endereços `.test` são reservados (RFC 2606) e nunca recebem e-mail, por iss
 | `ADMIN_BOOTSTRAP_*` | Render | Só no provisionamento do primeiro admin |
 | `SEED_DEMO`, `SEED_DEMO_PASSWORD` | Render | Não (só para apresentações; seção 5.1) |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Render | Não (sem elas, pagamentos desligados; seção Pagamentos) |
+| `STRIPE_PUBLISHABLE_KEY`, `STRIPE_CONNECT_WEBHOOK_SECRET` | Render | Não (sem a publicável, o cadastro da conta de recebimento não abre; sem o segredo Connect, avisos de saque e `account.updated` não chegam e a rotina de 5 min cobre o repasse) |
 | `STRIPE_PAYMENT_METHODS`, `PLATFORM_FEE_PERCENT` | Render | Não (padrões `CARD,PIX,BOLETO` e `10`) |
 | `VITE_DATA_MODE`, `VITE_API_BASE_URL` | Vercel | Sim |
 | `VITE_SUPPORT_EMAIL` | Vercel | Não |
@@ -150,14 +151,19 @@ Valores de exemplo ficam em `.env.example` e `web/.env.example`. Segredos reais 
 
 ## Pagamentos (F09)
 
-Os pagamentos rodam no **modo de teste do Stripe** (ADR33). Sem `STRIPE_SECRET_KEY`, a API segue sem cobrança: contratações funcionam como antes e carteira e transações mostram só o histórico de demonstração. Chaves `sk_live_` são recusadas na inicialização.
+Os pagamentos rodam no **modo de teste do Stripe** (ADR33, ADR34). Sem `STRIPE_SECRET_KEY`, a API segue sem cobrança: contratações funcionam como antes e carteira e transações mostram só o histórico de demonstração. Chaves `sk_live_` são recusadas na inicialização.
 
 1. Criar a conta Stripe com país **Brasil** e ficar no modo de teste. Nenhum dado bancário é necessário.
 2. Em **Settings → Payment methods**, ativar Pix e Boleto (cartão já vem ativo). Se algum não estiver disponível na conta, definir `STRIPE_PAYMENT_METHODS` só com os ativos (ex.: `CARD`).
-3. Em **Developers → API keys**, copiar a chave secreta de teste (`sk_test_...`).
-4. Em **Developers → Webhooks → Add endpoint**, cadastrar `https://freelancenow-api.onrender.com/api/v1/payments/webhook` com os eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`. Copiar o **Signing secret** (`whsec_...`).
-5. No Render, preencher `STRIPE_SECRET_KEY` e `STRIPE_WEBHOOK_SECRET` (declaradas com `sync: false` no Blueprint) e, se preciso, `STRIPE_PAYMENT_METHODS` e `PLATFORM_FEE_PERCENT`. Salvar reinicia a API.
-6. Testar: conta cliente solicita um serviço, profissional aceita, cliente clica em **Pagar** na contratação e usa o cartão `4242 4242 4242 4242` (validade futura, qualquer CVC). Em **Developers → Webhooks**, o evento deve aparecer com resposta 200 e a contratação passa a "Pago · em custódia".
+3. Em **Developers → API keys**, copiar a chave secreta de teste (`sk_test_...`) e a chave publicável (`pk_test_...`).
+4. Ativar o **Connect** na conta (menu Connect → Get started; plataforma/marketplace). O nome público da conta aparece no formulário que o profissional preenche; ajustar em **Settings → Business → Public details**.
+5. Em **Developers → Webhooks → Add destination**, criar dois destinos para `https://freelancenow-api.onrender.com/api/v1/payments/webhook`:
+   - **Sua conta**, com `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed`, `checkout.session.expired`, `charge.refunded`, `refund.failed`, `charge.dispute.created` e `charge.dispute.closed`. O **Signing secret** vai em `STRIPE_WEBHOOK_SECRET`.
+   - **Contas conectadas**, com `account.updated`, `payout.paid` e `payout.failed`. O segredo vai em `STRIPE_CONNECT_WEBHOOK_SECRET`.
+6. No Render, preencher `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET` e `STRIPE_CONNECT_WEBHOOK_SECRET` (declaradas com `sync: false` no Blueprint) e, se preciso, `STRIPE_PAYMENT_METHODS` e `PLATFORM_FEE_PERCENT`. Salvar reinicia a API.
+7. Testar: conta cliente solicita um serviço, profissional aceita, cliente clica em **Pagar** na contratação e usa o cartão `4242 4242 4242 4242` (validade futura, qualquer CVC). Em **Developers → Webhooks**, o evento deve aparecer com resposta 200 e a contratação passa a "Pago · em custódia".
+
+8. Repasse: o profissional abre **Carteira → Cadastrar conta** e preenche o formulário do Stripe com os dados de teste que o próprio formulário oferece. Com a conta pronta, a conclusão de uma contratação paga aparece em **Connect → Contas** como transferência, e a carteira mostra "Na conta de recebimento".
 
 Com o plano free, a API pode estar hibernando quando o Stripe envia o evento. O Stripe tenta de novo por até três dias, e a tela de confirmação continua consultando o status por cerca de um minuto; abrir o site antes da demonstração evita a espera.
 

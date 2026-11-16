@@ -261,19 +261,24 @@ Decisões são transacionais e usam locks para serializar alterações concorren
 
 ## Pagamentos (F09)
 
-Stripe Checkout em modo de teste (ADR33). Sem `STRIPE_SECRET_KEY` os pagamentos ficam desligados (`enabled: false`) e as contratações seguem sem cobrança. Com a chave, o cliente paga depois do aceite; o valor fica em custódia até a conclusão e só então vira saldo do profissional, já sem a comissão (`PLATFORM_FEE_PERCENT`, padrão 10%). Valores em reais.
+Stripe Checkout e Stripe Connect em modo de teste (ADR33, ADR34). Sem `STRIPE_SECRET_KEY` os pagamentos ficam desligados (`enabled: false`) e as contratações seguem sem cobrança. Com a chave, o cliente paga depois do aceite; o valor fica em custódia até a conclusão e só então vira saldo do profissional, já sem a comissão (`PLATFORM_FEE_PERCENT`, padrão 10%). Valores em reais.
 
 | Método | Caminho | Acesso | Resultado |
 |---|---|---|---|
 | GET | `/contracts/{id}/payment` | Participante ou ADMIN | 200 `{enabled, methods, feePercent, payment}`; `payment` é o mais recente ou `null` |
 | POST | `/contracts/{id}/payment` | Cliente da contratação | Body `{method: CARD\|PIX\|BOLETO}`; 201 `{paymentId, checkoutUrl}`. Só em `ACEITO`. Reaproveita o checkout aberto do mesmo método; trocar de método encerra o anterior. 409 se já pago, em compensação ou com pagamentos desligados; 502 se o Stripe recusar |
 | GET | `/payments/{id}` | Participante ou ADMIN | 200 `{payment, entries}` com os lançamentos do livro; 404 para terceiros |
-| GET | `/users/me/wallet` | Cliente ou freelancer | 200 com saldos (`held`, `available`, `released`, `withdrawn` para profissional; `paid`, `held`, `refunded` para cliente), pagamentos e saques |
-| POST | `/users/me/withdrawals` | Freelancer | Body `{amount}`; 201. Saque **simulado**: reduz o saldo, não transfere dinheiro. 409 acima do disponível |
-| GET | `/admin/payments` | ADMIN | 200 com totais (recebido, comissões, custódia, liberado, reembolsado, sacado) e até 500 pagamentos |
-| POST | `/payments/webhook` | Stripe (assinatura `Stripe-Signature`) | 200; 400 com assinatura ausente ou inválida. Eventos `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `checkout.session.async_payment_failed` e `checkout.session.expired`; cada `event.id` é processado uma vez |
+| GET | `/users/me/wallet` | Cliente ou freelancer | 200 com saldos (`held`, `available`, `released`, `withdrawn`, `transferred`, `awaitingAccount` para profissional; `paid`, `held`, `refunded` para cliente), pagamentos e saques. `available` conta só pagamentos de demonstração (`SIMULATED`) |
+| POST | `/users/me/withdrawals` | Freelancer | Body `{amount}`; 201. Saque **simulado** do saldo de demonstração: reduz o saldo, não transfere dinheiro. 409 acima do disponível |
+| GET | `/users/me/payout-account` | Freelancer | 200 `{enabled, status, transfersEnabled, payoutsEnabled, currentlyDue}`; `status` é `DISABLED`, `NOT_STARTED`, `INCOMPLETE`, `IN_REVIEW` ou `READY`. Consulta o Stripe se a conta não está pronta e, se ficou pronta, transfere o que esperava. 403 para outros perfis |
+| POST | `/users/me/payout-account/session` | Freelancer | 200 `{clientSecret, publishableKey}` para os componentes embutidos do Stripe; cria a conta conectada no primeiro uso e reaproveita depois. 409 com pagamentos desligados; 502 se o Stripe recusar |
+| GET | `/admin/payments` | ADMIN | 200 com totais (recebido, comissões, custódia, liberado, reembolsado, sacado, `transferred`, `reversed`, `inChargeback`), `issues` (pendências: `CHARGEBACK_OPEN`, `REFUND_FAILED`, `REVERSAL_FAILED`, `TRANSFER_FAILED`, `AWAITING_ACCOUNT`; `amount` é o valor bruto nas pendências do cliente e a parte atual do profissional, já descontado reembolso parcial, nas demais) e até 500 pagamentos |
+| POST | `/admin/payments/{id}/transfer` | ADMIN | Nova tentativa de transferência de um pagamento liberado; 200 com o pagamento; 409 se não espera transferência, se há chargeback aberto, se a conta não está pronta ou se o Stripe recusar de novo |
+| POST | `/payments/webhook` | Stripe (assinatura `Stripe-Signature`, segredo da plataforma ou do Connect) | 200; 400 com assinatura ausente ou inválida. Eventos `checkout.session.*`, `charge.refunded`, `refund.failed`, `charge.dispute.created`, `charge.dispute.closed` e, das contas conectadas, `account.updated`, `payout.paid` e `payout.failed`; cada `event.id` é processado uma vez |
 
 Efeitos no ciclo da contratação: `ACEITO → EM_ANDAMENTO` exige pagamento `PAID` (409 caso contrário); `CONCLUIDO`, inclusive pela confirmação automática de 5 dias ou decisão de disputa, libera o valor (`RELEASED`); `CANCELADO` reembolsa o que já foi pago (`REFUNDED`) e encerra checkouts abertos. Dinheiro que chega depois que a contratação deixou de esperá-lo (boleto pago após cancelamento, checkout antigo pago) é reembolsado automaticamente.
+
+Repasse (ADR34): na conclusão, o líquido é transferido para a conta de recebimento pronta do profissional; sem ela, espera. Reembolso pelo painel do Stripe e chargeback perdido tiram de volta da conta do profissional a parte dele (reversal). Chargeback aberto segura a transferência e, se a contratação for cancelada, o reembolso: ganho, o app reembolsa nessa hora. Status novos: `REFUND_FAILED` e `CHARGED_BACK`; `PaymentView` ganha `transferredAt`, `transferPending`, `refundedAmount` e `disputeStatus`.
 
 ## Erros e verificação manual
 
