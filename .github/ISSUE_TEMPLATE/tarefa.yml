@@ -6,7 +6,7 @@ body:
     id: resultado
     attributes:
       label: Resultado esperado
-      description: Referencie docs/backlog.md e descreva o comportamento. Combine contribuições e revisão conforme disponibilidade.
+      description: Descreva o comportamento esperado e o requisito relacionado (docs/requisitos.md). Combine contribuições e revisão conforme disponibilidade.
     validations:
       required: true
   - type: textarea

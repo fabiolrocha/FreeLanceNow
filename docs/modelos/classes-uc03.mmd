@@ -1,0 +1,92 @@
+classDiagram
+  direction LR
+  class User {
+    <<entity>>
+    UUID id
+    String name
+    Role role
+  }
+  class ServiceListing {
+    <<entity>>
+    UUID id
+    String title
+    BigDecimal price
+  }
+  class Contract {
+    <<entity>>
+    UUID id
+    String title
+    BigDecimal price
+    LocalDate scheduledDate
+    String description
+    String address
+    ContractStatus status
+    String dispute
+    Instant statusUpdatedAt
+    Instant completedAt
+  }
+  class ContractStatus {
+    <<enumeration>>
+    PENDENTE
+    ACEITO
+    EM_ANDAMENTO
+    AGUARDANDO_CONFIRMACAO
+    CONCLUIDO
+    EM_DISPUTA
+    RECUSADO
+    CANCELADO
+  }
+  class ContractEvent {
+    <<entity>>
+    UUID id
+    ContractStatus previousStatus
+    ContractStatus status
+    String note
+    Instant createdAt
+  }
+  class ContractMessage {
+    <<entity>>
+    UUID id
+    String text
+    Instant createdAt
+  }
+  class Payment {
+    <<entity>>
+    UUID id
+    PaymentMethod method
+    String status
+    BigDecimal grossAmount
+    BigDecimal feeAmount
+    BigDecimal netAmount
+  }
+  class Review {
+    <<entity>>
+    UUID id
+    int rating
+    String comment
+    String reply
+  }
+  class ContractService {
+    +list() List~ContractView~
+    +create(CreateContract) ContractView
+    +transition(id, status, comment) ContractView
+    +processExpiredDeadlines(now) int
+    +canTransition(from, to, role)$ boolean
+  }
+  class PaymentService {
+    +checkout(contractId, method) CheckoutStarted
+    +handle(GatewayEvent)
+    +requirePaidToStart(Contract)
+    +onCompleted(Contract, now)
+    +onCanceled(Contract, now)
+  }
+  User "1" --> "0..*" Contract : cliente
+  User "1" --> "0..*" Contract : freelancer
+  ServiceListing "0..1" --> "0..*" Contract : origina
+  Contract "1" --> "1..*" ContractEvent : histórico
+  Contract "1" --> "0..*" ContractMessage : chat
+  Contract "1" --> "0..*" Payment : pagamentos
+  Contract "1" --> "0..1" Review : avaliação
+  Contract --> ContractStatus
+  ContractService ..> Contract
+  ContractService ..> PaymentService

@@ -1,52 +1,74 @@
 # FreeLanceNow
 
-Marketplace acadêmico de serviços gerais: clientes encontram profissionais e freelancers publicam seus serviços. Este monorepositório reúne o frontend **React web**, a API **Java / Spring Boot**, PostgreSQL e a documentação do Grupo 2.
+Marketplace de serviços gerais. Clientes encontram profissionais, solicitam serviços ou publicam demandas para receber propostas. Freelancers publicam serviços, respondem às solicitações e recebem pelo trabalho. O administrador modera conteúdo, decide disputas e acompanha métricas.
 
-**Documentação revisada em 09/11/2026. Entrega final: quarta-feira, 18 de novembro de 2026.** A base atual inclui o marco de 7 de outubro e as integrações de contratações/prazos, avaliações e demandas/propostas (`F01`, `F02`, `F03`, `F08`). F04/F05 acrescentam administração e moderação persistentes. Avisos e chat por contratação já persistem (`F07` parcial, PR #45), assim como a migração de pagamentos (`V10`, PR #43) e a preparação de deploy (`F10` parcial, PR #44); recuperação de senha por e-mail, troca de senha e renovação de sessão foram acrescentadas; pagamentos com Stripe em modo de teste (custódia, liberação, reembolso e saque simulado) completam o F09. O [roadmap](docs/roadmap.md) distingue o estado atual das próximas janelas sugeridas. A entrega é React web; aplicativo móvel está fora do escopo.
+Projeto da disciplina Soluções Computacionais (2026/2), turma GPE17M80586. Integrantes, vídeo de apresentação e documentos da entrega: [docs/README.md](docs/README.md).
 
-**F11 — feed inicial e publicações** está integrada à `main`: após login, publicações profissionais, serviços e demandas aparecem em um feed cronológico com filtros e paginação. A [especificação aprovada](docs/superpowers/specs/2026-10-21-feed-inicial-design.md) registra o escopo, retomando o HTML de referência. F04/F05 foram integradas à `main` pelo [PR #40](https://github.com/fabiolrocha/FreeLanceNow/pull/40).
+| Aplicação | Pasta | Publicação | Instruções |
+|---|---|---|---|
+| Aplicação web (computador e celular) | `web/` | https://freelancenow.vercel.app | [web/README.md](web/README.md) |
+| API REST | `api/` | https://freelancenow-api.onrender.com | [api/README.md](api/README.md) |
 
-Acessos locais de cliente, freelancer e administrador: [contas de desenvolvimento](docs/contas-desenvolvimento.md).
+## Acesso para avaliação
 
-## Começar
+A versão publicada já tem dados de demonstração. Entre em https://freelancenow.vercel.app/login com uma destas contas:
 
-Pré-requisitos: Git e Docker com Compose. Para desenvolver o React fora do Docker: Node **22.12+** e npm. Para desenvolver a API fora do Docker: **JDK 21**; o Maven Wrapper está incluído.
+| Perfil | E-mail | Senha |
+|---|---|---|
+| Cliente | `cliente@demo.freelancenow.test` | `Avaliacao2026` |
+| Freelancer | `freelancer@demo.freelancenow.test` | `Avaliacao2026` |
+| Administrador | `admin@demo.freelancenow.test` | `Avaliacao2026` |
+
+A API fica no plano gratuito do Render e hiberna sem uso. O primeiro acesso pode levar até 1 minuto. Os pagamentos usam o modo de teste do Stripe (cartão `4242 4242 4242 4242`, qualquer validade futura e qualquer CVC) e nunca cobram dinheiro real. Mais contas e o que explorar com cada uma: [docs/contas-de-acesso.md](docs/contas-de-acesso.md).
+
+## Executar localmente com Docker
+
+Pré-requisitos: Git e Docker com Docker Compose v2. Nenhuma outra instalação é necessária.
+
+1. Na raiz do projeto, crie o arquivo de configuração local:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+2. Construa e suba o banco, a API e a aplicação web:
+
+   ```sh
+   docker compose up -d --build
+   ```
+
+3. Espere de 1 a 3 minutos e abra http://localhost:5173.
+
+4. Entre com `cliente@demo.freelancenow.test`, `freelancer@demo.freelancenow.test` ou `admin@demo.freelancenow.test`. Localmente, a senha de todas as contas é `Demo12345`.
+
+Na primeira subida, a API cria o banco com as migrações do Flyway (V1 a V18, em `api/src/main/resources/db/migration`) e carrega os dados de demonstração. Nas próximas subidas, ela só aplica migrações novas e não duplica dados.
+
+| Serviço | Endereço | Conteúdo |
+|---|---|---|
+| `web` | http://localhost:5173 | Aplicação web React, servida pelo Nginx no modo API |
+| `api` | http://localhost:8081/actuator/health | API Spring Boot (endpoints em `/api/v1`) |
+| `db` | `localhost:5435` | PostgreSQL 15, banco `freelancenow`, com volume persistente |
+
+Comandos úteis:
+
+| Comando | O que faz |
+|---|---|
+| `docker compose ps` | Mostra os serviços e a situação de cada um |
+| `docker compose logs -f api` | Mostra o log da API (migrações e dados de demonstração) |
+| `docker compose down` | Para os serviços e mantém os dados |
+| `docker compose down -v` | Para os serviços e apaga o banco. Na próxima subida, migrações e dados de demonstração rodam outra vez |
+
+Se a porta 5173, 8081 ou 5435 estiver ocupada, troque `WEB_PORT`, `API_PORT` ou `DB_PORT` no `.env`. Pagamentos reais com o Stripe e envio de e-mail são opcionais e ficam desligados sem as chaves no `.env`. Execução sem Docker e todas as variáveis: [api/README.md](api/README.md) e [web/README.md](web/README.md).
+
+## Testes
+
+Testes da API, com um PostgreSQL de teste separado:
 
 ```sh
-cp .env.example .env
-docker compose up -d --build
+docker compose --profile test run --rm api-test
 ```
 
-Depois de `git pull` ou de trocar de branch, repita `docker compose up -d --build`: `--build api` ou `--build web` reconstroem só aquele serviço e deixam o outro com a imagem anterior.
-
-Abra **http://localhost:5173**. A API responde em **http://localhost:8081/actuator/health**. O PostgreSQL local usa a porta **5435**. Essas portas evitam conflitos com outros projetos presentes na máquina de origem.
-
-Por padrão, a aplicação roda em **modo mock**, sem depender da API para navegar. O login aceita somente e-mail e senha. Contas fictícias do mock: `ana@demo.freelancenow.test` (cliente), `marcos@demo.freelancenow.test` (freelancer) e `admin@demo.freelancenow.test` (admin), todas com a senha `Demo12345`. Dados simulados ficam na sessão do navegador; fechar a aba ou limpar `sessionStorage` reinicia a experiência. Ações financeiras nunca movimentam dinheiro.
-
-### Usar a API real
-
-Altere `VITE_DATA_MODE=api` no `.env` da raiz e reconstrua o frontend:
-
-```sh
-docker compose up -d --build web
-```
-
-No modo API, cadastro, login, edição de perfil, categorias, profissionais, criação/edição/ativação de anúncios, **solicitação e ciclo completo de contratações (com prazos automáticos de 48h/5 dias), avaliações com nota média e resposta do profissional e publicação de demandas com propostas e aceite gerando contratação (`F01`, `F02`, `F03`, `F08`)** passam pelo Spring Boot e persistem no PostgreSQL. Gestão de usuários/categorias, denúncias de anúncios/avaliações, decisões de moderação, métricas e auditoria também estão integradas (`F04`/`F05`). Avisos internos (com contador de não lidos) e o chat entre cliente e freelancer de cada contratação também persistem. Pagamentos usam o Stripe em modo de teste quando `STRIPE_SECRET_KEY` está configurada; sem ela, carteira e transações mostram só o histórico de demonstração. Não há fallback silencioso para mocks quando a API falha.
-
-Crie uma conta pela interface, ou entre com `marcos@demo.freelancenow.test` / `Demo12345` para explorar um freelancer fictício sem criar conta. O seed está restrito ao perfil `dev` com `SEED_DEMO=true`. A API impede cadastro público de administradores. Para criar o primeiro ADMIN real, configure no `.env` ignorado `ADMIN_BOOTSTRAP_ENABLED=true`, `ADMIN_BOOTSTRAP_EMAIL` e `ADMIN_BOOTSTRAP_PASSWORD` (mínimo 8 caracteres com letras/números, máximo 72 bytes), então reconstrua/recrie `api`. Não há credenciais padrão. Depois da criação, desabilite o bootstrap e recrie a API. Reiniciar não redefine senha nem promove uma conta comum existente. Veja [desenvolvimento](docs/desenvolvimento.md).
-
-### Desenvolver com atualização automática
-
-```sh
-docker compose up -d --build db api
-cd web
-npm ci
-npm run dev
-```
-
-O Vite abre em http://localhost:5173 e encaminha `/api` para a API na porta 8081. Para alterar seu modo, copie `web/.env.example` para `web/.env.local`, ajuste `VITE_DATA_MODE` e reinicie o Vite. Variáveis do frontend são incorporadas durante o build; não coloque segredos nelas. Para Java local, veja [guia de desenvolvimento](docs/desenvolvimento.md).
-
-## Verificar
+Testes da aplicação web (requer Node 22.12 ou mais novo):
 
 ```sh
 cd web
@@ -58,45 +80,26 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-Na raiz, execute os testes da API em banco isolado:
+A CI do GitHub executa essas verificações em cada pull request. Roteiro de demonstração e resultados: [docs/testes-e-demonstracao.md](docs/testes-e-demonstracao.md).
 
-```sh
-docker compose --profile test run --rm api-test
-```
-
-Com `db` e `api` ligados, execute o fluxo real pelo navegador:
-
-```sh
-cd web
-E2E_DATA_MODE=api npm run test:e2e
-# Para incluir o fluxo administrativo, forneça as credenciais do ADMIN provisionado:
-E2E_DATA_MODE=api E2E_ADMIN_EMAIL='seu-admin@example.test' E2E_ADMIN_PASSWORD='sua-senha-de-teste' npm run test:e2e
-```
-
-Os testes integrados criam contas fictícias `@example.test`. A suíte da API usa `db-test`, nunca o banco de desenvolvimento. A CI executa preservação dos documentos originais, lint, formatação, build, testes unitários, navegação mock e integração da API com PostgreSQL. O fluxo de navegador em modo API é uma verificação local adicional. Para mudanças apenas documentais, execute também `node scripts/verify-documents.mjs` e confira links e `git diff --check`.
-
-## Estrutura e equipe
+## Estrutura
 
 ```text
-api/                  Java 21, Spring Boot, Spring Security, JPA, Flyway
-web/                  React, TypeScript, Vite, React Router
-docs/                 Documentação atual, fontes preservadas e decisões
-.github/              CI, modelos de issue e pull request
-compose.yml           Desenvolvimento e testes locais
+api/          API em Java 21 e Spring Boot 4.1 (Security, JPA, Flyway, Stripe)
+web/          Aplicação web em React 19, TypeScript e Vite
+docs/         Documentos da entrega, modelos editáveis, originais e guias técnicos
+loadtest/     Roteiro de teste de carga com k6
+scripts/      Geração das imagens de demonstração
+.github/      CI e modelos de issue e pull request
+compose.yml   Banco, API e web para execução local
+render.yaml   Configuração da API no Render
 ```
 
-Comece por estes documentos:
+## Tecnologias e serviços
 
-- [Plano da entrega e cronograma](docs/roadmap.md).
-- [Colaboração sem papéis fixos](docs/equipe.md) e [backlog com dependências e critérios de aceite](docs/backlog.md).
-- [Leitura dos materiais e divergências resolvidas](docs/leitura-do-projeto.md).
-- [Arquitetura](docs/arquitetura.md), [contrato da API](docs/api.md) e [modelo de dados](docs/dados.md).
-- [Marca e imagens](docs/imagens.md), [rotas e estado das telas](docs/frontend.md), [roteiro de demonstração](docs/testes-e-demonstracao.md).
-- [Índice completo](docs/README.md) e [fluxo de contribuição](CONTRIBUTING.md).
-- [Preparação para deploy com Vercel, Neon e Stripe](docs/deploy.md).
+- **Web:** React, TypeScript, Vite e React Router, publicada na Vercel.
+- **API:** Java 21, Spring Boot, Spring Security com JWT, JPA e Flyway, publicada no Render em Docker.
+- **Banco:** PostgreSQL (Neon em produção).
+- **Integrações:** Stripe em modo de teste para pagamentos com custódia e Resend para e-mails.
 
-A equipe organiza contribuições por entrega, sem designar pessoas ou revisores fixos para cada caso. O índice das docs identifica os guias atuais e as fontes históricas.
-
-O repositório Git e o remoto `fabiolrocha/FreeLanceNow` já existiam no início da organização. O marco inicial (`marco-1`) foi integrado na `main`, seguido pelas entregas incrementais nas branches `fase-01` (`F01`/`F02`), `fase-02` (`F03`) e `fase-03` (`F08`). Os documentos originais foram realocados sem alterar seu conteúdo; hashes e caminhos estão no [inventário](docs/referencias/inventario.json).
-
-Para parar os serviços sem perder dados: `docker compose down`. O volume `postgres_data` guarda os cadastros. Este ambiente é local e acadêmico; o roadmap descreve o trabalho necessário antes de um lançamento público.
+Publicação e variáveis de produção: [docs/deploy.md](docs/deploy.md). Fluxo de contribuição: [CONTRIBUTING.md](CONTRIBUTING.md).

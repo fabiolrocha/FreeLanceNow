@@ -86,6 +86,10 @@ public class ContentReport {
         decidedAt = now;
     }
 
+    public UUID getId() {
+        return id;
+    }
+
     public Target getTargetType() {
         return targetType;
     }

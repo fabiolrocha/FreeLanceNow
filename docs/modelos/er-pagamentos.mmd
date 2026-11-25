@@ -1,0 +1,52 @@
+erDiagram
+  CONTRACT ||--o{ PAYMENT : "é paga por"
+  APP_USER ||--o{ PAYMENT : "cliente / freelancer"
+  PAYMENT ||--o{ LEDGER_ENTRY : "gera lançamentos"
+  CONTRACT ||--o{ LEDGER_ENTRY : "referencia"
+  APP_USER |o--o{ LEDGER_ENTRY : "beneficiário"
+  APP_USER ||--o{ WITHDRAWAL : "solicita"
+  APP_USER ||--o| PAYOUT_ACCOUNT : "conta de recebimento"
+  PAYMENT {
+    uuid id PK
+    uuid contract_id FK
+    uuid client_id FK
+    uuid freelancer_id FK
+    varchar provider
+    varchar method
+    varchar status
+    numeric gross_amount
+    numeric fee_amount
+    numeric net_amount
+    varchar external_reference UK
+    varchar transfer_id
+    numeric refunded_amount
+    varchar dispute_status
+  }
+  LEDGER_ENTRY {
+    uuid id PK
+    uuid payment_id FK
+    uuid contract_id FK
+    uuid user_id FK
+    varchar entry_type
+    numeric amount
+    varchar external_event_id UK
+  }
+  WITHDRAWAL {
+    uuid id PK
+    uuid user_id FK
+    numeric amount
+    varchar status
+  }
+  PAYOUT_ACCOUNT {
+    uuid user_id PK,FK
+    varchar stripe_account_id UK
+    boolean transfers_enabled
+    boolean payouts_enabled
+  }
+  PAYMENT_WEBHOOK_EVENT {
+    varchar event_id PK
+    varchar event_type
+    timestamptz received_at
+  }
+  APP_USER { uuid id PK }
+  CONTRACT { uuid id PK }

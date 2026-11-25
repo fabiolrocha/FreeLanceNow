@@ -1,0 +1,18 @@
+stateDiagram-v2
+  [*] --> PENDENTE: cliente solicita serviço
+  [*] --> ACEITO: cliente aceita proposta
+  PENDENTE --> ACEITO: freelancer aceita
+  PENDENTE --> RECUSADO: freelancer recusa
+  PENDENTE --> CANCELADO: cliente cancela / 48 h sem resposta
+  ACEITO --> EM_ANDAMENTO: freelancer inicia (pagamento confirmado)
+  ACEITO --> CANCELADO: qualquer parte, com motivo
+  EM_ANDAMENTO --> AGUARDANDO_CONFIRMACAO: freelancer sinaliza conclusão
+  EM_ANDAMENTO --> EM_DISPUTA: qualquer parte, com motivo
+  AGUARDANDO_CONFIRMACAO --> CONCLUIDO: cliente confirma / 5 dias
+  AGUARDANDO_CONFIRMACAO --> EM_DISPUTA: cliente contesta
+  EM_DISPUTA --> CONCLUIDO: administrador decide
+  EM_DISPUTA --> EM_ANDAMENTO: administrador decide
+  EM_DISPUTA --> CANCELADO: administrador decide
+  CONCLUIDO --> [*]
+  RECUSADO --> [*]
+  CANCELADO --> [*]

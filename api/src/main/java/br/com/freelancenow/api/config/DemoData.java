@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +28,14 @@ import java.util.UUID;
 
 /**
  * Demo data for local development and presentations, enabled with SEED_DEMO=true. Locally every
- * account uses the password listed in docs/contas-desenvolvimento.md; the prod profile has no
+ * account uses the password listed in docs/contas-de-acesso.md; the prod profile has no
  * default and seeds nothing until SEED_DEMO_PASSWORD is set, so a published database never gets
- * accounts with a password that is in the repository. Accounts are created once. Contract history,
+ * the local password. Accounts are created once. Contract history,
  * reviews and feed posts are created only when the demo client Pedro does not exist yet, so
  * restarts never duplicate them.
  */
 @Component
+@Order(1)
 @ConditionalOnProperty(name = "app.seed-demo", havingValue = "true")
 public class DemoData implements CommandLineRunner {
     private static final String DOMAIN = "@demo.freelancenow.test";
