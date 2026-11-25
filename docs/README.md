@@ -15,7 +15,7 @@ Soluções Computacionais — 2026/2. Integrantes em ordem alfabética.
 
 ## Vídeo de apresentação
 
-[Vídeo de apresentação do FreeLanceNow no YouTube](LINK_DO_VIDEO_NAO_LISTADO)
+[Vídeo de apresentação do FreeLanceNow no YouTube](https://youtu.be/iwa1Ra2eZoY)
 
 ## Acesso para avaliação
 
