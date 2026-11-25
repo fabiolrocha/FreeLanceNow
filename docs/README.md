@@ -61,6 +61,22 @@ Instruções completas, variáveis de ambiente e execução sem Docker: [api/REA
 
 O projeto não tem pastas `app/` (mobile) nem `desktop/`. O escopo definido na proposta do semestre anterior ([Documento de Arquitetura](originais/Documento%20de%20Arquitetura.docx)) prevê uma única aplicação web responsiva, usada no computador e no navegador do celular. A aplicação web consome a mesma API, que concentra as regras de negócio e as permissões dos perfis cliente, freelancer e administrador.
 
+## Prints da solução
+
+Telas da aplicação web com os dados de demonstração. Os arquivos ficam em [prints/](prints/).
+
+**Página inicial:** o visitante busca um serviço ou escolhe uma categoria.
+
+![Página inicial do FreeLanceNow](prints/01-pagina-inicial.png)
+
+**Busca de serviços:** o cliente filtra por categoria, preço, nota e localização e compara os anúncios.
+
+![Busca de serviços com filtros e anúncios](prints/02-busca-de-servicos.png)
+
+**Painel do profissional:** o freelancer acompanha serviços ativos, solicitações novas, propostas e contratações em andamento.
+
+![Painel do profissional](prints/03-painel-do-profissional.png)
+
 ## Documentos da entrega
 
 | Documento | Conteúdo |
@@ -72,6 +88,7 @@ O projeto não tem pastas `app/` (mobile) nem `desktop/`. O escopo definido na p
 | [modelos/](modelos/) | Arquivos editáveis: fontes Mermaid e SVG dos diagramas, `bmc.html` e o gerador dos DOCX e PDF ([instruções](modelos/README.md)) |
 | [originais/](originais/) | Propostas do semestre anterior: documento de visão, casos de uso, arquitetura, apresentação, pitch deck e BMC original |
 | [prototipo/](prototipo/) | Protótipo navegável em HTML usado como referência visual |
+| [prints/](prints/) | Três telas da solução entregue: página inicial, busca de serviços e painel do profissional |
 
 ## Guias técnicos
 
