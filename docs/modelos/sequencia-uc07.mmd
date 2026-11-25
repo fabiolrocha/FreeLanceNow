@@ -1,0 +1,18 @@
+sequenceDiagram
+  autonumber
+  actor C as Cliente
+  actor F as Freelancer
+  participant W as Aplicação web
+  participant DS as DemandService
+  participant DB as PostgreSQL
+  C->>W: Publica demanda (título, orçamento, prazo, cidade)
+  W->>DS: POST /api/v1/demands
+  DS->>DB: INSERT demand (OPEN)
+  F->>W: Vê a demanda no feed e envia proposta
+  W->>DS: POST /demands/{id}/proposals
+  DS->>DB: INSERT proposal (PENDING) + aviso ao cliente
+  C->>W: Compara propostas e aceita uma
+  W->>DS: POST /proposals/{id}/accept
+  DS->>DB: transação: demand CLOSED, proposta ACCEPTED,<br/>demais REJECTED, contract ACEITO
+  DS-->>W: {demand, proposal, contract}
+  W-->>C: Contratação criada, pronta para pagamento

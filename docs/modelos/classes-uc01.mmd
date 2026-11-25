@@ -1,0 +1,62 @@
+classDiagram
+  direction LR
+  class AuthController {
+    +register(Register) Session
+    +login(Login) Session
+    +refresh(Refresh) Session
+    +forgotPassword(ForgotPassword)
+    +resetPassword(ResetPassword)
+    +verifyEmail(VerifyEmail)
+  }
+  class AuthService {
+    +register(Register) Session
+    +login(Login) Session
+    +refresh(Refresh) Session
+    +verifyEmail(VerifyEmail)
+    +forgotPassword(ForgotPassword)
+    +resetPassword(ResetPassword)
+  }
+  class TokenService {
+    +access(User) String
+    +refresh(User) String
+    +emailVerification(User) String
+    +passwordReset(User) String
+  }
+  class User {
+    <<entity>>
+    UUID id
+    String name
+    String email
+    String passwordHash
+    String phone
+    Role role
+    boolean active
+    String city
+    String bio
+    String termsVersion
+    Instant termsAcceptedAt
+    Instant emailVerifiedAt
+  }
+  class Role {
+    <<enumeration>>
+    CLIENT
+    FREELANCER
+    ADMIN
+  }
+  class UserRepository {
+    <<repository>>
+    +findByEmail(email) Optional~User~
+    +existsByEmail(email) boolean
+  }
+  class MailSender {
+    <<interface>>
+    +send(Mail)
+  }
+  class ResendMailSender
+  MailSender <|.. ResendMailSender
+  AuthController --> AuthService
+  AuthService --> UserRepository
+  AuthService --> TokenService
+  AuthService --> MailSender
+  UserRepository --> User
+  User --> Role

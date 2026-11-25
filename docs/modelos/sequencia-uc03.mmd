@@ -1,0 +1,30 @@
+sequenceDiagram
+  autonumber
+  actor C as Cliente
+  actor F as Freelancer
+  participant W as Aplicação web
+  participant CS as ContractService
+  participant PS as PaymentService
+  participant ST as Stripe
+  participant DB as PostgreSQL
+  C->>W: Busca serviço e solicita contratação (data e descrição)
+  W->>CS: POST /api/v1/contracts
+  CS->>DB: INSERT contract (PENDENTE) + contract_event + aviso
+  F->>W: Aceita a solicitação
+  W->>CS: PATCH /contracts/{id}/status ACEITO
+  CS->>DB: UPDATE contract (ACEITO) + evento + aviso
+  C->>W: Paga (cartão, Pix ou boleto)
+  W->>PS: POST /contracts/{id}/payment
+  PS->>ST: cria Checkout Session
+  ST-->>W: página de pagamento do Stripe
+  ST->>PS: webhook checkout.session.completed
+  PS->>DB: payment PAID + lançamentos CHARGE, PLATFORM_FEE, ESCROW_HOLD
+  F->>W: Inicia e depois sinaliza conclusão
+  W->>CS: PATCH status EM_ANDAMENTO (exige pagamento PAID)
+  W->>CS: PATCH status AGUARDANDO_CONFIRMACAO
+  C->>W: Confirma a conclusão (ou 5 dias automáticos)
+  W->>CS: PATCH status CONCLUIDO
+  CS->>PS: onCompleted(contract)
+  PS->>ST: transferência do valor líquido ao freelancer
+  PS->>DB: payment RELEASED + PAYOUT_RELEASE
+  C->>W: Avalia o serviço (1 a 5 estrelas)

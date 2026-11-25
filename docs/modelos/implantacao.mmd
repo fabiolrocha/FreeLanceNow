@@ -1,0 +1,24 @@
+flowchart LR
+  subgraph U["«device» Dispositivo do usuário"]
+    NAV["Navegador web<br/>(computador ou celular)"]
+  end
+  subgraph V["«server» Vercel (CDN)"]
+    WEBAPP["Aplicação web<br/>(arquivos estáticos do build React)"]
+  end
+  subgraph R["«server» Render (contêiner Docker, Linux)"]
+    JVM["«executionEnvironment» JVM Java 21<br/>API FreeLanceNow (Spring Boot)"]
+  end
+  subgraph N["«server» Neon"]
+    PG[("PostgreSQL (Neon serverless)<br/>banco freelancenow")]
+  end
+  subgraph E["«external» Serviços externos"]
+    STRIPE["Stripe (modo de teste)<br/>Checkout e Connect"]
+    RESEND["Resend<br/>e-mails transacionais"]
+  end
+  NAV -->|"HTTPS 443"| WEBAPP
+  NAV -->|"HTTPS 443 · REST/JSON + JWT"| JVM
+  JVM -->|"JDBC sobre TLS 5432"| PG
+  JVM -->|"HTTPS / REST"| STRIPE
+  STRIPE -.->|"webhooks HTTPS"| JVM
+  JVM -->|"HTTPS / REST"| RESEND
+  NAV -.->|"redirecionamento ao Checkout"| STRIPE

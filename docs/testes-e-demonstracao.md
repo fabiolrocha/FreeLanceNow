@@ -6,23 +6,16 @@ Revisado em **09/11/2026**. Os comandos abaixo descrevem a cobertura existente. 
 
 | Verificação | Comando | Cobertura |
 |---|---|---|
-| Preservação das fontes | `node scripts/verify-documents.mjs` (raiz) | Tamanho e SHA-256 dos 26 arquivos inventariados; não valida conteúdo dos Markdown |
 | Higiene do diff | `git diff --check` (raiz) | Erros de whitespace e marcadores de conflito introduzidos no diff |
 | Tipos/build React | `cd web && npm run build` | TypeScript e bundle de produção |
 | Lint | `cd web && npm run lint` | Regras React/TypeScript |
 | Regras unitárias | `cd web && npm test` | 6 testes: permissões de transição, prazos de 48h/5d/7d, senha 72 bytes e limites de fotos (quantidade, tipo e 5 MB) |
 | Acessibilidade | `cd web && npx playwright test tests/a11y.spec.ts` | axe-core com WCAG 2.1 A/AA em 26 telas dos quatro perfis, em 1280 px e 390 px; falha com qualquer violação |
 | Browser mock | `cd web && npm run test:e2e` | Contratação completa, contestação com decisão do admin, demanda/proposta/aceite, denúncia na fila com CSV, draft/publicação, mobile, role e sessão expirada |
-| API+PostgreSQL | `docker compose --profile test run --rm api-test` | 51 testes Java (44 de integração com PostgreSQL + 7 unitários de `JwtSecretValidatorTests`): contexto+migrações (`V1`–`V11`), fotos dos anúncios (envio/listagem/remoção, limite de 5, JPG/PNG pela assinatura, arquivo corrompido, 5 MB, dono, moderação), avisos e chat por contratação (autorização, encerramento, prazos), feed misto autenticado, publicação/retirada/moderação, vínculo próprio, filtros/paginação e demandas autorizadas; bootstrap administrativo, permissões, suspensão/reativação, categorias/auditoria, denúncias e remoção lógica/reputação, métricas por período e concorrência de perfil/resposta; também cadastro/login, termos, duplicidade com e-mail normalizado, admin, edição e perfil público sem contato, dono do anúncio, limite 20, filtros/paginação da busca (`minRating`), drafts/inativos ocultos, suspensão, ciclo de contratação (`UC03`/`UC06`), snapshots, jobs de 48h/5 dias, avaliações (`UC04`), média com 1 decimal, janela de 7 dias, resposta do profissional, demandas/propostas (`F08`, unicidade pendente e aceite gerando contratação) e seed idempotente |
+| API+PostgreSQL | `docker compose --profile test run --rm api-test` | 108 testes Java, todos aprovados em 24/11/2026: contexto+migrações (`V1`–`V18`), fotos dos anúncios (envio/listagem/remoção, limite de 5, JPG/PNG pela assinatura, arquivo corrompido, 5 MB, dono, moderação), avisos e chat por contratação (autorização, encerramento, prazos), feed misto autenticado, publicação/retirada/moderação, vínculo próprio, filtros/paginação e demandas autorizadas; bootstrap administrativo, permissões, suspensão/reativação, categorias/auditoria, denúncias e remoção lógica/reputação, métricas por período e concorrência de perfil/resposta; também cadastro/login, termos, duplicidade com e-mail normalizado, admin, edição e perfil público sem contato, dono do anúncio, limite 20, filtros/paginação da busca (`minRating`), drafts/inativos ocultos, suspensão, ciclo de contratação (`UC03`/`UC06`), snapshots, jobs de 48h/5 dias, avaliações (`UC04`), média com 1 decimal, janela de 7 dias, resposta do profissional, demandas/propostas (`F08`, unicidade pendente e aceite gerando contratação) e seed idempotente |
 | Browser API | `cd web && E2E_DATA_MODE=api npm run test:e2e` | Sete fluxos completos quando `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD` são fornecidos: (1) cadastro, perfil, anúncio persistente/reload, desativação e republicação; (2) ciclo completo de contratação entre duas contas, confirmação, avaliação 5 estrelas, resposta do profissional e persistência após reload; (3) demanda publicada, proposta única, aceite gerando contratação `ACEITO` no PostgreSQL e bloqueio de novas propostas em demanda encerrada; (4) admin gerencia categoria/usuário e decide denúncia com auditoria após reload; (5) publicação de texto no feed com serviço vinculado, falha preservando texto, persistência entre contas e moderação; (6) solicitação gerando aviso, prazo visível e chat persistente entre contas; (7) envio de fotos do anúncio com GIF recusado, capa na busca, galeria no detalhe e remoção persistente após reload |
 
 Os testes de navegador selecionam a suíte correspondente ao modo; o outro conjunto aparece como `skipped` de propósito. O cenário administrativo em API também exige credenciais explícitas `E2E_ADMIN_EMAIL`/`E2E_ADMIN_PASSWORD`; sem elas, somente esse teste é skipped com motivo. Não significa funcionalidade pulada dentro do fluxo testado. A suíte API usa banco `db-test` exclusivo e temporário. O teste browser API usa o banco de desenvolvimento e cria dados fictícios; não rodar contra um ambiente público.
-
-## Revisão documental de 21/10/2026
-
-Base: `main` em `7a6e769`; revisão na branch `codex/atualizar-documentacao`. Conferidos os links locais dos Markdown, as 50 rotas da matriz de frontend contra `App.tsx` (além do redirecionamento `/admin`) e os 29 endpoints de negócio contra os controllers. A revisão independente de leitura conferiu colaboração, fases, telas, moderação, variáveis e fontes históricas; a descrição da integração parcial de disputas foi corrigida conforme o código.
-
-`node scripts/verify-documents.mjs` confirmou tamanho e SHA-256 dos 26 arquivos preservados. `git diff --check` passou. Estas verificações são documentais; as suítes Java, React e Playwright não foram executadas novamente nesta mudança.
 
 ## Evidências históricas de execução
 
@@ -61,13 +54,13 @@ Dados de contratação e denúncia no modo mock são compartilhados entre contas
 ## Checklist de validação da equipe
 
 - Executar todos os comandos aplicáveis em clone limpo e conferir CI.
-- Percorrer cada grupo de rotas da matriz em [frontend](frontend.md) com o perfil apropriado, distinguindo API, simulação e texto estático.
+- Percorrer as telas de cada perfil (cliente, freelancer e administrador) com as [contas de acesso](contas-de-acesso.md).
 - Inspecionar console, erros HTTP, estados vazios e tentativas de acesso indevido.
 - Conferir layout de 390 px e desktop, teclado/foco, menu e validações.
 - Registrar versão/commit, data, ambiente, comandos e falhas corrigidas no PR.
 - Ter as contas fictícias e o roteiro prontos antes da apresentação.
 
-A validação e a revisão podem ser feitas por qualquer integrante disponível, sem nome ou par fixo. Em mudanças apenas documentais, conferir links locais, consistência com código/configuração, preservação das fontes e higiene do diff; não relatar execução das suítes da aplicação sem rodá-las.
+A validação e a revisão podem ser feitas por qualquer integrante disponível, sem nome ou par fixo. Em mudanças apenas documentais, conferir links locais, consistência com código/configuração e higiene do diff; não relatar execução das suítes da aplicação sem rodá-las.
 
 Limitações conhecidas: sem e-mail/chat remoto (`F07`), refresh token, anexos de evidência em disputas/denúncias, repasse real só em modo de teste (Stripe Connect, ADR34) e teste de carga (`F10`). F04/F05 preservam relato/cópia textual, removem conteúdo de forma lógica e auditam decisões. Não há exclusão definitiva de usuários, operação de desfazer remoção ou credenciais ADMIN padrão. A auditoria é transacional no banco, sem endpoint de alteração/exclusão; controles operacionais/retenção de produção pertencem a F10. OAuth/2FA e auditoria completa de acessibilidade são evoluções sem entrega confirmada. As metas de SLA das fontes históricas ainda não foram medidas.
 
@@ -118,7 +111,7 @@ Resultado de 15/11/2026, API do Compose limitada a 512 MB como no Render free (`
 
 ## Upload de fotos dos anúncios (F06)
 
-Executado em 14/11/2026 na branch `codex/f06-upload-imagens`: 51 testes Java (`docker compose --profile test run --rm api-test`, incluindo 5 de `ServiceImagesIntegrationTests`), 6 unitários web, 11 cenários browser mock e 6 browser API (`E2E_DATA_MODE=api`, admin pulado sem credenciais), além de lint, formatação, build, `verify-documents` e `git diff --check`. Conferência visual do formulário com prévias e da galeria no detalhe em 1280 px.
+Executado em 14/11/2026 na branch `codex/f06-upload-imagens`: 51 testes Java (`docker compose --profile test run --rm api-test`, incluindo 5 de `ServiceImagesIntegrationTests`), 6 unitários web, 11 cenários browser mock e 6 browser API (`E2E_DATA_MODE=api`, admin pulado sem credenciais), além de lint, formatação, build, verificação dos documentos preservados e `git diff --check`. Conferência visual do formulário com prévias e da galeria no detalhe em 1280 px.
 
 ## Pagamentos em sandbox (F09)
 

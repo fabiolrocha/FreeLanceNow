@@ -1,0 +1,16 @@
+{
+  "name": "freelancenow-documentos",
+  "private": true,
+  "description": "Gera os documentos da entrega (DOCX e PDF) e o BMC.pdf a partir das fontes desta pasta.",
+  "scripts": {
+    "visao": "node visao.js \"../../Documento de Visao/Documento-de-Visao\"",
+    "arquitetura": "node arq.js \"../../Documento de Arquitetura/Documento-de-Arquitetura\"",
+    "dados": "node dados.js ../../DADOS/DADOS",
+    "bmc": "node bmcpdf.js \"$PWD/../bmc.html\" ../../BMC/BMC.pdf",
+    "todos": "npm run visao && npm run arquitetura && npm run dados && npm run bmc"
+  },
+  "dependencies": {
+    "docx": "^9.16.0",
+    "puppeteer": "^25.18.1"
+  }
+}

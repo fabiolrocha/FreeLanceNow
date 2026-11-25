@@ -1,0 +1,63 @@
+classDiagram
+  direction LR
+  class CatalogController {
+    +search(filtros) PageView~ServiceView~
+    +create(SaveService) ServiceView
+    +update(id, SaveService) ServiceView
+    +status(id, ServiceStatus) ServiceView
+    +uploadImages(id, arquivos)
+  }
+  class CatalogService {
+    +search(filtros) PageView~ServiceView~
+    +create(SaveService) ServiceView
+    +update(id, SaveService) ServiceView
+    +status(id, ServiceStatus) ServiceView
+    +delete(id)
+  }
+  class ServiceImageService {
+    +upload(serviceId, arquivos) ServiceView
+    +delete(serviceId, imageId) ServiceView
+  }
+  class ServiceListing {
+    <<entity>>
+    UUID id
+    String title
+    String description
+    BigDecimal price
+    int deliveryDays
+    ServiceStatus status
+    boolean moderated
+    Instant createdAt
+  }
+  class ServiceStatus {
+    <<enumeration>>
+    DRAFT
+    ACTIVE
+    INACTIVE
+  }
+  class Category {
+    <<entity>>
+    UUID id
+    String name
+    String slug
+    boolean active
+  }
+  class ServiceImage {
+    <<entity>>
+    UUID id
+    String contentType
+    int sizeBytes
+    byte[] data
+  }
+  class User {
+    <<entity>>
+    Role role = FREELANCER
+  }
+  CatalogController --> CatalogService
+  CatalogController --> ServiceImageService
+  CatalogService --> ServiceListing
+  ServiceImageService --> ServiceImage
+  User "1" --> "0..*" ServiceListing : publica
+  Category "1" --> "0..*" ServiceListing : classifica
+  ServiceListing "1" --> "0..5" ServiceImage : fotos
+  ServiceListing --> ServiceStatus

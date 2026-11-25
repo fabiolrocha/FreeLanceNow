@@ -1,0 +1,55 @@
+erDiagram
+  APP_USER ||--o{ FEED_POST : "publica"
+  CATEGORY |o--o{ FEED_POST : "classifica"
+  SERVICE_LISTING |o--o{ FEED_POST : "é citado"
+  CONTRACT ||--o{ CONTRACT_MESSAGE : "chat"
+  APP_USER ||--o{ CONTRACT_MESSAGE : "escreve"
+  APP_USER ||--o{ NOTIFICATION : "recebe"
+  APP_USER ||--o{ CONTENT_REPORT : "denuncia"
+  APP_USER |o--o{ CONTENT_REPORT : "decide (admin)"
+  APP_USER ||--o{ AUDIT_EVENT : "executa (admin)"
+  FEED_POST {
+    uuid id PK
+    uuid author_id FK
+    varchar text
+    uuid category_id FK
+    uuid service_id FK
+    boolean hidden
+  }
+  CONTRACT_MESSAGE {
+    uuid id PK
+    uuid contract_id FK
+    uuid author_id FK
+    varchar text
+  }
+  NOTIFICATION {
+    uuid id PK
+    uuid user_id FK
+    varchar type
+    varchar title
+    varchar link
+    timestamptz read_at
+  }
+  CONTENT_REPORT {
+    uuid id PK
+    uuid reporter_id FK
+    varchar target_type
+    uuid target_id
+    varchar reason
+    varchar status
+    uuid decided_by FK
+  }
+  AUDIT_EVENT {
+    uuid id PK
+    uuid actor_id FK
+    varchar action
+    varchar target_type
+    uuid target_id
+    text before_value
+    text after_value
+    varchar reason
+  }
+  APP_USER { uuid id PK }
+  CATEGORY { uuid id PK }
+  SERVICE_LISTING { uuid id PK }
+  CONTRACT { uuid id PK }

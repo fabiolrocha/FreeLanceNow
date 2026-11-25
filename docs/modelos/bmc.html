@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Business Model Canvas — FreeLanceNow</title>
+<style>
+  @page { size: A4 landscape; margin: 10mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: #14213d; }
+  h1 { margin: 0; text-align: center; font-size: 22pt; letter-spacing: .5px; color: #0f2350; }
+  .sub { text-align: center; color: #5b3d8f; font-size: 12pt; margin: 2px 0 2px; }
+  .meta { text-align: center; color: #666; font-size: 8pt; margin-bottom: 8px; }
+  .grid { display: grid; grid-template-columns: repeat(10, 1fr); grid-template-rows: auto auto auto; gap: 6px; }
+  .box { border: 2px solid #0f2350; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; }
+  .box h2 { margin: 0; background: #0f2350; color: #fff; font-size: 10.5pt; text-transform: uppercase; text-align: center; padding: 5px 4px; letter-spacing: .3px; }
+  .box.teal { border-color: #0e6e78; } .box.teal h2 { background: #0e6e78; }
+  .box ul { margin: 6px 0 6px; padding-left: 16px; font-size: 9.5pt; line-height: 1.35; }
+  .box li { margin-bottom: 3px; }
+  .fut { color: #7a7a7a; font-style: italic; }
+  .fut::before { content: "Futuro: "; font-weight: bold; font-style: normal; }
+  .p { grid-column: 1 / 3; grid-row: 1 / 3; }
+  .a { grid-column: 3 / 5; grid-row: 1; }
+  .r { grid-column: 3 / 5; grid-row: 2; }
+  .v { grid-column: 5 / 7; grid-row: 1 / 3; }
+  .c { grid-column: 7 / 9; grid-row: 1; }
+  .ch { grid-column: 7 / 9; grid-row: 2; }
+  .s { grid-column: 9 / 11; grid-row: 1 / 3; }
+  .cost { grid-column: 1 / 6; grid-row: 3; }
+  .rev { grid-column: 6 / 11; grid-row: 3; }
+  .legend { margin-top: 6px; font-size: 7.5pt; color: #666; text-align: right; }
+</style>
+</head>
+<body>
+<h1>BUSINESS MODEL CANVAS — FREELANCENOW</h1>
+<div class="sub">Conectando demandas a talentos de forma simples e segura</div>
+<div class="meta">Versão 2.0 — 24/11/2026 · Soluções Computacionais · Turma GPE17M80586 · Equipe FreeLanceNow</div>
+<div class="grid">
+  <div class="box p"><h2>Parcerias principais</h2><ul>
+    <li>Stripe: pagamentos e custódia (escrow), em modo de teste</li>
+    <li>Vercel, Render e Neon: nuvem para web, API e banco</li>
+    <li>Resend: e-mails transacionais</li>
+    <li class="fut">lojas de materiais de construção</li>
+    <li class="fut">agências e associações profissionais</li>
+    <li class="fut">consultoria jurídica e LGPD</li>
+  </ul></div>
+  <div class="box teal a"><h2>Atividades principais</h2><ul>
+    <li>Desenvolver e manter a plataforma</li>
+    <li>Atrair clientes e freelancers</li>
+    <li>Intermediar contratações e pagamentos</li>
+    <li>Moderar perfis, conteúdo e avaliações</li>
+    <li>Prevenir fraudes e dar suporte</li>
+  </ul></div>
+  <div class="box teal r"><h2>Recursos principais</h2><ul>
+    <li>Aplicação web responsiva</li>
+    <li>API REST, banco PostgreSQL e nuvem</li>
+    <li>Busca, reputação e feed</li>
+    <li>Painel administrativo e auditoria</li>
+    <li>Base de usuários</li>
+    <li>Equipe técnica e administrativa</li>
+  </ul></div>
+  <div class="box v"><h2>Proposta de valor</h2><ul>
+    <li>Contratação rápida, simples e segura</li>
+    <li>Busca por categoria, cidade, preço e nota</li>
+    <li>Demandas: o cliente publica o pedido e recebe propostas</li>
+    <li>Perfis com portfólio, fotos e avaliações</li>
+    <li>Pagamento protegido por custódia até a conclusão</li>
+    <li>Disputas mediadas pelo administrador</li>
+    <li>Experiência acessível e responsiva</li>
+  </ul></div>
+  <div class="box teal c"><h2>Relacionamento com clientes</h2><ul>
+    <li>Autoatendimento pela plataforma</li>
+    <li>Avaliações após serviços concluídos</li>
+    <li>Avisos internos e por e-mail; chat por contratação</li>
+    <li>Moderação e denúncias</li>
+    <li class="fut">programa de indicação</li>
+  </ul></div>
+  <div class="box teal ch"><h2>Canais</h2><ul>
+    <li>Plataforma web responsiva (computador e celular)</li>
+    <li>Feed público com serviços, demandas e publicações</li>
+    <li>E-mails de confirmação e avisos</li>
+    <li class="fut">aplicativo móvel nativo</li>
+    <li class="fut">marketing hiperlocal, redes sociais e indicações</li>
+  </ul></div>
+  <div class="box s"><h2>Segmentos de clientes</h2><ul>
+    <li>Pessoas com demandas domésticas ou técnicas</li>
+    <li>Pequenas e médias empresas</li>
+    <li>Freelancers e profissionais autônomos</li>
+    <li class="fut">agências de emprego</li>
+  </ul></div>
+  <div class="box cost"><h2>Estrutura de custos</h2><ul>
+    <li>Desenvolvimento e manutenção</li>
+    <li>Infraestrutura, banco e backups (hoje em planos gratuitos)</li>
+    <li>Tarifas do processador de pagamentos</li>
+    <li>Segurança, LGPD e moderação</li>
+    <li>Marketing, suporte e administração</li>
+  </ul></div>
+  <div class="box rev"><h2>Fontes de receita</h2><ul>
+    <li>Taxa de 10% sobre cada serviço concluído, retida no pagamento em custódia</li>
+    <li class="fut">planos premium para freelancers</li>
+    <li class="fut">destaque patrocinado de serviços</li>
+  </ul></div>
+</div>
+<div class="legend">Itens marcados como "Futuro" não fazem parte da versão entregue. Detalhes em docs/BMC/BMC.md.</div>
+</body>
+</html>

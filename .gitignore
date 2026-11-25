@@ -13,3 +13,4 @@ test-results/
 .vscode/
 *.iml
 coverage/
+.backups/

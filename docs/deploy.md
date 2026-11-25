@@ -106,12 +106,14 @@ Não existe admin padrão (ADR16). Para criar o primeiro:
 
 ## 5.1 Dados de demonstração (opcional)
 
-Para apresentar o projeto com conteúdo, a API pode criar as mesmas contas e atividades do ambiente local (8 contas em `demo.freelancenow.test`, 10 anúncios, demandas, contratações com avaliações, um chat e posts no feed; lista em `docs/contas-desenvolvimento.md`).
+Para apresentar o projeto com conteúdo, a API cria as mesmas contas e atividades do ambiente local: duas rotinas, `DemoData` e `DemoShowcase`, geram contas de cliente, freelancer e administrador em `demo.freelancenow.test`, serviços com imagens, contratações em todas as etapas, avaliações, demandas com propostas, pagamentos simulados, posts, denúncias e avisos. A lista de contas está em [contas-de-acesso.md](contas-de-acesso.md).
 
-1. No Render, defina `SEED_DEMO=true` e `SEED_DEMO_PASSWORD` com uma senha nova, de pelo menos 8 caracteres. No `prod` não existe senha padrão: sem `SEED_DEMO_PASSWORD` o seed não roda e registra um aviso no log. Não use `Demo12345`, que está no repositório.
+1. No Render, defina `SEED_DEMO=true` e `SEED_DEMO_PASSWORD` com uma senha nova, de pelo menos 8 caracteres. No `prod` não existe senha padrão: sem `SEED_DEMO_PASSWORD` o seed não roda e registra um aviso no log. Não use `Demo12345`, que é a senha local.
 2. Salve e espere o novo deploy. As contas são criadas na inicialização; reinícios não duplicam nada nem trocam a senha de contas que já existem.
-3. Entre com `ana@demo.freelancenow.test` ou `marcos@demo.freelancenow.test` e a senha escolhida.
+3. Entre com `cliente@demo.freelancenow.test`, `freelancer@demo.freelancenow.test` ou `admin@demo.freelancenow.test` e a senha escolhida.
 4. Depois da apresentação, volte `SEED_DEMO` para `false` e apague `SEED_DEMO_PASSWORD`. Para tirar as contas do ar, desative-as pelo painel de administração.
+
+O banco publicado (Neon) já recebeu esses dados em 24/11/2026, com as contas de avaliação listadas em [contas-de-acesso.md](contas-de-acesso.md).
 
 Os endereços `.test` são reservados (RFC 2606) e nunca recebem e-mail, por isso `ResendMailSender` descarta mensagens para eles em vez de chamar o Resend. Avisos dentro do app continuam normais.
 

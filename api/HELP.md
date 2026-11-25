@@ -1,11 +1,11 @@
 # Guias da API
 
-Revisado em **21/10/2026**. O arquivo de ajuda gerado pelo Initializr foi substituído por este índice para evitar uma segunda documentação de execução e links presos à versão inicial do template.
+Índice dos guias da API. O arquivo de ajuda gerado pelo Spring Initializr foi substituído por esta página.
 
-- [README da API](README.md): ambiente e comandos principais.
+- [README da API](README.md): pré-requisitos, variáveis de ambiente e comandos.
 - [Contrato da API](../docs/api.md): endpoints, payloads, regras e limitações.
-- [Desenvolvimento](../docs/desenvolvimento.md): configuração e execução local.
-- [Dados](../docs/dados.md): migrações e invariantes.
+- [Modelo de dados](../docs/DADOS/DADOS.pdf): tabelas, relacionamentos e migrações.
 - [Testes](../docs/testes-e-demonstracao.md): comandos e evidências.
+- [Decisões técnicas](../docs/decisoes.md): motivo das escolhas de arquitetura.
 
-As dependências efetivamente utilizadas estão em `pom.xml`. As decisões e a proveniência do scaffold ficam em [decisoes.md](../docs/decisoes.md).
+As dependências usadas estão no `pom.xml`.

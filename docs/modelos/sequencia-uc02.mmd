@@ -1,0 +1,26 @@
+sequenceDiagram
+  autonumber
+  actor F as Freelancer
+  participant W as Aplicação web
+  participant C as CatalogController
+  participant S as CatalogService
+  participant I as ServiceImageService
+  participant DB as PostgreSQL
+  F->>W: Preenche título, descrição, preço, prazo e categoria
+  W->>C: POST /api/v1/services (JWT)
+  C->>S: create(freelancer, dados)
+  S->>DB: INSERT service_listing (DRAFT ou ACTIVE)
+  Note over S,DB: Ao ativar, bloqueia o usuário (lock) e conta os anúncios ativos
+  alt mais de 20 anúncios ativos
+    S-->>C: 409 Conflict
+    C-->>W: limite de anúncios atingido
+  else dentro do limite
+    S-->>C: ServiceView
+    C-->>W: 201 Created
+    loop até 5 fotos JPG/PNG de 5 MB
+      W->>C: POST /api/v1/services/{id}/images
+      C->>I: upload(arquivo)
+      I->>DB: INSERT service_image
+    end
+    W-->>F: Anúncio publicado com foto de capa
+  end

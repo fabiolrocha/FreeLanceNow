@@ -1,36 +1,34 @@
 # Contribuir com o FreeLanceNow
 
-Revisado em **21/10/2026**. Consulte o [backlog](docs/backlog.md) para escolher uma entrega e o [guia de colaboração](docs/equipe.md) para combinar mudanças com o grupo. Não há donos de áreas ou revisores predefinidos. Toda contribuição usa branch e PR revisado por outro integrante disponível.
+Toda mudança usa uma branch e um pull request revisado por outro integrante. Não há donos fixos de áreas nem revisores predefinidos.
 
 ## Branch e revisão
 
-Comece pela `main` atualizada, que contém o marco inicial e as fases já integradas:
+Comece pela `main` atualizada:
 
 ```sh
 git switch main
 git pull --ff-only origin main
-git switch -c codex/f04-administracao
+git switch -c feature/nome-da-entrega
 ```
 
-O prefixo `codex/` é a convenção deste workspace. Use um nome que descreva a entrega, mesmo quando ela não tiver card. Não é necessário partir de branches antigas como `codex/bootstrap-freelancenow` ou de fases já integradas.
-
-Faça commits pequenos e confira `git status` e `git diff` antes de adicionar arquivos. Não versionar `.env`, tokens, `node_modules`, `dist`, `target`, logs ou dados pessoais novos. O PR deve descrever problema/resultado, card quando houver, validação e limites. Solicite revisão conforme disponibilidade; integre após aceite, revisão e checks relevantes, sem push direto de funcionalidades na principal.
+Faça commits pequenos e confira `git status` e `git diff` antes de adicionar arquivos. Não versione `.env`, tokens, `node_modules`, `dist`, `target`, logs, cópias do banco ou dados pessoais. O pull request descreve o problema, o resultado, a validação feita e os limites conhecidos. Integre depois da revisão e das verificações da CI, sem push direto na `main`.
 
 ## Verificações por tipo de mudança
 
 | Mudança | Validação |
 |---|---|
-| Documentação | Conferir links, comandos, estado mock/API e `git diff --check`; executar `node scripts/verify-documents.mjs` na raiz |
-| React | Lint, build e testes relevantes; `npm run format:check` e navegador quando o fluxo mudar |
-| API/banco | Testes com PostgreSQL exclusivo; conferir migração, autorização e cenários negativos |
-| Contrato HTTP | Atualizar DTO, tipos, adapter/store, interface e `docs/api.md`; verificar o fluxo integrado |
+| Documentação | Conferir links, comandos e `git diff --check` |
+| React | `npm run lint`, `npm run format:check`, `npm run build`, `npm test` e o navegador quando o fluxo mudar |
+| API e banco | `docker compose --profile test run --rm api-test`; conferir migração, autorização e cenários negativos |
+| Contrato HTTP | Atualizar DTO, tipos, cliente HTTP, telas e `docs/api.md`; verificar o fluxo integrado |
 
-O [guia de testes](docs/testes-e-demonstracao.md) traz os comandos completos. Documente os comandos realmente executados no PR; registros antigos não comprovam a versão atual.
+O [guia de testes](docs/testes-e-demonstracao.md) traz os comandos completos.
 
-## Arquivos e contratos compartilhados
+## Arquivos compartilhados
 
-Não modificar migrações já aplicadas. Crie a próxima versão livre — atualmente após `V5` — e confira a numeração com o trabalho em andamento. Mudanças em banco e contrato devem incluir os documentos afetados.
+Não altere migrações já aplicadas. Crie a próxima versão livre, hoje depois de `V18`, e atualize o [modelo de dados](docs/DADOS/DADOS.pdf) com o [gerador](docs/modelos/README.md).
 
-`App.tsx`, `Layout.tsx`, store, tipos, client, fixtures e CSS são compartilhados. Combine trechos em edição com o grupo. Resolva conflitos preservando os fluxos envolvidos e execute a verificação correspondente.
+`App.tsx`, `Layout.tsx`, store, tipos, cliente HTTP, fixtures e CSS são compartilhados. Combine com o grupo antes de editar trechos em uso por outra pessoa.
 
-Fontes em `docs/originais/`, `docs/prototipo/`, `docs/legado/` e `docs/referencias/` são históricas; corrija a especificação nos Markdown atuais. Branch protection e acesso ao repositório são configurações administrativas, não garantias deste fluxo documentado.
+Os arquivos em `docs/originais/` e `docs/prototipo/` são fontes históricas. Não os altere: registre mudanças de especificação nos documentos atuais.

@@ -1,0 +1,15 @@
+flowchart TB
+  P["<b>Camada de Apresentação</b><br/>Aplicação web React (computador e celular)"]
+  AP["<b>Camada de Aplicação</b><br/>Controllers REST, DTOs, validação, Spring Security (JWT)"]
+  N["<b>Camada de Negócio</b><br/>Services: regras, transições de estado, prazos agendados, transações"]
+  PE["<b>Camada de Persistência</b><br/>Repositories JPA, consultas JDBC, migrações Flyway"]
+  DB[("<b>Banco de Dados</b><br/>PostgreSQL 15")]
+  EXT["<b>Integrações</b><br/>Stripe (pagamentos) · Resend (e-mail)"]
+  P -->|HTTPS / JSON| AP --> N --> PE --> DB
+  N --> EXT
+  style P fill:#dbeafe,stroke:#1e3a8a
+  style AP fill:#dcfce7,stroke:#166534
+  style N fill:#fef3c7,stroke:#92400e
+  style PE fill:#fee2e2,stroke:#991b1b
+  style DB fill:#ede9fe,stroke:#5b21b6
+  style EXT fill:#f3f4f6,stroke:#374151

@@ -1,0 +1,22 @@
+sequenceDiagram
+  autonumber
+  actor U as Usuário
+  participant W as Aplicação web
+  participant AC as AuthController
+  participant AS as AuthService
+  participant R as UserRepository
+  participant T as TokenService
+  participant M as Resend (e-mail)
+  U->>W: Preenche cadastro e aceita os termos
+  W->>AC: POST /api/v1/auth/register
+  AC->>AS: register(dados)
+  AS->>R: existsByEmail(email)
+  R-->>AS: false
+  AS->>R: save(User com hash bcrypt)
+  AS->>T: emailVerification(user)
+  AS->>M: envia link de confirmação de e-mail
+  AS->>T: access(user) (15 min) e refresh(user) (30 dias)
+  AS-->>AC: Session
+  AC-->>W: 201 Created
+  W-->>U: Abre o feed inicial
+  Note over U,W: Login: POST /auth/login valida e-mail e senha e devolve novos tokens.<br/>Falha retorna 401 com mensagem genérica.

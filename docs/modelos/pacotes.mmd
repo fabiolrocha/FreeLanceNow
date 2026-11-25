@@ -1,0 +1,33 @@
+flowchart TB
+  subgraph WEB["web/src — aplicação web (React + TypeScript)"]
+    direction LR
+    W1["app/<br/>rotas, layout, sessão,<br/>guards por perfil"] --> W2["features/<br/>auth, account, catalog, contracts,<br/>demands, feed, freelancer,<br/>payments, admin, extra"]
+    W2 --> W3["components/<br/>componentes<br/>compartilhados"]
+    W2 --> W4["data/<br/>client, admin, feed, inbox,<br/>payments, favorites"]
+    W4 --> W5["domain/<br/>tipos e regras"]
+  end
+  subgraph API["api — br.com.freelancenow.api (Spring Boot)"]
+    direction TB
+    subgraph R1[" "]
+      direction LR
+      B1["auth<br/>cadastro, login, tokens,<br/>recuperação de senha"] ~~~ B2["users<br/>perfis, fotos, conta"] ~~~ B3["catalog<br/>categorias, anúncios,<br/>fotos, busca"] ~~~ B4["contracts<br/>contratações, histórico,<br/>chat, prazos"]
+    end
+    subgraph R2[" "]
+      direction LR
+      B5["reviews<br/>avaliações e respostas"] ~~~ B6["demands<br/>demandas e propostas"] ~~~ B7["feed<br/>publicações e<br/>oportunidades"] ~~~ B8["favorites<br/>serviços salvos"]
+    end
+    subgraph R3[" "]
+      direction LR
+      B9["notifications<br/>avisos internos"] ~~~ B10["payments<br/>Stripe Checkout, Connect,<br/>livro financeiro"] ~~~ B11["admin · moderation<br/>usuários, denúncias,<br/>métricas, auditoria"] ~~~ B12["mail<br/>e-mails (Resend)"]
+    end
+    subgraph R4[" "]
+      direction LR
+      B13["config · common<br/>segurança JWT, CORS, erros, seed"]
+    end
+    R1 ~~~ R2 ~~~ R3 ~~~ R4
+  end
+  WEB -->|"HTTP /api/v1 (JSON)"| API
+  style R1 fill:none,stroke:none
+  style R2 fill:none,stroke:none
+  style R3 fill:none,stroke:none
+  style R4 fill:none,stroke:none

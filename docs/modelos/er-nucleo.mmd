@@ -1,0 +1,109 @@
+erDiagram
+  APP_USER ||--o{ SERVICE_LISTING : "publica"
+  CATEGORY ||--o{ SERVICE_LISTING : "classifica"
+  SERVICE_LISTING ||--o{ SERVICE_IMAGE : "tem fotos"
+  APP_USER ||--o| USER_AVATAR : "tem foto"
+  APP_USER ||--o{ FAVORITE_SERVICE : "salva"
+  SERVICE_LISTING ||--o{ FAVORITE_SERVICE : "é salvo"
+  APP_USER ||--o{ DEMAND : "publica"
+  CATEGORY ||--o{ DEMAND : "classifica"
+  DEMAND ||--o{ PROPOSAL : "recebe"
+  APP_USER ||--o{ PROPOSAL : "envia"
+  APP_USER ||--o{ CONTRACT : "cliente / freelancer"
+  SERVICE_LISTING |o--o{ CONTRACT : "origina"
+  DEMAND |o--o{ CONTRACT : "origina"
+  PROPOSAL |o--o| CONTRACT : "origina"
+  CONTRACT ||--o{ CONTRACT_EVENT : "registra"
+  CONTRACT ||--o| REVIEW : "recebe"
+  APP_USER {
+    uuid id PK
+    varchar name
+    varchar email UK
+    varchar password_hash
+    varchar phone
+    varchar role
+    boolean active
+    varchar city
+    varchar service_area
+    timestamptz email_verified_at
+    timestamptz deleted_at
+  }
+  CATEGORY {
+    uuid id PK
+    varchar name UK
+    varchar slug UK
+    boolean active
+  }
+  SERVICE_LISTING {
+    uuid id PK
+    uuid freelancer_id FK
+    uuid category_id FK
+    varchar title
+    numeric price
+    int delivery_days
+    varchar status
+    boolean moderated
+  }
+  SERVICE_IMAGE {
+    uuid id PK
+    uuid service_id FK
+    varchar content_type
+    int size_bytes
+    bytea data
+  }
+  USER_AVATAR {
+    uuid user_id PK,FK
+    varchar content_type
+    bytea data
+  }
+  FAVORITE_SERVICE {
+    uuid user_id PK,FK
+    uuid service_id PK,FK
+  }
+  DEMAND {
+    uuid id PK
+    uuid client_id FK
+    uuid category_id FK
+    varchar title
+    numeric budget
+    int days
+    varchar city
+    varchar status
+  }
+  PROPOSAL {
+    uuid id PK
+    uuid demand_id FK
+    uuid freelancer_id FK
+    numeric price
+    int days
+    varchar status
+  }
+  CONTRACT {
+    uuid id PK
+    uuid service_id FK
+    uuid demand_id FK
+    uuid proposal_id FK,UK
+    uuid client_id FK
+    uuid freelancer_id FK
+    varchar title
+    numeric price
+    date scheduled_date
+    varchar status
+  }
+  CONTRACT_EVENT {
+    uuid id PK
+    uuid contract_id FK
+    uuid actor_id FK
+    varchar previous_status
+    varchar status
+  }
+  REVIEW {
+    uuid id PK
+    uuid contract_id FK,UK
+    uuid client_id FK
+    uuid freelancer_id FK
+    int rating
+    varchar comment
+    varchar reply
+    boolean hidden
+  }
