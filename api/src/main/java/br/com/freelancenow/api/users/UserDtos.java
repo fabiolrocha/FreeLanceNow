@@ -20,6 +20,7 @@ public final class UserDtos {
             String serviceArea,
             Long avatarVersion,
             boolean emailVerified,
+            boolean googleLinked,
             boolean emailNotifications,
             Instant createdAt) {
         public static Me from(User u) {
@@ -34,6 +35,7 @@ public final class UserDtos {
                     u.getServiceArea(),
                     u.getAvatarVersion(),
                     u.isEmailVerified(),
+                    u.getGoogleSubject() != null,
                     u.isEmailNotifications(),
                     u.getCreatedAt());
         }

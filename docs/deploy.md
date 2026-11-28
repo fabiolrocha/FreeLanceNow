@@ -92,6 +92,15 @@ Variáveis `VITE_*` entram no bundle e ficam visíveis no navegador. Nunca coloq
 
 3. Depois do primeiro deploy, copie a URL de produção para `CORS_ORIGINS` e `PUBLIC_APP_URL` no Render. Previews da Vercel têm outra origem: inclua-a em `CORS_ORIGINS` só se for usar o Preview contra esta API.
 
+### Login com Google
+
+1. No Google Auth Platform, configure a marca e o público do app. Crie um cliente OAuth do tipo **Aplicativo da Web**. Em **Origens JavaScript autorizadas**, inclua a origem exata do frontend de produção e, para desenvolvimento, `http://localhost` e `http://localhost:5173` (ajuste à porta utilizada). Use o host autorizado ao abrir o app. Para um app externo em modo de teste, configure as contas de teste conforme as opções do console. O botão usa o popup do Google Identity Services com callback JavaScript.
+2. No Render, defina `GOOGLE_CLIENT_ID` com o ID público do cliente OAuth e faça o deploy da API. Na Vercel, defina `VITE_GOOGLE_CLIENT_ID` com o mesmo valor e gere um novo build. A origem do frontend também precisa estar autorizada em `CORS_ORIGINS` no Render.
+3. Localmente com Compose, defina `GOOGLE_CLIENT_ID` e `PUBLIC_APP_URL=http://localhost:5173` no `.env` da raiz e execute `docker compose up --build`. Com Vite, defina `GOOGLE_CLIENT_ID` no ambiente da API e `VITE_GOOGLE_CLIENT_ID` em `web/.env.local`, com `VITE_DATA_MODE=api`.
+4. Valide o primeiro acesso, o vínculo com uma conta existente usando sua senha e o acesso posterior à mesma conta. Confira também a exclusão de uma conta de teste pelo Google. Para novos usuários com e-mail de terceiros, confira também a entrega do link de confirmação pelo Resend.
+
+O recurso é opcional. O botão aparece no modo API quando `VITE_GOOGLE_CLIENT_ID` está configurado. [Configuração oficial do Google Identity Services](https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid).
+
 ### Backup e restauração
 
 O Neon guarda histórico para restauração em um ponto no tempo (a janela depende do plano). Antes de uma demonstração ou mudança grande, crie uma **branch** do banco no painel: ela é uma cópia instantânea que pode virar o banco da API se algo der errado (troque `DB_URL` para o host da branch). Para uma cópia fora do Neon, use `pg_dump` com a URL de conexão direta. Teste a restauração numa branch, nunca sobre o banco em uso.

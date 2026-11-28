@@ -3,9 +3,12 @@ import type { ChangeEvent, FormEvent } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { CheckCircle2, Plus, ArrowRight } from 'lucide-react'
 import { useApp } from '../../app/store'
-import { avatarUrl, client, isMock } from '../../data/client'
+import { GoogleButton } from '../auth/google-button'
+import type { GoogleCredential } from '../../domain/types'
+import { avatarUrl, client, googleClientId, isMock } from '../../data/client'
 import { useReviews } from '../../app/useReviews'
 import { useFavorites } from '../../data/favorites'
+import { loadSession } from '../../data/session'
 import {
   Avatar,
   ConfirmButton,
@@ -218,19 +221,37 @@ function DeleteAccount() {
     navigate = useNavigate(),
     [password, setPassword] = useState(''),
     [error, setError] = useState(''),
-    [busy, setBusy] = useState(false)
-  async function remove() {
-    if (!user) return
+    [busy, setBusy] = useState(false),
+    [confirmingGoogle, setConfirmingGoogle] = useState(false)
+  const canUseGoogle = Boolean(googleClientId && user?.googleLinked)
+  const deleting = useRef(false)
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+
+  async function remove(proof?: GoogleCredential) {
+    if (!user || deleting.current) return
+    deleting.current = true
     setBusy(true)
     setError('')
     try {
-      await client.deleteAccount(user, password)
+      if (proof) await client.deleteAccountWithGoogle(proof)
+      else await client.deleteAccount(user, password)
+      if (loadSession()?.user.id !== user.id) return
       signOut()
-      navigate('/')
-      notify('Sua conta foi excluída.')
+      if (mounted.current) {
+        navigate('/')
+        notify('Sua conta foi excluída.')
+      }
     } catch (e) {
-      setError((e as Error).message)
-      setBusy(false)
+      if (mounted.current) setError((e as Error).message)
+    } finally {
+      deleting.current = false
+      if (mounted.current) setBusy(false)
     }
   }
   return (
@@ -251,17 +272,57 @@ function DeleteAccount() {
         maxLength={72}
         autoComplete="current-password"
       />
+      {canUseGoogle && (
+        <Link className="subtle-link" to="/recuperar-senha">
+          Definir ou recuperar senha
+        </Link>
+      )}
       <ErrorMessage message={error} />
-      <ConfirmButton
-        className="button danger"
-        disabled={busy || !password}
-        label={busy ? 'Excluindo…' : 'Excluir minha conta'}
-        title="Excluir sua conta?"
-        message="Esta ação não pode ser desfeita. Você será desconectado e não poderá mais entrar com este e-mail e senha."
-        confirmLabel="Sim, excluir conta"
-        danger
-        onConfirm={() => void remove()}
-      />
+      <div className="row">
+        <ConfirmButton
+          className="button danger"
+          disabled={busy || !password}
+          label={busy ? 'Excluindo…' : 'Excluir minha conta'}
+          title="Excluir sua conta?"
+          message="Esta ação é permanente. Você será desconectado após a exclusão."
+          confirmLabel="Sim, excluir conta"
+          danger
+          onConfirm={() => void remove()}
+        />
+        {canUseGoogle && !confirmingGoogle && (
+          <ConfirmButton
+            className="button secondary"
+            disabled={busy}
+            label="Excluir com Google"
+            title="Excluir sua conta?"
+            message="Esta ação é permanente. Confirme a exclusão com a conta Google vinculada."
+            confirmLabel="Prosseguir com Google"
+            danger
+            onConfirm={() => {
+              setError('')
+              setConfirmingGoogle(true)
+            }}
+          />
+        )}
+      </div>
+      {canUseGoogle && confirmingGoogle && (
+        <div className="google-auth">
+          <p>Confirme com a conta Google vinculada para excluir sua conta do FreeLanceNow.</p>
+          <div hidden={busy}>
+            <GoogleButton forDeletion onCredential={(proof) => void remove(proof)} />
+            <button
+              type="button"
+              className="button secondary"
+              onClick={() => {
+                setError('')
+                setConfirmingGoogle(false)
+              }}
+            >
+              Cancelar exclusão
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

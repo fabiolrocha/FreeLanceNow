@@ -20,6 +20,9 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 100)
     private String passwordHash;
 
+    @Column(name = "google_subject", unique = true, length = 255)
+    private String googleSubject;
+
     @Column(nullable = false, length = 20)
     private String phone;
 
@@ -100,6 +103,7 @@ public class User {
         this.serviceArea = "";
         this.passwordHash = unusablePasswordHash;
         this.avatarUpdatedAt = null;
+        this.googleSubject = null;
         this.active = false;
         this.deletedAt = now;
     }
@@ -122,6 +126,18 @@ public class User {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getGoogleSubject() {
+        return googleSubject;
+    }
+
+    public void linkGoogle(String subject) {
+        this.googleSubject = subject;
+    }
+
+    public void unlinkGoogle() {
+        this.googleSubject = null;
     }
 
     public String getPhone() {

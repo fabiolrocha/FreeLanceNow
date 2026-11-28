@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 public final class AuthDtos {
     private AuthDtos() {}
 
+    static final String PHONE_PATTERN = "\\+?[0-9 ()-]{10,20}";
     static final String PASSWORD_PATTERN = "(?s)^(?=.*\\p{L})(?=.*\\d).{8,72}$";
     static final String PASSWORD_MESSAGE = "Use pelo menos 8 caracteres com letras e números.";
 
@@ -17,7 +18,7 @@ public final class AuthDtos {
                     @Size(min = 8, max = 72)
                     @Pattern(regexp = PASSWORD_PATTERN, message = PASSWORD_MESSAGE)
                     String password,
-            @NotBlank @Pattern(regexp = "\\+?[0-9 ()-]{10,20}") String phone,
+            @NotBlank @Pattern(regexp = PHONE_PATTERN) String phone,
             @NotNull Role role,
             @NotNull @AssertTrue Boolean acceptedTerms) {}
 

@@ -109,6 +109,17 @@ Cadastro público rejeita `ADMIN`; termos ausentes/falsos e senha fraca retornam
 
 `expiresAt` e `refreshExpiresAt` são calculados pelo frontend e não pertencem à resposta HTTP. O access token vale 15 minutos. O refresh token vale 30 dias (`JWT_REFRESH_TTL_SECONDS`), só é aceito em `POST /auth/refresh` (`{refreshToken}`) e não autentica outras rotas. Cada renovação devolve um par novo. Logout apaga a sessão local.
 
+**Login com Google.** Em modo API, o Google Identity Services entrega um ID token ao frontend. As rotas opcionais abaixo usam JSON e passam pelo mesmo limite de tentativas das outras rotas de autenticação.
+
+| Rota | Entrada | Resultado |
+|---|---|---|
+| `POST /auth/google` | `{credential, verifier}` | `next=SIGNED_IN` com `session`, ou `next=REGISTER\|LINK` com `email` e `name` para concluir o primeiro acesso |
+| `POST /auth/google/register` | `{credential, verifier, name, phone, role, acceptedTerms}` | 201 e a sessão da nova conta |
+| `POST /auth/google/link` | `{credential, verifier, password}` | 200 e a sessão da conta local vinculada |
+| `POST /auth/google/delete-account` | Bearer da conta e `{credential, verifier}` com `nonce` iniciado por `delete-account-` | 204 após confirmar a exclusão com a identidade já vinculada |
+
+A API valida o ID token com as chaves públicas do Google, confere o cliente OAuth, o emissor, a validade e o `nonce` derivado do `verifier` aleatório do navegador. A conta vinculada é localizada pelo `sub` do Google. Para o primeiro vínculo com conta existente, o e-mail orienta a busca e a senha local confirma o vínculo. Administradores e contas inativas não entram por esse fluxo. E-mails Gmail e Google Workspace são considerados confirmados. Para um endereço de terceiros, o cadastro envia o link de confirmação por e-mail. Contas criadas pelo Google podem definir uma senha com o fluxo de recuperação. A redefinição de senha por e-mail remove o vínculo com o Google. A sessão e o perfil privado sinalizam o vínculo em `googleLinked`, sem expor o identificador.
+
 **Recuperação de senha.** `POST /auth/password/forgot` recebe `{email}` e sempre responde 202, sem revelar se a conta existe. Pedidos repetidos para o mesmo e-mail em menos de 60 s são ignorados. A conta ativa recebe um link `PUBLIC_APP_URL/redefinir-senha?token=...` válido por 30 minutos. `POST /auth/password/reset` recebe `{token, password}`, aplica a regra de senha forte e responde 204; link inválido, expirado ou já usado retorna 400.
 
 **Confirmação de e-mail.** O cadastro envia, em segundo plano, um link `PUBLIC_APP_URL/verificar-email?token=...` válido por 24 horas (`app.jwt.verify-ttl-seconds`). O token tem propósito `email-verify` e carrega o e-mail de destino, então não confirma outro endereço. `POST /auth/email/verify` recebe `{token}` e responde 204, também quando o e-mail já estava confirmado. `GET /users/me` e a sessão trazem `emailVerified`. A confirmação não bloqueia o uso da conta (ADR25).

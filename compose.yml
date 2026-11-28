@@ -23,6 +23,7 @@ services:
       DB_USERNAME: ${DB_USERNAME:-freelancenow}
       DB_PASSWORD: ${DB_PASSWORD:-freelancenow-local}
       JWT_SECRET: ${JWT_SECRET:-freelancenow-local-development-key-change-before-deploy-2026}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       PORT: 8081
       SEED_DEMO: "true"
       PUBLIC_APP_URL: ${PUBLIC_APP_URL:-http://127.0.0.1:${WEB_PORT:-5173}}
@@ -59,6 +60,7 @@ services:
       args:
         VITE_DATA_MODE: ${VITE_DATA_MODE:-api}
         VITE_SUPPORT_EMAIL: ${VITE_SUPPORT_EMAIL:-}
+        VITE_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
       - "127.0.0.1:${WEB_PORT:-5173}:80"
     depends_on:
