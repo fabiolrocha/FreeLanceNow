@@ -81,7 +81,9 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         a ->
-                                a.requestMatchers(
+                                a.requestMatchers(HttpMethod.POST, "/api/v1/auth/google/delete-account")
+                                        .authenticated()
+                                        .requestMatchers(
                                                 "/api/v1/auth/**",
                                                 "/actuator/health",
                                                 // Render's health check; answers without the database.

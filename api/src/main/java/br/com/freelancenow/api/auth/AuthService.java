@@ -79,7 +79,7 @@ public class AuthService {
                                 passwords.encode(r.password()),
                                 r.phone(),
                                 r.role()));
-        mailExecutor.execute(() -> mail.send(verificationMail(u)));
+        sendVerification(u);
         return session(u);
     }
 
@@ -112,7 +112,7 @@ public class AuthService {
                     "Enviamos um link há menos de um minuto. Confira sua caixa de entrada e o spam.");
         lastVerifyRequest.put(u.getId(), now);
         lastVerifyRequest.values().removeIf(at -> at.plus(RESET_COOLDOWN).isBefore(now));
-        mailExecutor.execute(() -> mail.send(verificationMail(u)));
+        sendVerification(u);
     }
 
     @Transactional(readOnly = true)
@@ -182,6 +182,8 @@ public class AuthService {
         // A new hash changes the password fingerprint, so this link and all refresh tokens
         // issued before it stop working.
         u.changePassword(passwords.encode(r.password()));
+        // Recovery by e-mail must also revoke a previously linked sign-in method.
+        u.unlinkGoogle();
     }
 
     @Transactional
@@ -201,6 +203,10 @@ public class AuthService {
         u.changePassword(passwords.encode(r.newPassword()));
         users.flush();
         return session(u);
+    }
+
+    void sendVerification(User u) {
+        mailExecutor.execute(() -> mail.send(verificationMail(u)));
     }
 
     private MailSender.Mail verificationMail(User u) {
@@ -260,7 +266,7 @@ public class AuthService {
         return new MailSender.Mail(u.getEmail(), "Redefinição de senha — FreeLanceNow", text, html);
     }
 
-    private AuthDtos.Session session(User u) {
+    AuthDtos.Session session(User u) {
         return new AuthDtos.Session(
                 tokens.access(u),
                 "Bearer",

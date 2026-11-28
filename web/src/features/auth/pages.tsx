@@ -6,37 +6,34 @@ import { useApp } from '../../app/store'
 import { client, isMock } from '../../data/client'
 import { checkNewPassword, safeRedirect, validPassword } from '../../domain/rules'
 import { ErrorMessage, Field, NewPasswordFields } from '../../components/ui'
+import type { Session } from '../../domain/types'
+import { GoogleEntry } from './google'
+import { RegistrationPhone, RegistrationTerms } from './registration-fields'
+import { useAuthRequest } from './use-auth-request'
 
 export function Login() {
   const { signIn } = useApp(),
     navigate = useNavigate(),
     { state } = useLocation()
   const from = (state as { from?: unknown } | null)?.from
-  const [error, setError] = useState(''),
-    [busy, setBusy] = useState(false)
-  async function enter(email: string, password: string, remember: boolean) {
-    setBusy(true)
-    setError('')
-    try {
-      const s = await client.login(email, password)
-      signIn(s, remember)
-      navigate(safeRedirect(from, s.user.role === 'ADMIN' ? '/admin/usuarios' : '/inicio'), {
-        replace: true,
-      })
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setBusy(false)
-    }
+  const { busy, error, run } = useAuthRequest()
+  const [remember, setRemember] = useState(true)
+  function finish(session: Session, registered = false) {
+    signIn(session, remember)
+    const fallback = session.user.role === 'ADMIN' ? '/admin/usuarios' : '/inicio'
+    navigate(registered ? '/perfil/completar' : safeRedirect(from, fallback), { replace: true })
   }
   function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const data = new FormData(e.currentTarget)
-    void enter(
-      String(data.get('email')),
-      String(data.get('password')),
-      data.get('remember') === 'on',
-    )
+    void run(async (signal) => {
+      const session = await client.login(
+        String(data.get('email')),
+        String(data.get('password')),
+        signal,
+      )
+      if (!signal.aborted) finish(session)
+    })
   }
   return (
     <div className="auth-layout">
@@ -47,33 +44,44 @@ export function Login() {
         <div className="auth-story-bottom">Elétrica, limpeza, encanamento, pintura e TI.</div>
       </div>
       <section className="auth-panel">
-        <h2>Que bom ver você de novo</h2>
-        <p>{from ? 'Entre para continuar de onde parou.' : 'Entre para continuar.'}</p>
-        <form onSubmit={submit}>
-          <Field label="E-mail" name="email" type="email" required autoComplete="email" />
-          <Field
-            label="Senha"
-            name="password"
-            type="password"
-            required
-            maxLength={72}
-            autoComplete="current-password"
-          />
-          <label className="check">
-            <input type="checkbox" name="remember" defaultChecked />
-            <span>Manter conectado neste dispositivo</span>
-          </label>
-          <Link className="subtle-link" to="/recuperar-senha">
-            Esqueci minha senha
-          </Link>
-          <ErrorMessage message={error} />
-          <button disabled={busy} className="button full">
-            {busy ? 'Entrando…' : 'Entrar'}
-          </button>
-        </form>
-        <p className="auth-switch">
-          Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
-        </p>
+        <GoogleEntry onSignIn={finish} disabled={busy}>
+          {(googleBusy) => (
+            <>
+              <h2>Que bom ver você de novo</h2>
+              <p>{from ? 'Entre para continuar de onde parou.' : 'Entre para continuar.'}</p>
+              <form onSubmit={(e) => (googleBusy ? e.preventDefault() : submit(e))}>
+                <Field label="E-mail" name="email" type="email" required autoComplete="email" />
+                <Field
+                  label="Senha"
+                  name="password"
+                  type="password"
+                  required
+                  maxLength={72}
+                  autoComplete="current-password"
+                />
+                <label className="check">
+                  <input
+                    type="checkbox"
+                    name="remember"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                  />
+                  <span>Manter conectado neste dispositivo</span>
+                </label>
+                <Link className="subtle-link" to="/recuperar-senha">
+                  Esqueci minha senha
+                </Link>
+                <ErrorMessage message={error} />
+                <button disabled={busy || googleBusy} className="button full">
+                  {busy ? 'Entrando…' : 'Entrar'}
+                </button>
+              </form>
+              <p className="auth-switch">
+                Ainda não tem conta? <Link to="/cadastro">Criar conta</Link>
+              </p>
+            </>
+          )}
+        </GoogleEntry>
       </section>
     </div>
   )
@@ -85,35 +93,32 @@ export function Signup() {
   const [role, setRole] = useState<'CLIENT' | 'FREELANCER' | null>(
     params.get('tipo') === 'freelancer' ? 'FREELANCER' : null,
   )
-  const [error, setError] = useState(''),
-    [busy, setBusy] = useState(false)
-  async function submit(e: FormEvent<HTMLFormElement>) {
+  const { busy, error, setError, run } = useAuthRequest()
+  function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (!role) return
-    const d = new FormData(e.currentTarget),
-      password = String(d.get('password'))
+    const d = new FormData(e.currentTarget)
+    const password = String(d.get('password'))
     if (!validPassword(password)) {
       setError('Use pelo menos 8 caracteres com letras e números, até 72 bytes.')
       return
     }
-    setBusy(true)
-    setError('')
-    try {
-      const s = await client.register({
-        name: String(d.get('name')),
-        email: String(d.get('email')),
-        phone: String(d.get('phone')),
-        password,
-        role,
-        acceptedTerms: d.get('terms') === 'on',
-      })
-      signIn(s)
+    void run(async (signal) => {
+      const session = await client.register(
+        {
+          name: String(d.get('name')),
+          email: String(d.get('email')),
+          phone: String(d.get('phone')),
+          password,
+          role,
+          acceptedTerms: d.get('terms') === 'on',
+        },
+        signal,
+      )
+      if (signal.aborted) return
+      signIn(session)
       navigate('/perfil/completar')
-    } catch (e) {
-      setError((e as Error).message)
-    } finally {
-      setBusy(false)
-    }
+    })
   }
   return (
     <section className="form-panel auth-single">
@@ -121,87 +126,85 @@ export function Signup() {
         <ArrowLeft size={16} />
         Voltar ao início
       </Link>
-      <h1>
-        {!role
-          ? 'Como você quer participar?'
-          : role === 'CLIENT'
-            ? 'Criar conta de cliente'
-            : 'Criar conta de freelancer'}
-      </h1>
-      <p>
-        {!role
-          ? 'Escolha o perfil que combina com o que você precisa.'
-          : 'Depois, você poderá completar seu perfil.'}
-      </p>
-      {!role ? (
-        <>
-          <button className="role-choice" onClick={() => setRole('CLIENT')}>
-            <strong>Quero contratar</strong>
-            <span>Busque profissionais e acompanhe seus serviços.</span>
-          </button>
-          <button className="role-choice" onClick={() => setRole('FREELANCER')}>
-            <strong>Quero trabalhar</strong>
-            <span>Publique serviços e receba solicitações.</span>
-          </button>
-        </>
-      ) : (
-        <form onSubmit={submit}>
-          <Field label="Nome completo" name="name" required maxLength={100} autoComplete="name" />
-          <Field
-            label="E-mail"
-            name="email"
-            type="email"
-            required
-            maxLength={254}
-            autoComplete="email"
-          />
-          <Field
-            label="Telefone"
-            name="phone"
-            type="tel"
-            required
-            pattern={'\\+?[0-9 \\(\\)\\-]{10,20}'}
-            autoComplete="tel"
-            placeholder="(61) 99999-0000"
-          />
-          <Field
-            label="Senha"
-            name="password"
-            type="password"
-            required
-            minLength={8}
-            maxLength={72}
-            autoComplete="new-password"
-            hint="Ao menos 8 caracteres, com letras e números."
-          />
-          <label className="check">
-            <input type="checkbox" name="terms" required />
-            <span>
-              Li os{' '}
-              <Link to="/termos" target="_blank">
-                termos de uso
-              </Link>{' '}
-              e a{' '}
-              <Link to="/privacidade" target="_blank">
-                política de privacidade
-              </Link>{' '}
-              e autorizo o uso dos meus dados para operar minha conta.
-            </span>
-          </label>
-          <ErrorMessage message={error} />
-          <div className="row">
-            <button type="button" className="button secondary" onClick={() => setRole(null)}>
-              Trocar tipo de conta
-            </button>
-            <button disabled={busy} className="button">
-              {busy ? 'Criando…' : 'Criar conta'}
-            </button>
-          </div>
-        </form>
-      )}
-      <p>
-        Já tem conta? <Link to="/login">Entrar</Link>
-      </p>
+      <GoogleEntry
+        initialRole={role}
+        disabled={busy}
+        onSignIn={(session, registered) => {
+          signIn(session)
+          navigate(registered ? '/perfil/completar' : '/inicio', { replace: true })
+        }}
+      >
+        {(googleBusy) => (
+          <>
+            <h1>
+              {!role
+                ? 'Como você quer participar?'
+                : role === 'CLIENT'
+                  ? 'Criar conta de cliente'
+                  : 'Criar conta de freelancer'}
+            </h1>
+            <p>
+              {!role
+                ? 'Escolha o perfil que combina com o que você precisa.'
+                : 'Depois, você poderá completar seu perfil.'}
+            </p>
+            {!role ? (
+              <>
+                <button className="role-choice" onClick={() => setRole('CLIENT')}>
+                  <strong>Quero contratar</strong>
+                  <span>Busque profissionais e acompanhe seus serviços.</span>
+                </button>
+                <button className="role-choice" onClick={() => setRole('FREELANCER')}>
+                  <strong>Quero trabalhar</strong>
+                  <span>Publique serviços e receba solicitações.</span>
+                </button>
+              </>
+            ) : (
+              <form onSubmit={(e) => (googleBusy ? e.preventDefault() : submit(e))}>
+                <Field
+                  label="Nome completo"
+                  name="name"
+                  required
+                  maxLength={100}
+                  autoComplete="name"
+                />
+                <Field
+                  label="E-mail"
+                  name="email"
+                  type="email"
+                  required
+                  maxLength={254}
+                  autoComplete="email"
+                />
+                <RegistrationPhone />
+                <Field
+                  label="Senha"
+                  name="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  maxLength={72}
+                  autoComplete="new-password"
+                  hint="Ao menos 8 caracteres, com letras e números."
+                />
+                <RegistrationTerms />
+                <ErrorMessage message={error} />
+                <div className="row">
+                  <button type="button" className="button secondary" onClick={() => setRole(null)}>
+                    Trocar tipo de conta
+                  </button>
+                  <button disabled={busy || googleBusy} className="button">
+                    {busy ? 'Criando…' : 'Criar conta'}
+                  </button>
+                </div>
+              </form>
+            )}
+            <p>
+              Já tem conta? <Link to="/login">Entrar</Link>
+            </p>
+          </>
+        )}
+      </GoogleEntry>
     </section>
   )
 }

@@ -1201,6 +1201,13 @@ a.hero-service:hover h2 {
   text-align: center;
   margin-top: 1.5rem;
 }
+.google-auth {
+  margin-top: 1.25rem;
+  overflow-wrap: anywhere;
+}
+.google-auth .row {
+  flex-wrap: wrap;
+}
 .auth-single {
   max-width: 600px;
   margin: 1rem auto;

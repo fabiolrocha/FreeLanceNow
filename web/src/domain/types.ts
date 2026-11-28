@@ -21,10 +21,16 @@ export interface User extends Profile {
   phone: string
   /** False until the link sent at registration is opened; absent (treated as confirmed) in mock mode. */
   emailVerified?: boolean
+  googleLinked?: boolean
   /** E-mail copies of important notices; on by default (API only). */
   emailNotifications?: boolean
   createdAt?: string
 }
+export type GoogleCredential = { credential: string; verifier: string }
+export type GoogleNext =
+  | { next: 'SIGNED_IN'; session: Session }
+  | { next: 'REGISTER' | 'LINK'; email: string; name: string }
+
 export interface Session {
   accessToken: string
   tokenType: string

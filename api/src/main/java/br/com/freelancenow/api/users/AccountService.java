@@ -121,12 +121,29 @@ public class AccountService {
      */
     @Transactional
     public void deleteAccount(User current, String password) {
-        var u = users.lockById(current.getId()).orElseThrow(this::missing);
+        var u = lockForDeletion(current);
+        if (!passwords.matches(password, u.getPasswordHash()))
+            throw new ApiException(HttpStatus.BAD_REQUEST, "A senha não confere.");
+        deleteAccount(u);
+    }
+
+    @Transactional
+    public void deleteAccountWithGoogle(User current, String googleSubject) {
+        var u = lockForDeletion(current);
+        if (!googleSubject.equals(u.getGoogleSubject()))
+            throw new ApiException(HttpStatus.FORBIDDEN, "Confirme com a conta Google vinculada.");
+        deleteAccount(u);
+    }
+
+    private User lockForDeletion(User current) {
+        var u = users.lockById(current.getId()).filter(User::isActive).orElseThrow(this::missing);
         if (u.getRole() == Role.ADMIN)
             throw new ApiException(
                     HttpStatus.CONFLICT, "Contas de administrador não podem ser excluídas aqui.");
-        if (!passwords.matches(password, u.getPasswordHash()))
-            throw new ApiException(HttpStatus.BAD_REQUEST, "A senha não confere.");
+        return u;
+    }
+
+    private void deleteAccount(User u) {
         boolean busy =
                 u.getRole() == Role.CLIENT
                         ? contracts.existsByClientIdAndStatusIn(u.getId(), OPEN_CONTRACTS)

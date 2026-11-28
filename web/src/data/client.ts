@@ -7,6 +7,8 @@ import type {
   CreateProposal,
   AcceptProposal,
   Demand,
+  GoogleCredential,
+  GoogleNext,
   OwnReport,
   Profile,
   Proposal,
@@ -26,7 +28,9 @@ import { clearSession, loadSession, saveSession, timed } from './session'
 export const dataMode = import.meta.env.VITE_DATA_MODE || 'mock'
 if (!['mock', 'api'].includes(dataMode)) throw new Error('VITE_DATA_MODE deve ser mock ou api.')
 export const isMock = dataMode === 'mock'
+export const googleClientId = isMock ? undefined : import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim()
 const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api/v1'
+const googleDeletionPath = '/auth/google/delete-account'
 let token = ''
 const fieldLabels: Record<string, string> = {
   name: 'nome',
@@ -190,7 +194,8 @@ export async function request<T>(path: string, options: RequestInit = {}): Promi
     return await send<T>(path, options, token)
   } catch (e) {
     // An expired access token is renewed once with the refresh token, then the call is retried.
-    if ((e as { status?: number }).status !== 401 || !token || path.startsWith('/auth/')) throw e
+    const isPublicAuth = path.startsWith('/auth/') && path !== googleDeletionPath
+    if ((e as { status?: number }).status !== 401 || !token || isPublicAuth) throw e
     const renewed = await renewSession()
     if (renewed) return send<T>(path, options, renewed.accessToken)
     // Public endpoints still answer without credentials; private ones report the ended session.
@@ -269,9 +274,13 @@ const session = (user: User): Session => ({
   user,
 })
 export const client = {
-  async login(email: string, password: string): Promise<Session> {
+  async login(email: string, password: string, signal?: AbortSignal): Promise<Session> {
     if (!isMock)
-      return request('/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
+      return request('/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+        signal,
+      })
     const user = accounts.find((u) => u.email === email.trim().toLowerCase())
     const hash = user && hashes[user.id]
     const valid = hash
@@ -280,8 +289,25 @@ export const client = {
     if (!user || !valid) throw new Error('E-mail ou senha incorretos. Verifique e tente novamente.')
     return session(user)
   },
-  async register(r: Register): Promise<Session> {
-    if (!isMock) return request('/auth/register', { method: 'POST', body: JSON.stringify(r) })
+  googleSignIn(proof: GoogleCredential, signal: AbortSignal): Promise<GoogleNext> {
+    return send('/auth/google', { method: 'POST', body: JSON.stringify(proof), signal }, '')
+  },
+  googleRegister(
+    form: GoogleCredential & Omit<Register, 'email' | 'password'>,
+    signal: AbortSignal,
+  ): Promise<Session> {
+    return send('/auth/google/register', { method: 'POST', body: JSON.stringify(form), signal }, '')
+  },
+  googleLink(proof: GoogleCredential, password: string, signal: AbortSignal): Promise<Session> {
+    return send(
+      '/auth/google/link',
+      { method: 'POST', body: JSON.stringify({ ...proof, password }), signal },
+      '',
+    )
+  },
+  async register(r: Register, signal?: AbortSignal): Promise<Session> {
+    if (!isMock)
+      return request('/auth/register', { method: 'POST', body: JSON.stringify(r), signal })
     if (!validPassword(r.password) || !r.acceptedTerms)
       throw new Error('Confira a senha e aceite os termos da demonstração.')
     if (accounts.some((u) => u.email === r.email.trim().toLowerCase()))
@@ -399,6 +425,12 @@ export const client = {
     )
     delete hashes[u.id]
     persist()
+  },
+  deleteAccountWithGoogle(proof: GoogleCredential): Promise<void> {
+    return request(googleDeletionPath, {
+      method: 'POST',
+      body: JSON.stringify(proof),
+    })
   },
   async categories(): Promise<Category[]> {
     return isMock ? categories : request('/categories')

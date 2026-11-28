@@ -677,6 +677,10 @@ export function Help({ kind = 'help' }: { kind?: string }) {
             atendimento se você completar o perfil; e o que você publica ou troca na plataforma:
             anúncios e fotos, demandas, propostas, contratações, mensagens, avaliações e denúncias.
           </p>
+          <p>
+            Se você entrar com o Google, recebemos seu nome, e-mail e identificador da conta Google.
+            Guardamos o identificador para reconhecer a conta vinculada nos próximos acessos.
+          </p>
           <h2>Para que usamos</h2>
           <p>
             Para criar e proteger sua conta, mostrar seu perfil público, conectar clientes e
